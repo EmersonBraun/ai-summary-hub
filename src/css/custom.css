@@ -1,0 +1,123 @@
+/**
+ * AI Summary Hub — custom styles
+ * Theme aligned with AWS Cheatsheet / leetcode: blue primary
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap');
+
+/* Same blue palette as leetcode / AWS Cheatsheet */
+:root {
+  --ifm-font-family-base: 'Roboto', sans-serif;
+  --ifm-color-primary: #1a73e8;
+  --ifm-color-primary-dark: #1568d1;
+  --ifm-color-primary-darker: #1462c5;
+  --ifm-color-primary-darkest: #1051a2;
+  --ifm-color-primary-light: #3584eb;
+  --ifm-color-primary-lighter: #418cec;
+  --ifm-color-primary-lightest: #6ba7f1;
+  --card-border-radius: 12px;
+  --button-border-radius: 8px;
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #4285f4;
+  --ifm-color-primary-dark: #2b78f3;
+  --ifm-color-primary-darker: #1d6ff2;
+  --ifm-color-primary-darkest: #0b5ad9;
+  --ifm-color-primary-light: #5d92f5;
+  --ifm-color-primary-lighter: #6b9cf6;
+  --ifm-color-primary-lightest: #94b7f8;
+  --ifm-background-color: #1a1a1a;
+  --ifm-background-surface-color: #242424;
+}
+
+[data-theme='dark'] .navbar,
+[data-theme='dark'] .footer {
+  --ifm-background-surface-color: #1e1e1e;
+}
+
+/* Better contrast in dark code blocks */
+[data-theme='dark'] pre {
+  background: #1e1e1e;
+}
+
+/* Mobile */
+@media (max-width: 996px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .navbar__item {
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* Print */
+@media print {
+  .navbar,
+  .footer,
+  .theme-doc-toc-mobile,
+  .pagination-nav,
+  .theme-doc-breadcrumbs,
+  [class*='localeDropdown'],
+  .theme-edit-this-page {
+    display: none !important;
+  }
+
+  body {
+    color: #000;
+    background: #fff;
+  }
+
+  a {
+    color: #0000ee;
+  }
+
+  a[href]::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.85em;
+    color: #555;
+  }
+
+  pre,
+  code {
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    color: #000;
+  }
+
+  .main-wrapper {
+    max-width: 100%;
+  }
+}
+
+/* Footer Connect column: icons in a row (same as leetcode MultiColumn) */
+.footer__items--connect {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.footer__item--icon {
+  margin-bottom: 0;
+}
+
+.footer__link-item--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
+  border-radius: calc(var(--ifm-button-border-radius, 0.25rem) * 0.75);
+  color: var(--ifm-footer-link-color);
+  transition: color 0.2s, background 0.2s;
+}
+
+.footer__link-item--icon:hover {
+  color: var(--ifm-footer-link-hover-color);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.footer__link-item--icon svg {
+  display: block;
+}

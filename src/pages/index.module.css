@@ -1,0 +1,139 @@
+/* Hero - AWS Cheatsheet style */
+.heroBanner {
+  padding: 8rem 0 6rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  color: white;
+}
+
+.heroBanner::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  right: -50px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(
+    circle,
+    rgba(26, 115, 232, 0.2) 0%, /* primary blue */
+    rgba(0, 0, 0, 0) 70%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.heroBanner::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: -100px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(
+    circle,
+    rgba(26, 115, 232, 0.15) 0%,
+    rgba(0, 0, 0, 0) 70%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 3rem;
+  flex-wrap: wrap;
+}
+
+/* Main content section */
+.features {
+  display: flex;
+  align-items: center;
+  padding: 4rem 0;
+  width: 100%;
+  background-color: var(--ifm-background-color);
+}
+
+.features h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(
+    135deg,
+    var(--ifm-color-primary) 0%,
+    var(--ifm-color-primary-darker) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.features h2:first-of-type {
+  margin-top: 0;
+}
+
+.features p {
+  margin-bottom: 2rem;
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.introSection {
+  background: var(--ifm-card-background-color);
+  border-radius: var(--ifm-card-border-radius);
+  padding: 2.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  margin-bottom: 4rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.features ul {
+  text-align: left;
+  margin-bottom: 2rem;
+  padding-left: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.features li {
+  margin-bottom: 0;
+  background: var(--ifm-background-color);
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.features li::before {
+  content: '✨';
+  font-size: 1.2em;
+}
+
+@media (max-width: 996px) {
+  .heroBanner {
+    padding: 6rem 0 4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .heroBanner {
+    padding: 4rem 1rem;
+  }
+
+  .introSection {
+    padding: 1.5rem;
+  }
+}

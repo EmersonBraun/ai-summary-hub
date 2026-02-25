@@ -1,0 +1,36 @@
+---
+title: Case study — Grok
+description: xAI's LLM with real-time knowledge and reasoning.
+keywords: [Grok, xAI, real-time, reasoning]
+---
+
+# Case study: Grok
+
+## Definition
+
+Grok is a family of [LLMs](/docs/llms) from xAI. It is positioned around real-time or up-to-date knowledge (e.g. access to X/Twitter data) and strong reasoning, offered via API and in X’s product experience.
+
+Like [ChatGPT](/docs/case-studies/chatgpt) and [Claude](/docs/case-studies/claude), Grok uses a pretrained base, instruction tuning, and alignment; differentiation includes real-time [RAG](/docs/rag)-style grounding and integration with X’s platform. Use case: chat, research, and applications that benefit from current information and reasoning.
+
+## How it works
+
+A **base model** (decoder-only [transformer](/docs/transformers)) is pretrained on large-scale text (and optionally other data). **Instruction tuning** and **alignment** (e.g. preference optimization) shape helpfulness and safety. **Real-time or live knowledge** is provided by retrieving and conditioning on fresh content (e.g. from X) so answers can reflect recent events. The product exposes Grok via chat and API; [prompt engineering](/docs/llms/prompt-engineering) and tool use extend it for [agents](/docs/agents) and custom workflows.
+
+## Use cases
+
+Grok fits use cases where up-to-date information and reasoning matter more than a static training cutoff.
+
+- Chat and research with awareness of recent news and events
+- Applications that need real-time or search-augmented answers
+- Integration in X and third-party products via API
+
+## External documentation
+
+- [xAI – Grok](https://x.ai/) — Product and API
+- [xAI – Blog](https://x.ai/blog) — Model and capability updates
+
+## See also
+
+- [LLMs](/docs/llms)
+- [RAG](/docs/rag)
+- [Prompt engineering](/docs/llms/prompt-engineering)

@@ -1,0 +1,18 @@
+{
+  "sidebar.docsSidebar.category.Fundamentals": {"message": "基础知识", "description": "The label for category 'Fundamentals' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Neural Networks": {"message": "神经网络", "description": "The label for category 'Neural Networks' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Transformers": {"message": "Transformer", "description": "The label for category 'Transformers' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Large Language Models (LLMs)": {"message": "大语言模型 (LLM)", "description": "The label for category 'Large Language Models (LLMs)' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Retrieval & RAG": {"message": "检索与 RAG", "description": "The label for category 'Retrieval & RAG' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.AI Agents & Systems": {"message": "AI 智能体与系统", "description": "The label for category 'AI Agents & Systems' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Reasoning Patterns": {"message": "推理模式", "description": "The label for category 'Reasoning Patterns' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Development Approaches": {"message": "开发方法", "description": "The label for category 'Development Approaches' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.AI Safety & Ethics": {"message": "AI 安全与伦理", "description": "The label for category 'AI Safety & Ethics' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Advanced Learning": {"message": "高级学习", "description": "The label for category 'Advanced Learning' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Fields in AI": {"message": "AI 领域", "description": "The label for category 'Fields in AI' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Evaluation & Benchmarks": {"message": "评估与基准", "description": "The label for category 'Evaluation & Benchmarks' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Tools & Ecosystem": {"message": "工具与生态", "description": "The label for category 'Tools & Ecosystem' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Infrastructure": {"message": "基础设施", "description": "The label for category 'Infrastructure' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Frameworks": {"message": "框架", "description": "The label for category 'Frameworks' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Case Studies": {"message": "案例研究", "description": "The label for category 'Case Studies' in sidebar 'docsSidebar'"}
+}

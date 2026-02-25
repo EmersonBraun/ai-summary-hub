@@ -1,0 +1,18 @@
+{
+  "sidebar.docsSidebar.category.Fundamentals": {"message": "Grundlagen", "description": "The label for category 'Fundamentals' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Neural Networks": {"message": "Neuronale Netze", "description": "The label for category 'Neural Networks' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Transformers": {"message": "Transformers", "description": "The label for category 'Transformers' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Large Language Models (LLMs)": {"message": "Große Sprachmodelle (LLMs)", "description": "The label for category 'Large Language Models (LLMs)' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Retrieval & RAG": {"message": "Retrieval & RAG", "description": "The label for category 'Retrieval & RAG' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.AI Agents & Systems": {"message": "KI-Agenten & Systeme", "description": "The label for category 'AI Agents & Systems' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Reasoning Patterns": {"message": "Reasoning-Muster", "description": "The label for category 'Reasoning Patterns' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Development Approaches": {"message": "Entwicklungsansätze", "description": "The label for category 'Development Approaches' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.AI Safety & Ethics": {"message": "KI-Sicherheit & Ethik", "description": "The label for category 'AI Safety & Ethics' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Advanced Learning": {"message": "Fortgeschrittenes Lernen", "description": "The label for category 'Advanced Learning' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Fields in AI": {"message": "Bereiche der KI", "description": "The label for category 'Fields in AI' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Evaluation & Benchmarks": {"message": "Evaluation & Benchmarks", "description": "The label for category 'Evaluation & Benchmarks' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Tools & Ecosystem": {"message": "Tools & Ökosystem", "description": "The label for category 'Tools & Ecosystem' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Infrastructure": {"message": "Infrastruktur", "description": "The label for category 'Infrastructure' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Frameworks": {"message": "Frameworks", "description": "The label for category 'Frameworks' in sidebar 'docsSidebar'"},
+  "sidebar.docsSidebar.category.Case Studies": {"message": "Fallstudien", "description": "The label for category 'Case Studies' in sidebar 'docsSidebar'"}
+}

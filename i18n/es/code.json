@@ -1,0 +1,90 @@
+{
+  "theme.common.editThisPage": {
+    "message": "Editar esta página",
+    "description": "The link label to edit the current page"
+  },
+  "theme.docs.paginator.previous": {
+    "message": "Anterior",
+    "description": "The label used to navigate to the previous doc"
+  },
+  "theme.docs.paginator.next": {
+    "message": "Siguiente",
+    "description": "The label used to navigate to the next doc"
+  },
+  "theme.docs.paginator.navAriaLabel": {
+    "message": "Páginas de documentación",
+    "description": "The ARIA label for the docs pagination"
+  },
+  "home.hero.title": {
+    "message": "AI Summary Hub",
+    "description": "Hero section title"
+  },
+  "home.hero.tagline": {
+    "message": "Tu fuente única de verdad para conceptos de IA, desde fundamentos hasta agentes avanzados",
+    "description": "Hero section tagline"
+  },
+  "home.hero.startLearning": {
+    "message": "Comenzar a aprender",
+    "description": "Start learning button"
+  },
+  "home.section.whatTitle": {
+    "message": "¿Qué es este proyecto?",
+    "description": "What is this project section title"
+  },
+  "home.section.whatBody": {
+    "message": "AI Summary Hub es tu compañero integral para conceptos modernos de IA. Cada tema se presenta en un formato estructurado con definiciones, cómo funciona, ejemplos y enlaces útiles. Esta organización te ayuda a entender rápidamente RAG, transformers, LLMs, agentes, subagentes, RDD, desarrollo orientado a especificaciones y más de 50 temas, desde fundamentos hasta sistemas avanzados.",
+    "description": "What is this project body"
+  },
+  "home.section.exploreDocs": {
+    "message": "Explorar documentación",
+    "description": "Explore docs button aria label"
+  },
+  "home.section.exploreDocsButton": {
+    "message": "Explorar Docs",
+    "description": "Explore Docs button text"
+  },
+  "home.section.helpTitle": {
+    "message": "Ayuda a mejorar esta guía",
+    "description": "Help improve this guide title"
+  },
+  "home.section.helpBody": {
+    "message": "Este proyecto prospera con las contribuciones de la comunidad. Si trabajas con IA, LLMs o agentes, tus ideas son valiosas. Puedes ayudar a:",
+    "description": "Help improve body intro"
+  },
+  "home.section.contributeButton": {
+    "message": "Contribuir al proyecto",
+    "description": "Contribute button text"
+  },
+  "home.section.helpBullet1": {
+    "message": "Añadir temas nuevos según tu experiencia",
+    "description": "Help bullet"
+  },
+  "home.section.helpBullet2": {
+    "message": "Actualizar puntos clave con los conceptos más recientes",
+    "description": "Help bullet"
+  },
+  "home.section.helpBullet3": {
+    "message": "Contribuir con ejemplos y fragmentos de código",
+    "description": "Help bullet"
+  },
+  "home.section.helpBullet4": {
+    "message": "Corregir información desactualizada",
+    "description": "Help bullet"
+  },
+  "home.section.helpBullet5": {
+    "message": "Mejorar explicaciones y traducir contenido",
+    "description": "Help bullet"
+  },
+  "home.section.helpFooter": {
+    "message": "Tus contribuciones mantienen esta guía actual y útil para todos. Consulta nuestras guías de contribución para empezar.",
+    "description": "Help section closing"
+  },
+  "allTopics.title": {
+    "message": "Todos los temas",
+    "description": "All topics page title"
+  },
+  "allTopics.intro": {
+    "message": "Explora cada tema del hub por categoría. También puedes usar la {sidebarLink} o la búsqueda.",
+    "description": "All topics page intro"
+  }
+}
