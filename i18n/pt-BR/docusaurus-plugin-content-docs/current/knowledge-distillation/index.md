@@ -1,18 +1,18 @@
 ---
-title: Knowledge distillation
+title: Destilação de conhecimento
 description: Training a small student model to mimic a large teacher.
 keywords: [knowledge distillation, distillation, student-teacher]
 ---
 
-# Knowledge distillation
+# Destilação de conhecimento
 
-## Definition
+## Definição
 
-Knowledge distillation trains a smaller student model to match the outputs (and sometimes intermediate representations) of a larger teacher. The student gains from the teacher’s soft labels and can run with less compute.
+Destilação de conhecimento treina um modelo estudante menor para igualar as saídas (e às vezes representações intermediárians) de um professor maior. The student gains from the teacher’s soft labels and can run with less compute.
 
-It is a [model compression](/docs/model-compression) technique that preserves more of the teacher’s behavior than training the student on hard labels alone. Used for BERT → DistilBERT, large [LLMs](/docs/llms) → smaller variants, and [transfer learning](/docs/transfer-learning) from ensembles.
+É a [model compression](/docs/model-compression) technique that preserves more of the teacher’s behavior than training the student on hard labels alone. Used for BERT → DistilBERT, large [LLMs](/docs/llms) → smaller variants, and [transfer learning](/docs/transfer-learning) from ensembles.
 
-## How it works
+## Como funciona
 
 ```mermaid
 flowchart LR
@@ -22,22 +22,22 @@ flowchart LR
   Match --> Student
 ```
 
-The **teacher** (large model) produces **logits** (or embeddings) on training data. The **student** (smaller model) is trained to **match** the teacher’s logits (e.g. KL divergence with temperature scaling) in addition to or instead of **hard labels** (ground truth). Temperature softens the teacher distribution so the student learns from dark knowledge (relative scores across classes). Optionally, intermediate layers or attention can be matched. The student is trained with a mix of distillation loss and task loss; after training it runs with the student’s capacity and latency.
+O **professor** (modelo grande) produz **logits** (ou embeddings) em dados de treinamento. O **estudante** (modelo menor) é trained to **match** the teacher’s logits (por ex. KL divergence with temperature scaling) in addition to or instead of **hard labels** (ground truth). Temperature softens the teacher distribution so the student learns from dark knowledge (relative scores across classes). Optionally, intermediate layers or attention can be matched. The student is trained with a mix of distillation loss and task loss; after training it runs with the student’s capacity and latency.
 
-## Use cases
+## Casos de uso
 
 Knowledge distillation fits when you want a small, fast student that approximates a large teacher for deployment.
 
-- Training smaller, faster models that approximate large ones (e.g. BERT → DistilBERT)
+- Training smaller, faster models that approximate large ones (por ex. BERT → DistilBERT)
 - Enabling deployment when the teacher is too heavy for production
 - Transferring knowledge from ensembles or from multiple teachers
 
-## External documentation
+## Documentação externa
 
 - [Distilling the Knowledge in a Neural Network (Hinton et al.)](https://arxiv.org/abs/1503.02531)
 - [Hugging Face – Distillation](https://huggingface.co/docs/transformers/tasks/distillation)
 
-## See also
+## Veja também
 
 - [Model compression](/docs/model-compression)
 - [Transfer learning](/docs/transfer-learning)

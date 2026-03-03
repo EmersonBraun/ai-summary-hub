@@ -1,22 +1,22 @@
 ---
-title: Glossary
-description: Glossary of AI and ML terms used across the wiki.
+title: Glossar
+description: Glossar der KI- und ML-Begriffe, die im Wiki verwendet werden.
 keywords: [glossary, definitions, terms]
 ---
 
-# Glossary
+# Glossar
 
-A quick reference for key terms used in AI Summary Hub.
+Eine Kurzreferenz für Schlüsselbegriffe, die im AI Summary Hub verwendet werden.
 
 | Term | Definition |
 |------|------------|
-| **RAG** | Retrieval-augmented generation — combining retrieval with LLM generation. |
+| **RAG** | Retrieval-augmented generation — combining Abruf with LLM generation. |
 | **LLM** | Large language model. |
-| **Transformer** | Architecture based on self-attention (e.g. BERT, GPT). |
+| **Transformer** | Architecture based on self-attention (z. B. BERT, GPT). |
 | **Agent** | System that perceives and acts toward goals. |
 | **Subagent** | Agent within a hierarchical agent system. |
-| **RDD** | Retrieval-decision-design — spec-driven reasoning pattern. |
-| **CoT** | Chain-of-thought — step-by-step reasoning. |
+| **RDD** | Retrieval-Entscheidung-Entwurf — spec-driven Schlussfolgern pattern. |
+| **CoT** | Chain-of-thought — schrittweise Schlussfolgern. |
 | **ReAct** | Reasoning + acting in interleaved steps. |
 
 _More terms will be added as topics are expanded. See individual topic docs for detailed definitions._

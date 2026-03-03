@@ -1,43 +1,43 @@
 ---
-title: Convolutional neural networks (CNN)
-description: CNNs for spatial and image data.
-keywords: [CNN, convolution, computer vision]
+title: Redes neuronales convolucionales (CNN)
+description: CNNs para datos espaciales e imágenes.
+keywords: [CNN, convolución, visión por computadora]
 ---
 
-# Convolutional neural networks (CNN)
+# Redes neuronales convolucionales (CNN)
 
-## Definition
+## Definición
 
-CNNs use convolutional layers to capture local patterns (edges, textures) and build hierarchical features. They are the standard backbone for image classification, detection, and segmentation.
+Las CNN usan capas convolucionales para capturar patrones locales (bordes, texturas) y construir características jerárquicas. Son el backbone estándar para clasificación, detección y segmentación de imágenes.
 
-Unlike dense [neural networks](/docs/neural-networks), convolutions share weights across space, so they are translation-equivariant and efficient for images and other grid-like data. They form the backbone of most [computer vision](/docs/cv) systems and are also used in [transformers](/docs/transformers) for patch embedding.
+A diferencia de las [redes neuronales](/docs/neural-networks) densas, las convoluciones comparten pesos en el espacio, por lo que son equivariantes a la traslación y eficientes para imágenes y otros datos de tipo rejilla. Forman el backbone de la mayoría de los sistemas de [visión por computadora](/docs/cv) y también se usan en [transformers](/docs/transformers) para embedding de parches.
 
-## How it works
+## Cómo funciona
 
 ```mermaid
 flowchart LR
-  Image[Image] --> Conv[Conv]
+  Image[Imagen] --> Conv[Conv]
   Conv --> Pool[Pool]
   Pool --> Conv2[Conv]
-  Conv2 --> Class[Class]
+  Conv2 --> Class[Clase]
 ```
 
-The **image** (or feature map) is fed into **convolutional** layers: each filter slides over the input and computes dot products, producing activation maps that highlight local patterns (edges, textures). **Pooling** (e.g. max pooling) downsamples spatially, reducing size and adding slight invariance. Deeper **conv** layers see larger receptive fields and capture more abstract features (parts, objects). The final **class** (or detection/segmentation) head is usually one or more dense layers on top of the flattened or pooled features. Training uses the same backprop and gradient descent as other [deep learning](/docs/fundamentals/deep-learning) models.
+La **imagen** (o mapa de características) se alimenta a capas **convolucionales**: cada filtro se desliza sobre la entrada y calcula productos punto, produciendo mapas de activación que resaltan patrones locales (bordes, texturas). El **pooling** (p. ej., max pooling) reduce espacialmente el tamaño, añadiendo ligera invarianza. Las capas **conv** más profundas ven campos receptivos más grandes y capturan características más abstractas (partes, objetos). La cabeza final de **clase** (o detección/segmentación) suele ser una o más capas densas sobre las características aplanadas o con pooling. El entrenamiento usa la misma retropropagación y descenso de gradiente que otros modelos de [aprendizaje profundo](/docs/fundamentals/deep-learning).
 
-## Use cases
+## Casos de uso
 
-CNNs are the standard for any task where spatial structure (images, video, or 2D/3D signals) matters.
+Las CNN son el estándar para cualquier tarea donde la estructura espacial (imágenes, video o señales 2D/3D) importa.
 
-- Image classification (e.g. object recognition, medical image analysis)
-- Object detection and instance segmentation
-- Video analysis and action recognition
+- Clasificación de imágenes (p. ej., reconocimiento de objetos, análisis de imágenes médicas)
+- Detección de objetos y segmentación de instancias
+- Análisis de video y reconocimiento de acciones
 
-## External documentation
+## Documentación externa
 
-- [CS231n – CNNs for Visual Recognition](https://cs231n.github.io/convolutional-networks/)
-- [PyTorch – Convolutional neural networks](https://pytorch.org/tutorials/beginner/blitz/neural_networks_tutorial.html#convolutional-nets)
+- [CS231n – CNNs para reconocimiento visual](https://cs231n.github.io/convolutional-networks/)
+- [PyTorch – Redes neuronales convolucionales](https://pytorch.org/tutorials/beginner/blitz/neural_networks_tutorial.html#convolutional-nets)
 
-## See also
+## Ver también
 
-- [Computer vision](/docs/cv)
-- [Neural networks](/docs/neural-networks)
+- [Visión por computadora](/docs/cv)
+- [Redes neuronales](/docs/neural-networks)

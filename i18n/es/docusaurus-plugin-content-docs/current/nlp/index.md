@@ -1,18 +1,18 @@
 ---
-title: Natural language processing (NLP)
-description: AI for understanding and generating human language.
+title: Procesamiento de lenguaje natural (PLN)
+description: IA para comprender y generar lenguaje humano.
 keywords: [NLP, language, text, transformers]
 ---
 
-# Natural language processing (NLP)
+# Procesamiento de lenguaje natural (PLN)
 
-## Definition
+## Definición
 
-NLP covers tasks on text: classification, NER, QA, summarization, translation, and generation. Modern NLP is dominated by pretrained [transformers](/docs/transformers) (BERT, GPT, etc.) and [LLMs](/docs/llms).
+El NLP abarca tareas sobre texto: clasificación, NER, QA, resumen, traducción y generación. Modern NLP is dominated by pretrained [transformers](/docs/transformers) (BERT, GPT, etc.) and [LLMs](/docs/llms).
 
-Inputs are discrete (tokens); models learn from large corpora and are then adapted via [fine-tuning](/docs/llms/fine-tuning) or [prompting](/docs/llms/prompt-engineering). [RAG](/docs/rag) and [agents](/docs/agents) add retrieval and tools on top of NLP models for grounded QA and task completion.
+Inputs son discretas (tokens); los modelos aprenden de grandes corpus y luego se adaptan mediante [fine-tuning](/docs/llms/fine-tuning) or [prompting](/docs/llms/prompt-engineering). [RAG](/docs/rag) and [agents](/docs/agents) add recuperación and tools on top of NLP models for grounded QA and task completion.
 
-## How it works
+## Cómo funciona
 
 ```mermaid
 flowchart LR
@@ -21,9 +21,9 @@ flowchart LR
   Model --> TaskOutput[Task output]
 ```
 
-**Text** is **tokenized** (split into subwords or words) and optionally normalized. The **model** (e.g. BERT, GPT) processes token IDs through embeddings and [transformer](/docs/transformers) layers to produce contextual representations. A **task output** head (e.g. classifier, span predictor, or next-token decoder) maps those to the final prediction. Models are pretrained on large corpora (masked LM or next-token prediction), then fine-tuned or prompted for downstream tasks. Pipelines often combine tokenization, embedding, and task-specific heads; [LLMs](/docs/llms) can do many tasks with a single model and the right prompt.
+**Text** is **tokenized** (dividido en subpalabras o palabras) and optionally normalized. The **model** (por ej. BERT, GPT) processes token IDs through embeddings and [transformer](/docs/transformers) layers to produce contextual representations. A **task output** head (por ej. classifier, span predictor, or next-token decoder) maps those to the final prediction. Models se preentrenan en large corpora (masked LM or predicción del siguiente token), then fine-tuned or prompted for downstream tasks. Pipelines often combine tokenization, embedding, and task-specific heads; [LLMs](/docs/llms) can do many tasks with a single model and the right prompt.
 
-## Use cases
+## Casos de uso
 
 NLP applies to any product or pipeline that needs to understand or generate text at scale.
 
@@ -31,12 +31,12 @@ NLP applies to any product or pipeline that needs to understand or generate text
 - Named entity recognition, sentiment analysis, and text classification
 - Chatbots, code generation, and document understanding
 
-## External documentation
+## Documentación externa
 
 - [Hugging Face – NLP course](https://huggingface.co/learn/nlp-course/)
 - [Stanford CS224N – NLP with Deep Learning](http://web.stanford.edu/class/cs224n/)
 
-## See also
+## Ver también
 
 - [Transformers](/docs/transformers)
 - [LLMs](/docs/llms)

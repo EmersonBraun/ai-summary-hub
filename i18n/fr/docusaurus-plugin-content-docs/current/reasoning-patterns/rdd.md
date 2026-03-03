@@ -1,22 +1,22 @@
 ---
-title: Retrieval-decision-design (RDD)
-description: Spec-driven reasoning pattern combining retrieval and decision design.
-keywords: [RDD, retrieval-decision-design, spec-driven, reasoning]
+title: Récupération-décision-conception (RDD)
+description: "Modèle d'agents : récupérer, décider, concevoir."
+keywords: [RDD, récupération-décision-conception, spec-driven, raisonnement]
 ---
 
-# Retrieval-decision-design (RDD)
+# Récupération-décision-conception (RDD)
 
-## Definition
+## Définition
 
-**RDD (retrieval-decision-design)** is a reasoning pattern that ties together **retrieval** (fetching relevant specs, docs, or examples), **decision** (making choices aligned with specs or policies), and **design** (producing outputs that satisfy requirements). It is often used in spec-driven development: behavior is guided by explicit specifications that are retrieved and enforced during generation.
+**RDD (récupération-décision-conception)** est un schéma de raisonnement qui relie **récupération** (fetching relevant specs, docs, or examples), **décision** (making choices aligned with specs or policies), and **conception** (producing outputs that satisfy requirements). C'est often used in spec-driven development: behavior is guided by explicit specifications that are retrieved and enforced during generation.
 
-## How it works
+## Comment ça fonctionne
 
-1. **Retrieval:** Given the current task, retrieve relevant specification fragments, examples, or constraints (e.g. from a vector store or structured specs).
+1. **Retrieval:** Given the current task, retrieve relevant specification fragments, examples, or constraints (par ex. from a vector store or structured specs).
 2. **Decision:** Use the retrieved context to decide next steps, allowed actions, or output format.
-3. **Design:** Generate or execute in line with the spec; optionally validate outputs against the spec.
+3. **Conception :** Générer ou exécuter conformément à la spécification ; optionnellement valider les sorties par rapport à la spécification.
 
-This can be implemented in an [agent](/docs/agents) loop: retrieve spec → reason with spec in context → act or generate → validate → repeat. The diagram below shows the cycle: **task** triggers **retrieve**; retrieved spec feeds **decision**; **generate/act** produces output; **validate** checks against the spec and can loop back to the task (e.g. retry or refine).
+Cela peut être implémenté dans une boucle d'[agent](/docs/agents) : récupérer la spécification → raisonner avec la spécification en contexte → agir ou générer → validate → repeat. The diagram below shows the cycle: **task** triggers **retrieve**; retrieved spec feeds **décision**; **generate/act** produces output; **validate** checks against the spec and can loop back to the task (par ex. retry or refine).
 
 ```mermaid
 flowchart LR
@@ -27,28 +27,28 @@ flowchart LR
   V --> T
 ```
 
-## Use cases
+## Cas d'utilisation
 
 RDD is a fit when outputs must align with retrievable specs (compliance, policy, or documented requirements).
 
 - Spec-driven agents that retrieve requirements and validate outputs
-- Compliance and policy-aware generation (e.g. legal, safety)
+- Compliance and policy-aware generation (par ex. legal, safety)
 - Code or config generation aligned with documented specs
 
-## Pros and cons
+## Avantages et inconvénients
 
 | Pros | Cons |
 |------|------|
-| Outputs align with specs | Requires good spec coverage and retrieval |
-| Reduces drift and ad-hoc behavior | Extra retrieval and validation cost |
-| Fits regulated or safety-critical flows | Spec design and maintenance overhead |
+| Outputs align with specs | Requires good spec coverage and récupération |
+| Reduces drift and ad-hoc behavior | Extra récupération and validation cost |
+| Fits regulated or safety-critical flows | Spec conception and maintenance overhead |
 
-## External documentation
+## Documentation externe
 
 - [RAG paper (Lewis et al.)](https://arxiv.org/abs/2005.11401) — Retrieval component used in RDD
 - [LangChain – Agents and tools](https://python.langchain.com/docs/concepts/agents/) — Orchestration patterns
 
-## See also
+## Voir aussi
 
 - [Spec-driven development](/docs/spec-driven-development)
 - [RAG](/docs/rag)

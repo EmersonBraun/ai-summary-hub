@@ -1,20 +1,20 @@
 ---
-title: Generative adversarial networks (GANs)
+title: Redes adversárias generativas (GANs)
 description: Adversarial training for generative models.
 keywords: [GAN, generative, discriminator, generator]
 ---
 
-# Generative adversarial networks (GANs)
+# Redes adversárias generativas (GANs)
 
-## Definition
+## Definição
 
-GANs train a generator and a discriminator in a game: the generator produces samples; the discriminator tries to distinguish them from real data. Training pushes the generator toward realistic outputs.
+GANs treinam um gerador e um discriminador em um jogo: o gerador produz amostras; o discriminador tenta distinguiguish them from real data. Training pushes the generator toward realistic outputs.
 
-They were the dominant generative approach before [diffusion models](/docs/diffusion-models). Compared to [VAEs](/docs/vaes), GANs often produce sharper images but training can be unstable (mode collapse, discriminator/generator balance). Still used for style transfer, data augmentation, and some image editing.
+They eram a abordagem generativa dominante antes de [diffusion models](/docs/diffusion-models). Compared to [VAEs](/docs/vaes), GANs often produce sharper images but training can be unstable (mode collapse, discriminator/generator balance). Still used for style transfer, data augmentation, and some image editing.
 
-## How it works
+## Como funciona
 
-**Generator:** Takes **noise** (random vector) and outputs a **fake sample** (e.g. image). **Discriminator:** Receives **real data** and **fake sample**, outputs **real or fake** (or a score). Training is a **min-max game**: the generator tries to maximize the discriminator’s loss (fool it), the discriminator tries to minimize it (tell real from fake). In practice you alternate gradient steps. Variants (DCGAN, StyleGAN, etc.) use better architectures and training tricks (e.g. spectral norm, progressive growing) for stability and quality.
+**Gerador:** Recebe **ruído** (vetor aleatório) e produz uma **amostra falsa** (por ex. imagem). **Discriminador:** Recebes **real data** and **fake sample**, outputs **real or fake** (or a score). Training is a **min-max game**: the generator tries to maximize the discriminator’s loss (fool it), the discriminator tries to minimize it (tell real from fake). In practice you alternate gradient steps. Variants (DCGAN, StyleGAN, etc.) use better architectures and training tricks (por ex. spectral norm, progressive growing) for stability and quality.
 
 ```mermaid
 flowchart LR
@@ -25,20 +25,20 @@ flowchart LR
   D --> Out[Real or fake]
 ```
 
-## Use cases
+## Casos de uso
 
 GANs are used for generative and discriminative tasks when you want adversarial training and sharp samples (images, audio, data aug).
 
-- Image generation and editing (e.g. StyleGAN, face synthesis)
+- Image generation and editing (por ex. StyleGAN, face synthesis)
 - Data augmentation and synthetic data for training
 - Domain adaptation and style transfer
 
-## External documentation
+## Documentação externa
 
 - [Generative Adversarial Networks (Goodfellow et al.)](https://arxiv.org/abs/1406.2661)
 - [PyTorch – DCGAN tutorial](https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html)
 
-## See also
+## Veja também
 
 - [Diffusion models](/docs/diffusion-models)
 - [VAEs](/docs/vaes)

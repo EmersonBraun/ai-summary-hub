@@ -1,18 +1,18 @@
 ---
 title: GPT
-description: Generative Pre-trained Transformer and decoder-only models.
-keywords: [GPT, decoder, autoregressive, LLM]
+description: Transformer génératif pré-entraîné et modèles décodeur seul.
+keywords: [GPT, décodeur, autorégressif, LLM]
 ---
 
 # GPT
 
-## Definition
+## Définition
 
-GPT refers to decoder-only transformer models trained to predict the next token (autoregressive). Scaling these models has led to today's large language models (LLMs) capable of few-shot and zero-shot tasks.
+GPT désigne des modèles transformer décodeur seul entraînés à prédire le token suivant (autorégressif). La mise à l'échelle de ces modèles a conduit aux grands modèles de langage (LLMs) actuels capables de tâches few-shot et zero-shot.
 
-Decoder-only design is well-suited for **generation**: at each step the model conditions on previous tokens and predicts the next. [LLMs](/docs/llms) built on this idea are then instruction-tuned and aligned (e.g. RLHF) for chat and tool use. For understanding-only tasks, [BERT](/docs/transformers/bert)-style encoders can be more parameter-efficient.
+La conception décodeur seul est adaptée à la **génération** : à chaque étape, le modèle se conditionne sur les tokens précédents et prédit le suivant. Les [LLMs](/docs/llms) construits sur cette idée sont ensuite affinés avec des instructions et alignés (p. ex. RLHF) pour le chat et l'utilisation d'outils. Pour les tâches de compréhension uniquement, les encodeurs style [BERT](/docs/transformers/bert) peuvent être plus efficaces en paramètres.
 
-## How it works
+## Comment ça marche
 
 ```mermaid
 flowchart LR
@@ -21,22 +21,22 @@ flowchart LR
   DecoderLayers --> NextToken["Next token"]
 ```
 
-**Tokens** are embedded and fed into **causal decoder layers**: each position can attend only to itself and previous positions (masked self-attention), so the model cannot “see” the future. The **next token** is predicted from the last position’s representation (often with a linear layer and softmax over the vocabulary). **Training** maximizes the likelihood of the next token given the preceding context (teacher forcing). **Inference** generates autoregressively: sample or greedily pick the next token, append it, and repeat until a stop condition. [Prompt engineering](/docs/llms/prompt-engineering) and [fine-tuning](/docs/llms/fine-tuning) shape how the model uses this mechanism for tasks.
+Les **tokens** sont encodés et envoyés dans des **couches de décodeur causales** : chaque position ne peut attendre qu'à elle-même et aux positions précédentes (auto-attention masquée), donc le modèle ne peut pas « voir » le futur. Le **token suivant** est prédit à partir de la représentation de la dernière position (souvent avec une couche linéaire et softmax sur le vocabulaire). L'**entraînement** maximise la probabilité du token suivant étant donné le contexte précédent (teacher forcing). L'**inférence** génère autorégressivement : échantillonner ou choisir avidement le token suivant, l'ajouter et répéter jusqu'à une condition d'arrêt. Le [prompt engineering](/docs/llms/prompt-engineering) et l'[affinage](/docs/llms/fine-tuning) façonnent la façon dont le modèle utilise ce mécanisme pour les tâches.
 
-## Use cases
+## Cas d'utilisation
 
-Decoder-only models are the backbone of chat, code, and any task that benefits from autoregressive generation or few-shot prompting.
+Les modèles décodeur seul sont la base du chat, du code et de toute tâche bénéficiant de la génération autorégressive ou du prompting few-shot.
 
-- Text and code generation (completion, summarization, dialogue)
-- Few-shot and zero-shot classification via prompts
-- Assistants and chatbots built on instruction-tuned models
+- Génération de texte et de code (complétion, résumé, dialogue)
+- Classification few-shot et zero-shot via prompts
+- Assistants et chatbots basés sur des modèles affinés avec instructions
 
-## External documentation
+## Documentation externe
 
 - [Improving Language Understanding by Generative Pre-Training (OpenAI)](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf)
 - [Hugging Face – GPT-2](https://huggingface.co/docs/transformers/model_doc/gpt2)
 
-## See also
+## Voir aussi
 
 - [Transformers](/docs/transformers)
 - [LLMs](/docs/llms)

@@ -1,43 +1,43 @@
 ---
-title: Neural networks
-description: Introduction to artificial neural networks and their building blocks.
-keywords: [neural networks, ANN, layers, activation]
+title: Redes neurais
+description: Introdução às redes neurais artificiais e seus componentes básicos.
+keywords: [redes neurais, RNA, camadas, ativação]
 ---
 
-# Neural networks
+# Redes neurais
 
-## Definition
+## Definição
 
-Neural networks are function approximators built from layers of units (neurons) with learnable weights and nonlinear activations. They can approximate complex mappings from inputs to outputs when trained on data.
+Redes neurais são aproximadores de funções construídos a partir de camadas de unidades (neurônios) com pesos aprendíveis e ativações não lineares. Podem aproximar mapeamentos complexos de entradas para saídas quando treinadas com dados.
 
-They are the building blocks of [deep learning](/docs/fundamentals/deep-learning). Variants like [CNNs](/docs/neural-networks/cnn) and [RNNs](/docs/neural-networks/rnn) add inductive biases (e.g. locality, recurrence) for specific data types; the same training machinery (backprop, gradient descent) applies.
+São os blocos de construção do [aprendizado profundo](/docs/fundamentals/deep-learning). Variantes como [CNNs](/docs/neural-networks/cnn) e [RNNs](/docs/neural-networks/rnn) adicionam vieses indutivos (ex.: localidade, recorrência) para tipos de dados específicos; o mesmo mecanismo de treinamento (retropropagação, descida de gradiente) se aplica.
 
-## How it works
+## Como funciona
 
 ```mermaid
 flowchart LR
-  Input[Input] --> Layer1[Layer1]
-  Layer1 --> Layer2[Layer2]
-  Layer2 --> Output[Output]
+  Input[Entrada] --> Layer1[Camada1]
+  Layer1 --> Layer2[Camada2]
+  Layer2 --> Output[Saída]
 ```
 
-**Input** is passed to the first layer. Each **layer** computes a linear combination of its inputs (weights) and then a nonlinear activation (e.g. ReLU, sigmoid). The output of one layer becomes the input to the next; stacking layers allows the network to learn hierarchical features. The final **output** layer typically maps to predictions (e.g. class scores or a scalar). Training minimizes a loss by **backpropagation** (computing gradients through the chain rule) and **gradient descent** (updating weights). Depth and width determine capacity; regularization and data size control overfitting.
+A **entrada** é passada para a primeira camada. Cada **camada** calcula uma combinação linear de suas entradas (pesos) e então uma ativação não linear (ex.: ReLU, sigmoide). A saída de uma camada se torna a entrada da próxima; empilhar camadas permite à rede aprender características hierárquicas. A camada de **saída** final mapeia tipicamente para predições (ex.: pontuações de classe ou um escalar). O treinamento minimiza uma perda por **retropropagação** (cálculo de gradientes pela regra da cadeia) e **descida de gradiente** (atualização de pesos). Profundidade e largura determinam a capacidade; regularização e tamanho dos dados controlam o overfitting.
 
-## Use cases
+## Casos de uso
 
-Neural networks are used wherever you need flexible, data-driven function approximation.
+Redes neurais são usadas onde quer que se precise de aproximação de funções flexível e orientada por dados.
 
-- Regression and classification (e.g. predicting sales, labeling images)
-- Feature learning for downstream tasks (embeddings, transfer learning)
-- Approximating complex nonlinear functions in control or simulation
+- Regressão e classificação (ex.: previsão de vendas, classificação de imagens)
+- Aprendizado de características para tarefas posteriores (embeddings, transfer learning)
+- Aproximação de funções não lineares complexas em controle ou simulação
 
-## External documentation
+## Documentação externa
 
-- [Neural Networks and Deep Learning (Nielsen)](http://neuralnetworksanddeeplearning.com/) — Free online book
-- [3Blue1Brown – Neural networks](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi) — Visual introduction
+- [Neural Networks and Deep Learning (Nielsen)](http://neuralnetworksanddeeplearning.com/) — Livro online gratuito
+- [3Blue1Brown – Redes neurais](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi) — Introdução visual
 
-## See also
+## Veja também
 
 - [CNN](/docs/neural-networks/cnn)
 - [RNN](/docs/neural-networks/rnn)
-- [Deep learning](/docs/fundamentals/deep-learning)
+- [Aprendizado profundo](/docs/fundamentals/deep-learning)

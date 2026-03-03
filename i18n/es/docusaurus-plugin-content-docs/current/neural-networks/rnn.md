@@ -1,43 +1,43 @@
 ---
-title: Recurrent neural networks (RNN)
-description: RNNs and sequential data.
-keywords: [RNN, LSTM, sequence]
+title: Redes neuronales recurrentes (RNN)
+description: RNNs y datos secuenciales.
+keywords: [RNN, LSTM, secuencia]
 ---
 
-# Recurrent neural networks (RNN)
+# Redes neuronales recurrentes (RNN)
 
-## Definition
+## Definición
 
-RNNs process sequences by maintaining a hidden state that is updated at each step. They (and variants like LSTM) were the standard for sequence modeling before Transformers.
+Las RNN procesan secuencias manteniendo un estado oculto que se actualiza en cada paso. Ellas (y variantes como LSTM) eran el estándar para modelado de secuencias antes de los Transformers.
 
-They are a natural fit for [NLP](/docs/nlp), time series, and any ordered data where context from the past matters. [Transformers](/docs/transformers) have largely replaced them in language modeling due to parallelization and long-range dependency handling, but RNNs still appear in streaming or low-latency settings.
+Son una opción natural para [NLP](/docs/nlp), series temporales y cualquier dato ordenado donde el contexto del pasado importa. Los [Transformers](/docs/transformers) las han reemplazado en gran medida en modelado de lenguaje debido a la paralelización y el manejo de dependencias de largo alcance, pero las RNN aún aparecen en escenarios de streaming o baja latencia.
 
-## How it works
+## Cómo funciona
 
 ```mermaid
 flowchart LR
-  Step1[Step1] --> Hidden[Hidden]
-  Hidden --> Step2[Step2]
-  Step2 --> Hidden2[Hidden]
+  Step1[Paso1] --> Hidden[Oculto]
+  Hidden --> Step2[Paso2]
+  Step2 --> Hidden2[Oculto]
   Hidden2 --> More[...]
 ```
 
-At each **step**, the model receives the current input (e.g. a token or frame) and the previous **hidden** state. It computes an output (e.g. a prediction or next hidden representation) and updates the hidden state for the next step. The recurrence is unrolled in time for training (backprop through time); at inference, the hidden state is passed forward step by step. **LSTM** and **GRU** variants add gating to mitigate vanishing gradients. Inputs and outputs can be one-to-one, one-to-many, or many-to-one depending on the task (e.g. sequence labeling vs sequence-to-sequence).
+En cada **paso**, el modelo recibe la entrada actual (p. ej., un token o frame) y el **estado oculto** anterior. Calcula una salida (p. ej., una predicción o la siguiente representación oculta) y actualiza el estado oculto para el siguiente paso. La recurrencia se despliega en el tiempo para el entrenamiento (retropropagación a través del tiempo); en la inferencia, el estado oculto se pasa paso a paso. Las variantes **LSTM** y **GRU** añaden puertas para mitigar los gradientes que desaparecen. Las entradas y salidas pueden ser uno-a-uno, uno-a-muchos o muchos-a-uno según la tarea (p. ej., etiquetado de secuencias vs. secuencia a secuencia).
 
-## Use cases
+## Casos de uso
 
-RNNs fit problems with sequential input or output where order and context over time matter.
+Las RNN se ajustan a problemas con entrada o salida secuencial donde el orden y el contexto temporal importan.
 
-- Sequence labeling (e.g. named entity recognition, part-of-speech tagging)
-- Time-series forecasting and anomaly detection
-- Speech and text sequence modeling (before Transformers dominated)
+- Etiquetado de secuencias (p. ej., reconocimiento de entidades nombradas, etiquetado POS)
+- Pronóstico de series temporales y detección de anomalías
+- Modelado de secuencias de voz y texto (antes de que los Transformers dominaran)
 
-## External documentation
+## Documentación externa
 
-- [Understanding LSTM networks (Olah)](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
-- [PyTorch – Sequence models and RNNs](https://pytorch.org/tutorials/beginner/sequence_models_tutorial.html)
+- [Comprendiendo las redes LSTM (Olah)](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
+- [PyTorch – Modelos de secuencia y RNNs](https://pytorch.org/tutorials/beginner/sequence_models_tutorial.html)
 
-## See also
+## Ver también
 
 - [Transformers](/docs/transformers)
 - [NLP](/docs/nlp)

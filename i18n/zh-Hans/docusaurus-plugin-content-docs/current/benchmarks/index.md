@@ -1,18 +1,18 @@
 ---
-title: Benchmarks
-description: "Standard benchmarks for AI: GLUE, SuperGLUE, MMLU, and more."
+title: 基准测试
+description: AI 标准基准测试：GLUE、SuperGLUE、MMLU 等。
 keywords: [benchmarks, GLUE, SuperGLUE, MMLU]
 ---
 
-# Benchmarks
+# 基准测试
 
-## Definition
+## 定义
 
-Benchmarks are standardized datasets and evaluation protocols (e.g. GLUE, SuperGLUE for NLP; MMLU for broad knowledge; HumanEval for code). They enable comparison across models and over time.
+基准测试是标准化的数据集和评估协议 (例如 GLUE, SuperGLUE for NLP; MMLU for broad knowledge; HumanEval for code). They enable comparison across models and over time.
 
-They rely on [evaluation metrics](/docs/evaluation-metrics) and fixed splits so results are comparable. Overfitting to benchmarks is a known issue; supplement with out-of-distribution and human eval when deploying [LLMs](/docs/llms) or production systems.
+They 依赖于 [evaluation metrics](/docs/evaluation-metrics) 和固定分割以便结果可比较. 对基准的过拟合是一个已知问题; supplement with out-of-distribution and human eval when deploying [LLMs](/docs/llms) or production systems.
 
-## How it works
+## 工作原理
 
 ```mermaid
 flowchart LR
@@ -21,23 +21,23 @@ flowchart LR
   Metric --> Leaderboard[Leaderboard]
 ```
 
-A **model** is run on a **benchmark dataset** (fixed prompts or inputs, standard split). **Metrics** (e.g. accuracy, pass@k) are computed per task and often averaged; results are reported on a **leaderboard** or in papers. Protocols define what inputs to use, how to parse outputs, and which [metrics](/docs/evaluation-metrics) to report. Reusing the same benchmark across time lets the community track progress. Care is needed: models can overfit to benchmark quirks, and benchmarks may not reflect real-world quality—use them as one signal among others.
+A **model** is run on a **benchmark dataset** (固定提示或输入，标准划分). **Metrics** (例如 accuracy, pass@k) 被计算 每个任务 and often averaged; results are reported on a **leaderboard** or in papers. Protocols define what inputs to use, how to parse outputs, and which [metrics](/docs/evaluation-metrics) to report. Reusing the same benchmark across time lets the community track progress. Care is needed: models can overfit to benchmark quirks, and benchmarks may not reflect real-world quality—use them as one signal among others.
 
-## Use cases
+## 应用场景
 
 Benchmarks give a common yardstick to compare models and methods; use them together with task-specific and human evaluation.
 
-- Comparing NLP models (e.g. GLUE, SuperGLUE, MMLU)
-- Evaluating code generation (e.g. HumanEval) or reasoning
+- Comparing NLP models (例如 GLUE, SuperGLUE, MMLU)
+- Evaluating code generation (例如 HumanEval) or 推理
 - Tracking model and method progress over time
 
-## External documentation
+## 外部文档
 
 - [Papers with Code – Leaderboards](https://paperswithcode.com/)
 - [MMLU (Hendrycks et al.)](https://arxiv.org/abs/2009.03300) — Broad knowledge benchmark
 - [HumanEval](https://github.com/openai/human-eval) — Code generation benchmark
 
-## See also
+## 另请参阅
 
 - [Evaluation metrics](/docs/evaluation-metrics)
 - [LLMs](/docs/llms)

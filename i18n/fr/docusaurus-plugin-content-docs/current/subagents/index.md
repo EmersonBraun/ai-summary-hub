@@ -1,18 +1,18 @@
 ---
-title: Subagents
-description: Hierarchical agents and delegation.
+title: Sous-agents
+description: "Agents hiérarchiques : parents déléguant aux enfants."
 keywords: [subagents, hierarchy, delegation]
 ---
 
-# Subagents
+# Sous-agents
 
-## Definition
+## Définition
 
-**Subagents** are agents that sit within a hierarchy: a parent agent delegates sub-tasks to child agents (subagents), which may in turn delegate to further subagents. This structures complex work and keeps each agent focused.
+Les **sous-agents** sont des agents qui se situent dans une hiérarchie: a parent agent delegates sub-tasks to child agents (subagents), qui peuvent à leur tour déléguer à d'autres subagents. Cela structure la complexix work and keeps each agent focused.
 
-They are one way to implement [multi-agent](/docs/agents/multi-agent-systems) systems with a clear chain of responsibility. The root [agent](/docs/agents) owns the user-facing goal; subagents handle focused sub-tasks (e.g. [retrieval](/docs/rag), code execution, validation). Often used with [spec-driven development](/docs/spec-driven-development) or [RDD](/docs/reasoning-patterns/rdd) so subagents receive and follow specs.
+Ils sont un moyen d'implémenter des systèmes [multi-agents](/docs/agents/multi-agent-systems) avec une chaîne claire de responsabilitty. The root [agent](/docs/agents) owns the user-facing goal; subagents handle focused sub-tasks (par ex. [récupération](/docs/rag), code execution, validation). Often used with [spec-driven development](/docs/spec-driven-development) or [RDD](/docs/reasoning-patterns/rdd) so subagents receive and follow specs.
 
-## How it works
+## Comment ça fonctionne
 
 ```mermaid
 flowchart LR
@@ -23,22 +23,22 @@ flowchart LR
   Results --> Root
 ```
 
-The **root** agent receives the task, breaks it into sub-tasks, and assigns them to **Subagent1**, **Subagent2**, etc. (by role or capability). Each subagent runs its own loop (possibly with tools and an LLM) and returns **results** to the root. The root **aggregates** results (e.g. merges, selects, or passes to another subagent) and either continues the loop or returns to the user. Subagents can be specialized (e.g. retrieval, code, critique) and use the same or different models. Clear contracts (inputs/outputs or tools) and error handling make the hierarchy debuggable and reusable.
+L'agent **racine** reçoit la tâche, la divise en sous-tâches et les attribue au **Subagent1**, **Subagent2**, etc. (par rôle ou capacité). Chaque subagent exécute sa propre boucle (possiblement avec des outils et un LLM) and returns **results** to the root. The root **aggregates** results (par ex. merges, selects, or passes to another subagent) and either continues the loop or returns to the user. Subagents can be specialized (par ex. récupération, code, critique) and use the same or different models. Clear contracts (inputs/outputs or tools) and error handling make the hierarchy debuggable and reusable.
 
-## Use cases
+## Cas d'utilisation
 
-Subagents help when a task naturally splits into focused sub-tasks that can be delegated and aggregated.
+Subagents aident quand une tâche se divise naturellement en sous-tâches ciblées pouvant être déléguées et agrégées.
 
-- Root agent delegating retrieval, generation, and validation to subagents
-- Complex workflows (e.g. research, code review) with focused sub-tasks
+- Root agent delegating récupération, generation, and validation to subagents
+- Complex workflows (par ex. research, code review) with focused sub-tasks
 - Reusing the same subagent in different parent workflows
 
-## External documentation
+## Documentation externe
 
 - [From Prototypes to Agents with ADK – Google Codelabs](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — ADK multi-agent systems with hierarchy
 - [LangChain – Multi-agent workflows](https://python.langchain.com/docs/concepts/multi_agent/) — Workflow and subagent patterns
 
-## Pros and cons
+## Avantages et inconvénients
 
 | Pros | Cons |
 |------|------|
@@ -46,7 +46,7 @@ Subagents help when a task naturally splits into focused sub-tasks that can be d
 | Scalable to complex tasks | Need clear contracts and error handling |
 | Reusable subagent capabilities | Debugging across hierarchy can be hard |
 
-## See also
+## Voir aussi
 
 - [Agents](/docs/agents)
 - [Multi-agent systems](/docs/agents/multi-agent-systems)

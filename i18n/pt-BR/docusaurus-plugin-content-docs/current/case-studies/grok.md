@@ -1,35 +1,35 @@
 ---
 title: Case study — Grok
-description: xAI's LLM with real-time knowledge and reasoning.
-keywords: [Grok, xAI, real-time, reasoning]
+description: LLM da xAI com conhecimento em tempo real e raciocínio.
+keywords: [Grok, xAI, real-time, raciocínio]
 ---
 
 # Case study: Grok
 
-## Definition
+## Definição
 
-Grok is a family of [LLMs](/docs/llms) from xAI. It is positioned around real-time or up-to-date knowledge (e.g. access to X/Twitter data) and strong reasoning, offered via API and in X’s product experience.
+Grok is a família de [LLMs](/docs/llms) from xAI. É positioned around real-time or up-to-date knowledge (por ex. access to X/Twitter data) and strong raciocínio, offered via API and in X’s product experience.
 
-Like [ChatGPT](/docs/case-studies/chatgpt) and [Claude](/docs/case-studies/claude), Grok uses a pretrained base, instruction tuning, and alignment; differentiation includes real-time [RAG](/docs/rag)-style grounding and integration with X’s platform. Use case: chat, research, and applications that benefit from current information and reasoning.
+Assim como [ChatGPT](/docs/case-studies/chatgpt) e [Claude](/docs/case-studies/claude), o Grok usa um modelo base pré-treinado, ajuste de instruçõtion tuning, and alignment; differentiation includes real-time [RAG](/docs/rag)-style grounding and integration with X’s platform. Use case: chat, research, and applications that benefit from current information and raciocínio.
 
-## How it works
+## Como funciona
 
-A **base model** (decoder-only [transformer](/docs/transformers)) is pretrained on large-scale text (and optionally other data). **Instruction tuning** and **alignment** (e.g. preference optimization) shape helpfulness and safety. **Real-time or live knowledge** is provided by retrieving and conditioning on fresh content (e.g. from X) so answers can reflect recent events. The product exposes Grok via chat and API; [prompt engineering](/docs/llms/prompt-engineering) and tool use extend it for [agents](/docs/agents) and custom workflows.
+Um **modelo base** ([transformer](/docs/transformers) apenas decodificador) é pré-treinado em texto em larga escala (e opcionalmente outros dados). **Ajuste de instruções** and **alignment** (por ex. preference optimization) shape helpfulness and safety. **Real-time or live knowledge** is provided by retrieving and conditioning on fresh content (por ex. from X) so answers can reflect recent events. The product exposes Grok via chat and API; [prompt engineering](/docs/llms/prompt-engineering) and tool use extend it for [agents](/docs/agents) and custom workflows.
 
-## Use cases
+## Casos de uso
 
-Grok fits use cases where up-to-date information and reasoning matter more than a static training cutoff.
+Grok fits use cases where up-to-date information and raciocínio matter more than a static training cutoff.
 
 - Chat and research with awareness of recent news and events
 - Applications that need real-time or search-augmented answers
 - Integration in X and third-party products via API
 
-## External documentation
+## Documentação externa
 
 - [xAI – Grok](https://x.ai/) — Product and API
 - [xAI – Blog](https://x.ai/blog) — Model and capability updates
 
-## See also
+## Veja também
 
 - [LLMs](/docs/llms)
 - [RAG](/docs/rag)

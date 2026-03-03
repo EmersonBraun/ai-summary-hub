@@ -1,18 +1,18 @@
 ---
-title: Multi-agent systems
-description: Multiple agents collaborating or competing.
-keywords: [multi-agent, collaboration, orchestration]
+title: Multi-Agenten-Systeme
+description: Mehrere Agenten, die zusammenarbeiten oder konkurrieren.
+keywords: [Multi-Agent, Zusammenarbeit, Orchestrierung]
 ---
 
-# Multi-agent systems
+# Multi-Agenten-Systeme
 
 ## Definition
 
-Multi-agent systems involve multiple AI agents that interact to solve tasks: collaboration (divide work, share state), debate (argue and refine answers), or specialized roles (planner, executor, critic).
+Multi-Agenten-Systeme umfassen mehrere KI-Agenten, die interagieren, um Aufgaben zu lösen: Zusammenarbeit (Arbeit teilen, Zustand teilen), Debatte (argumentieren und Antworten verfeinern) oder spezialisierte Rollen (Planer, Ausführer, Kritiker).
 
-They extend single [agents](/docs/agents) when one model or one loop is insufficient: e.g. one agent for [RAG](/docs/rag) retrieval, another for generation, another for critique. [Subagents](/docs/subagents) are a hierarchical form where a root agent delegates to children; here we focus on flat or peer-to-peer multi-agent patterns.
+Sie erweitern single [agents](/docs/agents) when one model or one loop is insufficient: z. B. one agent for [RAG](/docs/rag) Abruf, another for generation, another for critique. [Subagents](/docs/subagents) are a hierarchical form where a root agent delegates to children; here we focus on flat or peer-to-peer multi-agent patterns.
 
-## How it works
+## Funktionsweise
 
 ```mermaid
 flowchart LR
@@ -24,22 +24,22 @@ flowchart LR
   Aggregate --> User
 ```
 
-The **user** sends a task to an **orchestrator** (which can be an LLM or a fixed workflow). The orchestrator assigns work to **Agent1**, **Agent2**, etc., each with its own role, tools, and optionally model. Agents may share a common state, pass messages, or be invoked in sequence/parallel. Their outputs are **aggregated** (e.g. combined, voted, or summarized) and returned to the user. Design choices include role assignment, communication protocol, and conflict resolution. MAS are useful when you want **modularity** (each agent has a clear responsibility), **specialization** (different models or tools per role), **reusability** (same agent in different workflows), and **structured control flow**.
+The **user** sends a task to an **orchestrator** (was sein kann an LLM or a fixed workflow). The orchestrator assigns work to **Agent1**, **Agent2**, etc., each with its own role, tools, und optional model. Agents may share a common state, pass messages, or be invoked in sequence/parallel. Their outputs are **aggregated** (z. B. combined, voted, or summarized) and returned to the user. Design-Entscheidungen include role assignment, communication protocol, and conflict resolution. MAS are useful wenn Sie want **modularity** (each agent has a clear responsibility), **specialization** (different models or tools per role), **reusability** (same agent in different workflows), and **structured control flow**.
 
-## Use cases
+## Anwendungsfälle
 
-Multi-agent systems help when a single agent is not enough: you need distinct roles, debate, or modular pipelines.
+Multi-Agenten-Systeme helfen, wenn ein einzelner Agent nicht ausreicht: Sie benötigen unterschiedliche Rollen, Debatten oder modulare Pipelines.
 
-- Orchestrating planner, executor, and critic agents for complex tasks
+- Orchestrierung von Planer-, Ausführer- und Kritiker-Agenten für komplexe Aufgaben
 - Debate or review flows where multiple agents refine an answer
-- Specialized pipelines (e.g. one agent for retrieval, one for generation)
+- Specialized pipelines (z. B. one agent for Abruf, one for generation)
 
-## External documentation
+## Externe Dokumentation
 
 - [From Prototypes to Agents with ADK – Google Codelabs](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — ADK supports composing multiple agents into a multi-agent system
 - [LangChain – Multi-agent](https://python.langchain.com/docs/concepts/multi_agent/) — Multi-agent orchestration patterns
 
-## See also
+## Siehe auch
 
 - [Agents](/docs/agents)
 - [Subagents](/docs/subagents)

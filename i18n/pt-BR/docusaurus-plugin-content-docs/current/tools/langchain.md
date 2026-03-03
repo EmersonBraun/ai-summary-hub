@@ -1,22 +1,22 @@
 ---
 title: LangChain
-description: Framework for LLM applications and agents.
+description: Framework para aplicações e agentes de LLM.
 keywords: [LangChain, chains, agents, RAG]
 ---
 
 # LangChain
 
-## Definition
+## Definição
 
-LangChain is a framework for building [LLM](/docs/llms) applications: chains, [agents](/docs/agents), tools, and [RAG](/docs/rag) pipelines. It abstracts providers, prompts, and retrieval for quick prototyping and production.
+LangChain é um framework for building [LLM](/docs/llms) applications: chains, [agents](/docs/agents), tools, and [RAG](/docs/rag) pipelines. It abstracts providers, prompts, and recuperação for quick prototyping and production.
 
-It complements [LlamaIndex](/docs/tools/llamaindex) (which emphasizes data and indexing); LangChain emphasizes composable chains and agent loops. Use it when you need [RAG](/docs/rag), [agents](/docs/agents) with tools, or multi-step [prompt](/docs/llms/prompt-engineering) workflows with minimal glue code.
+Ele complementa o [LlamaIndex](/docs/tools/llamaindex) (que enfatiza dados e indexação); LangChain enfatiza cadeias componívele chains and agent loops. Use quando you need [RAG](/docs/rag), [agents](/docs/agents) with tools, or multi-step [prompt](/docs/llms/prompt-engineering) workflows with minimal glue code.
 
-## How it works
+## Como funciona
 
-You **compose** components: LLM (OpenAI, Anthropic, local, etc.), [prompts](/docs/llms/prompt-engineering), retrievers ([vector stores](/docs/rag/vector-databases), [embeddings](/docs/rag/embeddings)), and tools (APIs, search, code). **Chains** wire them in sequence (e.g. prompt → LLM → parser). **Agents** add a loop: LLM decides which tool to call, you execute it and append the result, repeat until the LLM returns a final answer. LangSmith provides tracing and evaluation. Integrations cover many [vector databases](/docs/rag/vector-databases), document loaders, and tool APIs. Start with a template (e.g. RAG, agent) and swap or add components as needed.
+Você **compõe** componentes: LLM (OpenAI, Anthropic, local, etc.), [prompts](/docs/llms/prompt-engineering), recuperadores ([vector stores](/docs/rag/vector-databases), [embeddings](/docs/rag/embeddings)), e ferramentas (APIs, busca, código). **Chains** os conectam em sequência (por ex. prompt → LLM → parser). **Agents** add a loop: LLM decides which tool to call, you execute it and append the result, repeat until the LLM returns a final answer. LangSmith provides tracing and evaluation. Integrations cover many [vector databases](/docs/rag/vector-databases), document loaders, and tool APIs. Start with a template (por ex. RAG, agent) and swap or add components as needed.
 
-## Use cases
+## Casos de uso
 
 LangChain is used to assemble LLM apps quickly: RAG, agents, and workflows with minimal boilerplate.
 
@@ -24,13 +24,13 @@ LangChain is used to assemble LLM apps quickly: RAG, agents, and workflows with 
 - Implementing agents with tools (search, APIs, code)
 - Rapid prototyping of LLM workflows with minimal boilerplate
 
-## External documentation
+## Documentação externa
 
 - [LangChain documentation](https://python.langchain.com/docs/)
 - [LangChain – Agents](https://python.langchain.com/docs/concepts/agents/)
 - [LangChain – Question answering / RAG](https://python.langchain.com/docs/use_cases/question_answering/)
 
-## See also
+## Veja também
 
 - [RAG](/docs/rag)
 - [Agents](/docs/agents)

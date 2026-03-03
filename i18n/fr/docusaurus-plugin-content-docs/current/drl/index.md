@@ -1,18 +1,18 @@
 ---
-title: Deep reinforcement learning (DRL)
-description: RL with deep neural networks for function approximation.
+title: Apprentissage par renforcement profond (DRL)
+description: RL avec réseaux de neurones profonds pour l'approximation de fonctions.
 keywords: [deep RL, DRL, DQN, policy gradient]
 ---
 
-# Deep reinforcement learning (DRL)
+# Apprentissage par renforcement profond (DRL)
 
-## Definition
+## Définition
 
 Deep RL combines reinforcement learning with deep neural networks to handle high-dimensional state and action spaces. Examples: DQN, A3C, PPO, SAC.
 
-[Neural networks](/docs/neural-networks) approximate the value function and/or policy so [RL](/docs/rl) can scale to raw pixels, high-D controls, and large discrete actions. Training is unstable without tricks (experience replay, target networks, advantage estimation); modern algorithms (PPO, SAC) are widely used in robotics and [LLM](/docs/llms) alignment (RLHF, DPO).
+[Neural networks](/docs/neural-networks) approximent la fonction de valeur et/ou la politique pour que [RL](/docs/rl) can scale to raw pixels, high-D controls, and large discrete actions. Training is unstable without tricks (experience replay, target networks, advantage estimation); modern algorithms (PPO, SAC) are widely used in robotics and [LLM](/docs/llms) alignment (RLHF, DPO).
 
-## How it works
+## Comment ça fonctionne
 
 ```mermaid
 flowchart LR
@@ -25,22 +25,22 @@ flowchart LR
   NextState --> Policy
 ```
 
-The **state** (e.g. image, vector) is fed into a **neural network policy** (or value network) that outputs an **action**. The **env** returns **reward** and **next state**; the agent uses this experience to update the policy (e.g. policy gradient or Q-learning with function approximation). **Experience replay** (store transitions, sample batches) and **target networks** (slow-moving copy of the network) stabilize training. **Advantage estimation** (e.g. GAE) reduces variance in policy gradients. PPO and SAC are common for continuous control; DQN and variants for discrete actions.
+The **state** (par ex. image, vector) est alimenté dans un **neural network policy** (or value network) qui produit an **action**. The **env** returns **reward** and **next state**; the agent uses this experience to update the policy (par ex. policy gradient or Q-learning with function approximation). **Experience replay** (store transitions, sample batches) and **target networks** (slow-moving copy of the network) stabilize training. **Advantage estimation** (par ex. GAE) reduces variance in policy gradients. PPO and SAC are common for continuous control; DQN and variants for discrete actions.
 
-## Use cases
+## Cas d'utilisation
 
-Deep RL is used when the decision problem is complex and you can learn from trial and error (simulation or real environment).
+Deep RL est utilisé quand le problème de décision est complexe et qu'on peut apprendre par essai et erreur (simulation or real environment).
 
-- High-dimensional control (e.g. robotics, autonomous driving)
-- Game AI and simulation (e.g. DQN, PPO in complex environments)
-- LLM alignment via policy optimization (e.g. RLHF, DPO)
+- High-dimensional control (par ex. robotics, autonomous driving)
+- Game AI and simulation (par ex. DQN, PPO in complex environments)
+- LLM alignment via policy optimization (par ex. RLHF, DPO)
 
-## External documentation
+## Documentation externe
 
 - [Spinning Up in Deep RL (OpenAI)](https://spinningup.openai.com/)
 - [Stable-Baselines3 – DRL algorithms](https://stable-baselines3.readthedocs.io/)
 
-## See also
+## Voir aussi
 
 - [RL](/docs/rl)
 - [Neural networks](/docs/neural-networks)

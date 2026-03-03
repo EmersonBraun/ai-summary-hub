@@ -1,57 +1,57 @@
 ---
 title: Transformers
-description: Transformer architecture and self-attention mechanisms.
-keywords: [transformer, attention, self-attention, BERT, GPT]
+description: Arquitetura Transformer e mecanismos de auto-atenção.
+keywords: [transformer, atenção, auto-atenção, BERT, GPT]
 ---
 
 # Transformers
 
-## Definition
+## Definição
 
-Transformers are neural architectures based on **self-attention**: each token attends to all others to compute contextual representations. They avoid recurrence and enable parallelization, scaling to very long sequences and large models (BERT, GPT, etc.).
+Transformers são arquiteturas neurais baseadas em **auto-atenção**: cada token atende a todos os outros para calcular representações contextuais. Evitam recorrência e permitem paralelização, escalando para sequências muito longas e modelos grandes (BERT, GPT, etc.).
 
-They underpin modern [LLMs](/docs/llms) and have been extended to [multimodal](/docs/multimodal-ai) and [vision](/docs/cv) models. Encoder-only ([BERT](/docs/transformers/bert)) and decoder-only ([GPT](/docs/transformers/gpt)) variants are most common today; the encoder-decoder layout remains used for sequence-to-sequence tasks.
+Sustentam os [LLMs](/docs/llms) modernos e foram estendidos para modelos [multimodais](/docs/multimodal-ai) e de [visão](/docs/cv). Variantes somente-encoder ([BERT](/docs/transformers/bert)) e somente-decoder ([GPT](/docs/transformers/gpt)) são as mais comuns hoje; o layout encoder-decoder continua sendo usado para tarefas de sequência para sequência.
 
-## How it works
+## Como funciona
 
-- **Attention:** Query, Key, Value are computed from inputs; attention weights combine values.
-- **Multi-head attention:** Multiple attention heads capture different relations.
-- **Encoder-decoder or decoder-only:** Encoder (e.g. BERT) sees full sequence; decoder (e.g. GPT) uses causal masking for autoregressive generation.
+- **Atenção:** Query, Key, Value são calculados a partir das entradas; os pesos de atenção combinam valores.
+- **Atenção multi-cabeça:** Múltiplas cabeças de atenção capturam diferentes relações.
+- **Encoder-decoder ou somente-decoder:** O encoder (ex.: BERT) vê a sequência completa; o decoder (ex.: GPT) usa mascaramento causal para geração autorregressiva.
 
-The diagram below shows one block: input goes through multi-head attention (with add and norm), then a feed-forward network (FFN), then add and norm again. Encoder stacks use bidirectional attention; decoder stacks use causal (masked) attention so each position only sees past tokens. Residual connections and layer norm stabilize training. Stacking many such blocks and scaling width and depth yields the large models used for [NLP](/docs/nlp) and beyond.
+O diagrama mostra um bloco: a entrada passa pela atenção multi-cabeça (com add e norm), depois uma rede feed-forward (FFN), depois add e norm novamente. Pilhas de encoder usam atenção bidirecional; pilhas de decoder usam atenção causal (mascarada) para que cada posição veja apenas tokens anteriores. Conexões residuais e normalização de camada estabilizam o treinamento. Empilhar muitos blocos e escalar largura e profundidade produz os grandes modelos usados para [NLP](/docs/nlp) e além.
 
 ```mermaid
 flowchart LR
-  A[Input] --> B[Multi-Head Attention]
+  A[Entrada] --> B[Atenção Multi-Cabeça]
   B --> C[Add & Norm]
   C --> D[FFN]
   D --> E[Add & Norm]
-  E --> F[Output]
+  E --> F[Saída]
 ```
 
-## Use cases
+## Casos de uso
 
-Transformers underpin most modern NLP and multimodal systems; encoder-only, decoder-only, and encoder-decoder variants suit different tasks.
+Transformers sustentam a maioria dos sistemas modernos de NLP e multimodais; variantes somente-encoder, somente-decoder e encoder-decoder se adequam a diferentes tarefas.
 
-- BERT-style: named entity recognition, search relevance, question answering
-- GPT-style: text generation, code completion, chat and dialogue
-- Multimodal transformers for vision-language tasks
+- Estilo BERT: reconhecimento de entidades nomeadas, relevância de busca, resposta a perguntas
+- Estilo GPT: geração de texto, completação de código, chat e diálogo
+- Transformers multimodais para tarefas de visão-linguagem
 
-## Pros and cons
+## Vantagens e desvantagens
 
-| Pros | Cons |
-|------|------|
-| Parallelizable, scalable | High compute and memory |
-| Strong at long-range dependencies | Requires large data |
-| Unified architecture for many tasks | Interpretability challenges |
+| Vantagens | Desvantagens |
+|-----------|--------------|
+| Paralelizável, escalável | Alto custo computacional e de memória |
+| Forte em dependências de longo alcance | Requer grandes volumes de dados |
+| Arquitetura unificada para muitas tarefas | Desafios de interpretabilidade |
 
-## External documentation
+## Documentação externa
 
-- [Attention Is All You Need (Vaswani et al.)](https://arxiv.org/abs/1706.03762) — Original transformer paper
-- [Hugging Face – Summary of the models](https://huggingface.co/docs/transformers/model_summary) — Transformer model families
-- [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/) — Visual explanation of the architecture
+- [Attention Is All You Need (Vaswani et al.)](https://arxiv.org/abs/1706.03762) — Artigo original do Transformer
+- [Hugging Face – Resumo dos modelos](https://huggingface.co/docs/transformers/model_summary) — Famílias de modelos Transformer
+- [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/) — Explicação visual da arquitetura
 
-## See also
+## Veja também
 
 - [BERT](/docs/transformers/bert)
 - [GPT](/docs/transformers/gpt)

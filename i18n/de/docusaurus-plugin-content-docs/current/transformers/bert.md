@@ -1,6 +1,6 @@
 ---
 title: BERT
-description: Bidirectional Encoder Representations from Transformers.
+description: Bidirektionaler Encoder für Sprachverständnis.
 keywords: [BERT, encoder, masked LM, NLP]
 ---
 
@@ -8,11 +8,11 @@ keywords: [BERT, encoder, masked LM, NLP]
 
 ## Definition
 
-BERT is a transformer **encoder** model pretrained with masked language modeling (MLM) and next-sentence prediction. It produces contextual embeddings that are fine-tuned for downstream NLP tasks.
+BERT ist ein Transformer-**Encoder**-Modell, das mit Masked Language Modeling (MLM) und Next-Sentence-Prediction vortrainiert wurde. Es erzeugt kontextuelle Einbettungen, die für nachgelagerte NLP-Aufgaben feinabgestimmt werden.
 
-Unlike [GPT](/docs/transformers/gpt)-style decoders, BERT uses **bidirectional** context (left and right of each token), which helps for understanding tasks (e.g. [NLP](/docs/nlp) classification, NER, QA) rather than open-ended generation. It is often used as a frozen or fine-tuned encoder in [RAG](/docs/rag) and search pipelines.
+Im Gegensatz zu [GPT](/docs/transformers/gpt)-Stil-Decodern verwendet BERT **bidirektionalen** Kontext (links und rechts jedes Tokens), was bei Verständnisaufgaben (z. B. [NLP](/docs/nlp)-Klassifikation, NER, QA) hilft, anstatt bei offener Generierung. Es wird häufig als eingefrorener oder feinabgestimmter Encoder in [RAG](/docs/rag)- und Such-Pipelines verwendet.
 
-## How it works
+## Funktionsweise
 
 ```mermaid
 flowchart LR
@@ -21,22 +21,22 @@ flowchart LR
   EncoderLayers --> Output["Pooled/Seq output"]
 ```
 
-**Tokens** are tokenized and embedded (token + position embeddings). The **encoder layers** apply bidirectional self-attention and FFNs; each token’s representation is influenced by all other tokens. Output can be **pooled** (e.g. [CLS] for sentence-level tasks) or **sequence** (one vector per token for NER, QA). Pretraining: randomly mask tokens and predict them (MLM), and predict whether two sentences are consecutive (NSP). **Fine-tuning** adds a task head (e.g. linear classifier) and updates the model (or only the head) on labeled data.
+**Tokens** werden tokenisiert und eingebettet (Token- + Positionseinbettungen). Die **Encoder-Schichten** wenden bidirektionale Self-Attention und FFNs an; die Repräsentation jedes Tokens wird von allen anderen Tokens beeinflusst. Die Ausgabe kann **gepoolt** (z. B. [CLS] für Satzaufgaben) oder **sequenziell** (ein Vektor pro Token für NER, QA) sein. Vortraining: zufällig Token maskieren und vorhersagen (MLM), und vorhersagen, ob zwei Sätze aufeinanderfolgend sind (NSP). **Feinabstimmung** fügt einen Aufgabenkopf (z. B. linearen Klassifikator) hinzu und aktualisiert das Modell (oder nur den Kopf) auf gelabelten Daten.
 
-## Use cases
+## Anwendungsfälle
 
-BERT-style models excel when you need rich contextual representations for understanding (classification, NER, QA) rather than generation.
+BERT-Stil-Modelle glänzen, wenn Sie reichhaltige kontextuelle Repräsentationen für Verständnis (Klassifikation, NER, QA) benötigen, anstatt für Generierung.
 
-- Named entity recognition and relation extraction
-- Search and retrieval (semantic matching, relevance ranking)
-- Question answering and natural language inference
+- Eigennamenerkennung und Relationsextraktion
+- Suche und Retrieval (semantisches Matching, Relevanzranking)
+- Fragebeantwortung und Natural Language Inference
 
-## External documentation
+## Externe Dokumentation
 
 - [BERT: Pre-training of Deep Bidirectional Transformers (Devlin et al.)](https://arxiv.org/abs/1810.04805)
 - [Hugging Face – BERT](https://huggingface.co/docs/transformers/model_doc/bert)
 
-## See also
+## Siehe auch
 
 - [Transformers](/docs/transformers)
 - [GPT](/docs/transformers/gpt)

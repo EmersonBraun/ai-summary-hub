@@ -8,11 +8,11 @@ keywords: [pruning, sparsity, structured pruning]
 
 ## Definition
 
-Pruning removes redundant or low-impact weights (or neurons/heads) from a model. Unstructured pruning drops individual weights; structured pruning removes entire channels or layers for efficient execution.
+Pruning entfernt redundante oder wirkungsarme Gewichte (or neurons/heads) from a model. Unstructured pruning drops individual weights; structured pruning removes entire channels or layers for efficient execution.
 
-It is part of [model compression](/docs/model-compression); often used with [quantization](/docs/quantization) or [knowledge distillation](/docs/knowledge-distillation) for smaller, faster models. Unstructured pruning saves parameters but may not speed up much on standard hardware; structured pruning (e.g. channels) yields real speedups.
+Es ist part of [model compression](/docs/model-compression); often used with [quantization](/docs/quantization) or [knowledge distillation](/docs/knowledge-distillation) for smaller, faster models. Unstructured pruning saves parameters but may not speed up much on standard hardware; structured pruning (z. B. channels) yields real speedups.
 
-## How it works
+## Funktionsweise
 
 ```mermaid
 flowchart LR
@@ -21,22 +21,22 @@ flowchart LR
   Prune --> FineTune[Fine-tune]
 ```
 
-Start from a trained **model**. **Score** weights (or channels/heads) by importance (e.g. magnitude, gradient, or learned mask). **Prune**: zero out or remove the lowest-scoring parameters (unstructured) or entire channels/layers (structured). **Fine-tune** the pruned model to recover accuracy. Pruning can be one-shot (after training) or iterative (train → prune → fine-tune, repeat). Sparsity is often enforced with L1 or other regularizers during training so the model adapts to pruning. The final model has fewer non-zero weights and, with structured pruning, faster inference.
+Start from a trained **model**. **Score** weights (or channels/heads) by importance (z. B. magnitude, gradient, or learned mask). **Prune**: zero out or remove the lowest-scoring parameters (unstructured) or entire channels/layers (structured). **Fine-tune** the pruned model to recover accuracy. Pruning can be one-shot (after training) or iterative (train → prune → fine-tune, repeat). Sparsity wird oft enforced with L1 or other regularizers during training sodass das model adapts to pruning. The final model has fewer non-zero weights and, with structured pruning, faster inference.
 
-## Use cases
+## Anwendungsfälle
 
-Pruning helps when you want a smaller or faster model by removing low-importance weights or structures.
+Pruning hilft, wenn you want a smaller or faster model by removing low-importance weights or structures.
 
 - Shrinking models for edge or mobile deployment
-- Reducing compute and memory with structured pruning (e.g. channels)
+- Reducing compute and memory with structured pruning (z. B. channels)
 - Combining with quantization for smaller, faster models
 
-## External documentation
+## Externe Dokumentation
 
 - [TensorFlow – Pruning](https://www.tensorflow.org/model_optimization/guide/pruning)
 - [PyTorch – Pruning tutorial](https://pytorch.org/tutorials/intermediate/pruning_tutorial.html)
 
-## See also
+## Siehe auch
 
 - [Model compression](/docs/model-compression)
 - [Knowledge distillation](/docs/knowledge-distillation)

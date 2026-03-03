@@ -1,20 +1,20 @@
 ---
 title: ReAct (Reasoning + Acting)
-description: Interleaving reasoning and action in agents.
-keywords: [ReAct, reasoning, acting, agents]
+description: Raciocínio + Ação para agentes LLM.
+keywords: [ReAct, raciocínio, acting, agents]
 ---
 
 # ReAct (Reasoning + Acting)
 
-## Definition
+## Definição
 
-ReAct is a paradigm where the model alternates **reasoning** (what to do next, why) and **acting** (tool calls). The observation from the environment feeds back into the next reasoning step, forming a loop until the task is done.
+ReAct é um paradigma onde o modelo alterna **raciocínio** (o que fazer a seguir, por quê) e **ação** (chamadas de ferramentas). A observação do ambiente feeds back into the next raciocínio step, forming a loop until the task is done.
 
-It is the standard pattern for [agents](/docs/agents) that use tools: each action is preceded by a thought, which reduces blind or repetitive tool use. Often combined with [chain-of-thought](/docs/reasoning-patterns/cot) (reasoning inside the thought) and with [RDD](/docs/reasoning-patterns/rdd) when specs guide decisions.
+É the standard pattern for [agents](/docs/agents) que usam ferramentas: cada ação é precedida por um pensamento, o que reduz o uso cego ou repetitivo de ferramentas. Ften combined with [chain-of-thought](/docs/reasoning-patterns/cot) (raciocínio inside the thought) and with [RDD](/docs/reasoning-patterns/rdd) when specs guide decisãos.
 
-## How it works
+## Como funciona
 
-Prompt format is **Thought → Action → Observation → Thought → … → Final Answer**. The **user** gives a **task**; the **agent** produces a **thought** (reasoning about what to do), then an **action** (e.g. tool call). The **environment/tools** return an **observation**, which is appended to the context for the next thought. The loop continues until the agent outputs a final answer. The model decides when to call tools and when to conclude, which reduces arbitrary or repetitive actions. The sequence diagram below summarizes this flow; frameworks like LangChain implement ReAct-style agents with tool registration and message handling.
+Formato do prompt é **Pensamento → Ação → Observação → Pensamento → … → Resposta Final**. O **usuário** dá uma **tarefa**; o **agent** produces a **thought** (raciocínio about what to do), then an **action** (por ex. tool call). The **environment/tools** return an **observation**, which is appended to the context for the next thought. The loop continues until the agent outputs a final answer. The model decides when to call tools and when to conclude, which reduces arbitrary or repetitive actions. The sequence diagram below summarizes this flow; frameworks like LangChain implement ReAct-style agents with tool registration and message handling.
 
 ```mermaid
 sequenceDiagram
@@ -30,20 +30,20 @@ sequenceDiagram
   Agent->>User: Final answer
 ```
 
-## Use cases
+## Casos de uso
 
-ReAct fits agent workflows where each tool call should be preceded by a clear reasoning step.
+ReAct fits agent workflows where each tool call should be preceded by a clear raciocínio step.
 
-- Agents that use tools (search, calculator, API) with explicit reasoning
-- Reducing arbitrary or repetitive tool calls by interleaving thought
+- Agents that use tools (search, calculator, API) with explicit raciocínio
+- Reducing arbitrary or repetitive chamadas de ferramentas by interleaving thought
 - Debuggable agent behavior via visible thought–action–observation traces
 
-## External documentation
+## Documentação externa
 
 - [ReAct: Synergizing Reasoning and Acting in LLMs (Yao et al.)](https://arxiv.org/abs/2210.03629) — Original ReAct paper
 - [LangChain – ReAct agent](https://python.langchain.com/docs/concepts/agents/) — ReAct-style agents in LangChain
 
-## See also
+## Veja também
 
 - [Agents](/docs/agents)
 - [Chain-of-thought](/docs/reasoning-patterns/cot)

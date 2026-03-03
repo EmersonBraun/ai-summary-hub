@@ -1,18 +1,18 @@
 ---
-title: Model compression
-description: Reducing model size and compute for deployment.
+title: 模型压缩
+description: 减小模型大小和计算量以用于部署。
 keywords: [model compression, pruning, quantization, distillation]
 ---
 
-# Model compression
+# 模型压缩
 
-## Definition
+## 定义
 
-Model compression reduces the size, latency, or memory of models so they can run on edge or with limited compute. Methods include [pruning](/docs/pruning), [quantization](/docs/quantization), and [knowledge distillation](/docs/knowledge-distillation).
+模型压缩减少模型的大小、延迟或内存 so they can run on edge or with limited compute. Methods include [pruning](/docs/pruning), [quantization](/docs/quantization), and [knowledge distillation](/docs/knowledge-distillation).
 
-Use it when the full model is too large for deployment (e.g. [LLMs](/docs/llms) on edge, real-time serving). Trade off accuracy vs size/latency; often combine several methods. See [infrastructure](/docs/infrastructure) for how compressed models are served at scale.
+当…时使用 the full model is too large for deployment (例如 [LLMs](/docs/llms) on edge, real-time serving). Trade off accuracy vs size/latency; often combine several methods. See [infrastructure](/docs/infrastructure) for how compressed models are served at scale.
 
-## How it works
+## 工作原理
 
 ```mermaid
 flowchart LR
@@ -20,9 +20,9 @@ flowchart LR
   Compress --> SmallModel[Small model]
 ```
 
-You start from a **large model** and apply one or more **compress** steps. **Pruning** removes low-importance weights or structures (unstructured or channel-wise). **Quantization** stores weights (and optionally activations) in lower precision (e.g. INT8). **Distillation** trains a smaller **small model** (student) to mimic the large one (teacher) via soft labels or representations. The result is a smaller, faster model; accuracy is validated on a dev set. Methods are often combined (e.g. prune then quantize, or distill then quantize) and may require fine-tuning to recover accuracy.
+你从一个**大模型**开始，应用一个或多个**压缩**步骤。**剪枝**移除低重要性的权重或 structures (unstructured or channel-wise). **Quantization** stores weights (and optionally activations) in lower precision (例如 INT8). **Distillation** trains a smaller **small model** (student) to mimic the large one (teacher) via soft labels or representations. 结果是一个 smaller, faster model; accuracy is validated on a dev set. Methods are often combined (例如 prune then quantize, or distill then quantize) and may require fine-tuning to recover accuracy.
 
-## Use cases
+## 应用场景
 
 Model compression is used when you need smaller or faster models for edge, mobile, or cost-sensitive production.
 
@@ -30,12 +30,12 @@ Model compression is used when you need smaller or faster models for edge, mobil
 - Reducing inference latency and cost in production
 - Combining pruning, quantization, and distillation for maximum compression
 
-## External documentation
+## 外部文档
 
 - [PyTorch – Quantization](https://pytorch.org/docs/stable/quantization.html)
 - [TensorFlow – Model optimization](https://www.tensorflow.org/model_optimization)
 
-## See also
+## 另请参阅
 
 - [Quantization](/docs/quantization)
 - [Pruning](/docs/pruning)

@@ -1,18 +1,18 @@
 ---
-title: Chain-of-thought (CoT)
-description: Step-by-step reasoning to improve LLM outputs.
-keywords: [chain-of-thought, CoT, reasoning]
+title: Cadena de pensamiento (CoT)
+description: Razonamiento paso a paso para mejorar las salidas del LLM.
+keywords: [chain-of-thought, CoT, razonamiento]
 ---
 
-# Chain-of-thought (CoT)
+# Cadena de pensamiento (CoT)
 
-## Definition
+## Definición
 
-Chain-of-thought (CoT) prompting asks the model to output intermediate reasoning steps before the final answer. This often improves accuracy on math, logic, and multi-step tasks.
+El prompting de cadena de pensamiento (CoT) pide al modelo que genere pasos intermedios de razonamiento before the final answer. This often improves accuracy on math, logic, and multi-step tasks.
 
-It is one of the simplest [reasoning patterns](/docs/reasoning-patterns): no tools or search, just prompting. Use it when the task benefits from explicit steps (e.g. arithmetic, deduction) and you want to avoid [fine-tuning](/docs/llms/fine-tuning). For exploring multiple solution paths, see [tree of thoughts](/docs/reasoning-patterns/tot); for tool-using agents, see [ReAct](/docs/reasoning-patterns/react).
+Es one of the simplest [razonamiento patterns](/docs/reasoning-patterns): sin herramientas ni búsqueda, solo prompting. Úselo cuando the task benefits from explicit steps (por ej. arithmetic, deduction) and you want to avoid [fine-tuning](/docs/llms/fine-tuning). For exploring multiple solution paths, see [tree of thoughts](/docs/reasoning-patterns/tot); for tool-using agents, see [ReAct](/docs/reasoning-patterns/react).
 
-## How it works
+## Cómo funciona
 
 ```mermaid
 flowchart LR
@@ -22,22 +22,22 @@ flowchart LR
   More --> Answer[Answer]
 ```
 
-You give the model a **question** (or task) and ask it to reason step by step. The model produces **Step1**, **Step2**, … (intermediate reasoning) and then the **answer**. **Zero-shot CoT**: add “Let’s think step by step” (or similar) to the prompt. **Few-shot CoT**: include example (question, steps, answer) triples so the model mimics the format. The model generates the sequence in one pass; you can optionally parse the steps and verify or score them. Quality depends on [prompt engineering](/docs/llms/prompt-engineering) and model capability.
+You give the model a **question** (or task) and ask it to reason paso a paso. The model produce **Step1**, **Step2**, … (intermediate razonamiento) and then the **answer**. **Zero-shot CoT**: add “Let’s think paso a paso” (or similar) to the prompt. **Few-shot CoT**: include example (question, steps, answer) triples so the model mimics the format. The model generates the sequence in one pass; you can optionally parse the steps and verify or score them. Quality depends on [prompt engineering](/docs/llms/prompt-engineering) and model capability.
 
-## Use cases
+## Casos de uso
 
-Chain-of-thought is most useful when the task benefits from explicit intermediate steps (math, logic, code).
+Chain-of-thought es más útil cuando la tarea se beneficia de pasos intermedios explícitos (matemáticas, lógica, código).
 
 - Math and arithmetic where intermediate steps improve accuracy
 - Logic puzzles and multi-step deduction
-- Code or design reasoning where showing steps aids debugging
+- Code or diseño razonamiento where showing steps aids debugging
 
-## External documentation
+## Documentación externa
 
 - [Chain-of-Thought Prompting (Wei et al.)](https://arxiv.org/abs/2201.11903) — CoT paper
-- [OpenAI – Prompt engineering](https://platform.openai.com/docs/guides/prompt-engineering) — Includes reasoning and step-by-step guidance
+- [OpenAI – Prompt engineering](https://platform.openai.com/docs/guides/prompt-engineering) — Includes razonamiento and step-by-step guidance
 
-## See also
+## Ver también
 
 - [Tree of thoughts](/docs/reasoning-patterns/tot)
 - [Prompt engineering](/docs/llms/prompt-engineering)

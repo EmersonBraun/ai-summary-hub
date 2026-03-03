@@ -1,18 +1,18 @@
 ---
-title: Few-shot learning
+title: Aprendizado com poucos exemplos
 description: Learning from very few examples.
 keywords: [few-shot, meta-learning, MAML]
 ---
 
-# Few-shot learning
+# Aprendizado com poucos exemplos
 
-## Definition
+## Definição
 
-Few-shot learning aims to adapt quickly from a small number of labeled examples (e.g. 1–5 per class). Meta-learning (e.g. MAML) trains models to be good at few-shot adaptation.
+Few-shot learning aims to adapt quickly from a small number of labeled examples (por ex. 1–5 por classe). Meta-learning (por ex. MAML) trains models to be good at few-shot adaptation.
 
-It sits between [transfer learning](/docs/transfer-learning) (more target data) and [zero-shot](/docs/zero-shot-learning) (no target examples). [LLMs](/docs/llms) do few-shot implicitly via in-context examples in the prompt; classical few-shot uses episodic meta-training (e.g. MAML) so the model learns to adapt from a support set.
+Situa-se entre [transfer learning](/docs/transfer-learning) (more target data) and [zero-shot](/docs/zero-shot-learning) (no target examples). [LLMs](/docs/llms) do few-shot implicitly via in-context examples in the prompt; classical few-shot uses episodic meta-training (por ex. MAML) so the model learns to adapt from a support set.
 
-## How it works
+## Como funciona
 
 ```mermaid
 flowchart LR
@@ -21,22 +21,22 @@ flowchart LR
   Query --> Predict[Predict]
 ```
 
-Each task has a **support set** (few labeled examples, e.g. 1–5 per class) and a **query set** (examples to predict). **Adapt**: the model uses the support set to adapt (e.g. compute prototypes, or take a few gradient steps in MAML). **Predict**: the adapted model predicts labels for the query set. **Episodic training**: sample many few-shot tasks from a meta-train set; for each, adapt on the task support set and optimize so that predictions on the query set improve. At test time, the model gets a new task’s support set and predicts on its query set. For LLMs, "adapt" is just conditioning on the support examples in the prompt (in-context few-shot).
+Cada tarefa tem um **conjunto de suporte** (poucos exemplos rotulados, por ex. 1–5 por classe) e um **conjunto de consulta** (exemplos para prever). **Adaptar**: o modelo usa o conjunto de suporte para se adaptar (por ex. compute prototypes, or take a few gradient steps in MAML). **Predict**: the adapted model predicts labels for the query set. **Episodic training**: sample many few-shot tasks from a meta-train set; for each, adapt on the task support set and optimize so that predictions on the query set improve. At test time, the model gets a new task’s support set and predicts on its query set. For LLMs, "adapt" is just conditioning on the support examples in the prompt (in-context few-shot).
 
-## Use cases
+## Casos de uso
 
-Few-shot learning applies when you have only a handful of examples per class or task (including in-context LLM prompts).
+Few-shot learning applies when you have only a handful of examples por classe or task (including in-context LLM prompts).
 
-- Classifying rare classes with only a few labeled examples
-- LLM in-context learning (e.g. 1–5 examples in the prompt)
+- Classifying rare classes with only a poucos exemplos rotulados
+- LLM in-context learning (por ex. 1–5 examples in the prompt)
 - Rapid adaptation in robotics or personalization with minimal data
 
-## External documentation
+## Documentação externa
 
 - [Model-Agnostic Meta-Learning (MAML) (Finn et al.)](https://arxiv.org/abs/1703.03400)
 - [Hugging Face – Few-shot learning](https://huggingface.co/docs/transformers/tasks/summarization#few-shot-summarization)
 
-## See also
+## Veja também
 
 - [Zero-shot learning](/docs/zero-shot-learning)
 - [LLMs](/docs/llms)

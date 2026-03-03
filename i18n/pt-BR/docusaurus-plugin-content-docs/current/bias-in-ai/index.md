@@ -1,35 +1,35 @@
 ---
-title: Bias in AI
-description: Sources and mitigation of bias in ML systems.
-keywords: [bias, fairness, discrimination]
+title: Viés em IA
+description: Fontes e mitigação de viés em sistemas de ML.
+keywords: [viés, justiça, discriminação]
 ---
 
-# Bias in AI
+# Viés em IA
 
-## Definition
+## Definição
 
-Bias in AI refers to systematic errors or unfair outcomes (e.g. across demographics) arising from data, model design, or deployment. Mitigation includes data audits, fairness metrics, and debiasing methods.
+Viés em IA refere-se a erros sistemáticos ou resultados injustos (por ex. across demographics) arising from data, model projeto, or deployment. Mitigation includes data audits, fairness metrics, and debiasing methods.
 
-It is a core concern in [AI ethics](/docs/ai-ethics) and [AI safety](/docs/ai-safety). [Evaluation metrics](/docs/evaluation-metrics) for fairness (e.g. demographic parity, equalized odds) are used in audits and before deploying in regulated domains. [Explainable AI](/docs/xai) can help identify when and why bias appears.
+É a core concern in [AI ethics](/docs/ai-ethics) and [AI safety](/docs/ai-safety). [Evaluation metrics](/docs/evaluation-metrics) for fairness (por ex. demographic parity, equalized odds) are used in audits and before deploying in regulated domains. [Explainable AI](/docs/xai) can help identify when and why bias appears.
 
-## How it works
+## Como funciona
 
-Bias can **enter** via skewed training data (underrepresentation, label bias), proxy variables (e.g. zip code for race), or feedback loops (model outputs influence future data). **Detection** uses fairness metrics (e.g. demographic parity, equalized odds, calibration by group) on [evaluation](/docs/evaluation-metrics) sets stratified by protected attributes. **Mitigation** includes: data (reweighting, resampling, collecting more representative data); training (fairness constraints, adversarial debiasing); and post-processing (thresholds or rules per group). Trade-offs exist between fairness metrics and accuracy; legal and domain norms define which metrics and thresholds to use. Audits should be run before deployment and monitored in production.
+O viés pode **entrar** por dados de treinamento enviesados (sub-representação, viés de rótulo), variáveis proxy (por ex. CEP para raça), ou loops de feedback (modelo outputs influence future data). **Detection** uses fairness metrics (por ex. demographic parity, equalized odds, calibration by group) on [evaluation](/docs/evaluation-metrics) sets stratified by protected attributes. **Mitigation** includes: data (reweighting, resampling, collecting more representative data); training (fairness constraints, adversarial debiasing); and post-processing (thresholds or rules per group). Trade-offs exist between fairness metrics and accuracy; legal and domain norms define which metrics and thresholds to use. Audits should be run before deployment and monitored in production.
 
-## Use cases
+## Casos de uso
 
-Bias work applies when model decisions affect people in regulated or sensitive domains (hiring, lending, scoring, content).
+Bias work applies when model decisãos affect people in regulated or sensitive domains (hiring, lending, scoring, content).
 
 - Auditing hiring, lending, or scoring systems for discriminatory impact
 - Fairness checks before deploying models in regulated domains
 - Explainability and remediation when bias is detected
 
-## External documentation
+## Documentação externa
 
 - [Google – Responsible AI – Fairness](https://ai.google.dev/responsible-ai)
 - [Fairness and Machine Learning (Barocas et al.)](https://fairmlbook.org/) — Free book
 
-## See also
+## Veja também
 
 - [AI ethics](/docs/ai-ethics)
 - [AI safety](/docs/ai-safety)

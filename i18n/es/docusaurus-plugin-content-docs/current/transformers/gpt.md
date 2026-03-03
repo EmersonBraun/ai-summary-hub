@@ -1,18 +1,18 @@
 ---
 title: GPT
-description: Generative Pre-trained Transformer and decoder-only models.
-keywords: [GPT, decoder, autoregressive, LLM]
+description: Transformer generativo preentrenado y modelos solo-decoder.
+keywords: [GPT, decoder, autorregresivo, LLM]
 ---
 
 # GPT
 
-## Definition
+## Definición
 
-GPT refers to decoder-only transformer models trained to predict the next token (autoregressive). Scaling these models has led to today's large language models (LLMs) capable of few-shot and zero-shot tasks.
+GPT se refiere a modelos transformer solo-decoder entrenados para predecir el siguiente token (autorregresivo). Escalar estos modelos ha llevado a los grandes modelos de lenguaje (LLMs) actuales capaces de tareas few-shot y zero-shot.
 
-Decoder-only design is well-suited for **generation**: at each step the model conditions on previous tokens and predicts the next. [LLMs](/docs/llms) built on this idea are then instruction-tuned and aligned (e.g. RLHF) for chat and tool use. For understanding-only tasks, [BERT](/docs/transformers/bert)-style encoders can be more parameter-efficient.
+El diseño solo-decoder es ideal para la **generación**: en cada paso el modelo se condiciona en tokens anteriores y predice el siguiente. Los [LLMs](/docs/llms) basados en esta idea se afinan con instrucciones y se alinean (p. ej., RLHF) para chat y uso de herramientas. Para tareas de solo comprensión, los encoders estilo [BERT](/docs/transformers/bert) pueden ser más eficientes en parámetros.
 
-## How it works
+## Cómo funciona
 
 ```mermaid
 flowchart LR
@@ -21,22 +21,22 @@ flowchart LR
   DecoderLayers --> NextToken["Next token"]
 ```
 
-**Tokens** are embedded and fed into **causal decoder layers**: each position can attend only to itself and previous positions (masked self-attention), so the model cannot “see” the future. The **next token** is predicted from the last position’s representation (often with a linear layer and softmax over the vocabulary). **Training** maximizes the likelihood of the next token given the preceding context (teacher forcing). **Inference** generates autoregressively: sample or greedily pick the next token, append it, and repeat until a stop condition. [Prompt engineering](/docs/llms/prompt-engineering) and [fine-tuning](/docs/llms/fine-tuning) shape how the model uses this mechanism for tasks.
+Los **tokens** se embeben y se alimentan en **capas causales de decoder**: cada posición solo puede atender a sí misma y a posiciones anteriores (auto-atención enmascarada), por lo que el modelo no puede "ver" el futuro. El **siguiente token** se predice a partir de la representación de la última posición (generalmente con una capa lineal y softmax sobre el vocabulario). El **entrenamiento** maximiza la probabilidad del siguiente token dado el contexto anterior (teacher forcing). La **inferencia** genera autorregresivamente: se muestrea o se elige ávidamente el siguiente token, se añade y se repite hasta una condición de parada. [Prompt engineering](/docs/llms/prompt-engineering) y [afinamiento](/docs/llms/fine-tuning) moldean cómo el modelo usa este mecanismo para tareas.
 
-## Use cases
+## Casos de uso
 
-Decoder-only models are the backbone of chat, code, and any task that benefits from autoregressive generation or few-shot prompting.
+Los modelos solo-decoder son la base del chat, código y cualquier tarea que se beneficie de generación autorregresiva o prompting few-shot.
 
-- Text and code generation (completion, summarization, dialogue)
-- Few-shot and zero-shot classification via prompts
-- Assistants and chatbots built on instruction-tuned models
+- Generación de texto y código (completado, resumen, diálogo)
+- Clasificación few-shot y zero-shot mediante prompts
+- Asistentes y chatbots basados en modelos afinados con instrucciones
 
-## External documentation
+## Documentación externa
 
 - [Improving Language Understanding by Generative Pre-Training (OpenAI)](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf)
 - [Hugging Face – GPT-2](https://huggingface.co/docs/transformers/model_doc/gpt2)
 
-## See also
+## Ver también
 
 - [Transformers](/docs/transformers)
 - [LLMs](/docs/llms)

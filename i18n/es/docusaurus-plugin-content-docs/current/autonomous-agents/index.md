@@ -1,18 +1,18 @@
 ---
-title: Autonomous agents
-description: Agents that operate with minimal human intervention.
-keywords: [autonomous agents, long-horizon, self-directed]
+title: Agentes autónomos
+description: Agentes que operan con mínima intervención humana.
+keywords: [agentes autónomos, largo horizonte, autodirigido]
 ---
 
-# Autonomous agents
+# Agentes autónomos
 
-## Definition
+## Definición
 
-Autonomous agents pursue goals over extended horizons with limited human input. They plan, use tools, and adapt when the environment or task changes (e.g. coding agents, research assistants).
+Los agentes autónomos persiguen objetivos a largo plazo con intervención humana limitada. They plan, use tools, and adapt when the environment or task changes (por ej. codificación agents, research assistants).
 
-They sit at the “high autonomy” end of the [agents](/docs/agents) spectrum: instead of one user turn and one response, they run long loops (plan → act → observe → replan) until the goal is met or a limit is hit. [Subagents](/docs/subagents) and [reasoning patterns](/docs/reasoning-patterns) (e.g. ReAct, ToT) are often used inside autonomous agents to structure planning and action.
+They se sitúan en el “alta autonomía” extremo del [agents](/docs/agents) espectro: en lugar de un turno de usuario y una respuesta, ejecutan bucles largos (plan → act → observe → replan) until the goal is met or a limit is hit. [Subagents](/docs/subagents) and [razonamiento patterns](/docs/reasoning-patterns) (por ej. ReAct, ToT) are often used inside autonomous agents to structure planning and action.
 
-## How it works
+## Cómo funciona
 
 ```mermaid
 flowchart LR
@@ -22,22 +22,22 @@ flowchart LR
   Observe --> Plan
 ```
 
-The agent starts from a **goal** (e.g. “implement feature X”). It **plans** (possibly breaking into steps or sub-tasks), then **acts** (tool calls, code edits, search). The **observe** step captures results (tool outputs, errors, state) and feeds back into **plan** for the next iteration. The loop combines planning, memory (what was tried, what worked), tool use, and often reflection (e.g. self-critique). It runs until a stopping condition: task done, step/budget limit, or human-in-the-loop check. Safety and oversight (e.g. approval gates, rollback) are important when autonomy is high.
+The agent starts from a **goal** (por ej. “implement feature X”). It **plans** (possibly breaking into steps or sub-tasks), then **acts** (llamadas a herramientas, code edits, search). The **observe** step captures results (tool outputs, errors, state) and feeds back into **plan** for the next iteration. The loop combines planning, memory (what was tried, what worked), tool use, and often reflection (por ej. self-critique). It runs until a stopping condition: task done, step/budget limit, or human-in-the-loop check. Safety and oversight (por ej. approval gates, rollback) are important when autonomy is high.
 
-## Use cases
+## Casos de uso
 
-Autonomous agents are a fit for long-horizon, multi-step work where the system must plan, act, and adapt without step-by-step human input.
+Los agentes autónomos son adecuados para trabajo de largo horizonte y múltiples pasos donde el sistema debe planificar, actuar y adaptarse sin input humano paso a paso.
 
-- Long-horizon coding agents that plan, edit, and test
+- Long-horizon codificación agents that plan, edit, and test
 - Research assistants that gather sources, summarize, and iterate
 - Data pipelines that adapt when inputs or schemas change
 
-## External documentation
+## Documentación externa
 
 - [From Prototypes to Agents with ADK – Google Codelabs](https://codelabs.developers.google.com/your-first-agent-with-adk#0)
 - [LangChain – Autonomous agents](https://python.langchain.com/docs/concepts/agents/)
 
-## See also
+## Ver también
 
 - [Agents](/docs/agents)
 - [Subagents](/docs/subagents)

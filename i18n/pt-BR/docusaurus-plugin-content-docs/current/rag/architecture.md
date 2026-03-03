@@ -1,18 +1,18 @@
 ---
-title: RAG architecture
-description: Components and design choices in RAG systems.
-keywords: [RAG, architecture, chunks, retrieval]
+title: Arquitetura RAG
+description: Design de sistemas RAG e visão geral dos componentes.
+keywords: [RAG, architecture, chunks, recuperação]
 ---
 
-# RAG architecture
+# Arquitetura RAG
 
-## Definition
+## Definição
 
-RAG architecture covers how you chunk documents, choose embeddings and vector stores, run retrieval (dense, sparse, or hybrid), and combine context with the LLM (prompt design, reranking).
+RAG architecture covers how you chunk documents, choose embeddings and vector stores, run recuperação (dense, sparse, or hybrid), and combine context with the LLM (prompt projeto, reranking).
 
 Design choices here directly affect [RAG](/docs/rag) quality and latency. Trade-offs include chunk size (larger = more context per chunk, less precision), [embedding](/docs/rag/embeddings) model (quality vs cost), and whether to add a reranker or hybrid search. See [vector databases](/docs/rag/vector-databases) for indexing options.
 
-## How it works
+## Como funciona
 
 ```mermaid
 flowchart LR
@@ -23,22 +23,22 @@ flowchart LR
   Retrieve --> Rank[Rank]
 ```
 
-**Chunk:** Documents are split into segments (by paragraph, sentence, or fixed size); overlap and metadata can be added. **Embed** and **index:** Chunks are turned into vectors via an [embedding](/docs/rag/embeddings) model and stored in a [vector database](/docs/rag/vector-databases). **Query:** At query time the query is embedded; **retrieve** fetches the top-k similar chunks (dense search), optionally combined with keyword (sparse) for hybrid. **Rank:** An optional reranker (e.g. cross-encoder) rescores the top candidates. The chosen chunks are then formatted into the LLM prompt. Advanced setups add query rewriting, multi-hop retrieval, and citation extraction.
+**Fragmentação:** Documentos são divididos em segmentos (por parágrafo, sentença ou tamanho fixo); sobreposição e metadados podem ser adicionados. **Embed** and **index:** Chunks are turned into vectors via an [embedding](/docs/rag/embeddings) model and stored in a [vector database](/docs/rag/vector-databases). **Query:** At query time the query is embedded; **retrieve** fetches the top-k similar chunks (dense search), optionally combined with keyword (sparse) for hybrid. **Rank:** An optional reranker (por ex. cross-encoder) rescores the top candidates. The chosen chunks are then formatted into the LLM prompt. Advanced setups add query rewriting, multi-hop recuperação, and citation extraction.
 
-## Use cases
+## Casos de uso
 
-Architecture choices (chunking, retrieval, reranking) directly affect answer quality and latency in production RAG.
+Architecture choices (chunking, recuperação, reranking) directly affect answer quality and latency in production RAG.
 
 - Designing chunking and indexing for long documents or codebases
-- Choosing dense vs. sparse or hybrid retrieval for domain data
+- Choosing dense vs. sparse or hybrid recuperação for domain data
 - Adding reranking and citation for production RAG systems
 
-## External documentation
+## Documentação externa
 
 - [LangChain – RAG architecture](https://python.langchain.com/docs/use_cases/question_answering/)
 - [LlamaIndex – Document processing and indexing](https://docs.llamaindex.ai/en/stable/module_guides/loading/)
 
-## See also
+## Veja também
 
 - [RAG](/docs/rag)
 - [Vector databases](/docs/rag/vector-databases)

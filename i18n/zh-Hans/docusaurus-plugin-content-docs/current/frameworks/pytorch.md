@@ -1,35 +1,35 @@
 ---
 title: PyTorch
 description: Deep learning framework with dynamic computation graphs.
-keywords: [PyTorch, deep learning, research]
+keywords: [PyTorch, 深度学习, research]
 ---
 
 # PyTorch
 
-## Definition
+## 定义
 
-PyTorch is a popular [deep learning](/docs/fundamentals/deep-learning) framework with an imperative, Pythonic style. It is widely used in research and industry and is the base for many libraries ([Hugging Face](/docs/tools/huggingface), torchvision, etc.).
+PyTorch is a popular [deep learning](/docs/fundamentals/deep-learning) framework with an imperative, Pythonic style. 它是 widely used in research and industry and is the base for many libraries ([Hugging Face](/docs/tools/huggingface), torchvision, etc.).
 
 It competes with [TensorFlow](/docs/frameworks/tensorflow); PyTorch is often preferred for research and rapid iteration due to eager execution and clear debugging. Used for [LLMs](/docs/llms), [vision](/docs/cv), [NLP](/docs/nlp), and [RL](/docs/drl); production deployment uses TorchScript, ONNX, or dedicated runtimes.
 
-## How it works
+## 工作原理
 
-You **define models** as Python classes (nn.Module); the **forward pass** runs immediately (eager mode), and **autograd** records operations for **backprop**. Optimizers (e.g. Adam) update parameters from computed gradients. Training loops are explicit (for epoch, for batch, loss.backward(), optimizer.step()), which makes experimentation and debugging straightforward. For **deployment**, export to TorchScript (Python-free), ONNX (cross-framework), or PyTorch Mobile. Distributed training uses torch.distributed or higher-level APIs (e.g. Hugging Face Accelerate). The same code can run on CPU, GPU, or multiple GPUs with minimal changes.
+你将**模型定义**为 Python 类（nn.Module）；**前向传播**立即运行（eager 模式），**autograd** records operations for **backprop**. Optimizers (例如 Adam) update parameters from computed gradients. Training loops are explicit (for epoch, for batch, loss.backward(), optimizer.step()), which makes experimentation and debugging straightforward. For **deployment**, export to TorchScript (Python-free), ONNX (cross-framework), or PyTorch Mobile. Distributed training uses torch.distributed or higher-level APIs (例如 Hugging Face Accelerate). The same code can run on CPU, GPU, or multiple GPUs with minimal changes.
 
-## Use cases
+## 应用场景
 
 PyTorch is a natural fit for research, prototyping, and production when you want flexibility and a Python-first workflow.
 
-- Research and prototyping (e.g. new architectures, experiments)
+- Research and prototyping (例如 new architectures, experiments)
 - Training and fine-tuning models (vision, NLP, RL)
 - Production deployment via TorchScript, ONNX, or mobile
 
-## External documentation
+## 外部文档
 
 - [PyTorch – Get started](https://pytorch.org/get-started/locally/)
 - [PyTorch tutorials](https://pytorch.org/tutorials/)
 
-## See also
+## 另请参阅
 
 - [TensorFlow](/docs/frameworks/tensorflow)
 - [Hugging Face](/docs/tools/huggingface)

@@ -1,6 +1,6 @@
 ---
 title: Case study — ChatGPT
-description: How ChatGPT and conversational LLMs work.
+description: Wie ChatGPT und konversationelle LLMs funktionieren.
 keywords: [ChatGPT, OpenAI, conversational AI]
 ---
 
@@ -8,15 +8,15 @@ keywords: [ChatGPT, OpenAI, conversational AI]
 
 ## Definition
 
-ChatGPT is a family of conversational [LLMs](/docs/llms) from OpenAI. They are trained with supervised [fine-tuning](/docs/llms/fine-tuning) and reinforcement learning from human feedback (RLHF) to follow instructions and converse safely.
+ChatGPT ist eine Familie von konversationellen [LLMs](/docs/llms) von OpenAI. Sie sind trained with supervised [Feinabstimmung](/docs/llms/fine-tuning) und Reinforcement Learning aus menschlichem Feedback trainiert (RLHF) to follow instructions and converse safely.
 
-They illustrate the full [LLM](/docs/llms) stack: pretrained base model, instruction tuning, and [RL](/docs/rl)-based alignment (RLHF). The same ideas (instruction tuning, preference optimization) appear in open and other proprietary models. Use case: chat, [prompt](/docs/llms/prompt-engineering)-driven tasks, and [agent](/docs/agents)-like workflows with tools.
+They illustrate die vollständige [LLM](/docs/llms) Stack: vortrainiertes Basismodell, Instruktions-Tuning und [RL](/docs/rl)-basierte Ausrichtung (RLHF). Die gleichen Ideen (Instruktions-Tuning, Präferenzoptimierung) appear in open and other proprietary models. Use case: chat, [prompt](/docs/llms/prompt-engineering)-driven tasks, and [agent](/docs/agents)-like workflows with tools.
 
-## How it works
+## Funktionsweise
 
-Start from a **base model** (e.g. GPT-4): a [decoder-only](/docs/transformers/gpt) [transformer](/docs/transformers) pretrained on next-token prediction. **Instruction tuning**: fine-tune on (instruction, response) pairs so the model follows user intent. **RLHF**: train a **reward model** on human preference data (which of two responses is better); then optimize the **policy** (the LLM) with [reinforcement learning](/docs/rl) (e.g. PPO) to maximize the reward. The result is a model that is helpful, follows instructions, and is less likely to produce harmful or off-policy content. **Safety and guardrails** (content filters, refusals, monitoring) are applied in the product. [Prompt engineering](/docs/llms/prompt-engineering) and [RAG](/docs/rag) or [agents](/docs/agents) extend the system for specific use cases.
+Start from a **base model** (z. B. GPT-4): a [Decoder-only](/docs/transformers/gpt) [transformer](/docs/transformers) vortrainiert auf Next-Token-Vorhersage. **Instruction tuning**: fine-tune on (instruction, response) pairs sodass das model follows user intent. **RLHF**: train a **reward model** on human preference data (which of two responses is better); then optimize the **policy** (the LLM) with [reinforcement learning](/docs/rl) (z. B. PPO) to maximize the reward. Das Ergebnis ist ein model that is helpful, follows instructions, and is less likely to produce harmful or off-policy content. **Safety and guardrails** (content filters, refusals, monitoring) are applied in the product. [Prompt engineering](/docs/llms/prompt-engineering) and [RAG](/docs/rag) or [agents](/docs/agents) extend the system for specific use cases.
 
-## Use cases
+## Anwendungsfälle
 
 ChatGPT-style systems fit chat, writing, code help, and task automation that benefit from instruction-following and tool use.
 
@@ -24,12 +24,12 @@ ChatGPT-style systems fit chat, writing, code help, and task automation that ben
 - Writing, summarization, and brainstorming
 - Code help, tutoring, and task automation via chat
 
-## External documentation
+## Externe Dokumentation
 
 - [OpenAI – ChatGPT and models](https://openai.com/chatgpt)
-- [InstructGPT (Ouyang et al.)](https://arxiv.org/abs/2203.02155) — RLHF and instruction tuning
+- [InstructGPT (Ouyang et al.)](https://arxiv.org/abs/2203.02155) — RLHF and Instruktions-Tuning
 
-## See also
+## Siehe auch
 
 - [LLMs](/docs/llms)
 - [Reinforcement learning](/docs/rl)
