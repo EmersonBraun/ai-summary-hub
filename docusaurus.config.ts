@@ -119,8 +119,8 @@ const config: Config = {
       copyright: `AI Summary Hub. Created by <a href="https://www.linkedin.com/in/emerson-braun/" target="_blank" rel="noopener noreferrer">Emerson Braun</a>, last updated on ${new Date().toLocaleDateString('en-GB')}`,
     },
     algolia: {
-      appId: process.env.ALGOLIA_APP_ID ?? 'placeholder',
-      apiKey: process.env.ALGOLIA_API_KEY ?? 'placeholder',
+      appId: process.env.ALGOLIA_APP_ID || 'placeholder',
+      apiKey: process.env.ALGOLIA_API_KEY || 'placeholder',
       indexName: 'ai-summary-hub',
       contextualSearch: true,
     },
