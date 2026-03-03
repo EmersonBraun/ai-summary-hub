@@ -1,42 +1,42 @@
 ---
-title: AI fundamentals
-description: Core concepts in artificial intelligence and machine learning.
-keywords: [AI, fundamentals, basics]
+title: KI-Grundlagen
+description: Kernkonzepte der künstlichen Intelligenz und des maschinellen Lernens.
+keywords: [KI, Grundlagen, Grundlagen]
 ---
 
-# AI fundamentals
+# KI-Grundlagen
 
 ## Definition
 
-AI fundamentals cover the core ideas behind artificial intelligence: what we mean by learning, representation, and generalization. This includes supervised and unsupervised learning, optimization, and the relationship between data, models, and objectives.
+KI-Grundlagen umfassen die Kernideen hinter künstlicher Intelligenz: was wir unter Lernen, Repräsentation und Generalisierung verstehen. Dies beinhaltet überwachtes und unüberwachtes Lernen, Optimierung und die Beziehung zwischen Daten, Modellen und Zielen.
 
-These ideas underpin both classical [machine learning](/docs/fundamentals/machine-learning) and [deep learning](/docs/fundamentals/deep-learning). Understanding them helps you choose the right paradigm, interpret results, and reason about limits (e.g. data requirements, bias, robustness).
+Diese Ideen bilden die Grundlage sowohl für klassisches [maschinelles Lernen](/docs/fundamentals/machine-learning) als auch für [Deep Learning](/docs/fundamentals/deep-learning). Ihr Verständnis hilft Ihnen, das richtige Paradigma zu wählen, Ergebnisse zu interpretieren und über Grenzen nachzudenken (z. B. Datenanforderungen, Bias, Robustheit).
 
-## How it works
+## Funktionsweise
 
 ```mermaid
 flowchart LR
-  Data[Data] --> Model[Model]
-  Model --> Prediction[Prediction]
+  Data[Daten] --> Model[Modell]
+  Model --> Prediction[Vorhersage]
 ```
 
-In practice, **data** is collected or labeled; a **model** (e.g. a function or network) is chosen; and an objective (loss or reward) is optimized so the model fits the data. The result is a **prediction** (or action) on new inputs. The pipeline relies on mathematical foundations — probability, linear algebra, optimization — and evaluation on held-out data to ensure generalization rather than memorization.
+In der Praxis werden **Daten** gesammelt oder gelabelt; ein **Modell** (z. B. eine Funktion oder ein Netzwerk) wird gewählt; und ein Ziel (Verlust oder Belohnung) wird optimiert, damit das Modell zu den Daten passt. Das Ergebnis ist eine **Vorhersage** (oder Aktion) auf neuen Eingaben. Die Pipeline basiert auf mathematischen Grundlagen — Wahrscheinlichkeit, lineare Algebra, Optimierung — und Evaluation auf zurückgehaltenen Daten, um Generalisierung statt Auswendiglernen sicherzustellen.
 
-## Use cases
+## Anwendungsfälle
 
-Core ML ideas apply wherever you have data and a well-defined prediction or optimization goal.
+ML-Kernideen kommen überall zum Einsatz, wo Sie Daten und ein klar definiertes Vorhersage- oder Optimierungsziel haben.
 
-- Building classifiers (e.g. spam detection, sentiment analysis) from labeled data
-- Learning representations for recommendation systems or search
-- Framing decision-making as prediction or optimization (e.g. forecasting, control)
+- Erstellung von Klassifikatoren (z. B. Spam-Erkennung, Sentiment-Analyse) aus gelabelten Daten
+- Erlernen von Repräsentationen für Empfehlungssysteme oder Suche
+- Entscheidungsfindung als Vorhersage oder Optimierung formulieren (z. B. Prognose, Steuerung)
 
-## External documentation
+## Externe Dokumentation
 
-- [Google ML crash course](https://developers.google.com/machine-learning/crash-course) — Introduction to ML concepts
-- [MIT 6.S191 – Introduction to Deep Learning](http://introtodeeplearning.com/) — Lectures and materials
+- [Google ML-Crashkurs](https://developers.google.com/machine-learning/crash-course) — Einführung in ML-Konzepte
+- [MIT 6.S191 – Einführung in Deep Learning](http://introtodeeplearning.com/) — Vorlesungen und Materialien
 
-## See also
+## Siehe auch
 
-- [Machine learning](/docs/fundamentals/machine-learning)
-- [Deep learning](/docs/fundamentals/deep-learning)
-- [Neural networks](/docs/neural-networks)
+- [Maschinelles Lernen](/docs/fundamentals/machine-learning)
+- [Deep Learning](/docs/fundamentals/deep-learning)
+- [Neuronale Netze](/docs/neural-networks)

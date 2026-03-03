@@ -1,43 +1,43 @@
 ---
-title: Convolutional neural networks (CNN)
-description: CNNs for spatial and image data.
-keywords: [CNN, convolution, computer vision]
+title: 卷积神经网络（CNN）
+description: 用于空间和图像数据的 CNN。
+keywords: [CNN, 卷积, 计算机视觉]
 ---
 
-# Convolutional neural networks (CNN)
+# 卷积神经网络（CNN）
 
-## Definition
+## 定义
 
-CNNs use convolutional layers to capture local patterns (edges, textures) and build hierarchical features. They are the standard backbone for image classification, detection, and segmentation.
+CNN 使用卷积层来捕获局部模式（边缘、纹理）并构建层次化特征。它们是图像分类、检测和分割的标准骨干网络。
 
-Unlike dense [neural networks](/docs/neural-networks), convolutions share weights across space, so they are translation-equivariant and efficient for images and other grid-like data. They form the backbone of most [computer vision](/docs/cv) systems and are also used in [transformers](/docs/transformers) for patch embedding.
+与密集[神经网络](/docs/neural-networks)不同，卷积在空间上共享权重，因此对于图像和其他网格状数据具有平移等变性和高效性。它们构成了大多数[计算机视觉](/docs/cv)系统的骨干，也用于 [Transformer](/docs/transformers) 中的 patch 嵌入。
 
-## How it works
+## 工作原理
 
 ```mermaid
 flowchart LR
-  Image[Image] --> Conv[Conv]
-  Conv --> Pool[Pool]
-  Pool --> Conv2[Conv]
-  Conv2 --> Class[Class]
+  Image[图像] --> Conv[卷积]
+  Conv --> Pool[池化]
+  Pool --> Conv2[卷积]
+  Conv2 --> Class[分类]
 ```
 
-The **image** (or feature map) is fed into **convolutional** layers: each filter slides over the input and computes dot products, producing activation maps that highlight local patterns (edges, textures). **Pooling** (e.g. max pooling) downsamples spatially, reducing size and adding slight invariance. Deeper **conv** layers see larger receptive fields and capture more abstract features (parts, objects). The final **class** (or detection/segmentation) head is usually one or more dense layers on top of the flattened or pooled features. Training uses the same backprop and gradient descent as other [deep learning](/docs/fundamentals/deep-learning) models.
+**图像**（或特征图）被送入**卷积**层：每个滤波器在输入上滑动并计算点积，产生突出局部模式（边缘、纹理）的激活图。**池化**（如最大池化）在空间上下采样，减小尺寸并添加轻微的不变性。更深的**卷积**层看到更大的感受野，捕获更抽象的特征（部件、物体）。最终的**分类**（或检测/分割）头通常是在展平或池化特征之上的一个或多个密集层。训练使用与其他[深度学习](/docs/fundamentals/deep-learning)模型相同的反向传播和梯度下降。
 
-## Use cases
+## 应用场景
 
-CNNs are the standard for any task where spatial structure (images, video, or 2D/3D signals) matters.
+CNN 是任何空间结构（图像、视频或 2D/3D 信号）重要的任务的标准选择。
 
-- Image classification (e.g. object recognition, medical image analysis)
-- Object detection and instance segmentation
-- Video analysis and action recognition
+- 图像分类（如物体识别、医学图像分析）
+- 目标检测和实例分割
+- 视频分析和动作识别
 
-## External documentation
+## 外部文档
 
-- [CS231n – CNNs for Visual Recognition](https://cs231n.github.io/convolutional-networks/)
-- [PyTorch – Convolutional neural networks](https://pytorch.org/tutorials/beginner/blitz/neural_networks_tutorial.html#convolutional-nets)
+- [CS231n – 用于视觉识别的 CNN](https://cs231n.github.io/convolutional-networks/)
+- [PyTorch – 卷积神经网络](https://pytorch.org/tutorials/beginner/blitz/neural_networks_tutorial.html#convolutional-nets)
 
-## See also
+## 另请参阅
 
-- [Computer vision](/docs/cv)
-- [Neural networks](/docs/neural-networks)
+- [计算机视觉](/docs/cv)
+- [神经网络](/docs/neural-networks)

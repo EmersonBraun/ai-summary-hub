@@ -1,43 +1,43 @@
 ---
-title: Recurrent neural networks (RNN)
-description: RNNs and sequential data.
-keywords: [RNN, LSTM, sequence]
+title: Rekurrente neuronale Netze (RNN)
+description: RNNs und sequenzielle Daten.
+keywords: [RNN, LSTM, Sequenz]
 ---
 
-# Recurrent neural networks (RNN)
+# Rekurrente neuronale Netze (RNN)
 
 ## Definition
 
-RNNs process sequences by maintaining a hidden state that is updated at each step. They (and variants like LSTM) were the standard for sequence modeling before Transformers.
+RNNs verarbeiten Sequenzen, indem sie einen verborgenen Zustand beibehalten, der bei jedem Schritt aktualisiert wird. Sie (und Varianten wie LSTM) waren vor Transformern der Standard für Sequenzmodellierung.
 
-They are a natural fit for [NLP](/docs/nlp), time series, and any ordered data where context from the past matters. [Transformers](/docs/transformers) have largely replaced them in language modeling due to parallelization and long-range dependency handling, but RNNs still appear in streaming or low-latency settings.
+Sie eignen sich natürlich für [NLP](/docs/nlp), Zeitreihen und alle geordneten Daten, bei denen der Kontext aus der Vergangenheit wichtig ist. [Transformer](/docs/transformers) haben sie in der Sprachmodellierung weitgehend ersetzt, da sie Parallelisierung und den Umgang mit langreichweitigen Abhängigkeiten ermöglichen, aber RNNs kommen noch in Streaming- oder Low-Latency-Szenarien vor.
 
-## How it works
+## Funktionsweise
 
 ```mermaid
 flowchart LR
-  Step1[Step1] --> Hidden[Hidden]
-  Hidden --> Step2[Step2]
-  Step2 --> Hidden2[Hidden]
+  Step1[Schritt1] --> Hidden[Verborgen]
+  Hidden --> Step2[Schritt2]
+  Step2 --> Hidden2[Verborgen]
   Hidden2 --> More[...]
 ```
 
-At each **step**, the model receives the current input (e.g. a token or frame) and the previous **hidden** state. It computes an output (e.g. a prediction or next hidden representation) and updates the hidden state for the next step. The recurrence is unrolled in time for training (backprop through time); at inference, the hidden state is passed forward step by step. **LSTM** and **GRU** variants add gating to mitigate vanishing gradients. Inputs and outputs can be one-to-one, one-to-many, or many-to-one depending on the task (e.g. sequence labeling vs sequence-to-sequence).
+Bei jedem **Schritt** empfängt das Modell die aktuelle Eingabe (z. B. ein Token oder Frame) und den vorherigen **verborgenen** Zustand. Es berechnet eine Ausgabe (z. B. eine Vorhersage oder die nächste verborgene Repräsentation) und aktualisiert den verborgenen Zustand für den nächsten Schritt. Die Rekurrenz wird für das Training zeitlich entrollt (Backpropagation durch die Zeit); bei der Inferenz wird der verborgene Zustand Schritt für Schritt weitergegeben. **LSTM**- und **GRU**-Varianten fügen Gating hinzu, um verschwindende Gradienten abzumildern. Ein- und Ausgaben können eins-zu-eins, eins-zu-viele oder viele-zu-eins sein, abhängig von der Aufgabe (z. B. Sequenzkennzeichnung vs. Sequenz-zu-Sequenz).
 
-## Use cases
+## Anwendungsfälle
 
-RNNs fit problems with sequential input or output where order and context over time matter.
+RNNs passen zu Problemen mit sequenzieller Ein- oder Ausgabe, bei denen Reihenfolge und Kontext über die Zeit wichtig sind.
 
-- Sequence labeling (e.g. named entity recognition, part-of-speech tagging)
-- Time-series forecasting and anomaly detection
-- Speech and text sequence modeling (before Transformers dominated)
+- Sequenzkennzeichnung (z. B. Eigennamenerkennung, Wortarterkennung)
+- Zeitreihenprognose und Anomalieerkennung
+- Sprach- und Textsequenzmodellierung (bevor Transformer dominierten)
 
-## External documentation
+## Externe Dokumentation
 
-- [Understanding LSTM networks (Olah)](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
-- [PyTorch – Sequence models and RNNs](https://pytorch.org/tutorials/beginner/sequence_models_tutorial.html)
+- [LSTM-Netze verstehen (Olah)](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
+- [PyTorch – Sequenzmodelle und RNNs](https://pytorch.org/tutorials/beginner/sequence_models_tutorial.html)
 
-## See also
+## Siehe auch
 
-- [Transformers](/docs/transformers)
+- [Transformer](/docs/transformers)
 - [NLP](/docs/nlp)

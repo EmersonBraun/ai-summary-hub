@@ -1,43 +1,43 @@
 ---
-title: Recurrent neural networks (RNN)
-description: RNNs and sequential data.
-keywords: [RNN, LSTM, sequence]
+title: 循环神经网络（RNN）
+description: RNN 与序列数据。
+keywords: [RNN, LSTM, 序列]
 ---
 
-# Recurrent neural networks (RNN)
+# 循环神经网络（RNN）
 
-## Definition
+## 定义
 
-RNNs process sequences by maintaining a hidden state that is updated at each step. They (and variants like LSTM) were the standard for sequence modeling before Transformers.
+RNN 通过维护在每一步更新的隐藏状态来处理序列。它们（以及 LSTM 等变体）在 Transformer 之前是序列建模的标准。
 
-They are a natural fit for [NLP](/docs/nlp), time series, and any ordered data where context from the past matters. [Transformers](/docs/transformers) have largely replaced them in language modeling due to parallelization and long-range dependency handling, but RNNs still appear in streaming or low-latency settings.
+它们天然适用于 [NLP](/docs/nlp)、时间序列以及任何过去上下文重要的有序数据。[Transformer](/docs/transformers) 由于并行化和长距离依赖处理能力，已在语言建模中大量取代了它们，但 RNN 仍出现在流式或低延迟场景中。
 
-## How it works
+## 工作原理
 
 ```mermaid
 flowchart LR
-  Step1[Step1] --> Hidden[Hidden]
-  Hidden --> Step2[Step2]
-  Step2 --> Hidden2[Hidden]
+  Step1[步骤1] --> Hidden[隐藏]
+  Hidden --> Step2[步骤2]
+  Step2 --> Hidden2[隐藏]
   Hidden2 --> More[...]
 ```
 
-At each **step**, the model receives the current input (e.g. a token or frame) and the previous **hidden** state. It computes an output (e.g. a prediction or next hidden representation) and updates the hidden state for the next step. The recurrence is unrolled in time for training (backprop through time); at inference, the hidden state is passed forward step by step. **LSTM** and **GRU** variants add gating to mitigate vanishing gradients. Inputs and outputs can be one-to-one, one-to-many, or many-to-one depending on the task (e.g. sequence labeling vs sequence-to-sequence).
+在每一**步**中，模型接收当前输入（如 token 或帧）和前一个**隐藏**状态。它计算一个输出（如预测或下一个隐藏表示）并更新下一步的隐藏状态。递归在时间上展开用于训练（时间反向传播）；推理时，隐藏状态逐步向前传递。**LSTM** 和 **GRU** 变体添加门控来缓解梯度消失。输入和输出可以是一对一、一对多或多对一，取决于任务（如序列标注 vs 序列到序列）。
 
-## Use cases
+## 应用场景
 
-RNNs fit problems with sequential input or output where order and context over time matter.
+RNN 适合具有序列输入或输出的问题，其中顺序和时间上下文很重要。
 
-- Sequence labeling (e.g. named entity recognition, part-of-speech tagging)
-- Time-series forecasting and anomaly detection
-- Speech and text sequence modeling (before Transformers dominated)
+- 序列标注（如命名实体识别、词性标注）
+- 时间序列预测和异常检测
+- 语音和文本序列建模（在 Transformer 主导之前）
 
-## External documentation
+## 外部文档
 
-- [Understanding LSTM networks (Olah)](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
-- [PyTorch – Sequence models and RNNs](https://pytorch.org/tutorials/beginner/sequence_models_tutorial.html)
+- [理解 LSTM 网络 (Olah)](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
+- [PyTorch – 序列模型和 RNN](https://pytorch.org/tutorials/beginner/sequence_models_tutorial.html)
 
-## See also
+## 另请参阅
 
-- [Transformers](/docs/transformers)
+- [Transformer](/docs/transformers)
 - [NLP](/docs/nlp)

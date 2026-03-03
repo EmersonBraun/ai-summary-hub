@@ -1,18 +1,18 @@
 ---
-title: Semantic search
+title: Búsqueda semántica
 description: Search by meaning using embeddings and similarity.
 keywords: [semantic search, embeddings, similarity]
 ---
 
-# Semantic search
+# Búsqueda semántica
 
-## Definition
+## Definición
 
-Semantic search retrieves items by meaning rather than exact keywords. Query and documents are embedded; retrieval returns the most similar vectors (e.g. cosine similarity or ANN search).
+La búsqueda semántica recupera elementos por significado en lugar de palabras clave exactas. Query and documents are embedded; recuperación returns the most similar vectors (por ej. cosine similarity or ANN search).
 
-It is the retrieval backbone of [RAG](/docs/rag): see [embeddings](/docs/rag/embeddings) and [vector databases](/docs/rag/vector-databases) for how vectors are produced and stored. Use it when users express intent in natural language and you want “similar meaning” rather than literal keyword match. Combines well with keyword (hybrid search) when exact terms matter.
+Es the recuperación backbone of [RAG](/docs/rag): see [embeddings](/docs/rag/embeddings) and [vector databases](/docs/rag/vector-databases) for how vectors are produced and stored. Úselo cuando users express intent in natural language and you want “similar meaning” rather than literal keyword igualar. Combines well with keyword (hybrid search) when exact terms matter.
 
-## How it works
+## Cómo funciona
 
 ```mermaid
 flowchart LR
@@ -21,22 +21,22 @@ flowchart LR
   VectorSearch --> RankedDocs[Ranked docs]
 ```
 
-The **query** (and optionally filters) is sent to an **embedding** model that outputs a vector. **Vector search** (e.g. k-NN or approximate k-NN over an index of document vectors) returns the **ranked docs** (or chunk IDs) with highest similarity (e.g. cosine or dot product). Embedding models are trained so that semantically similar text maps to nearby vectors; the same model is used for queries and documents. Indexing can be offline (batch) or incremental; scale and latency determine whether you need an approximate index (HNSW, IVF) and a dedicated [vector database](/docs/rag/vector-databases).
+La **consulta** (y opcionalmente filtros) se envía a un modelo de **embedding** que produce un vector. **Búsqueda vectorial** (por ej.j. k-NN or approximate k-NN over an index of document vectors) returns the **ranked docs** (or chunk IDs) with highest similarity (por ej. cosine or dot product). Embedding models are trained so that semantically similar text maps to nearby vectors; the same model is used for queries and documents. Indexing can be offline (batch) or incremental; scale and latency determine whether you need an approximate index (HNSW, IVF) and a dedicated [vector database](/docs/rag/vector-databases).
 
-## Use cases
+## Casos de uso
 
 Semantic search is used whenever you need to find items by meaning rather than exact keywords (RAG, recommendations, dedup).
 
-- RAG retrieval: finding relevant chunks for a user query
+- RAG recuperación: finding relevant chunks for a user query
 - Recommendation and “similar item” search
 - Duplicate or near-duplicate detection in document sets
 
-## External documentation
+## Documentación externa
 
-- [Sentence-BERT](https://www.sbert.net/) — Dense retrieval models
+- [Sentence-BERT](https://www.sbert.net/) — Dense recuperación models
 - [LangChain – Vector stores](https://python.langchain.com/docs/concepts/vectorstores/)
 
-## See also
+## Ver también
 
 - [Embeddings](/docs/rag/embeddings)
 - [Vector databases](/docs/rag/vector-databases)

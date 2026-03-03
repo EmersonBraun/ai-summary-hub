@@ -6,17 +6,17 @@ keywords: [Cursor, AI coding, IDE]
 
 # Cursor
 
-## Definition
+## Definição
 
-Cursor is an AI-powered code editor built on VS Code. It integrates [LLMs](/docs/llms) for code completion, editing, and chat, with context from the codebase and docs.
+Cursor é um editor de código impulsionado por IA baseado no VS Code. Ele integra [LLMs](/docs/llms) para completamento de códigoão, edição e chat, com contexto da base de código e documentação.
 
-It is similar to [GitHub Copilot](/docs/tools/github-copilot) but adds deeper project context, chat, and edit-in-place. Useful for [agent](/docs/agents)-like workflows (describe a feature, get code changes) and pair programming. Supports multiple models and optional project rules for consistent behavior.
+É similar to [GitHub Copilot](/docs/tools/github-copilot) but adds deeper project context, chat, and edit-in-place. Useful for [agent](/docs/agents)-like workflows (describe a feature, get code changes) and pair programming. Supports multiple models and optional project rules for consistent behavior.
 
-## How it works
+## Como funciona
 
-You use **natural language** in chat or inline to request edits, generation, or refactoring. The **model** has access to open files, the current file, and optionally the whole codebase (via indexing). You can accept, edit, or reject suggestions. **Edit flow**: select code or place cursor, describe the change, the model proposes a diff. **Chat**: ask questions, get explanations, or request multi-file changes. **Rules/skills** (e.g. in .cursorrules) steer the model for your stack and conventions. Multiple [LLM](/docs/llms) backends and model sizes are supported; context window and indexing determine how much of the repo is visible to the model.
+Você usa **linguagem natural** no chat ou inline para solicitar edições, geração ou refatoração. O **modelo** tem acesso a arquivos abertos, o arquivo atual e opcionalmente toda a base de código (via indexação). You can accept, edit, or reject suggestions. **Edit flow**: select code or place cursor, describe the change, the model proposes a diff. **Chat**: ask questions, get explanations, or request multi-file changes. **Rules/skills** (por ex. in .cursorrules) steer the model for your stack and conventions. Multiple [LLM](/docs/llms) backends and model sizes are supported; context window and indexing determine how much of the repo is visible to the model.
 
-## Use cases
+## Casos de uso
 
 Cursor fits developers who want AI-assisted editing and chat inside the IDE with project and file context.
 
@@ -24,11 +24,11 @@ Cursor fits developers who want AI-assisted editing and chat inside the IDE with
 - Pair programming with project-aware AI (files, docs)
 - Exploring codebases and implementing features from descriptions
 
-## External documentation
+## Documentação externa
 
 - [Cursor – Documentation](https://docs.cursor.com/) — Official Cursor docs and guides
 
-## See also
+## Veja também
 
 - [Agents](/docs/agents)
 - [GitHub Copilot](/docs/tools/github-copilot)

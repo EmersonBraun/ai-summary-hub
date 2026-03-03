@@ -1,58 +1,58 @@
 ---
-title: Transformers
-description: Transformer architecture and self-attention mechanisms.
-keywords: [transformer, attention, self-attention, BERT, GPT]
+title: Transformer
+description: Transformer 架构和自注意力机制。
+keywords: [Transformer, 注意力, 自注意力, BERT, GPT]
 ---
 
-# Transformers
+# Transformer
 
-## Definition
+## 定义
 
-Transformers are neural architectures based on **self-attention**: each token attends to all others to compute contextual representations. They avoid recurrence and enable parallelization, scaling to very long sequences and large models (BERT, GPT, etc.).
+Transformer 是基于**自注意力**的神经架构：每个 token 关注所有其他 token 以计算上下文表示。它们避免了递归并实现了并行化，可扩展到非常长的序列和大型模型（BERT、GPT 等）。
 
-They underpin modern [LLMs](/docs/llms) and have been extended to [multimodal](/docs/multimodal-ai) and [vision](/docs/cv) models. Encoder-only ([BERT](/docs/transformers/bert)) and decoder-only ([GPT](/docs/transformers/gpt)) variants are most common today; the encoder-decoder layout remains used for sequence-to-sequence tasks.
+它们支撑着现代 [LLM](/docs/llms)，并已扩展到[多模态](/docs/multimodal-ai)和[视觉](/docs/cv)模型。仅编码器（[BERT](/docs/transformers/bert)）和仅解码器（[GPT](/docs/transformers/gpt)）变体如今最为常见；编码器-解码器布局仍用于序列到序列任务。
 
-## How it works
+## 工作原理
 
-- **Attention:** Query, Key, Value are computed from inputs; attention weights combine values.
-- **Multi-head attention:** Multiple attention heads capture different relations.
-- **Encoder-decoder or decoder-only:** Encoder (e.g. BERT) sees full sequence; decoder (e.g. GPT) uses causal masking for autoregressive generation.
+- **注意力：**从输入计算 Query、Key、Value；注意力权重组合 Value。
+- **多头注意力：**多个注意力头捕获不同的关系。
+- **编码器-解码器或仅解码器：**编码器（如 BERT）看到完整序列；解码器（如 GPT）使用因果掩码进行自回归生成。
 
-The diagram below shows one block: input goes through multi-head attention (with add and norm), then a feed-forward network (FFN), then add and norm again. Encoder stacks use bidirectional attention; decoder stacks use causal (masked) attention so each position only sees past tokens. Residual connections and layer norm stabilize training. Stacking many such blocks and scaling width and depth yields the large models used for [NLP](/docs/nlp) and beyond.
+下图展示了一个块：输入经过多头注意力（带 add 和 norm），然后是前馈网络（FFN），再次 add 和 norm。编码器栈使用双向注意力；解码器栈使用因果（掩码）注意力，每个位置只能看到过去的 token。残差连接和层归一化稳定训练。堆叠许多这样的块并扩展宽度和深度，产生用于 [NLP](/docs/nlp) 及其他领域的大型模型。
 
 ```mermaid
 flowchart LR
-  A[Input] --> B[Multi-Head Attention]
+  A[输入] --> B[多头注意力]
   B --> C[Add & Norm]
   C --> D[FFN]
   D --> E[Add & Norm]
-  E --> F[Output]
+  E --> F[输出]
 ```
 
-## Use cases
+## 应用场景
 
-Transformers underpin most modern NLP and multimodal systems; encoder-only, decoder-only, and encoder-decoder variants suit different tasks.
+Transformer 支撑着大多数现代 NLP 和多模态系统；仅编码器、仅解码器和编码器-解码器变体适用于不同任务。
 
-- BERT-style: named entity recognition, search relevance, question answering
-- GPT-style: text generation, code completion, chat and dialogue
-- Multimodal transformers for vision-language tasks
+- BERT 风格：命名实体识别、搜索相关性、问答
+- GPT 风格：文本生成、代码补全、对话
+- 多模态 Transformer 用于视觉-语言任务
 
-## Pros and cons
+## 优缺点
 
-| Pros | Cons |
+| 优点 | 缺点 |
 |------|------|
-| Parallelizable, scalable | High compute and memory |
-| Strong at long-range dependencies | Requires large data |
-| Unified architecture for many tasks | Interpretability challenges |
+| 可并行化、可扩展 | 高计算和内存需求 |
+| 长距离依赖能力强 | 需要大量数据 |
+| 统一架构适用于多种任务 | 可解释性挑战 |
 
-## External documentation
+## 外部文档
 
-- [Attention Is All You Need (Vaswani et al.)](https://arxiv.org/abs/1706.03762) — Original transformer paper
-- [Hugging Face – Summary of the models](https://huggingface.co/docs/transformers/model_summary) — Transformer model families
-- [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/) — Visual explanation of the architecture
+- [Attention Is All You Need (Vaswani 等人)](https://arxiv.org/abs/1706.03762) — 原始 Transformer 论文
+- [Hugging Face – 模型总结](https://huggingface.co/docs/transformers/model_summary) — Transformer 模型家族
+- [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/) — 架构的可视化解释
 
-## See also
+## 另请参阅
 
 - [BERT](/docs/transformers/bert)
 - [GPT](/docs/transformers/gpt)
-- [LLMs](/docs/llms)
+- [LLM](/docs/llms)

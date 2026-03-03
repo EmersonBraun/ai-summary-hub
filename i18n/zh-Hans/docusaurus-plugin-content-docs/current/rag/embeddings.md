@@ -1,18 +1,18 @@
 ---
-title: Embeddings
-description: Dense vector representations for text and retrieval.
+title: 嵌入
+description: 用于语义搜索和检索的向量表示。
 keywords: [embeddings, vector, semantic similarity]
 ---
 
-# Embeddings
+# 嵌入
 
-## Definition
+## 定义
 
-Embeddings are dense vector representations of text (or other modalities). Similar content maps to nearby vectors, enabling semantic search and retrieval in RAG.
+嵌入是文本（或其他模态）的密集向量表示。 Similar content maps to nearby vectors, enabling semantic search and 检索 in RAG.
 
-They are the bridge between raw text and [vector databases](/docs/rag/vector-databases): both documents and queries are embedded so similarity can be computed as vector distance (e.g. cosine). Choice of [embedding](/docs/rag/embeddings) model affects [RAG](/docs/rag) retrieval quality and cost; see [semantic search](/docs/semantic-search) for the broader use of embeddings in search.
+它们是 the bridge between raw text and [vector databases](/docs/rag/vector-databases): both documents and queries are embedded so similarity can be computed as vector distance (例如 cosine). Choice of [embedding](/docs/rag/embeddings) model affects [RAG](/docs/rag) 检索 quality and cost; see [semantic search](/docs/semantic-search) for the broader use of embeddings in search.
 
-## How it works
+## 工作原理
 
 ```mermaid
 flowchart LR
@@ -20,22 +20,22 @@ flowchart LR
   Encoder --> Vector[Vector]
 ```
 
-**Text** (a sentence, paragraph, or chunk) is fed into an **encoder** (e.g. OpenAI embeddings, Cohere, or open-source sentence-transformers). The encoder outputs a fixed-size **vector** (e.g. 768 or 1536 dimensions). Training uses contrastive or similar objectives so that semantically related texts get nearby vectors; similarity at query time is usually cosine or dot product. Models can be multilingual or domain-specific. For [RAG](/docs/rag), use the same encoder for documents and queries so distances are meaningful.
+**Text** (a sentence, paragraph, or chunk) 被输入到一个 **encoder** (例如 OpenAI embeddings, Cohere, or open-source sentence-transformers). The encoder outputs a fixed-size **vector** (例如 768 or 1536 dimensions). Training uses contrastive or similar objectives so that semantically related texts get nearby vectors; similarity at query time is usually cosine or dot product. Models can be multilingual or domain-specific. For [RAG](/docs/rag), use the same encoder for documents and queries so distances are meaningful.
 
-## Use cases
+## 应用场景
 
-Embeddings are the bridge between raw text and similarity search; quality here drives retrieval recall and RAG accuracy.
+Embeddings 是原始文本和相似性搜索之间的桥梁; 这里的质量决定了检索召回率和 RAG 准确性.
 
-- Converting documents and queries to vectors for RAG retrieval
-- Semantic similarity and clustering (e.g. duplicate detection)
-- Cross-lingual and multimodal retrieval when using matching encoders
+- Converting documents and queries to vectors for RAG 检索
+- Semantic similarity and clustering (例如 duplicate detection)
+- Cross-lingual and multimodal 检索 when using matching encoders
 
-## External documentation
+## 外部文档
 
 - [OpenAI – Embeddings](https://platform.openai.com/docs/guides/embeddings)
 - [Hugging Face – Sentence transformers](https://www.sbert.net/)
 
-## See also
+## 另请参阅
 
 - [RAG](/docs/rag)
 - [Vector databases](/docs/rag/vector-databases)

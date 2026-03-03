@@ -1,35 +1,35 @@
 ---
-title: Federated learning
+title: Föderiertes Lernen
 description: Training across decentralized data without centralizing it.
-keywords: [federated learning, privacy, distributed]
+keywords: [federated learning, Datenschutz, distributed]
 ---
 
-# Federated learning
+# Föderiertes Lernen
 
 ## Definition
 
-Federated learning trains models across many devices or organizations while keeping raw data local. Only model updates (e.g. gradients) are shared, reducing privacy and regulatory risk.
+Föderiertes Lernen trainiert Modelle über viele Geräte oder Organisationen wobei die Rohdaten lokal bleiben. Only model updates (z. B. gradients) are shared, reducing Datenschutz and regulatory risk.
 
-Use it when data cannot be centralized (e.g. hospitals, phones) but you still want a shared [machine learning](/docs/fundamentals/machine-learning) model. Privacy is improved compared to sending raw data; additional techniques (differential privacy, secure aggregation) can be layered. See [AI ethics](/docs/ai-ethics) for privacy and governance context.
+Verwenden Sie es, wenn data cannot be centralized (z. B. hospitals, phones) but you still want a shared [machine learning](/docs/fundamentals/machine-learning) model. Privacy is improved compared to sending raw data; additional techniques (differential Datenschutz, secure aggregation) can be layered. See [AI ethics](/docs/ai-ethics) for Datenschutz and governance context.
 
-## How it works
+## Funktionsweise
 
-The **server** holds the global model and sends it to **clients** (devices or orgs). Each client **trains locally** on its own data and sends **updates** (gradients or model diff) back. The server **aggregates** updates (e.g. FedAvg: average the client models or gradients) and produces a new global model, then broadcasts again. Rounds repeat until convergence. Challenges: **heterogeneity** (non-IID data, different compute), **communication cost** (limit round count or update size), and **privacy** (updates can leak information; DP or secure aggregation mitigate).
+Der **Server** hält das globale Modell und sendet es an **Clients** (Geräte oder Organisationen). Jeder Client **trainiert lokal** auf seinents own data and sends **updates** (gradients or model diff) back. The server **aggregates** updates (z. B. FedAvg: average the client models or gradients) and erzeugt a new global model, then broadcasts again. Rounds repeat until convergence. Challenges: **heterogeneity** (non-IID data, different compute), **communication cost** (limit round count or update size), and **Datenschutz** (updates can leak information; DP or secure aggregation mitigate).
 
-## Use cases
+## Anwendungsfälle
 
-Federated learning fits when data must stay on devices or silos and you still want a shared model.
+Federated learning passt, wenn data must stay on devices or silos and you still want a shared model.
 
-- Training on sensitive data (e.g. healthcare, finance) without centralizing it
-- Mobile and edge devices (e.g. keyboard suggestions, on-device ML)
-- Cross-organization collaboration under privacy constraints
+- Training on sensitive data (z. B. healthcare, finance) without centralizing it
+- Mobile and edge devices (z. B. keyboard suggestions, on-device ML)
+- Cross-organization collaboration under Datenschutz constraints
 
-## External documentation
+## Externe Dokumentation
 
 - [Communication-Efficient Learning (McMahan et al.) – FedAvg](https://arxiv.org/abs/1602.05629)
 - [TensorFlow Federated](https://www.tensorflow.org/federated)
 
-## See also
+## Siehe auch
 
 - [Machine learning](/docs/fundamentals/machine-learning)
 - [Privacy and AI ethics](/docs/ai-ethics)

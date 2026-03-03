@@ -1,43 +1,43 @@
 ---
-title: Deep learning
-description: Deep neural networks and representation learning.
-keywords: [deep learning, neural networks, representation learning]
+title: 深度学习
+description: 深度神经网络与表示学习。
+keywords: [深度学习, 神经网络, 表示学习]
 ---
 
-# Deep learning
+# 深度学习
 
-## Definition
+## 定义
 
-Deep learning uses neural networks with many layers to learn hierarchical representations from data. It has driven progress in vision, language, and other domains by scaling data and compute.
+深度学习使用多层神经网络从数据中学习层次化表示。通过扩展数据和计算，它推动了视觉、语言和其他领域的进步。
 
-It extends [machine learning](/docs/fundamentals/machine-learning) by using differentiable, layered models (see [neural networks](/docs/neural-networks)) that learn features automatically instead of hand-crafted ones. Depth allows the model to build increasingly abstract representations (e.g. edges → textures → parts → objects in vision).
+它扩展了[机器学习](/docs/fundamentals/machine-learning)，使用可微分的分层模型（参见[神经网络](/docs/neural-networks)），自动学习特征而非手工设计。深度使模型能够构建越来越抽象的表示（例如在视觉中：边缘 → 纹理 → 部件 → 物体）。
 
-## How it works
+## 工作原理
 
 ```mermaid
 flowchart LR
-  Data[Data] --> Layers[Layers]
-  Layers --> Representation[Representation]
-  Representation --> Output[Output]
+  Data[数据] --> Layers[层]
+  Layers --> Representation[表示]
+  Representation --> Output[输出]
 ```
 
-**Data** is fed into the first **layer**; each layer applies a linear transformation followed by a nonlinearity (e.g. ReLU). Stacking layers produces a **representation** (embedding) that becomes more abstract in deeper layers. The final layer maps to the **output** (e.g. class scores or tokens). Training uses **backpropagation** to compute gradients and **gradient descent** to update weights. Architectures (CNNs for images, RNNs for sequences, [Transformers](/docs/transformers) for both) tailor the connectivity and operations to the data and task.
+**数据**被送入第一**层**；每层应用线性变换后接非线性激活（如 ReLU）。堆叠层产生**表示**（嵌入），在更深的层中变得更抽象。最后一层映射到**输出**（如类别分数或 token）。训练使用**反向传播**计算梯度和**梯度下降**更新权重。架构（CNN 用于图像、RNN 用于序列、[Transformer](/docs/transformers) 用于两者）根据数据和任务调整连接方式和操作。
 
-## Use cases
+## 应用场景
 
-Deep learning is the default for perception and generation when data is abundant and tasks are complex.
+当数据丰富且任务复杂时，深度学习是感知和生成的默认选择。
 
-- Image recognition, object detection, and segmentation (vision)
-- Speech recognition, machine translation, and text generation (language)
-- Game playing, robotics control, and simulation (reinforcement learning)
+- 图像识别、目标检测和分割（视觉）
+- 语音识别、机器翻译和文本生成（语言）
+- 游戏、机器人控制和仿真（强化学习）
 
-## External documentation
+## 外部文档
 
-- [Deep Learning (Goodfellow et al.)](https://www.deeplearningbook.org/) — Free online book
-- [PyTorch – Introduction](https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html) — Hands-on deep learning
+- [Deep Learning（Goodfellow 等人）](https://www.deeplearningbook.org/) — 免费在线书籍
+- [PyTorch – 入门](https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html) — 实践深度学习
 
-## See also
+## 另请参阅
 
-- [Neural networks](/docs/neural-networks)
-- [Transformers](/docs/transformers)
-- [Frameworks (PyTorch, TensorFlow)](/docs/frameworks/pytorch)
+- [神经网络](/docs/neural-networks)
+- [Transformer](/docs/transformers)
+- [框架（PyTorch、TensorFlow）](/docs/frameworks/pytorch)

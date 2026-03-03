@@ -1,20 +1,20 @@
 ---
-title: Large language models (LLMs)
-description: What LLMs are, how they are trained and used.
+title: Modelos de lenguaje grandes (LLMs)
+description: "Modelos de lenguaje grandes: arquitectura, entrenamiento y capacidades."
 keywords: [LLM, large language model, foundation model]
 ---
 
-# Large language models (LLMs)
+# Modelos de lenguaje grandes (LLMs)
 
-## Definition
+## Definición
 
-Large language models are transformer-based models trained on massive text (and sometimes multimodal) data. They exhibit emergent abilities: few-shot learning, reasoning, and tool use when scaled and aligned (e.g. via RLHF).
+Los grandes modelos de lenguaje son modelos basados en transformers entrenados con datos textuales masivos (y a veces multimodales). They exhibit emergent abilities: few-shot learning, razonamiento, and tool use when scaled and aligned (por ej. via RLHF).
 
-A useful mental model: **pretraining** learns next-token prediction on huge corpora and gives the model broad knowledge and language ability. **Instruction tuning** (and similar) trains the model to follow user instructions and formats. **Alignment** (e.g. RLHF, DPO) shapes behavior to be helpful, honest, and safe. At inference time you can use the model zero-shot, few-shot, or augment it with retrieval (RAG) or tools (agents).
+Un modelo mental útil: **preentrenamiento** aprende predicción del siguiente token en enormes corpus y da al modelo amplio conocimiento y lenguaje ability. **Instruction tuning** (and similar) trains the model to follow user instructions and formats. **Alignment** (por ej. RLHF, DPO) shapes behavior to be helpful, honest, and safe. At inference time you can use the model zero-shot, few-shot, or augment it with recuperación (RAG) or tools (agents).
 
-## How it works
+## Cómo funciona
 
-**Pretraining** learns next-token prediction on large corpora and produces a base model. **Optional fine-tuning** (e.g. [fine-tuning](/docs/llms/fine-tuning)) adapts it to tasks or instruction formats; **alignment** (e.g. RLHF, DPO) optimizes human preference and safety. The **deployed model** is then used at **inference** time. You can call it zero-shot (no examples), few-shot (with [prompt engineering](/docs/llms/prompt-engineering)), or augment it with [RAG](/docs/rag) (retrieval as context) or [agents](/docs/agents) (tools and loops). The diagram summarizes the training pipeline and the two main inference augmentations.
+**Pretraining** learns predicción del siguiente token on large corpora and produce a base model. **Optional fine-tuning** (por ej. [fine-tuning](/docs/llms/fine-tuning)) adapts it to tasks or instruction formats; **alignment** (por ej. RLHF, DPO) optimizes human preference and safety. The **deployed model** is then used at **inference** time. You can call it zero-shot (no examples), few-shot (with [prompt engineering](/docs/llms/prompt-engineering)), or augment it with [RAG](/docs/rag) (recuperación as context) or [agents](/docs/agents) (tools and loops). The diagram summarizes the training pipeline and the two main inference augmentations.
 
 ```mermaid
 flowchart LR
@@ -28,7 +28,7 @@ flowchart LR
   Tools["Tools / Agents"] --> Infer
 ```
 
-## Use cases
+## Casos de uso
 
 LLMs are used wherever you need flexible language understanding or generation, from chat to code to analysis.
 
@@ -36,7 +36,7 @@ LLMs are used wherever you need flexible language understanding or generation, f
 - Code assistance and generation
 - Question answering and research assistance (often with RAG or tools)
 
-## Pros and cons
+## Ventajas y desventajas
 
 | Pros | Cons |
 |------|------|
@@ -44,14 +44,14 @@ LLMs are used wherever you need flexible language understanding or generation, f
 | Strong few-shot performance | Hallucination, bias |
 | Enables agents and tool use | Requires careful evaluation |
 
-## External documentation
+## Documentación externa
 
 - [OpenAI – Models overview](https://platform.openai.com/docs/models) — GPT and capabilities
 - [Google AI for Developers](https://ai.google.dev/) — Gemini and APIs
 - [Anthropic – Models](https://www.anthropic.com/product) — Claude and documentation
 - [Hugging Face – NLP course](https://huggingface.co/learn/nlp-course/) — From transformers to LLMs
 
-## See also
+## Ver también
 
 - [Fine-tuning](/docs/llms/fine-tuning)
 - [Prompt engineering](/docs/llms/prompt-engineering)

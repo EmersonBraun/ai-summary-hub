@@ -1,18 +1,18 @@
 ---
-title: Quantization
-description: Using lower precision (e.g. int8) for weights and activations.
+title: Quantização
+description: Uso de menor precisão (ex. int8) para pesos e ativações.
 keywords: [quantization, int8, precision]
 ---
 
-# Quantization
+# Quantização
 
-## Definition
+## Definição
 
-Quantization represents weights and optionally activations in lower precision (e.g. 8-bit instead of 32-bit float) to reduce memory and speed up inference with minimal accuracy loss.
+A quantização representa pesos e opcionalmente ativações em menor precisão (por ex. 8-bit instead of 32-bit float) to reduce memory and speed up inference with minimal accuracy loss.
 
-It is one of the main [model compression](/docs/model-compression) levers for [LLMs](/docs/llms) and vision models. INT8 is common; INT4 and lower are used for aggressive compression. Deploy on [infrastructure](/docs/infrastructure) that supports quantized ops (e.g. GPU tensor cores, dedicated inference chips).
+É one of the main [model compression](/docs/model-compression) levers for [LLMs](/docs/llms) and vision models. INT8 is common; INT4 and lower are used for aggressive compression. Deploy on [infrastructure](/docs/infrastructure) that supports quantized ops (por ex. GPU tensor cores, dedicated inference chips).
 
-## How it works
+## Como funciona
 
 ```mermaid
 flowchart LR
@@ -21,22 +21,22 @@ flowchart LR
   Quantize --> INT8[INT8]
 ```
 
-**FP32 weights** (and optionally activations) are mapped to a discrete range (e.g. INT8). **Calibrate**: run a representative dataset to collect activation statistics and choose **scales and zero-points** so the quantized values approximate the original range. **Quantize**: convert weights (and optionally activations at runtime) to INT8. **Post-training quantization (PTQ)** does this without retraining; **quantization-aware training (QAT)** fine-tunes with simulated quantization so the model adapts. The **INT8** model is then run on hardware that supports low-precision ops for faster inference and lower memory.
+**Pesos FP32** (e opcionalmente ativações) são mapeados para um intervalo discreto (por ex. INT8). **Calibrar**: executar um conjuntentative dataset to collect activation statistics and choose **scales and zero-points** so the quantized values approximate the original range. **Quantize**: convert weights (and optionally activations at runtime) to INT8. **Post-training quantization (PTQ)** does this sem retreinar; **quantization-aware training (QAT)** fine-tunes with simulated quantization so the model adapts. The **INT8** model is then run on hardware that supports low-precision ops for faster inference and lower memory.
 
-## Use cases
+## Casos de uso
 
-Quantization is the main lever for reducing memory and speeding inference with limited accuracy loss (edge, cloud, cost).
+Quantization é a principal alavanca para reduzir memória e acelerar a inferência com perda de precisão limitada (edge, cloud, cost).
 
 - Running LLMs and vision models on consumer GPUs or edge devices
 - Reducing memory and speeding inference with minimal accuracy loss
 - INT8 or lower precision for production serving
 
-## External documentation
+## Documentação externa
 
 - [PyTorch – Quantization](https://pytorch.org/docs/stable/quantization.html)
 - [TensorFlow Lite – Quantization](https://www.tensorflow.org/lite/performance/quantization)
 
-## See also
+## Veja também
 
 - [Model compression](/docs/model-compression)
 - [Infrastructure](/docs/infrastructure)

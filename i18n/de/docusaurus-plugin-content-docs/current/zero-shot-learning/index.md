@@ -1,35 +1,35 @@
 ---
-title: Zero-shot learning
+title: Zero-Shot Learning
 description: Performing tasks without task-specific training examples.
 keywords: [zero-shot, generalization, prompts]
 ---
 
-# Zero-shot learning
+# Zero-Shot Learning
 
 ## Definition
 
-Zero-shot learning is solving a task without any labeled examples for that task. LLMs do this via prompting; vision models can do it with text-conditioned classifiers (e.g. CLIP).
+Zero-Shot-Lernen löst eine Aufgabe ohne gelabelte Beispiele für diese Aufgabe. LLMs tun dies über Prompting; Bildmodelle können dies mit textbedingtenoned classifiers (z. B. CLIP).
 
-No [fine-tuning](/docs/llms/fine-tuning) or [few-shot](/docs/few-shot-learning) examples are used; the task is specified only by description or by mapping to a shared space (e.g. text). [LLMs](/docs/llms) excel at zero-shot for many NLP tasks; CLIP and similar models enable zero-shot image classification from text. Quality depends on how well pretraining covered the task or similar ones.
+No [Feinabstimmung](/docs/llms/fine-tuning) or [few-shot](/docs/few-shot-learning) examples are used; die Aufgabe wird nur durch Beschreibung oder durch Zuordnung spezifiziertping to a shared space (z. B. text). [LLMs](/docs/llms) excel at zero-shot for many NLP tasks; CLIP and similar models enable zero-shot image classification from text. Quality depends on how well pretraining covered the task or similar ones.
 
-## How it works
+## Funktionsweise
 
-The **task** is described in natural language (e.g. [prompt](/docs/llms/prompt-engineering): “Classify the sentiment as positive or negative”) or via a shared representation (e.g. attribute vectors, text embeddings). **Input** (e.g. a sentence or image) is fed to the **model** along with the task description. The **model** produces an **output** (e.g. label, summary) using only what it learned at pretraining—no gradient updates on the target task. For CLIP: image and text are embedded in a shared space; zero-shot classification is done by comparing the image embedding to class name embeddings. For LLMs: the prompt states the task and format; the model completes accordingly.
+The **task** is described in natural language (z. B. [prompt](/docs/llms/prompt-engineering): “Classify the sentiment as positive or negative”) or via a shared representation (z. B. attribute vectors, text embeddings). **Input** (z. B. a sentence or image) is fed to the **model** along mit dem task description. The **model** erzeugt an **output** (z. B. label, summary) using only what it learned at pretraining—no gradient updates auf dem target task. For CLIP: image and text are embedded in a shared space; zero-shot classification is done by comparing the image embedding to class name embeddings. For LLMs: the prompt states the task and format; the model completes accordingly.
 
-## Use cases
+## Anwendungsfälle
 
-Zero-shot learning fits when you want to run a task with no target-task training—only a task description (e.g. prompt or class names).
+Zero-shot learning passt, wenn you want to run a task with no target-task training—only a task description (z. B. prompt or class names).
 
-- LLM tasks via prompts (e.g. classification, summarization) without fine-tuning
+- LLM tasks via prompts (z. B. classification, summarization) without Feinabstimmung
 - CLIP-style image classification from text descriptions
 - New categories or languages without labeled examples
 
-## External documentation
+## Externe Dokumentation
 
 - [Learning Transferable Visual Models (CLIP) (Radford et al.)](https://arxiv.org/abs/2103.00020)
 - [OpenAI – Zero-shot classification](https://platform.openai.com/docs/guides/classification)
 
-## See also
+## Siehe auch
 
 - [Few-shot learning](/docs/few-shot-learning)
 - [Prompt engineering](/docs/llms/prompt-engineering)

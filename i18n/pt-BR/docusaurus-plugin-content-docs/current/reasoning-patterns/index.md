@@ -1,18 +1,18 @@
 ---
-title: Reasoning patterns
-description: How LLMs and agents structure reasoning and action.
-keywords: [reasoning, CoT, ReAct, ToT, RDD]
+title: Padrões de raciocínio
+description: "Padrões para raciocínio estruturado de IA: CoT, ToT, ReAct, RDD."
+keywords: [raciocínio, CoT, ReAct, ToT, RDD]
 ---
 
-# Reasoning patterns
+# Padrões de raciocínio
 
-## Definition
+## Definição
 
-Reasoning patterns are structured ways to elicit or organize model reasoning: chain-of-thought (step-by-step), tree-of-thoughts (explore branches), ReAct (reason + act), and RDD (retrieval-decision-design), among others. Using a clear pattern improves **reliability** (more consistent reasoning) and **debuggability** (you can inspect steps or actions).
+Padrões de raciocínio são formas estruturadas de provocar ou organizar o raciocínio do modelo: chain-of-thought (step-by-step), tree-of-thoughts (explore branches), ReAct (reason + act), and RDD (recuperação-decisão-projeto), among others. Using a clear pattern improves **reliability** (more consistent raciocínio) and **debuggability** (you can inspect steps or actions).
 
-They are used in [prompt engineering](/docs/llms/prompt-engineering) (e.g. CoT) and inside [agents](/docs/agents) (e.g. ReAct, RDD). Choosing a pattern depends on the task: CoT for math/reasoning, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
+Eles são used in [prompt engineering](/docs/llms/prompt-engineering) (por ex. CoT) and inside [agents](/docs/agents) (por ex. ReAct, RDD). Choosing a pattern depends on the task: CoT for math/raciocínio, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
 
-## How it works
+## Como funciona
 
 ```mermaid
 flowchart LR
@@ -20,23 +20,23 @@ flowchart LR
   Pattern --> Output[Output]
 ```
 
-You feed **input** (question, task) into a **pattern**: the pattern constrains how the model reasons or acts (e.g. “think step by step”, or thought–action–observation loops). The model produces an **output** (answer, action sequence). Prompts or system design encourage the model to show reasoning (e.g. “Think step by step”) or to interleave thought and action. Patterns can be combined (e.g. [CoT](/docs/reasoning-patterns/cot) inside an [agent](/docs/agents) loop). See the linked pages for each pattern’s details.
+You feed **input** (question, task) into a **pattern**: the pattern constrains how the model reasons or acts (por ex. “think passo a passo”, or thought–action–observation loops). The model produces an **output** (answer, action sequence). Prompts or system projeto encourage the model to show raciocínio (por ex. “Think passo a passo”) or to interleave thought and action. Patterns can be combined (por ex. [CoT](/docs/reasoning-patterns/cot) inside an [agent](/docs/agents) loop). See the linked pages for each pattern’s details.
 
-## Use cases
+## Casos de uso
 
-Different patterns suit different needs: CoT for stepwise reasoning, ReAct for tool use, ToT for search and planning.
+Different patterns suit different needs: CoT for stepwise raciocínio, ReAct for tool use, ToT for search and planning.
 
-- CoT: math, logic, and multi-step reasoning tasks
+- CoT: math, logic, and multi-step raciocínio tasks
 - ReAct: tool-using agents that reason before each action
 - ToT: search and planning over multiple solution branches
 
-## External documentation
+## Documentação externa
 
 - [Chain-of-Thought Prompting (Wei et al.)](https://arxiv.org/abs/2201.11903) — CoT paper
 - [ReAct: Synergizing Reasoning and Acting (Yao et al.)](https://arxiv.org/abs/2210.03629) — ReAct paper
 - [Tree of Thoughts (Yao et al.)](https://arxiv.org/abs/2305.10601) — ToT paper
 
-## See also
+## Veja também
 
 - [Chain-of-thought](/docs/reasoning-patterns/cot)
 - [Tree of thoughts](/docs/reasoning-patterns/tot)

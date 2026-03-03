@@ -1,18 +1,18 @@
 ---
-title: AI safety
-description: Ensuring AI systems are robust, aligned, and safe.
-keywords: [AI safety, alignment, robustness]
+title: Segurança em IA
+description: Garantir que os sistemas de IA sejam robustos, alinhados e seguros.
+keywords: [segurança em IA, alinhamento, robustez]
 ---
 
-# AI safety
+# Segurança em IA
 
-## Definition
+## Definição
 
-AI safety addresses risks from advanced AI: misuse, unintended behavior, and alignment (systems doing what we intend). It includes robustness, interpretability, and value alignment.
+A segurança de IA aborda riscos da IA avançada: mau uso, comportamento não intencional e alinhamento (systems doing what we intend). It includes robustness, interpretability, and value alignment.
 
-It overlaps with [AI ethics](/docs/ai-ethics) (governance, fairness) and [bias in AI](/docs/bias-in-ai) (unfair outcomes). For [LLMs](/docs/llms) and [agents](/docs/agents), alignment (e.g. RLHF, constitutional AI) and guardrails are the main levers; [explainable AI](/docs/xai) supports auditing and debugging.
+Ele se sobrepõe com [AI ethics](/docs/ai-ethics) (governance, fairness) and [bias in AI](/docs/bias-in-ai) (unfair outcomes). For [LLMs](/docs/llms) and [agents](/docs/agents), alignment (por ex. RLHF, constitutional AI) and guardrails are the main levers; [explainable AI](/docs/xai) supports auditing and debugging.
 
-## How it works
+## Como funciona
 
 ```mermaid
 flowchart LR
@@ -21,22 +21,22 @@ flowchart LR
   Output --> Audit[Audit]
 ```
 
-**Input** is processed by the **model** to produce **output**. **Audit** (testing, monitoring, red-teaming) checks that outputs are safe, aligned, and robust. Research and practice focus on: **alignment** (RLHF, constitutional AI, scalable oversight) so models follow intent; **robustness** (adversarial testing, distribution shift) so they behave under edge cases; **monitoring** in production to detect misuse or drift. Safety is considered across the lifecycle from design and data to training, evaluation, and deployment. Formal methods and interpretability ([XAI](/docs/xai)) support the audit step.
+**Entrada** é processada pelo **modelo** para produzir **saída**. **Auditoria** (testes, monitoramento, red-teaming) verifica que as saídas são seguras, alinhadas e robust. Research and practice focus on: **alignment** (RLHF, constitutional AI, scalable oversight) so models follow intent; **robustness** (adversarial testing, distribution shift) so they behave under edge cases; **monitoring** in production to detect misuse or drift. Safety is considered across the lifecycle from projeto and data to training, evaluation, and deployment. Formal methods and interpretability ([XAI](/docs/xai)) support the audit step.
 
-## Use cases
+## Casos de uso
 
-AI safety is relevant for any high-stakes or public-facing system: alignment, robustness, and monitoring from design to deployment.
+A segurança em IA é relevante para qualquer sistema de alto risco ou voltado ao público: alinhamento, robustez e monitoramento do projeto à implantação.
 
 - Auditing and red-teaming high-stakes or public-facing models
-- Alignment and guardrails for LLMs and agents (e.g. RLHF, constitutional AI)
+- Alignment and guardrails for LLMs and agents (por ex. RLHF, constitutional AI)
 - Robustness testing and monitoring in production
 
-## External documentation
+## Documentação externa
 
 - [Anthropic – Safety](https://www.anthropic.com/research) — Research on AI safety and alignment
 - [OpenAI – Safety and responsibility](https://openai.com/safety)
 
-## See also
+## Veja também
 
 - [AI ethics](/docs/ai-ethics)
 - [Explainable AI](/docs/xai)

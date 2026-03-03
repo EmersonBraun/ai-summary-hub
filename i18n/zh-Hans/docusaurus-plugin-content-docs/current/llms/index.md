@@ -1,20 +1,20 @@
 ---
-title: Large language models (LLMs)
-description: What LLMs are, how they are trained and used.
+title: 大语言模型 (LLM)
+description: 大语言模型：架构、训练和能力。
 keywords: [LLM, large language model, foundation model]
 ---
 
-# Large language models (LLMs)
+# 大语言模型 (LLM)
 
-## Definition
+## 定义
 
-Large language models are transformer-based models trained on massive text (and sometimes multimodal) data. They exhibit emergent abilities: few-shot learning, reasoning, and tool use when scaled and aligned (e.g. via RLHF).
+大语言模型是基于 Transformer 的模型，在大规模文本（有时是多模态）数据上训练。 They exhibit emergent abilities: few-shot learning, 推理, and tool use when scaled and aligned (例如 via RLHF).
 
-A useful mental model: **pretraining** learns next-token prediction on huge corpora and gives the model broad knowledge and language ability. **Instruction tuning** (and similar) trains the model to follow user instructions and formats. **Alignment** (e.g. RLHF, DPO) shapes behavior to be helpful, honest, and safe. At inference time you can use the model zero-shot, few-shot, or augment it with retrieval (RAG) or tools (agents).
+一个有用的心智模型：**预训练**在巨大的语料库上学习下一个 token 预测，赋予模型广泛的知识and language ability. **Instruction tuning** (and similar) trains the model to follow user instructions and formats. **Alignment** (例如 RLHF, DPO) shapes behavior to be helpful, honest, and safe. At inference time you can use the model zero-shot, few-shot, or augment it with 检索 (RAG) or tools (agents).
 
-## How it works
+## 工作原理
 
-**Pretraining** learns next-token prediction on large corpora and produces a base model. **Optional fine-tuning** (e.g. [fine-tuning](/docs/llms/fine-tuning)) adapts it to tasks or instruction formats; **alignment** (e.g. RLHF, DPO) optimizes human preference and safety. The **deployed model** is then used at **inference** time. You can call it zero-shot (no examples), few-shot (with [prompt engineering](/docs/llms/prompt-engineering)), or augment it with [RAG](/docs/rag) (retrieval as context) or [agents](/docs/agents) (tools and loops). The diagram summarizes the training pipeline and the two main inference augmentations.
+**Pretraining** learns 下一个 token 预测 on large corpora and produces a base model. **Optional fine-tuning** (例如 [fine-tuning](/docs/llms/fine-tuning)) adapts it to tasks or instruction formats; **alignment** (例如 RLHF, DPO) optimizes human preference and safety. The **deployed model** is then used at **inference** time. You can call it zero-shot (no examples), few-shot (with [prompt engineering](/docs/llms/prompt-engineering)), or augment it with [RAG](/docs/rag) (检索 as context) or [agents](/docs/agents) (tools and loops). The diagram summarizes the training pipeline and the two main inference augmentations.
 
 ```mermaid
 flowchart LR
@@ -28,7 +28,7 @@ flowchart LR
   Tools["Tools / Agents"] --> Infer
 ```
 
-## Use cases
+## 应用场景
 
 LLMs are used wherever you need flexible language understanding or generation, from chat to code to analysis.
 
@@ -36,7 +36,7 @@ LLMs are used wherever you need flexible language understanding or generation, f
 - Code assistance and generation
 - Question answering and research assistance (often with RAG or tools)
 
-## Pros and cons
+## 优缺点
 
 | Pros | Cons |
 |------|------|
@@ -44,14 +44,14 @@ LLMs are used wherever you need flexible language understanding or generation, f
 | Strong few-shot performance | Hallucination, bias |
 | Enables agents and tool use | Requires careful evaluation |
 
-## External documentation
+## 外部文档
 
 - [OpenAI – Models overview](https://platform.openai.com/docs/models) — GPT and capabilities
 - [Google AI for Developers](https://ai.google.dev/) — Gemini and APIs
 - [Anthropic – Models](https://www.anthropic.com/product) — Claude and documentation
 - [Hugging Face – NLP course](https://huggingface.co/learn/nlp-course/) — From transformers to LLMs
 
-## See also
+## 另请参阅
 
 - [Fine-tuning](/docs/llms/fine-tuning)
 - [Prompt engineering](/docs/llms/prompt-engineering)

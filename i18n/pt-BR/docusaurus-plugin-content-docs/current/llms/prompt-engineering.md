@@ -1,18 +1,18 @@
 ---
-title: Prompt engineering
-description: Designing prompts to steer LLM behavior and improve outputs.
+title: Engenharia de prompts
+description: Criação de prompts eficazes para direcionar a saída do LLM.
 keywords: [prompt engineering, prompting, in-context learning]
 ---
 
-# Prompt engineering
+# Engenharia de prompts
 
-## Definition
+## Definição
 
-Prompt engineering is the practice of crafting input text (prompts) to get desired behavior from LLMs: task format, few-shot examples, chain-of-thought, role-playing, and constraints.
+Prompt engineering é a prática de elaborar texto de entrada (prompts) para obter o comportamento desejado dos LLMs: task format, few-shot examples, chain-of-thought, role-playing, and constraints.
 
-It is the primary way to steer [LLMs](/docs/llms) without [fine-tuning](/docs/llms/fine-tuning): you control context, format, and examples in the prompt. Combined with [RAG](/docs/rag), prompts often include retrieved passages; with [agents](/docs/agents), they define tool use and reasoning style.
+É the primary way to steer [LLMs](/docs/llms) without [fine-tuning](/docs/llms/fine-tuning): you control context, format, and examples in the prompt. Combined with [RAG](/docs/rag), prompts often include retrieved passages; with [agents](/docs/agents), they define tool use and raciocínio style.
 
-## How it works
+## Como funciona
 
 ```mermaid
 flowchart LR
@@ -21,22 +21,22 @@ flowchart LR
   LLM --> Output[Output]
 ```
 
-You compose a **prompt** (system message, task description, constraints) and optionally **examples** (few-shot). The **LLM** takes this as input and produces an **output**. **Zero-shot** uses only instructions; **few-shot** adds example input-output pairs so the model infers the task. **Chain-of-thought** (see [CoT](/docs/reasoning-patterns/cot)) asks the model to “think step by step” to improve reasoning. **Structured output** (e.g. “respond in JSON”) can be enforced via parsing or API options. Iterate on prompt wording and examples, and evaluate on a dev set to improve reliability.
+Você compõe um **prompt** (mensagem de sistema, descrição da tarefa, restrições) e opcionalmente **exemplos** (few-shot). O **LLM** takes this as input and produces an **output**. **Zero-shot** uses only instructions; **few-shot** adds example input-output pairs so the model infers the task. **Chain-of-thought** (see [CoT](/docs/reasoning-patterns/cot)) asks the model to “think passo a passo” to improve raciocínio. **Structured output** (por ex. “respond in JSON”) can be enforced via parsing or API options. Iterate on prompt wording and examples, and evaluate on a dev set to improve reliability.
 
-## Use cases
+## Casos de uso
 
-Prompt engineering matters whenever you call an LLM: it shapes behavior, format, and reasoning without changing weights.
+Prompt engineering matters whenever you call an LLM: it shapes behavior, format, and raciocínio without changing weights.
 
 - Steering chat and task completion (role, format, examples)
-- Eliciting reasoning (chain-of-thought) for math or logic
+- Eliciting raciocínio (chain-of-thought) for math or logic
 - Constraining outputs (JSON, length, tone) for APIs or UX
 
-## External documentation
+## Documentação externa
 
 - [OpenAI – Prompt engineering guide](https://platform.openai.com/docs/guides/prompt-engineering)
-- [Anthropic – Prompt design](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview)
+- [Anthropic – Prompt projeto](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview)
 
-## See also
+## Veja também
 
 - [LLMs](/docs/llms)
 - [Chain-of-thought](/docs/reasoning-patterns/cot)

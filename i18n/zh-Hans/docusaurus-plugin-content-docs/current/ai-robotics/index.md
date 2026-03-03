@@ -1,35 +1,35 @@
 ---
-title: AI and robotics
-description: AI for perception, planning, and control in robotics.
-keywords: [robotics, control, perception, RL]
+title: AI 与机器人技术
+description: AI 在机器人技术中的感知、规划和控制。
+keywords: [机器人技术, 控制, 感知, RL]
 ---
 
-# AI and robotics
+# AI 与机器人技术
 
-## Definition
+## 定义
 
 AI in robotics covers perception (vision, touch), planning (motion, task), and control (actuation). [Reinforcement learning](/docs/rl) and imitation learning train policies from data; sim-to-real transfer is a key challenge.
 
-Perception often uses [computer vision](/docs/cv) and sometimes [multimodal](/docs/multimodal-ai) models. Control policies are trained in simulation ([DRL](/docs/drl)) or from human demonstrations; deploying to real hardware requires dealing with dynamics mismatch (sim-to-real), safety, and latency.
+感知通常使用[计算机视觉](/docs/cv)，有时使用[多模态](/docs/multimodal-ai)模型。控制策略在模拟中训练（[DRL](/docs/drl)) or from human demonstrations; deploying to real hardware requires dealing with dynamics mismatch (sim-to-real), safety, and latency.
 
-## How it works
+## 工作原理
 
-**Sensors** (cameras, force/torque, proprioception) feed into **perception** models that estimate state (e.g. object poses, scene layout). **Planners** (classical or learned) produce trajectories or high-level actions (e.g. “pick block A”). **Controllers** (e.g. PID, learned policy) execute low-level commands (joint torques, velocities) to track the plan. **End-to-end** learning maps raw sensor input to actions in one network; **modular** pipelines separate perception, planning, and control for interpretability and reuse. Training is often in simulation ([DRL](/docs/drl)); sim-to-real (domain randomization, system identification) and safety constraints are critical for deployment.
+**Sensors** (cameras, force/torque, proprioception) 输入到 **perception** models that estimate state (例如 object poses, scene layout). **Planners** (classical or learned) produce trajectories or high-level actions (例如 “pick block A”). **Controllers** (例如 PID, learned policy) execute low-level commands (joint torques, velocities) to track the plan. **End-to-end** learning maps raw sensor input to actions in one network; **modular** pipelines separate perception, planning, and control for interpretability and reuse. Training is often in simulation ([DRL](/docs/drl)); sim-to-real (domain randomization, system identification) and safety constraints are critical for deployment.
 
-## Use cases
+## 应用场景
 
 AI robotics applies when perception, planning, or control are learned from data (manipulation, navigation, sim-to-real).
 
-- Manipulation and grasping (e.g. pick-and-place, assembly)
+- Manipulation and grasping (例如 pick-and-place, assembly)
 - Navigation and autonomous driving
 - Sim-to-real and imitation learning for policy training
 
-## External documentation
+## 外部文档
 
 - [Spinning Up in Deep RL (OpenAI)](https://spinningup.openai.com/) — RL for control
 - [Google – Robotics](https://research.google/pubs/robotics/) — Research overview
 
-## See also
+## 另请参阅
 
 - [Reinforcement learning](/docs/rl)
 - [Computer vision](/docs/cv)

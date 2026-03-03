@@ -1,18 +1,18 @@
 ---
-title: Vibe coding
+title: Vibe Coding
 description: Iterative, AI-assisted coding driven by intent and quick feedback.
 keywords: [vibe coding, AI-assisted coding, iterative development]
 ---
 
-# Vibe coding
+# Vibe Coding
 
-## Definition
+## 定义
 
-Vibe coding is a style of software development where you work **iteratively with AI assistance**: you describe intent in natural language, get code or edits from an [LLM](/docs/llms) or coding tool, then refine by feedback and context rather than writing every line from scratch. The “vibe” is the loose, exploratory flow—you steer by intent and feel, and the model fills in implementation details.
+Vibe coding 是一种软件开发风格，通过 **AI 辅助进行迭代工作**: you describe intent in natural language, get code or edits from an [LLM](/docs/llms) or coding tool, then refine by feedback and context rather than writing every line from scratch. The “vibe” is the loose, exploratory flow—you steer by intent and feel, and the model fills in implementation details.
 
-It contrasts with fully spec-first or plan-then-code approaches (e.g. [spec-driven development](/docs/spec-driven-development)): you often start with a rough idea and let [prompt engineering](/docs/llms/prompt-engineering), [agents](/docs/agents), and tools (e.g. [Cursor](/docs/tools/cursor), [Claude Code](/docs/tools/claude-code)) suggest and edit code. Useful for prototypes, scripting, and tasks where speed and iteration matter more than upfront design.
+It contrasts with fully spec-first or plan-then-code approaches (例如 [spec-driven development](/docs/spec-driven-development)): you often start with a rough idea and let [prompt engineering](/docs/llms/prompt-engineering), [agents](/docs/agents), and tools (例如 [Cursor](/docs/tools/cursor), [Claude Code](/docs/tools/claude-code)) suggest and edit code. Useful for prototypes, scripting, and tasks where speed and iteration matter more than upfront 设计.
 
-## How it works
+## 工作原理
 
 ```mermaid
 flowchart LR
@@ -22,18 +22,18 @@ flowchart LR
   Feedback --> Intent
 ```
 
-You give the **model** (or IDE tool) **context**: open files, cursor position, or a short prompt (“add a test for this”, “refactor to use async”). The **model** returns suggested code or diffs; you **accept, edit, or reject** and optionally add **feedback** (“use a different library”, “make it shorter”). The loop repeats until the result matches what you want. Tools often provide project-aware context (indexed codebase, [RAG](/docs/rag)-style retrieval) so suggestions stay relevant. Success depends on clear intent, good tooling, and knowing when to take over or refine the output.
+You give the **model** (or IDE tool) **context**: open files, cursor position, or a short prompt (“add a test for this”, “refactor to use async”). The **model** returns suggested code or diffs; you **accept, edit, or reject** and optionally add **feedback** (“use a different library”, “make it shorter”). The loop repeats until the result matches what you want. Tools often provide project-aware context (indexed codebase, [RAG](/docs/rag)-style 检索) so suggestions stay relevant. Success depends on clear intent, good tooling, and knowing when to take over or refine the output.
 
-## Use cases
+## 应用场景
 
-Vibe coding fits when you want to move fast with AI assistance and are okay iterating in the loop rather than nailing the spec first.
+Vibe coding 适用于想要借助 AI 快速推进、愿意在循环中迭代而非先确定规范的场景.
 
-- Prototyping and scripting (e.g. one-off scripts, small tools)
+- Prototyping and scripting (例如 one-off scripts, small tools)
 - Boilerplate, tests, and refactors where the intent is easy to state
 - Learning or exploring a codebase by asking the AI to implement or explain
-- Pairing with [agents](/docs/agents) or [autonomous agents](/docs/autonomous-agents) that write and edit code from descriptions
+- 与[代理](/docs/agents)或[自主代理](/docs/autonomous-agents)配合，根据描述编写和编辑代码riptions
 
-## Pros and cons
+## 优缺点
 
 | Pros | Cons |
 |------|------|
@@ -42,12 +42,12 @@ Vibe coding fits when you want to move fast with AI assistance and are okay iter
 | Low friction for small tasks | Hard to scale to large, consistent systems without specs |
 | Works well with [agents](/docs/agents) and IDEs | Depends on model quality and context |
 
-## External documentation
+## 外部文档
 
 - [Antigravity – Vibe coding](https://www.antigravityai.io/) — Agent-first IDE that emphasizes vibe coding
 - [Kiro – Spec-driven and Autopilot](https://kiro.dev/) — Balancing structure with AI-driven flow
 
-## See also
+## 另请参阅
 
 - [Spec-driven development](/docs/spec-driven-development) — More structured, spec-first approach
 - [Agents](/docs/agents) — AI that can write and edit code

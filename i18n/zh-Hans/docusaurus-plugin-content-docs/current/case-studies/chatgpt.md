@@ -1,22 +1,22 @@
 ---
 title: Case study — ChatGPT
-description: How ChatGPT and conversational LLMs work.
+description: ChatGPT 和对话式大语言模型的工作原理。
 keywords: [ChatGPT, OpenAI, conversational AI]
 ---
 
 # Case study: ChatGPT
 
-## Definition
+## 定义
 
-ChatGPT is a family of conversational [LLMs](/docs/llms) from OpenAI. They are trained with supervised [fine-tuning](/docs/llms/fine-tuning) and reinforcement learning from human feedback (RLHF) to follow instructions and converse safely.
+ChatGPT is a 对话式模型家族 [LLMs](/docs/llms) 来自 OpenAI. 它们是 trained with supervised [fine-tuning](/docs/llms/fine-tuning) and reinforcement learning from human feedback (RLHF) to follow instructions and converse safely.
 
-They illustrate the full [LLM](/docs/llms) stack: pretrained base model, instruction tuning, and [RL](/docs/rl)-based alignment (RLHF). The same ideas (instruction tuning, preference optimization) appear in open and other proprietary models. Use case: chat, [prompt](/docs/llms/prompt-engineering)-driven tasks, and [agent](/docs/agents)-like workflows with tools.
+它们展示了完整的 [LLM](/docs/llms) stack: pretrained base model, 指令调优, and [RL](/docs/rl)-based alignment (RLHF). The same ideas (指令调优, preference optimization) appear in open and other proprietary models. Use case: chat, [prompt](/docs/llms/prompt-engineering)-driven tasks, and [agent](/docs/agents)-like workflows with tools.
 
-## How it works
+## 工作原理
 
-Start from a **base model** (e.g. GPT-4): a [decoder-only](/docs/transformers/gpt) [transformer](/docs/transformers) pretrained on next-token prediction. **Instruction tuning**: fine-tune on (instruction, response) pairs so the model follows user intent. **RLHF**: train a **reward model** on human preference data (which of two responses is better); then optimize the **policy** (the LLM) with [reinforcement learning](/docs/rl) (e.g. PPO) to maximize the reward. The result is a model that is helpful, follows instructions, and is less likely to produce harmful or off-policy content. **Safety and guardrails** (content filters, refusals, monitoring) are applied in the product. [Prompt engineering](/docs/llms/prompt-engineering) and [RAG](/docs/rag) or [agents](/docs/agents) extend the system for specific use cases.
+Start from a **base model** (例如 GPT-4): a [decoder-only](/docs/transformers/gpt) [transformer](/docs/transformers) 预训练于 下一个 token 预测. **Instruction tuning**: fine-tune on (instruction, response) pairs so the model follows user intent. **RLHF**: train a **reward model** on human preference data (which of two responses is better); then optimize the **policy** (the LLM) with [reinforcement learning](/docs/rl) (例如 PPO) to maximize the reward. 结果是一个 model that is helpful, follows instructions, and is less likely to produce harmful or off-policy content. **Safety and guardrails** (content filters, refusals, monitoring) are applied in the product. [Prompt engineering](/docs/llms/prompt-engineering) and [RAG](/docs/rag) or [agents](/docs/agents) extend the system for specific use cases.
 
-## Use cases
+## 应用场景
 
 ChatGPT-style systems fit chat, writing, code help, and task automation that benefit from instruction-following and tool use.
 
@@ -24,12 +24,12 @@ ChatGPT-style systems fit chat, writing, code help, and task automation that ben
 - Writing, summarization, and brainstorming
 - Code help, tutoring, and task automation via chat
 
-## External documentation
+## 外部文档
 
 - [OpenAI – ChatGPT and models](https://openai.com/chatgpt)
-- [InstructGPT (Ouyang et al.)](https://arxiv.org/abs/2203.02155) — RLHF and instruction tuning
+- [InstructGPT (Ouyang et al.)](https://arxiv.org/abs/2203.02155) — RLHF and 指令调优
 
-## See also
+## 另请参阅
 
 - [LLMs](/docs/llms)
 - [Reinforcement learning](/docs/rl)

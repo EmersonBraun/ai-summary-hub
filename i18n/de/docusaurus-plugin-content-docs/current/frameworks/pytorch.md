@@ -1,35 +1,35 @@
 ---
 title: PyTorch
 description: Deep learning framework with dynamic computation graphs.
-keywords: [PyTorch, deep learning, research]
+keywords: [PyTorch, Deep Learning, research]
 ---
 
 # PyTorch
 
 ## Definition
 
-PyTorch is a popular [deep learning](/docs/fundamentals/deep-learning) framework with an imperative, Pythonic style. It is widely used in research and industry and is the base for many libraries ([Hugging Face](/docs/tools/huggingface), torchvision, etc.).
+PyTorch ist ein beliebtes [deep learning](/docs/fundamentals/deep-learning) framework mit einem imperativen, pythonischen Stil. Es ist weit verbreitet in Forschung und Industry and is the base for many libraries ([Hugging Face](/docs/tools/huggingface), torchvision, etc.).
 
-It competes with [TensorFlow](/docs/frameworks/tensorflow); PyTorch is often preferred for research and rapid iteration due to eager execution and clear debugging. Used for [LLMs](/docs/llms), [vision](/docs/cv), [NLP](/docs/nlp), and [RL](/docs/drl); production deployment uses TorchScript, ONNX, or dedicated runtimes.
+It competes with [TensorFlow](/docs/frameworks/tensorflow); PyTorch wird oft preferred for research and rapid iteration due to Eager-Ausführung and clear debugging. Used for [LLMs](/docs/llms), [vision](/docs/cv), [NLP](/docs/nlp), and [RL](/docs/drl); production deployment uses TorchScript, ONNX, or dedicated runtimes.
 
-## How it works
+## Funktionsweise
 
-You **define models** as Python classes (nn.Module); the **forward pass** runs immediately (eager mode), and **autograd** records operations for **backprop**. Optimizers (e.g. Adam) update parameters from computed gradients. Training loops are explicit (for epoch, for batch, loss.backward(), optimizer.step()), which makes experimentation and debugging straightforward. For **deployment**, export to TorchScript (Python-free), ONNX (cross-framework), or PyTorch Mobile. Distributed training uses torch.distributed or higher-level APIs (e.g. Hugging Face Accelerate). The same code can run on CPU, GPU, or multiple GPUs with minimal changes.
+Man **definiert Modelle** als Python-Klassen (nn.Module); der **Forward-Pass** läuft sofort (Eager-Modus), und **Autograd** records operations for **backprop**. Optimizers (z. B. Adam) update parameters from computed gradients. Training loops are explicit (for epoch, for batch, loss.backward(), optimizer.step()), which makes experimentation and debugging straightforward. For **deployment**, export to TorchScript (Python-free), ONNX (cross-framework), or PyTorch Mobile. Distributed training uses torch.distributed or higher-level APIs (z. B. Hugging Face Accelerate). The same code can run on CPU, GPU, or multiple GPUs mit minimalem changes.
 
-## Use cases
+## Anwendungsfälle
 
-PyTorch is a natural fit for research, prototyping, and production when you want flexibility and a Python-first workflow.
+PyTorch is a natural fit for research, prototyping, and production wenn Sie want flexibility and a Python-first workflow.
 
-- Research and prototyping (e.g. new architectures, experiments)
-- Training and fine-tuning models (vision, NLP, RL)
+- Research and prototyping (z. B. new architectures, experiments)
+- Training and Feinabstimmung models (vision, NLP, RL)
 - Production deployment via TorchScript, ONNX, or mobile
 
-## External documentation
+## Externe Dokumentation
 
 - [PyTorch – Get started](https://pytorch.org/get-started/locally/)
 - [PyTorch tutorials](https://pytorch.org/tutorials/)
 
-## See also
+## Siehe auch
 
 - [TensorFlow](/docs/frameworks/tensorflow)
 - [Hugging Face](/docs/tools/huggingface)

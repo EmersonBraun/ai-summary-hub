@@ -1,43 +1,43 @@
 ---
-title: Machine learning
-description: Introduction to machine learning — supervised, unsupervised, and reinforcement learning.
-keywords: [machine learning, ML, supervised, unsupervised]
+title: Apprentissage automatique
+description: Introduction à l'apprentissage automatique — supervisé, non supervisé et par renforcement.
+keywords: [apprentissage automatique, ML, supervisé, non supervisé]
 ---
 
-# Machine learning
+# Apprentissage automatique
 
-## Definition
+## Définition
 
-Machine learning (ML) is the study of algorithms that improve with experience (data). Key paradigms include **supervised learning** (learning from labeled examples), **unsupervised learning** (finding structure without labels), and **reinforcement learning** (learning from rewards).
+L'apprentissage automatique (ML) est l'étude d'algorithmes qui s'améliorent avec l'expérience (les données). Les principaux paradigmes incluent l'**apprentissage supervisé** (apprendre à partir d'exemples étiquetés), l'**apprentissage non supervisé** (trouver des structures sans étiquettes) et l'**apprentissage par renforcement** (apprendre à partir de récompenses).
 
-ML is preferred over hand-coded rules when the problem is too complex to specify explicitly or when data is abundant. It sits between classical AI (symbolic rules) and [deep learning](/docs/fundamentals/deep-learning) (large neural networks); many real-world systems combine ML models with pipelines and business logic.
+Le ML est préféré aux règles codées manuellement lorsque le problème est trop complexe pour être spécifié explicitement ou lorsque les données sont abondantes. Il se situe entre l'IA classique (règles symboliques) et l'[apprentissage profond](/docs/fundamentals/deep-learning) (grands réseaux de neurones) ; de nombreux systèmes réels combinent des modèles ML avec des pipelines et de la logique métier.
 
-## How it works
+## Comment ça marche
 
 ```mermaid
 flowchart LR
-  Data[Data] --> Train[Train]
-  Train --> Model[Model]
-  Model --> Predict[Predict]
+  Data[Données] --> Train[Entraînement]
+  Train --> Model[Modèle]
+  Model --> Predict[Prédiction]
 ```
 
-**Train:** You choose a representation (e.g. linear model, tree, or neural network) and an objective (loss for supervised/unsupervised, reward for RL). An optimizer (e.g. gradient descent) updates the model parameters to minimize the loss or maximize the reward on the training data. **Model:** The result is a fitted model (weights, structure) that captures patterns in the data. **Predict:** At inference time, you feed new inputs into the model to get outputs (labels, scores, or actions). Evaluation uses train/validation/test splits to estimate generalization and avoid overfitting.
+**Entraînement :** Vous choisissez une représentation (p. ex. modèle linéaire, arbre ou réseau de neurones) et un objectif (perte pour supervisé/non supervisé, récompense pour RL). Un optimiseur (p. ex. descente de gradient) met à jour les paramètres du modèle pour minimiser la perte ou maximiser la récompense sur les données d'entraînement. **Modèle :** Le résultat est un modèle ajusté (poids, structure) qui capture les patterns dans les données. **Prédiction :** Au moment de l'inférence, de nouvelles entrées sont fournies au modèle pour obtenir des sorties (étiquettes, scores ou actions). L'évaluation utilise des splits entraînement/validation/test pour estimer la généralisation et éviter le surapprentissage.
 
-## Use cases
+## Cas d'utilisation
 
-Classical ML shines when you have structured or tabular data and clear labels or targets.
+Le ML classique excelle avec des données structurées ou tabulaires et des étiquettes ou objectifs clairs.
 
-- Spam classification, fraud detection, and other supervised classification tasks
-- Recommendation systems and collaborative filtering
-- Forecasting and time-series prediction
+- Classification de spam, détection de fraude et autres tâches de classification supervisée
+- Systèmes de recommandation et filtrage collaboratif
+- Prévisions et prédiction de séries temporelles
 
-## External documentation
+## Documentation externe
 
-- [Google ML crash course](https://developers.google.com/machine-learning/crash-course)
-- [Scikit-learn – User guide](https://scikit-learn.org/stable/user_guide.html) — Classical ML in practice
+- [Cours accéléré ML de Google](https://developers.google.com/machine-learning/crash-course)
+- [Scikit-learn – Guide utilisateur](https://scikit-learn.org/stable/user_guide.html) — ML classique en pratique
 
-## See also
+## Voir aussi
 
-- [Deep learning](/docs/fundamentals/deep-learning)
-- [Reinforcement learning](/docs/rl)
-- [Evaluation metrics](/docs/evaluation-metrics)
+- [Apprentissage profond](/docs/fundamentals/deep-learning)
+- [Apprentissage par renforcement](/docs/rl)
+- [Métriques d'évaluation](/docs/evaluation-metrics)

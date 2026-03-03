@@ -1,43 +1,43 @@
 ---
-title: Deep learning
-description: Deep neural networks and representation learning.
-keywords: [deep learning, neural networks, representation learning]
+title: Apprentissage profond
+description: Réseaux de neurones profonds et apprentissage de représentations.
+keywords: [apprentissage profond, réseaux de neurones, apprentissage de représentations]
 ---
 
-# Deep learning
+# Apprentissage profond
 
-## Definition
+## Définition
 
-Deep learning uses neural networks with many layers to learn hierarchical representations from data. It has driven progress in vision, language, and other domains by scaling data and compute.
+L'apprentissage profond utilise des réseaux de neurones avec de nombreuses couches pour apprendre des représentations hiérarchiques à partir de données. Il a stimulé les progrès en vision, langage et autres domaines en mettant à l'échelle données et calcul.
 
-It extends [machine learning](/docs/fundamentals/machine-learning) by using differentiable, layered models (see [neural networks](/docs/neural-networks)) that learn features automatically instead of hand-crafted ones. Depth allows the model to build increasingly abstract representations (e.g. edges → textures → parts → objects in vision).
+Il étend l'[apprentissage automatique](/docs/fundamentals/machine-learning) en utilisant des modèles différentiables en couches (voir [réseaux de neurones](/docs/neural-networks)) qui apprennent automatiquement les caractéristiques au lieu de les concevoir manuellement. La profondeur permet au modèle de construire des représentations de plus en plus abstraites (p. ex. bords → textures → parties → objets en vision).
 
-## How it works
+## Comment ça marche
 
 ```mermaid
 flowchart LR
-  Data[Data] --> Layers[Layers]
-  Layers --> Representation[Representation]
-  Representation --> Output[Output]
+  Data[Données] --> Layers[Couches]
+  Layers --> Representation[Représentation]
+  Representation --> Output[Sortie]
 ```
 
-**Data** is fed into the first **layer**; each layer applies a linear transformation followed by a nonlinearity (e.g. ReLU). Stacking layers produces a **representation** (embedding) that becomes more abstract in deeper layers. The final layer maps to the **output** (e.g. class scores or tokens). Training uses **backpropagation** to compute gradients and **gradient descent** to update weights. Architectures (CNNs for images, RNNs for sequences, [Transformers](/docs/transformers) for both) tailor the connectivity and operations to the data and task.
+Les **données** sont envoyées dans la première **couche** ; chaque couche applique une transformation linéaire suivie d'une non-linéarité (p. ex. ReLU). L'empilement de couches produit une **représentation** (embedding) qui devient plus abstraite dans les couches profondes. La dernière couche projette vers la **sortie** (p. ex. scores de classes ou tokens). L'entraînement utilise la **rétropropagation** pour calculer les gradients et la **descente de gradient** pour mettre à jour les poids. Les architectures (CNN pour les images, RNN pour les séquences, [Transformers](/docs/transformers) pour les deux) adaptent la connectivité et les opérations aux données et à la tâche.
 
-## Use cases
+## Cas d'utilisation
 
-Deep learning is the default for perception and generation when data is abundant and tasks are complex.
+L'apprentissage profond est le standard pour la perception et la génération quand les données sont abondantes et les tâches complexes.
 
-- Image recognition, object detection, and segmentation (vision)
-- Speech recognition, machine translation, and text generation (language)
-- Game playing, robotics control, and simulation (reinforcement learning)
+- Reconnaissance d'images, détection d'objets et segmentation (vision)
+- Reconnaissance vocale, traduction automatique et génération de texte (langage)
+- Jeux, contrôle robotique et simulation (apprentissage par renforcement)
 
-## External documentation
+## Documentation externe
 
-- [Deep Learning (Goodfellow et al.)](https://www.deeplearningbook.org/) — Free online book
-- [PyTorch – Introduction](https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html) — Hands-on deep learning
+- [Deep Learning (Goodfellow et al.)](https://www.deeplearningbook.org/) — Livre en ligne gratuit
+- [PyTorch – Introduction](https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html) — Apprentissage profond pratique
 
-## See also
+## Voir aussi
 
-- [Neural networks](/docs/neural-networks)
+- [Réseaux de neurones](/docs/neural-networks)
 - [Transformers](/docs/transformers)
 - [Frameworks (PyTorch, TensorFlow)](/docs/frameworks/pytorch)

@@ -1,43 +1,43 @@
 ---
-title: Recurrent neural networks (RNN)
-description: RNNs and sequential data.
-keywords: [RNN, LSTM, sequence]
+title: Redes neurais recorrentes (RNN)
+description: RNNs e dados sequenciais.
+keywords: [RNN, LSTM, sequência]
 ---
 
-# Recurrent neural networks (RNN)
+# Redes neurais recorrentes (RNN)
 
-## Definition
+## Definição
 
-RNNs process sequences by maintaining a hidden state that is updated at each step. They (and variants like LSTM) were the standard for sequence modeling before Transformers.
+RNNs processam sequências mantendo um estado oculto que é atualizado a cada passo. Elas (e variantes como LSTM) eram o padrão para modelagem de sequências antes dos Transformers.
 
-They are a natural fit for [NLP](/docs/nlp), time series, and any ordered data where context from the past matters. [Transformers](/docs/transformers) have largely replaced them in language modeling due to parallelization and long-range dependency handling, but RNNs still appear in streaming or low-latency settings.
+São uma escolha natural para [NLP](/docs/nlp), séries temporais e quaisquer dados ordenados onde o contexto do passado importa. Os [Transformers](/docs/transformers) as substituíram amplamente na modelagem de linguagem devido à paralelização e ao tratamento de dependências de longo alcance, mas RNNs ainda aparecem em cenários de streaming ou baixa latência.
 
-## How it works
+## Como funciona
 
 ```mermaid
 flowchart LR
-  Step1[Step1] --> Hidden[Hidden]
-  Hidden --> Step2[Step2]
-  Step2 --> Hidden2[Hidden]
+  Step1[Passo1] --> Hidden[Oculto]
+  Hidden --> Step2[Passo2]
+  Step2 --> Hidden2[Oculto]
   Hidden2 --> More[...]
 ```
 
-At each **step**, the model receives the current input (e.g. a token or frame) and the previous **hidden** state. It computes an output (e.g. a prediction or next hidden representation) and updates the hidden state for the next step. The recurrence is unrolled in time for training (backprop through time); at inference, the hidden state is passed forward step by step. **LSTM** and **GRU** variants add gating to mitigate vanishing gradients. Inputs and outputs can be one-to-one, one-to-many, or many-to-one depending on the task (e.g. sequence labeling vs sequence-to-sequence).
+A cada **passo**, o modelo recebe a entrada atual (ex.: um token ou frame) e o **estado oculto** anterior. Calcula uma saída (ex.: uma predição ou a próxima representação oculta) e atualiza o estado oculto para o próximo passo. A recorrência é desenrolada no tempo para treinamento (retropropagação através do tempo); na inferência, o estado oculto é passado passo a passo. Variantes **LSTM** e **GRU** adicionam portas para mitigar gradientes que desaparecem. Entradas e saídas podem ser um-para-um, um-para-muitos ou muitos-para-um dependendo da tarefa (ex.: rotulação de sequência vs. sequência para sequência).
 
-## Use cases
+## Casos de uso
 
-RNNs fit problems with sequential input or output where order and context over time matter.
+RNNs se encaixam em problemas com entrada ou saída sequencial onde a ordem e o contexto temporal importam.
 
-- Sequence labeling (e.g. named entity recognition, part-of-speech tagging)
-- Time-series forecasting and anomaly detection
-- Speech and text sequence modeling (before Transformers dominated)
+- Rotulação de sequências (ex.: reconhecimento de entidades nomeadas, etiquetagem POS)
+- Previsão de séries temporais e detecção de anomalias
+- Modelagem de sequências de fala e texto (antes dos Transformers dominarem)
 
-## External documentation
+## Documentação externa
 
-- [Understanding LSTM networks (Olah)](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
-- [PyTorch – Sequence models and RNNs](https://pytorch.org/tutorials/beginner/sequence_models_tutorial.html)
+- [Entendendo redes LSTM (Olah)](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
+- [PyTorch – Modelos de sequência e RNNs](https://pytorch.org/tutorials/beginner/sequence_models_tutorial.html)
 
-## See also
+## Veja também
 
 - [Transformers](/docs/transformers)
 - [NLP](/docs/nlp)

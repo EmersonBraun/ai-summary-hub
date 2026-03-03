@@ -1,6 +1,6 @@
 ---
 title: Case study — Claude
-description: Anthropic's instruction-following LLM with long context and safety.
+description: Anthropics anweisungsfolgendes LLM mit langem Kontext und Sicherheit.
 keywords: [Claude, Anthropic, constitutional AI, long context]
 ---
 
@@ -8,15 +8,15 @@ keywords: [Claude, Anthropic, constitutional AI, long context]
 
 ## Definition
 
-Claude is Anthropic’s family of conversational [LLMs](/docs/llms). The models are built for instruction-following, long context, and safety, using techniques such as constitutional AI and RLHF-style alignment.
+Claude is Anthropic’s Familie konversationeller [LLMs](/docs/llms). Die Modelle sind gebaut für Instruktionsfolgen, langen Kontext und Sicherheit, unter Verwendung von Techhniques such as constitutional AI and RLHF-style alignment.
 
-They share the same broad stack as [ChatGPT](/docs/case-studies/chatgpt): pretrained base, instruction tuning, and preference-based alignment. Claude emphasizes long-context windows, [prompt engineering](/docs/llms/prompt-engineering)-friendly behavior, and safety constraints. Use case: chat, long-document analysis, coding, and [agent](/docs/agents)-style workflows via API and products like [Claude Code](/docs/tools/claude-code).
+They share the same broad Stack as [ChatGPT](/docs/case-studies/chatgpt): pretrained base, Instruktions-Tuning, and preference-basierte Ausrichtung. Claude emphasizes long-context windows, [prompt engineering](/docs/llms/prompt-engineering)-friendly behavior, and safety constraints. Use case: chat, long-document analysis, Programmierung, and [agent](/docs/agents)-style workflows via API and products like [Claude Code](/docs/tools/claude-code).
 
-## How it works
+## Funktionsweise
 
-A **base model** (decoder-only [transformer](/docs/transformers)) is pretrained on large text corpora. **Instruction tuning** trains the model on (instruction, response) pairs. **Constitutional AI** and **RLHF** (reward model + policy optimization) shape helpfulness, honesty, and refusals. The result is a model with long context support (e.g. 100K+ tokens), suitable for documents and extended conversations. **Safety and guardrails** (content policy, refusals) are applied in the product. [RAG](/docs/rag) and tools extend Claude for specific applications.
+A **base model** (Decoder-only [transformer](/docs/transformers)) is vortrainiert auf großen Textkorpora. **Instruction tuning** trains the model on (instruction, response) pairs. **Constitutional AI** and **RLHF** (reward model + policy optimization) shape helpfulness, honesty, and refusals. Das Ergebnis ist ein model with long context support (z. B. 100K+ tokens), suitable for documents and extended conversations. **Safety and guardrails** (content policy, refusals) are applied in the product. [RAG](/docs/rag) and tools extend Claude for specific applications.
 
-## Use cases
+## Anwendungsfälle
 
 Claude fits applications that need long context, careful instruction-following, and strong safety defaults.
 
@@ -24,12 +24,12 @@ Claude fits applications that need long context, careful instruction-following, 
 - Coding assistance and code generation with large codebase context
 - Chat and task automation with explicit safety and refusal behavior
 
-## External documentation
+## Externe Dokumentation
 
 - [Anthropic – Claude](https://www.anthropic.com/product) — Models and product
 - [Anthropic – Model documentation](https://docs.anthropic.com/) — API and guides
 
-## See also
+## Siehe auch
 
 - [LLMs](/docs/llms)
 - [Prompt engineering](/docs/llms/prompt-engineering)

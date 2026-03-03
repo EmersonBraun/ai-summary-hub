@@ -1,18 +1,18 @@
 ---
 title: Computer vision (CV)
-description: AI for images and video.
+description: Clasificación de imágenes, detección de objetos y segmentación.
 keywords: [computer vision, image, video, CNN]
 ---
 
 # Computer vision (CV)
 
-## Definition
+## Definición
 
-Computer vision enables machines to interpret images and video: classification, detection, segmentation, tracking, and generative tasks. [CNNs](/docs/neural-networks/cnn) and vision [transformers](/docs/transformers) are core building blocks.
+La visión por computadora permite a las máquinas interpretar imágenes y video: classification, detection, segmentation, tracking, and generative tasks. [CNNs](/docs/neural-networks/cnn) and vision [transformers](/docs/transformers) are core building blocks.
 
-It overlaps with [multimodal](/docs/multimodal-ai) when combining vision and language (e.g. VLMs). Generative CV uses [diffusion](/docs/diffusion-models) or [GANs](/docs/gans). Most pipelines follow a backbone (feature extraction) plus task head; [transfer learning](/docs/transfer-learning) from ImageNet or similar is standard.
+Se superpone con [multimodal](/docs/multimodal-ai) when combining vision y lenguaje (por ej. VLMs). Generative CV uses [diffusion](/docs/diffusion-models) or [GANs](/docs/gans). Most pipelines follow a backbone (feature extraction) plus task head; [transfer learning](/docs/transfer-learning) from ImageNet or similar is standard.
 
-## How it works
+## Cómo funciona
 
 ```mermaid
 flowchart LR
@@ -22,22 +22,22 @@ flowchart LR
   Head --> Output["Detection/Seg/Class"]
 ```
 
-The **image** (or video frame) is fed into a **backbone** (e.g. ResNet, ViT) that outputs **features** (spatial feature maps or patch tokens). A **head** (one or more layers) maps features to the **output**: classification (logits per class), detection (boxes + classes), segmentation (mask per pixel), or generation (e.g. [diffusion](/docs/diffusion-models)). Backbones are usually pretrained on large datasets (e.g. ImageNet) then fine-tuned with the head on the target task. Data augmentation, normalization, and loss design (e.g. focal loss, mask head) are task-specific.
+The **image** (or video frame) se alimenta en un **backbone** (por ej. ResNet, ViT) que produce **features** (spatial feature maps or patch tokens). A **head** (one or more layers) maps features to the **output**: classification (logits por clase), detection (boxes + classes), segmentation (mask per pixel), or generation (por ej. [diffusion](/docs/diffusion-models)). Backbones are usually preentrenado en large datasets (por ej. ImageNet) then fine-tuned with the head on the target task. Data augmentation, normalization, and loss diseño (por ej. focal loss, mask head) are task-specific.
 
-## Use cases
+## Casos de uso
 
-Computer vision is used wherever you need to interpret or generate images and video (detection, segmentation, recognition).
+Computer vision se usa en cualquier lugar donde you need to interpret or generate images and video (detection, segmentation, recognition).
 
 - Object detection, instance segmentation, and tracking
-- Image classification and recognition (e.g. medical, satellite)
+- Image classification and recognition (por ej. medical, satellite)
 - Video understanding and action recognition
 
-## External documentation
+## Documentación externa
 
 - [CS231n – CNNs for Visual Recognition](https://cs231n.github.io/)
 - [PyTorch – Vision tutorials](https://pytorch.org/vision/stable/index.html)
 
-## See also
+## Ver también
 
 - [CNN](/docs/neural-networks/cnn)
 - [Multimodal AI](/docs/multimodal-ai)

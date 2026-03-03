@@ -1,18 +1,18 @@
 ---
 title: Infrastructure
-description: "Hardware and systems for training and serving AI: GPUs, TPUs, clusters."
+description: "Hardware y sistemas para entrenar y servir IA: GPUs, TPUs, clústeres."
 keywords: [infrastructure, GPU, TPU, training]
 ---
 
 # Infrastructure
 
-## Definition
+## Definición
 
-AI infrastructure covers hardware (GPUs, TPUs, custom accelerators) and software (distributed training, serving, orchestration) for training and deploying large models.
+La infraestructura de IA abarca hardware (GPUs, TPUs, aceleradores personalizados) y software (distributed training, serving, orchestration) for training and deploying modelo grandes.
 
-Scale is driven by [LLMs](/docs/llms) and large vision models; training may use thousands of GPUs; serving uses [model compression](/docs/model-compression) (e.g. [quantization](/docs/quantization)) and batching to meet latency and cost. [Frameworks](/docs/frameworks/pytorch) (PyTorch, JAX, TensorFlow) provide the programming model; clouds and on-prem clusters provide the hardware and orchestration.
+La escala es impulsada por [LLMs](/docs/llms) y grandes modelos de visión; el entrenamiento puede usar miles de GPUs; el servicio usa [compresión de modeloompression](/docs/model-compression) (por ej. [quantization](/docs/quantization)) and batching to meet latency and cost. [Frameworks](/docs/frameworks/pytorch) (PyTorch, JAX, TensorFlow) provide the programming model; clouds and on-prem clusters provide the hardware and orchestration.
 
-## How it works
+## Cómo funciona
 
 ```mermaid
 flowchart LR
@@ -22,25 +22,25 @@ flowchart LR
   Model --> Serve[Serve]
 ```
 
-**Data** and **config** (model, hyperparameters) feed into **train**: distributed training runs across many devices using data parallelism (replicate model, split data) and/or model parallelism (split model across devices). Frameworks (PyTorch, JAX) and orchestrators (SLURM, Kubernetes, cloud jobs) manage scheduling and communication. The trained **model** is then **served**: loaded on inference hardware, optionally [quantized](/docs/quantization), and exposed via an API. Serving uses batching, replication, and load balancing to meet throughput and latency; monitoring and versioning are part of the pipeline.
+**Datos** y **configuración** (modelo, hiperparámetros) alimentan el **entrenamiento**: el entrenamiento distribuido se ejecuta en muchos dispositivos usandog data parallelism (replicate model, split data) and/or model parallelism (split model across devices). Frameworks (PyTorch, JAX) and orchestrators (SLURM, Kubernetes, cloud jobs) manage scheduling and communication. The trained **model** is then **served**: loaded on inference hardware, optionally [quantized](/docs/quantization), and exposed via an API. Serving uses batching, replication, and load balancing to meet throughput and latency; monitoring and versioning are part of the pipeline.
 
-## Use cases
+## Casos de uso
 
 ML infrastructure covers training at scale and serving with the right latency, throughput, and reliability.
 
-- Distributed training of large models across GPU/TPU clusters
+- Distributed training of modelo grandes across GPU/TPU clusters
 - Serving models at scale with batching and replication
 - End-to-end ML pipelines from data to deployment
 
-## External documentation
+## Documentación externa
 
 - [PyTorch – Distributed training](https://pytorch.org/tutorials/beginner/distributed_overview.html)
 - [Google Cloud – GPU and TPU](https://cloud.google.com/ai-platform/docs/get-started-with-tpu)
 
-## See also
+## Ver también
 
 - [Local inference](/docs/local-inference)
-- [Edge reasoning](/docs/edge-reasoning)
+- [Edge razonamiento](/docs/edge-reasoning)
 - [Model compression](/docs/model-compression)
 - [Quantization](/docs/quantization)
 - [Frameworks](/docs/frameworks/pytorch)

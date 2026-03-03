@@ -1,20 +1,20 @@
 ---
 title: Reinforcement learning (RL)
-description: Learning from rewards and sequential decision-making.
+description: Apprentissage à partir de récompenses et prise de décision séquentielle.
 keywords: [reinforcement learning, RL, rewards, MDP]
 ---
 
 # Reinforcement learning (RL)
 
-## Definition
+## Définition
 
-Reinforcement learning trains agents to maximize cumulative reward in an environment. The agent takes actions, receives observations and rewards, and improves its policy (e.g. value-based, policy gradient, actor-critic).
+L'apprentissage par renforcement entraîne des agents à maximiser la récompense cumulative in an environment. The agent takes actions, receives observations and rewards, and improves its policy (par ex. value-based, policy gradient, actor-critic).
 
-It differs from [supervised](/docs/fundamentals/machine-learning) and [unsupervised](/docs/fundamentals/machine-learning) learning because feedback is sparse and delayed (rewards), and the agent must explore. Used in games, robotics, and [LLM](/docs/llms) alignment (RLHF). For high-dimensional states/actions, see [deep RL](/docs/drl).
+Il se distingue de [supervised](/docs/fundamentals/machine-learning) and [unsupervised](/docs/fundamentals/machine-learning) learning car le retour est sparse and delayed (rewards), and the agent must explore. Used in games, robotics, and [LLM](/docs/llms) alignment (RLHF). For high-dimensional states/actions, see [deep RL](/docs/drl).
 
-## How it works
+## Comment ça fonctionne
 
-The setting is usually an **MDP**: the **agent** sees a **state**, chooses an **action**, and the **environment** returns a **reward** and **next state**. The agent improves its policy (mapping from state to action) to maximize cumulative reward. **Value-based** methods (e.g. Q-learning, DQN) learn a value function and derive the policy; **policy gradient** methods (e.g. PPO, SAC) optimize the policy directly. Exploration (e.g. epsilon-greedy, entropy bonus) is needed because rewards are only observed for actions taken. Algorithms differ in how they handle off-policy data, continuous actions, and scaling to large state spaces.
+Le cadre est généralement un **MDP** : l'**agent** voit un **état**, choisit une **action**, et l'**environnement** renvoies a **reward** and **next state**. The agent improves its policy (mapping from state to action) to maximize cumulative reward. **Value-based** methods (par ex. Q-learning, DQN) learn a value function and derive the policy; **policy gradient** methods (par ex. PPO, SAC) optimize the policy directly. Exploration (par ex. epsilon-greedy, entropy bonus) is needed because rewards are only observed for actions taken. Algorithms differ in how they handle off-policy data, continuous actions, and scaling to large state spaces.
 
 ```mermaid
 flowchart LR
@@ -27,20 +27,20 @@ flowchart LR
   Agent --> A
 ```
 
-## Use cases
+## Cas d'utilisation
 
-Reinforcement learning applies wherever an agent learns from rewards and sequential decisions (games, control, alignment).
+Reinforcement learning applies wherever an agent learns from rewards and sequential décisions (games, control, alignment).
 
-- Game playing (e.g. Atari, Go, poker) and simulation
-- Robotics control and continuous control (e.g. manipulation)
-- LLM alignment (e.g. RLHF) and sequential decision systems
+- Game playing (par ex. Atari, Go, poker) and simulation
+- Robotics control and continuous control (par ex. manipulation)
+- LLM alignment (par ex. RLHF) and sequential décision systems
 
-## External documentation
+## Documentation externe
 
 - [Reinforcement Learning (Sutton & Barto)](http://incompleteideas.net/book/the-book-2nd.html) — Free online book
 - [Spinning Up in Deep RL (OpenAI)](https://spinningup.openai.com/)
 
-## See also
+## Voir aussi
 
 - [Deep RL](/docs/drl)
 - [Machine learning](/docs/fundamentals/machine-learning)
