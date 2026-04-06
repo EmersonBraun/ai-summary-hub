@@ -2,6 +2,7 @@
 title: Deep reinforcement learning (DRL)
 description: RL with deep neural networks for function approximation.
 keywords: [deep RL, DRL, DQN, policy gradient]
+tags: [intermediate]
 ---
 
 # Deep reinforcement learning (DRL)

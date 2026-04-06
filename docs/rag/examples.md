@@ -2,6 +2,7 @@
 title: RAG examples
 description: Example RAG pipelines and code snippets.
 keywords: [RAG, examples, code, LangChain, LlamaIndex]
+tags: [intermediate]
 ---
 
 # RAG examples

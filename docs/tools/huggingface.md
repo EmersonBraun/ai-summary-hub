@@ -2,6 +2,7 @@
 title: Hugging Face
 description: Platform and libraries for models, datasets, and pipelines.
 keywords: [Hugging Face, Transformers, datasets]
+tags: [intermediate]
 ---
 
 # Hugging Face

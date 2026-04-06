@@ -2,6 +2,7 @@
 title: Tree of thoughts (ToT)
 description: Exploring multiple reasoning branches.
 keywords: [tree of thoughts, ToT, search, reasoning]
+tags: [intermediate]
 ---
 
 # Tree of thoughts (ToT)

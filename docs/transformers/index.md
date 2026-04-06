@@ -2,6 +2,7 @@
 title: Transformers
 description: Transformer architecture and self-attention mechanisms.
 keywords: [transformer, attention, self-attention, BERT, GPT]
+tags: [beginner]
 ---
 
 # Transformers

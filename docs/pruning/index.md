@@ -2,6 +2,7 @@
 title: Pruning
 description: Removing weights or structures to shrink models.
 keywords: [pruning, sparsity, structured pruning]
+tags: [advanced]
 ---
 
 # Pruning

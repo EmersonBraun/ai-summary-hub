@@ -1,0 +1,14 @@
+beginner:
+  label: Beginner
+  description: Introductory content, no prior AI knowledge needed
+  permalink: /beginner
+
+intermediate:
+  label: Intermediate
+  description: Requires basic AI/ML understanding
+  permalink: /intermediate
+
+advanced:
+  label: Advanced
+  description: Deep technical content for practitioners
+  permalink: /advanced

@@ -2,6 +2,7 @@
 title: LlamaIndex
 description: Data framework for LLM applications and RAG.
 keywords: [LlamaIndex, RAG, data layer]
+tags: [intermediate]
 ---
 
 # LlamaIndex

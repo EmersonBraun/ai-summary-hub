@@ -2,6 +2,7 @@
 title: Subagents
 description: Hierarchical agents and delegation.
 keywords: [subagents, hierarchy, delegation]
+tags: [intermediate]
 ---
 
 # Subagents

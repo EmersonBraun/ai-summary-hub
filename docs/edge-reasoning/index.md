@@ -2,6 +2,7 @@
 title: Edge reasoning
 description: Running lightweight reasoning and inference at the edge (devices, gateways).
 keywords: [edge reasoning, edge AI, on-device, small models]
+tags: [advanced]
 ---
 
 # Edge reasoning

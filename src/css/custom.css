@@ -91,6 +91,84 @@
   }
 }
 
+/* Level tag badges — color-coded by difficulty */
+a[href*="/tags/beginner"],
+span[class*="tag_"][class*="tagRegular_"]:has(+ a[href*="/tags/beginner"]),
+a[href*="/tags/beginner"] + span {
+  --docusaurus-tag-list-border: #34a853;
+}
+
+a[href*="/tags/intermediate"],
+span[class*="tag_"][class*="tagRegular_"]:has(+ a[href*="/tags/intermediate"]),
+a[href*="/tags/intermediate"] + span {
+  --docusaurus-tag-list-border: #4285f4;
+}
+
+a[href*="/tags/advanced"],
+span[class*="tag_"][class*="tagRegular_"]:has(+ a[href*="/tags/advanced"]),
+a[href*="/tags/advanced"] + span {
+  --docusaurus-tag-list-border: #ea4335;
+}
+
+/* Style tag links as colored badges */
+.theme-doc-tags-list-content a[href*="/tags/beginner"],
+.doc-tags-top a[href*="/tags/beginner"] {
+  background-color: rgba(52, 168, 83, 0.15);
+  border: 1px solid #34a853;
+  color: #34a853;
+}
+
+.theme-doc-tags-list-content a[href*="/tags/intermediate"],
+.doc-tags-top a[href*="/tags/intermediate"] {
+  background-color: rgba(66, 133, 244, 0.15);
+  border: 1px solid #4285f4;
+  color: #4285f4;
+}
+
+.theme-doc-tags-list-content a[href*="/tags/advanced"],
+.doc-tags-top a[href*="/tags/advanced"] {
+  background-color: rgba(234, 67, 53, 0.15);
+  border: 1px solid #ea4335;
+  color: #ea4335;
+}
+
+/* Tag badges in both light and dark themes */
+.doc-tags-top {
+  margin-bottom: 1rem;
+}
+
+.doc-tags-top a {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  margin-right: 0.5rem;
+}
+
+.doc-tags-top a:hover {
+  opacity: 0.8;
+  text-decoration: none;
+}
+
+[data-theme='dark'] .doc-tags-top a[href*="/tags/beginner"] {
+  background-color: rgba(52, 168, 83, 0.2);
+  color: #5cd87a;
+}
+
+[data-theme='dark'] .doc-tags-top a[href*="/tags/intermediate"] {
+  background-color: rgba(66, 133, 244, 0.2);
+  color: #7eadf6;
+}
+
+[data-theme='dark'] .doc-tags-top a[href*="/tags/advanced"] {
+  background-color: rgba(234, 67, 53, 0.2);
+  color: #f28b83;
+}
+
 /* Footer Connect column: icons in a row (same as leetcode MultiColumn) */
 .footer__items--connect {
   display: flex;

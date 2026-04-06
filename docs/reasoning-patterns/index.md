@@ -2,6 +2,7 @@
 title: Reasoning patterns
 description: How LLMs and agents structure reasoning and action.
 keywords: [reasoning, CoT, ReAct, ToT, RDD]
+tags: [intermediate]
 ---
 
 # Reasoning patterns

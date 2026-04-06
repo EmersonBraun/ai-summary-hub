@@ -2,6 +2,7 @@
 title: Vector databases
 description: Storing and searching embeddings for RAG.
 keywords: [vector database, similarity search, embeddings]
+tags: [intermediate]
 ---
 
 # Vector databases

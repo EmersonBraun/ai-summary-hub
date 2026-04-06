@@ -2,6 +2,7 @@
 title: Recurrent neural networks (RNN)
 description: RNNs and sequential data.
 keywords: [RNN, LSTM, sequence]
+tags: [intermediate]
 ---
 
 # Recurrent neural networks (RNN)

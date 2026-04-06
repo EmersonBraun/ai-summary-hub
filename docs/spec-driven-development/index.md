@@ -2,6 +2,7 @@
 title: Spec-driven development
 description: Building AI systems from explicit specifications.
 keywords: [spec-driven, specification, requirements, RDD]
+tags: [intermediate]
 ---
 
 # Spec-driven development

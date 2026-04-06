@@ -52,6 +52,8 @@ const config: Config = {
           // Disabled until repo has commits (git log fails on empty branch); set true to show "Last updated" on docs
           showLastUpdateTime: false,
           showLastUpdateAuthor: false,
+          onInlineTags: 'throw',
+          tags: 'tags.yml',
         },
         blog: false,
         theme: {

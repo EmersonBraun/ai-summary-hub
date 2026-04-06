@@ -2,6 +2,7 @@
 title: Few-shot learning
 description: Learning from very few examples.
 keywords: [few-shot, meta-learning, MAML]
+tags: [beginner]
 ---
 
 # Few-shot learning

@@ -2,6 +2,7 @@
 title: Case study — Grok
 description: xAI's LLM with real-time knowledge and reasoning.
 keywords: [Grok, xAI, real-time, reasoning]
+tags: [beginner]
 ---
 
 # Case study: Grok

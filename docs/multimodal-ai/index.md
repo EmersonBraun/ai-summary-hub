@@ -2,6 +2,7 @@
 title: Multimodal AI
 description: Models that combine text, image, audio, and other modalities.
 keywords: [multimodal, vision-language, CLIP]
+tags: [intermediate]
 ---
 
 # Multimodal AI

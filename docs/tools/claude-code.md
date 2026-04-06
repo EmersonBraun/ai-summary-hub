@@ -2,6 +2,7 @@
 title: Claude Code
 description: Anthropic's AI coding agent for terminal, IDE, and web.
 keywords: [Claude Code, Anthropic, coding agent, IDE]
+tags: [beginner]
 ---
 
 # Claude Code

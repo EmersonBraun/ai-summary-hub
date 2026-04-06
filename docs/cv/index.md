@@ -2,6 +2,7 @@
 title: Computer vision (CV)
 description: AI for images and video.
 keywords: [computer vision, image, video, CNN]
+tags: [beginner]
 ---
 
 # Computer vision (CV)

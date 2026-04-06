@@ -3,6 +3,7 @@ sidebar_position: 1
 title: Introduction
 description: Getting started with AI Summary Hub and an overview of AI fields.
 keywords: [AI, introduction, overview, fundamentals]
+tags: [beginner]
 ---
 
 # Introduction

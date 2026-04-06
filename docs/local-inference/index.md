@@ -2,6 +2,7 @@
 title: Local inference
 description: Running AI models on-device or on-premises instead of cloud APIs.
 keywords: [local inference, on-device, on-prem, Ollama, private inference]
+tags: [intermediate]
 ---
 
 # Local inference
