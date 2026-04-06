@@ -6,35 +6,179 @@ keywords: [contributing, template, PR]
 
 # Contributing to AI Summary Hub
 
-Thank you for helping improve this wiki. Here’s how to contribute.
+Thank you for helping improve this wiki. Here's how to contribute.
 
 ## Topic template
 
-Each topic doc should include:
+Every article follows a structured template designed to make AI Summary Hub a comprehensive knowledge oracle. Sections are divided into **mandatory** and **optional**.
 
-- **Frontmatter:** `title`, `description`, `keywords`
-- **Definition** — At least 2 paragraphs (or one longer paragraph covering “what it is” and “context/why it matters”). Add key terms, relation to nearby concepts, or when to use vs alternatives. Up to 3 paragraphs unless the topic is broad.
-- **How it works** — At least a short multi-sentence explanation (3–5 sentences) in addition to any diagram or code. Include a **Mermaid diagram** when it explains architecture, flow, or sequence (e.g. agent loop, RAG pipeline, attention). Add numbered steps or component-by-component explanation where it helps.
-- **Examples** — Python/JS code blocks where useful (commented if not runnable)
-- **Pros/Cons** — Table when relevant
-- **Benchmarks** — Links to benchmarks or papers (when applicable)
-- **External documentation** (required) — At least 2–3 external resources per topic: official docs, codelabs, key papers, or repos. Prefer authoritative sources (Google, OpenAI, Hugging Face, arXiv). This section is for outbound links only; use **See also** for internal links.
-- **See also** — Internal links to related docs
+### Mandatory sections
 
-### Link checklist (External documentation)
+Every article **must** include these sections in this exact order:
 
-When adding a topic, aim to include:
+1. **Frontmatter** — Metadata block at the top of the file (see [Frontmatter spec](#frontmatter-spec) below)
+2. **Definition** — What it is, context, and why it matters. Minimum 2–3 paragraphs.
+3. **How it works** — Technical explanation. Use H3 sub-sections for complex topics. Include at least one Mermaid diagram with **labeled edges** (not just boxes). Minimum 3–5 sentences per sub-section.
+4. **When to use / When NOT to use** — A two-column table with practical guidance. Minimum 3 rows.
+5. **Code examples** — At least one **functional** snippet (not pseudocode). Language is at the author's discretion: Python is the default for ML/MLOps topics; TypeScript for MCP/Claude Code topics; use whatever is most natural for the subject.
+6. **Practical resources** — 2–5 curated external links. Accepted types: official docs, courses (free or paid), GitHub repos, arXiv papers, company blog posts (e.g. OpenAI blog, Anthropic blog).
+7. **See also** — Internal links to related docs within this wiki.
 
-1. **Official product or framework doc** (e.g. LangChain agents, Hugging Face transformers)
-2. **Tutorial or codelab** when available (e.g. [Google ADK codelab](https://codelabs.developers.google.com/your-first-agent-with-adk#0))
-3. **Key paper or benchmark** (e.g. arXiv, benchmark leaderboard) where relevant
+### Optional sections
+
+Include these **only when relevant**. When a section does not apply, simply omit it entirely — do not add the heading with "N/A" or a placeholder.
+
+- **Comparisons** — A quick comparison table with 3–5 criteria (e.g. ease of use, community, performance). **Reciprocity rule**: if article A includes a comparison to article B, then article B must also include a comparison to article A.
+- **Pros & Cons** — Table format with two columns.
+- **Benchmarks** — Links to benchmarks, leaderboards, or papers with quantitative data.
+
+### Section order
+
+The full order when all sections are present:
+
+```
+1. Definition
+2. How it works
+3. When to use / When NOT to use
+4. Comparisons (optional)
+5. Pros & Cons (optional)
+6. Benchmarks (optional)
+7. Code examples
+8. Practical resources
+9. See also
+```
+
+### Depth guidelines
+
+| Section | Minimum depth |
+|---------|---------------|
+| Definition | 2–3 paragraphs covering what, context, and why it matters |
+| How it works | H3 sub-sections for complex topics; 1+ Mermaid diagram with labeled edges; 3–5 sentences per sub-section |
+| When to use / When NOT to use | Table with 3+ rows |
+| Code examples | 1+ functional snippet with comments; must be runnable or clearly annotated |
+| Practical resources | 2–5 curated links |
+| Comparisons (if included) | Table with 3–5 criteria |
+
+### Frontmatter spec
+
+Every doc must include this frontmatter block:
+
+```yaml
+---
+title: "Full article title"
+description: "One-line description for SEO and search"
+keywords: [keyword1, keyword2, keyword3]
+tags: [intermediate]  # exactly one of: beginner, intermediate, advanced
+authors: [GitHubUsername]  # GitHub username(s) of author(s)
+---
+```
+
+**Required fields:**
+
+| Field | Description |
+|-------|-------------|
+| `title` | Full article title |
+| `description` | One-line description (used for SEO and search) |
+| `keywords` | Array of relevant keywords |
+| `tags` | Array containing **exactly one** level tag: `beginner`, `intermediate`, or `advanced` |
+| `authors` | Array of GitHub usernames who wrote the article |
+
+**Optional fields:**
+
+| Field | Description | When to use |
+|-------|-------------|-------------|
+| `sidebar_label` | Short label for the sidebar | Only when the title exceeds ~30 characters |
+
+**Note:** `last_updated` is handled automatically by Docusaurus via git history. Do not add it manually.
+
+### Complete template example
+
+```markdown
+---
+title: "Example Topic"
+description: "A brief description of the topic."
+keywords: [topic, example, ai]
+tags: [intermediate]
+authors: [YourGitHubUsername]
+---
+
+# Example Topic
+
+## Definition
+
+Paragraph 1: What it is.
+
+Paragraph 2: Context and relation to other concepts.
+
+Paragraph 3: Why it matters.
+
+## How it works
+
+### Sub-section A
+
+Explanation with 3–5 sentences.
+
+### Sub-section B
+
+Explanation with diagram:
+
+(Mermaid diagram here with labeled edges)
+
+## When to use / When NOT to use
+
+| Use when | Avoid when |
+|----------|------------|
+| Scenario A | Counter-scenario A |
+| Scenario B | Counter-scenario B |
+| Scenario C | Counter-scenario C |
+
+## Comparisons
+
+(Optional — only if alternatives exist)
+
+| Criteria | This topic | Alternative |
+|----------|-----------|-------------|
+| Criterion 1 | ... | ... |
+| Criterion 2 | ... | ... |
+| Criterion 3 | ... | ... |
+
+## Pros and cons
+
+(Optional)
+
+| Pros | Cons |
+|------|------|
+| Pro 1 | Con 1 |
+| Pro 2 | Con 2 |
+
+## Benchmarks
+
+(Optional — link to papers or leaderboards)
+
+## Code examples
+
+(Functional code snippet here)
+
+## Practical resources
+
+- [Official docs](https://example.com) — Description
+- [Tutorial or course](https://example.com) — Description
+- [GitHub repo](https://example.com) — Description
+
+## See also
+
+- [Related doc 1](/docs/path)
+- [Related doc 2](/docs/path)
+```
 
 ## Adding new topics
 
 1. Create a new file under `docs/` in the right category (e.g. `docs/tools/my-tool.md`).
 2. Use the template above and ensure a unique doc ID (path-based).
-3. Add the doc to `sidebars.ts` in the right category.
-4. Open a PR with a short description.
+3. Include **all mandatory sections** and relevant optional sections.
+4. Add the doc to `sidebars.ts` in the right category.
+5. If your article includes a **Comparison** to another article, update that article with a reciprocal comparison.
+6. Open a PR with a short description.
 
 ## Improving examples
 
@@ -44,11 +188,18 @@ When adding a topic, aim to include:
 
 ## Diagrams (Mermaid)
 
-Diagrams in the docs are written in [Mermaid](https://mermaid.js.org/intro/getting-started.html) and rendered by the site via Docusaurus. Use valid Mermaid.js syntax so diagrams display correctly. If unsure, test your diagram in the [Mermaid Live Editor](https://mermaid.live/) before submitting.
+Diagrams in the docs are written in [Mermaid](https://mermaid.js.org/intro/getting-started.html) and rendered by the site via Docusaurus. Guidelines:
+
+- Use valid Mermaid.js syntax — test in the [Mermaid Live Editor](https://mermaid.live/) before submitting.
+- **Label edges** to describe relationships (not just boxes connected by arrows).
+- Use subgraphs to group related components when diagrams have 5+ nodes.
+- Prefer `flowchart LR` or `flowchart TD` for architecture; `sequenceDiagram` for interactions.
 
 ## Translations
 
 The site is localized for **Spanish (es), Portuguese (pt-BR), German (de), French (fr), and Simplified Chinese (zh-Hans)**. Default content is in English.
+
+New articles are produced in **English only**. Translations are handled in a separate phase.
 
 **Where translation files live:**
 
@@ -65,7 +216,7 @@ The site is localized for **Spanish (es), Portuguese (pt-BR), German (de), Frenc
 ## Code style and commits
 
 - Follow existing formatting (e.g. 2 spaces, trailing newline).
-- Use clear commit messages (e.g. “Add doc: X”, “Fix link in Y”).
+- Use clear commit messages (e.g. "Add doc: X", "Fix link in Y").
 
 ## Versioning
 
