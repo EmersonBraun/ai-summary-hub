@@ -51,6 +51,49 @@ const config: Config = {
     },
   },
 
+  headTags: [
+    {
+      tagName: 'script',
+      attributes: {type: 'application/ld+json'},
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'AI Summary Hub',
+        url: 'https://emersonbraun.github.io/ai-summary-hub/',
+        description:
+          'Your single source of truth for AI concepts, from fundamentals to advanced agents.',
+        inLanguage: ['en', 'es', 'pt-BR', 'de', 'fr', 'zh-Hans'],
+        author: {
+          '@type': 'Person',
+          name: 'Emerson Braun',
+          url: 'https://emersonbraun.dev/',
+        },
+      }),
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preconnect',
+        href: 'https://fonts.googleapis.com',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preconnect',
+        href: 'https://fonts.gstatic.com',
+        crossorigin: 'anonymous',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap',
+      },
+    },
+  ],
+
   presets: [
     [
       'classic',
@@ -69,12 +112,24 @@ const config: Config = {
         theme: {
           customCss: './src/css/custom.css',
         },
+        sitemap: {
+          changefreq: 'weekly' as const,
+          priority: 0.5,
+          ignorePatterns: ['**/tags/**', '**/search'],
+        },
       } satisfies Preset.Options,
     ],
   ],
 
   themeConfig: {
     image: 'img/docusaurus-social-card.jpg',
+    metadata: [
+      {name: 'twitter:card', content: 'summary_large_image'},
+      {name: 'twitter:site', content: '@EmersonfBraun'},
+      {name: 'twitter:creator', content: '@EmersonfBraun'},
+      {name: 'og:type', content: 'website'},
+      {name: 'og:site_name', content: 'AI Summary Hub'},
+    ],
     colorMode: {
       defaultMode: 'dark',
       disableSwitch: false,

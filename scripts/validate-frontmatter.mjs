@@ -41,6 +41,9 @@ for (const file of files) {
   if (!data.authors || !Array.isArray(data.authors) || data.authors.length === 0) {
     errors.push(`${rel}: missing or empty 'authors' field (must be an array of GitHub usernames)`);
   }
+  if (!data.keywords || !Array.isArray(data.keywords) || data.keywords.length === 0) {
+    errors.push(`${rel}: missing or empty 'keywords' field (must be a non-empty array)`);
+  }
 
   const skipTags = SKIP_TAG_VALIDATION.some((s) => rel === s || rel.endsWith(s));
   if (!skipTags) {

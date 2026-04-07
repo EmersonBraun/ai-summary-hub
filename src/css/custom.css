@@ -3,7 +3,7 @@
  * Theme aligned with AWS Cheatsheet / leetcode: blue primary
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap');
+/* Roboto is loaded via <link rel="preload"> in docusaurus.config.ts — no @import needed */
 
 /* Same blue palette as leetcode / AWS Cheatsheet */
 :root {

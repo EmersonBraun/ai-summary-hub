@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /search
+Disallow: /tags
+
+Sitemap: https://emersonbraun.github.io/ai-summary-hub/sitemap.xml
