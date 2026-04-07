@@ -1,5 +1,6 @@
 import React, {type ReactNode} from 'react';
 import clsx from 'clsx';
+import Link from '@docusaurus/Link';
 import {useWindowSize} from '@docusaurus/theme-common';
 import {useDoc} from '@docusaurus/plugin-content-docs/client';
 import DocItemPaginator from '@theme/DocItem/Paginator';
@@ -47,9 +48,9 @@ function TagsTop(): ReactNode {
   return (
     <div className="doc-tags-top">
       {tags.map((tag) => (
-        <a key={tag.permalink} href={tag.permalink}>
+        <Link key={tag.permalink} to={tag.permalink}>
           {tag.label}
-        </a>
+        </Link>
       ))}
     </div>
   );

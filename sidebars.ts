@@ -140,6 +140,68 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'MLOps',
+      collapsed: true,
+      items: [
+        'mlops/index',
+        'mlops/experiment-tracking',
+        'mlops/mlflow',
+        'mlops/wandb',
+        'mlops/feature-stores',
+        {
+          type: 'category',
+          label: 'Data Engineering',
+          collapsed: true,
+          items: [
+            'mlops/data-engineering/index',
+            'mlops/data-engineering/airflow',
+            'mlops/data-engineering/spark',
+            'mlops/data-engineering/kafka',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'CI/CD & Versioning',
+          collapsed: true,
+          items: [
+            'mlops/cicd/index',
+            'mlops/cicd/dvc',
+            'mlops/cicd/model-registry',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Deployment & Serving',
+          collapsed: true,
+          items: [
+            'mlops/deployment/model-serving',
+            'mlops/deployment/kubeflow',
+            'mlops/deployment/ml-kubernetes',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Monitoring',
+          collapsed: true,
+          items: [
+            'mlops/monitoring/index',
+            'mlops/monitoring/prometheus',
+            'mlops/monitoring/grafana',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Infrastructure as Code',
+          collapsed: true,
+          items: [
+            'mlops/iac/terraform',
+            'mlops/iac/ansible',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'category',
       label: 'Infrastructure',
       collapsed: true,
       items: [
