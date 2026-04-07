@@ -29,13 +29,18 @@ This wiki covers **50+ topics** across:
 - **Tools** — Hugging Face, LangChain, Cursor, Claude Code, Antigravity, Kiro, PyTorch, TensorFlow
 - **Case studies** — ChatGPT, DALL·E, Claude, Gemini, BART, Grok, DeepSeek, Qwen
 
-Each topic includes definitions, examples (code and diagrams), pros/cons, benchmarks, and **external documentation** links to official docs, codelabs, and papers.
+Each topic includes definitions, examples (code and diagrams), pros/cons, benchmarks, and **practical resources** linking to official docs, codelabs, and papers.
 
-## Learn more elsewhere
+## When to use this hub
 
-- [Google AI for Developers](https://ai.google.dev/) — Gemini, APIs, and guides
-- [Hugging Face NLP Course](https://huggingface.co/learn/nlp-course/) — From transformers to LLMs
-- [From Prototypes to Agents with ADK (Codelab)](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — Build your first agent with Google's Agent Development Kit
+| Goal | Where to start |
+|---|---|
+| New to AI | [Fundamentals](/docs/fundamentals) then [Neural Networks](/docs/neural-networks) |
+| Building with LLMs | [LLMs](/docs/llms), [RAG](/docs/rag), and [Agents](/docs/agents) |
+| Exploring reasoning | [Reasoning Patterns](/docs/reasoning-patterns) and [RDD](/docs/reasoning-patterns/rdd) |
+| Running models locally or at the edge | [Local inference](/docs/local-inference) and [Edge reasoning](/docs/edge-reasoning) |
+| Multimodal (text + image, etc.) | [Multimodal AI](/docs/multimodal-ai) |
+| Deploying models in production | [MLOps](/docs/mlops) and [Infrastructure](/docs/infrastructure) |
 
 ## Getting started
 
@@ -46,3 +51,10 @@ Each topic includes definitions, examples (code and diagrams), pros/cons, benchm
 - **Multimodal (text + image, etc.)?** See [Multimodal AI](/docs/multimodal-ai).
 
 Use the sidebar to browse all topics or the search bar to find specific concepts.
+
+## Practical resources
+
+- [Google AI for Developers](https://ai.google.dev/) — Gemini, APIs, and guides for building AI applications
+- [Hugging Face NLP Course](https://huggingface.co/learn/nlp-course/) — Practical course from transformers to production LLMs
+- [From Prototypes to Agents with ADK (Codelab)](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — Build your first agent with Google's Agent Development Kit
+- [fast.ai – Practical Deep Learning](https://course.fast.ai/) — Top-down, code-first deep learning course for practitioners

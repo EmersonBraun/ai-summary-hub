@@ -10,35 +10,114 @@ authors: [EmersonBraun]
 
 ## Definition
 
-Quantization represents weights and optionally activations in lower precision (e.g. 8-bit instead of 32-bit float) to reduce memory and speed up inference with minimal accuracy loss.
+Quantization is the process of representing neural network weights — and optionally activations — in lower numerical precision than the original training format (typically FP32 or BF16). By mapping floating-point values to a discrete integer range (INT8, INT4, INT2), quantization reduces model memory by 2–8x and enables faster inference on hardware with integer compute units such as GPU tensor cores, NPUs, and dedicated inference accelerators.
 
-It is one of the main [model compression](/docs/model-compression) levers for [LLMs](/docs/llms) and vision models. INT8 is common; INT4 and lower are used for aggressive compression. Deploy on [infrastructure](/docs/infrastructure) that supports quantized ops (e.g. GPU tensor cores, dedicated inference chips).
+In practice, quantization is the most commonly applied [model compression](/docs/model-compression) technique for [LLMs](/docs/llms) because it requires no architecture changes, works post-training, and delivers memory reductions large enough to shift a model from server-grade hardware to consumer hardware. A 70B parameter model in FP16 requires approximately 140 GB of VRAM; the same model quantized to INT4 fits in around 35 GB, making it runnable on a dual-GPU workstation. The accuracy cost is typically small (1–3% on downstream benchmarks) for INT8, and manageable for INT4 with calibration-aware methods.
+
+Quantization exists on a spectrum of approaches: **post-training quantization (PTQ)** applies the conversion after training using a small calibration dataset, while **quantization-aware training (QAT)** fine-tunes the model with simulated quantization so weights learn to be robust to the precision reduction. Modern LLM quantization schemes like GPTQ, AWQ, and GGUF integrate calibration and packing strategies that go beyond naive weight rounding, preserving accuracy even at INT4 precision.
 
 ## How it works
 
+### Post-training quantization (PTQ)
+
 ```mermaid
 flowchart LR
-  FP32[FP32 weights] --> Calibrate[Calibrate]
-  Calibrate --> Quantize[Quantize]
-  Quantize --> INT8[INT8]
+  FP32["FP32 / BF16 weights"] -->|"run calibration data"| Calibrate["Collect activation stats\n(min, max, percentiles)"]
+  Calibrate -->|"compute"| Scale["Scale + zero-point per layer"]
+  Scale -->|"map weights"| INT8["INT8 / INT4 weights"]
+  INT8 -->|"deploy"| Runtime["Inference runtime\n(GPU tensor cores / NPU)"]
 ```
 
-**FP32 weights** (and optionally activations) are mapped to a discrete range (e.g. INT8). **Calibrate**: run a representative dataset to collect activation statistics and choose **scales and zero-points** so the quantized values approximate the original range. **Quantize**: convert weights (and optionally activations at runtime) to INT8. **Post-training quantization (PTQ)** does this without retraining; **quantization-aware training (QAT)** fine-tunes with simulated quantization so the model adapts. The **INT8** model is then run on hardware that supports low-precision ops for faster inference and lower memory.
+### Quantization-aware training (QAT)
 
-## Use cases
+```mermaid
+flowchart LR
+  Model["FP32 model"] -->|"insert"| FakeQuant["Fake quantization nodes\n(simulate rounding in forward pass)"]
+  FakeQuant -->|"fine-tune with data"| Adapted["Weights adapted to quantization"]
+  Adapted -->|"strip fake quant"| INT8Model["INT8 model"]
+  INT8Model -->|"deploy"| Runtime["Inference runtime"]
+```
 
-Quantization is the main lever for reducing memory and speeding inference with limited accuracy loss (edge, cloud, cost).
+### Common quantization schemes
 
-- Running LLMs and vision models on consumer GPUs or edge devices
-- Reducing memory and speeding inference with minimal accuracy loss
-- INT8 or lower precision for production serving
+| Scheme | Precision | Method | Best for |
+|--------|-----------|--------|---------|
+| Dynamic INT8 | INT8 | Quantize activations at runtime | CPU inference, NLP |
+| Static INT8 | INT8 | Calibrate activations offline | Low-latency GPU serving |
+| GPTQ | INT4 | Second-order weight quantization | LLM serving on consumer GPUs |
+| AWQ | INT4 | Activation-aware weight quantization | LLM serving, low accuracy loss |
+| GGUF (llama.cpp) | INT2–INT8 | Mixed-precision per tensor | Local inference on CPU / Apple Silicon |
+| QAT | INT8 | Train with simulated quantization | Highest accuracy at INT8 |
 
-## External documentation
+## When to use / When NOT to use
 
-- [PyTorch – Quantization](https://pytorch.org/docs/stable/quantization.html)
-- [TensorFlow Lite – Quantization](https://www.tensorflow.org/lite/performance/quantization)
+| Scenario | Use quantization | Do NOT use quantization |
+|----------|-----------------|------------------------|
+| Running a large LLM on a consumer GPU | Yes — INT4 cuts memory 4–8x | |
+| Reducing inference latency in production | Yes — INT8 accelerates throughput on modern hardware | |
+| Deploying models on mobile or edge hardware | Yes — TFLite and ONNX support INT8 natively | |
+| Maximum accuracy on a well-resourced server | | Serve FP16 or BF16 if memory and cost allow |
+| Very small models where accuracy loss is significant | | Distillation or pruning may be more appropriate |
+| Models with unusual activation distributions | | Standard PTQ may fail; QAT or activation-aware methods needed |
+
+## Pros and cons
+
+| Pros | Cons |
+|------|------|
+| Large memory reduction (2–8x) with minimal accuracy loss | Accuracy degradation increases at aggressive precision (INT2/INT3) |
+| PTQ requires no retraining — fast to apply | Calibration quality affects accuracy; needs representative data |
+| Widely supported by runtimes (TFLite, ONNX, vLLM) | Requires hardware support for integer ops to see speedups |
+| Enables LLM deployment on consumer and edge hardware | Activation quantization harder than weight-only quantization |
+
+## Code examples
+
+```python
+# Static INT8 post-training quantization with PyTorch
+import torch
+import torch.quantization
+
+model = MyModel()
+model.load_state_dict(torch.load("model.pt"))
+model.eval()  # set to inference mode
+
+# Fuse BatchNorm and Conv for quantization efficiency
+model_fused = torch.quantization.fuse_modules(model, [["conv", "bn", "relu"]])
+
+# Set quantization config (fbgemm for x86, qnnpack for ARM/mobile)
+model_fused.qconfig = torch.quantization.get_default_qconfig("fbgemm")
+torch.quantization.prepare(model_fused, inplace=True)
+
+# Calibration pass — run representative data to collect activation statistics
+with torch.no_grad():
+    for x_batch, _ in calibration_loader:
+        model_fused(x_batch)
+
+# Convert weights and activations to INT8
+quantized_model = torch.quantization.convert(model_fused, inplace=True)
+
+# Verify size reduction
+original_params = sum(p.numel() for p in model.parameters())
+quantized_params = sum(p.numel() for p in quantized_model.parameters())
+print(f"Parameter count: {original_params:,} (same; precision changed, not count)")
+print("INT8 model ready — memory footprint reduced ~4x vs FP32")
+
+# Save quantized model
+torch.save(quantized_model.state_dict(), "model_int8.pt")
+```
+
+## Practical resources
+
+- [PyTorch — Quantization](https://pytorch.org/docs/stable/quantization.html) — PTQ, QAT, and dynamic quantization API
+- [TensorFlow Lite — Quantization guide](https://www.tensorflow.org/lite/performance/quantization) — Post-training and QAT for mobile
+- [GPTQ paper](https://arxiv.org/abs/2210.17323) — Accurate post-training quantization for generative pre-trained transformers
+- [AWQ paper](https://arxiv.org/abs/2306.00978) — Activation-aware weight quantization for on-device LLMs
+- [llama.cpp GGUF format](https://github.com/ggerganov/llama.cpp) — Local inference with flexible per-tensor mixed precision
 
 ## See also
 
 - [Model compression](/docs/model-compression)
+- [Pruning](/docs/pruning)
+- [Knowledge distillation](/docs/knowledge-distillation)
+- [Local inference](/docs/local-inference)
+- [Edge reasoning](/docs/edge-reasoning)
 - [Infrastructure](/docs/infrastructure)
