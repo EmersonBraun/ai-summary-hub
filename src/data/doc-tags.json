@@ -93,6 +93,21 @@
   "ai-safety/index": "beginner",
   "ai-robotics/index": "beginner",
   "ai-ethics/index": "beginner",
+  "agents/tools-actions": "beginner",
+  "agents/self-critique": "advanced",
+  "agents/security": "advanced",
+  "agents/prompt-engineering": "intermediate",
+  "agents/planner-executor": "intermediate",
   "agents/multi-agent-systems": "intermediate",
-  "agents/index": "beginner"
+  "agents/memory": "intermediate",
+  "agents/langgraph": "intermediate",
+  "agents/index": "beginner",
+  "agents/frameworks-overview": "beginner",
+  "agents/evaluation": "advanced",
+  "agents/debugging": "advanced",
+  "agents/dag-agents": "advanced",
+  "agents/crewai": "intermediate",
+  "agents/conversational-memory": "intermediate",
+  "agents/autogen": "intermediate",
+  "agents/anthropic-tool-use": "intermediate"
 }

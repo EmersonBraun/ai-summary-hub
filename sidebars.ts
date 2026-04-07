@@ -57,6 +57,49 @@ const sidebars: SidebarsConfig = {
         'agents/multi-agent-systems',
         'subagents/index',
         'autonomous-agents/index',
+        {
+          type: 'category',
+          label: 'Memory',
+          collapsed: true,
+          items: [
+            'agents/memory',
+            'agents/conversational-memory',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Architectures',
+          collapsed: true,
+          items: [
+            'agents/planner-executor',
+            'agents/dag-agents',
+            'agents/self-critique',
+            'agents/tools-actions',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Agent Frameworks',
+          collapsed: true,
+          items: [
+            'agents/frameworks-overview',
+            'agents/crewai',
+            'agents/autogen',
+            'agents/langgraph',
+            'agents/anthropic-tool-use',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Evaluation & Ops',
+          collapsed: true,
+          items: [
+            'agents/evaluation',
+            'agents/debugging',
+            'agents/security',
+            'agents/prompt-engineering',
+          ],
+        },
       ],
     },
     {
