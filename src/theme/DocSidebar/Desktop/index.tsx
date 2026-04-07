@@ -9,9 +9,11 @@ type Props = WrapperProps<typeof DocSidebarDesktopType>;
 export default function DocSidebarDesktopWrapper(props: Props): React.ReactElement {
   const sidebarId = 'sidebarId' in props ? (props as unknown as {sidebarId: string}).sidebarId : undefined;
   return (
-    <>
+    <div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
       <SidebarSwitcher currentSidebarId={sidebarId} />
-      <DocSidebarDesktop {...props} />
-    </>
+      <div style={{flex: 1, overflow: 'auto'}}>
+        <DocSidebarDesktop {...props} />
+      </div>
+    </div>
   );
 }
