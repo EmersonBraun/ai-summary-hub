@@ -113,6 +113,19 @@ const config: Config = {
           ],
         },
         {
+          title: 'Open Source',
+          items: [
+            {
+              label: 'AgentsKit — AI agent framework',
+              href: 'https://github.com/EmersonBraun/agentskit',
+            },
+            {
+              label: 'Skills — Reusable AI skills',
+              href: 'https://github.com/EmersonBraun/skills',
+            },
+          ],
+        },
+        {
           title: 'Connect',
           items: [
             { label: 'Website', href: 'https://emersonbraun.dev/' },
