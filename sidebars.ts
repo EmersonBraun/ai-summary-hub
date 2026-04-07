@@ -196,6 +196,20 @@ const sidebars: SidebarsConfig = {
         'tools/claude-code',
         'tools/antigravity',
         'tools/kiro',
+        {
+          type: 'category',
+          label: 'Claude Code Deep Dive',
+          collapsed: true,
+          items: [
+            'claude-code/index',
+            'claude-code/claude-md',
+            'claude-code/skills',
+            'claude-code/thinking-modes',
+            'claude-code/prompt-caching',
+            'claude-code/context-management',
+            'claude-code/mcp-plugins',
+          ],
+        },
       ],
     },
     {
@@ -272,6 +286,16 @@ const sidebars: SidebarsConfig = {
         'quantization/index',
         'pruning/index',
         'knowledge-distillation/index',
+        {
+          type: 'category',
+          label: 'Edge AI',
+          collapsed: true,
+          items: [
+            'edge-ai/tflite',
+            'edge-ai/pytorch-mobile',
+            'edge-ai/onnx',
+          ],
+        },
       ],
     },
     {
