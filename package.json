@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@docusaurus/eslint-plugin": "3.9.2",
-    "@typescript-eslint/parser": "^7.0.0",
+    "@typescript-eslint/parser": "^8.58.0",
     "@docusaurus/module-type-aliases": "3.9.2",
     "@docusaurus/tsconfig": "3.9.2",
     "@docusaurus/types": "3.9.2",
