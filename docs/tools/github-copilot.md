@@ -3,6 +3,7 @@ title: GitHub Copilot
 description: AI pair programmer for code completion and generation.
 keywords: [GitHub Copilot, code completion, AI coding]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # GitHub Copilot

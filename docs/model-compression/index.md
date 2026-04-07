@@ -3,6 +3,7 @@ title: Model compression
 description: Reducing model size and compute for deployment.
 keywords: [model compression, pruning, quantization, distillation]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Model compression

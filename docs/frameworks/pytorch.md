@@ -3,6 +3,7 @@ title: PyTorch
 description: Deep learning framework with dynamic computation graphs.
 keywords: [PyTorch, deep learning, research]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # PyTorch

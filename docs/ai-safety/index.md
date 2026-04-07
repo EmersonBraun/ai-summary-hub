@@ -3,6 +3,7 @@ title: AI safety
 description: Ensuring AI systems are robust, aligned, and safe.
 keywords: [AI safety, alignment, robustness]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # AI safety

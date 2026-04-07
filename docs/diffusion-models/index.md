@@ -3,6 +3,7 @@ title: Diffusion models
 description: Generative models based on denoising diffusion.
 keywords: [diffusion, denoising, DALL-E, Stable Diffusion]
 tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Diffusion models

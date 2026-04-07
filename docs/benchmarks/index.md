@@ -3,6 +3,7 @@ title: Benchmarks
 description: "Standard benchmarks for AI: GLUE, SuperGLUE, MMLU, and more."
 keywords: [benchmarks, GLUE, SuperGLUE, MMLU]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Benchmarks

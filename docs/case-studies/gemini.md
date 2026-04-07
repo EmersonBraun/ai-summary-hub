@@ -3,6 +3,7 @@ title: Case study — Gemini
 description: Google's multimodal LLM family with native multimodal and scale tiers.
 keywords: [Gemini, Google, multimodal, VLM]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Case study: Gemini

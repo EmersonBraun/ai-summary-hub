@@ -3,6 +3,7 @@ title: Prompt engineering
 description: Designing prompts to steer LLM behavior and improve outputs.
 keywords: [prompt engineering, prompting, in-context learning]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Prompt engineering

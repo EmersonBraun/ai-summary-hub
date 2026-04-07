@@ -1,0 +1,21 @@
+{
+  "config": {
+    "default": true,
+    // Disable line length — docs have tables and long links
+    "MD013": false,
+    // Disable inline HTML — MDX uses JSX components
+    "MD033": false,
+    // Disable first line H1 — frontmatter comes before
+    "MD041": false,
+    // Disable multiple H1 — Docusaurus uses frontmatter title + explicit # Title
+    "MD025": false,
+    // Disable table column style — compact tables are fine for pros/cons
+    "MD060": false,
+    // Disable fenced code language — template examples use plain code blocks
+    "MD040": false,
+    // Allow duplicate headings in different sections (e.g., multiple "Definition" across files)
+    "MD024": { "siblings_only": true }
+  },
+  "globs": ["docs/**/*.md"],
+  "ignores": ["docs/tags.yml", "node_modules"]
+}

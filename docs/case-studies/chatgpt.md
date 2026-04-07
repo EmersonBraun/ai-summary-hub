@@ -3,6 +3,7 @@ title: Case study — ChatGPT
 description: How ChatGPT and conversational LLMs work.
 keywords: [ChatGPT, OpenAI, conversational AI]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Case study: ChatGPT

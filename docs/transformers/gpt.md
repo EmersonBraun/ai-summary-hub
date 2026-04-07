@@ -3,6 +3,7 @@ title: GPT
 description: Generative Pre-trained Transformer and decoder-only models.
 keywords: [GPT, decoder, autoregressive, LLM]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # GPT

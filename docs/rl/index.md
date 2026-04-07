@@ -3,6 +3,7 @@ title: Reinforcement learning (RL)
 description: Learning from rewards and sequential decision-making.
 keywords: [reinforcement learning, RL, rewards, MDP]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Reinforcement learning (RL)

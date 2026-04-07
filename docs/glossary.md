@@ -2,6 +2,7 @@
 title: Glossary
 description: Glossary of AI and ML terms used across the wiki.
 keywords: [glossary, definitions, terms]
+authors: [EmersonBraun]
 ---
 
 # Glossary

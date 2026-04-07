@@ -3,6 +3,7 @@ title: Machine learning
 description: Introduction to machine learning — supervised, unsupervised, and reinforcement learning.
 keywords: [machine learning, ML, supervised, unsupervised]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Machine learning

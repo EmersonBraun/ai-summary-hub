@@ -3,6 +3,7 @@ title: Speech recognition
 description: Converting speech to text and related audio tasks.
 keywords: [speech recognition, ASR, audio]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Speech recognition

@@ -2,6 +2,7 @@
 title: Changelog / Updates
 description: Recent updates and new topics in AI Summary Hub.
 keywords: [changelog, updates, releases]
+authors: [EmersonBraun]
 ---
 
 # Changelog / Updates

@@ -3,6 +3,7 @@ title: Federated learning
 description: Training across decentralized data without centralizing it.
 keywords: [federated learning, privacy, distributed]
 tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Federated learning

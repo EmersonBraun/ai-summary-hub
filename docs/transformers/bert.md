@@ -3,6 +3,7 @@ title: BERT
 description: Bidirectional Encoder Representations from Transformers.
 keywords: [BERT, encoder, masked LM, NLP]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # BERT

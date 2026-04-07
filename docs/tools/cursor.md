@@ -3,6 +3,7 @@ title: Cursor
 description: AI-powered code editor and pair-programming tool.
 keywords: [Cursor, AI coding, IDE]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Cursor

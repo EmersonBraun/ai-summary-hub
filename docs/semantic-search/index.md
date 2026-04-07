@@ -3,6 +3,7 @@ title: Semantic search
 description: Search by meaning using embeddings and similarity.
 keywords: [semantic search, embeddings, similarity]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Semantic search

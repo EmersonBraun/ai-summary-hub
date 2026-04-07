@@ -2,6 +2,7 @@
 title: Contributing
 description: How to add topics, improve examples, and translate content.
 keywords: [contributing, template, PR]
+authors: [EmersonBraun]
 ---
 
 # Contributing to AI Summary Hub
