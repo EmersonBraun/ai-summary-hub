@@ -63,9 +63,18 @@ Multimodal generation extends beyond text output. **Image generation** models (D
 | Zero-shot capability | Strong | Strong | N/A (generative) |
 | Compute cost | High (large model) | Moderate | High (iterative denoising) |
 
+## Pros and cons
+
+| Pros | Cons |
+|------|------|
+| Single model handles diverse input types without separate pipelines | Higher inference cost and latency than unimodal models |
+| Strong zero-shot cross-modal reasoning | Modality-specific fine-tuning may outperform general multimodal models |
+| Enables rich, natural interactions (voice + vision + text) | Complex failure modes that are harder to debug than unimodal errors |
+| Foundation models transfer well across multimodal tasks | Privacy and compliance concerns multiply across modalities |
+
 ## Code examples
 
-### Multimodal chat with OpenAI GPT-4V (Python)
+### Multimodal chat with OpenAI GPT-4o (Python)
 
 ```python
 from openai import OpenAI
@@ -95,26 +104,6 @@ response = client.chat.completions.create(
 )
 
 print(response.choices[0].message.content)
-```
-
-### Speech-to-text with Whisper (Python)
-
-```python
-from openai import OpenAI
-
-client = OpenAI()
-
-# Transcribe audio file
-with open("meeting.mp3", "rb") as audio_file:
-    transcript = client.audio.transcriptions.create(
-        model="whisper-1",
-        file=audio_file,
-        response_format="verbose_json",
-        timestamp_granularities=["segment"],
-    )
-
-for segment in transcript.segments:
-    print(f"[{segment['start']:.1f}s - {segment['end']:.1f}s] {segment['text']}")
 ```
 
 ### Multimodal with Anthropic Claude (Python)
@@ -164,8 +153,6 @@ print(message.content[0].text)
 - [LLMs](/docs/llms)
 - [Computer vision](/docs/cv)
 - [NLP](/docs/nlp)
-- [Model providers](/docs/model-providers)
-- [Google Gemini](/docs/model-providers/google-gemini)
 - [Diffusion models](/docs/diffusion-models)
 - [Local inference](/docs/local-inference)
 - [Edge reasoning](/docs/edge-reasoning)
