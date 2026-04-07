@@ -151,6 +151,7 @@ response = client.messages.create(
 - [AutoGen documentation (Microsoft)](https://microsoft.github.io/autogen/) — Covers ConversableAgent, group chats, code execution, and human-in-the-loop patterns.
 - [LangGraph documentation](https://langchain-ai.github.io/langgraph/) — Graph-based agent state machines, persistence, and human-in-the-loop checkpoints.
 - [Anthropic Tool Use guide](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Official guide to defining tools with JSON schema and handling tool_use / tool_result message types.
+- [AgentsKit](https://emersonbraun.github.io/agentskit/) — Production-ready framework for building AI agents with memory, tools, and multi-agent orchestration
 
 ## See also
 

@@ -1,6 +1,16 @@
+import {config as loadDotenv} from 'dotenv';
+import {resolve} from 'node:path';
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+
+// Docusaurus does not load .env by default; Algolia keys must be in process.env when this file runs.
+loadDotenv({path: resolve(process.cwd(), '.env')});
+
+const algoliaAppId = process.env.ALGOLIA_APP_ID?.trim();
+const algoliaApiKey = process.env.ALGOLIA_API_KEY?.trim();
+/** DocSearch only loads when real credentials are set (see example.env). */
+const algoliaConfigured = Boolean(algoliaAppId && algoliaApiKey);
 
 const config: Config = {
   title: 'AI Summary Hub',
@@ -83,6 +93,11 @@ const config: Config = {
           position: 'left',
           label: 'Docs',
         },
+        {
+          to: '/all-topics',
+          position: 'left',
+          label: 'All Topics',
+        },
         {type: 'localeDropdown', position: 'right'},
         {
           href: 'https://github.com/EmersonBraun/ai-summary-hub',
@@ -108,6 +123,19 @@ const config: Config = {
           ],
         },
         {
+          title: 'Open Source',
+          items: [
+            {
+              label: 'AgentsKit — AI agent framework',
+              href: 'https://emersonbraun.github.io/agentskit/',
+            },
+            {
+              label: 'Skills — Reusable AI skills',
+              href: 'https://github.com/EmersonBraun/skills',
+            },
+          ],
+        },
+        {
           title: 'Connect',
           items: [
             { label: 'Website', href: 'https://emersonbraun.dev/' },
@@ -120,12 +148,16 @@ const config: Config = {
       ],
       copyright: `AI Summary Hub. Created by <a href="https://www.linkedin.com/in/emerson-braun/" target="_blank" rel="noopener noreferrer">Emerson Braun</a>, last updated on ${new Date().toLocaleDateString('en-GB')}`,
     },
-    algolia: {
-      appId: process.env.ALGOLIA_APP_ID || 'placeholder',
-      apiKey: process.env.ALGOLIA_API_KEY || 'placeholder',
-      indexName: 'ai-summary-hub',
-      contextualSearch: true,
-    },
+    ...(algoliaConfigured
+      ? {
+          algolia: {
+            appId: algoliaAppId!,
+            apiKey: algoliaApiKey!,
+            indexName: 'ai-summary-hub',
+            contextualSearch: true,
+          },
+        }
+      : {}),
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,

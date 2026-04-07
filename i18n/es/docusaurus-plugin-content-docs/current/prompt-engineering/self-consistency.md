@@ -1,0 +1,173 @@
+---
+title: Self-consistency
+description: Una técnica de prompting que genera múltiples caminos de razonamiento chain-of-thought independientes y selecciona la respuesta final por voto mayoritario, mejorando significativamente la fiabilidad respecto al chain-of-thought de un solo paso.
+keywords: [self-consistency, chain-of-thought, CoT, voto mayoritario, muestreo, razonamiento, fiabilidad, ingeniería de prompts, Wang et al]
+---
+
+# Self-consistency
+
+## Definición
+
+La self-consistency es una técnica de prompting introducida por Wang et al. (2022) que aborda una debilidad fundamental del prompting chain-of-thought (CoT): un único camino de razonamiento puede llevar a una respuesta confiada pero incorrecta. La intuición es que las respuestas correctas tienden a ser robustas — múltiples caminos de razonamiento independientes que abordan un problema desde diferentes ángulos deberían converger en la misma respuesta — mientras que las respuestas incorrectas tienden a ser frágiles e inconsistentes entre caminos. Al muestrear muchas cadenas de razonamiento con temperature > 0 y tomar el voto mayoritario sobre sus respuestas finales, la self-consistency actúa como un método de ensemble débil pero práctico que reduce significativamente los errores de razonamiento sin ningún ajuste fino del modelo.
+
+La relación con CoT es directa: la self-consistency es CoT con muestreo repetido. Un prompt CoT estándar produce una cadena de razonamiento y una respuesta; la self-consistency produce N cadenas (típicamente 10–40) y N respuestas, luego las agrega. El ajuste de la temperature es crítico: necesitas diversidad en los caminos de razonamiento, por lo que la decodificación voraz (temperature=0) derrota el propósito. Una temperature en el rango 0.5–0.8 usualmente proporciona suficiente diversidad para una votación efectiva manteniendo cada cadena individual coherente. En benchmarks como GSM8K (problemas matemáticos de palabras), AQuA (razonamiento algebraico) y SVAMP, la self-consistency mejora la precisión del CoT en 10–20 puntos porcentuales al coste de N veces más llamadas de inferencia.
+
+Lo que hace a la self-consistency prácticamente útil — y distinta de simplemente agregar un paso de auto-evaluación — es que no requiere llamadas adicionales al modelo para "verificar" o "criticar". El mecanismo de votación es puramente estadístico: gana la respuesta que aparece con mayor frecuencia entre N muestras. Esto la hace simple de implementar, agnóstica al modelo y sencilla de ajustar (simplemente varía N). La limitación principal es el coste: N completaciones cuestan N veces más. La self-consistency es por tanto mejor aplicada a tareas donde la precisión vale el presupuesto de inferencia — matemáticas, razonamiento en múltiples pasos y clasificación de alto riesgo — más que a aplicaciones sensibles a la latencia o al coste de tokens.
+
+## Cómo funciona
+
+```mermaid
+flowchart TD
+  Prompt[Question + CoT prompt] -->|"sample, temp > 0"| Path1[Reasoning path 1\n-> Answer A]
+  Prompt -->|"sample, temp > 0"| Path2[Reasoning path 2\n-> Answer A]
+  Prompt -->|"sample, temp > 0"| Path3[Reasoning path 3\n-> Answer B]
+  Prompt -->|"sample, temp > 0"| PathN[Reasoning path N\n-> Answer A]
+  Path1 -->|"extract answer"| Vote{Majority\nvote}
+  Path2 -->|"extract answer"| Vote
+  Path3 -->|"extract answer"| Vote
+  PathN -->|"extract answer"| Vote
+  Vote -->|"most frequent answer"| Final[Final answer: A]
+```
+
+### Generación de caminos de razonamiento diversos
+
+El primer paso es hacer un prompt al modelo con un prompt CoT few-shot estándar — un conjunto de triples de ejemplo (pregunta, razonamiento paso a paso, respuesta) seguidos de la nueva pregunta. La desviación clave del CoT estándar es que llamas a la API N veces con temperature > 0 en lugar de una vez con temperature 0. Cada llamada es estadísticamente independiente; el modelo explora una descomposición diferente del problema, puede usar diferentes variables intermedias u órdenes de cálculo, e incluso puede cometer diferentes errores intermedios — pero si la respuesta subyacente es correcta, la mayoría de los caminos seguirán llegando a ella. El número de muestras N es un hiperparámetro: más muestras reducen la varianza pero aumentan el coste. En el paper original, se usa N=40 para máxima precisión; en la práctica, N=10–20 a menudo recupera la mayor parte del beneficio a menor coste.
+
+### Extracción y normalización de respuestas
+
+Después de recopilar N completaciones, debes extraer la respuesta final de cada cadena de razonamiento. Para prompts CoT bien estructurados, la respuesta está típicamente en la última oración después de una frase como "La respuesta es..." o "Por lo tanto, X". Para respuestas numéricas, la normalización importa: "3/4", "0.75" y "75%" son la misma respuesta y deben mapearse a la misma forma canónica antes de votar. Para tareas de clasificación o respuesta corta, la extracción es usualmente una coincidencia de subcadena o un análisis simple. La robustez de la extracción es la parte más frágil del pipeline — si el modelo produce una cadena que no termina con una respuesta claramente analizable, ese camino debe descartarse o asignarse a un bucket "desconocido".
+
+### Voto mayoritario
+
+El paso de agregación es un recuento de frecuencias sobre las respuestas extraídas. La respuesta más común gana. Los empates pueden resolverse eligiendo la respuesta del camino con mayor log-probabilidad, o simplemente devolviendo las respuestas empatadas con sus recuentos de votos para revisión humana. La intuición estadística es que los errores son diversos (diferentes respuestas incorrectas por diferentes razones) mientras que las respuestas correctas están concentradas (la mayoría de los caminos llegan a la misma respuesta correcta). Esta propiedad se sostiene con mayor fuerza para tareas con una única respuesta correcta, como aritmética, razonamiento simbólico y QA basado en hechos. Para tareas de generación abierta — resumen, escritura creativa, código — la self-consistency es menos aplicable porque el voto mayoritario sobre ensayos no está bien definido.
+
+## Cuándo usar / Cuándo NO usar
+
+| Usar cuando | Evitar cuando |
+|-------------|---------------|
+| La tarea tiene una única respuesta correcta y la precisión del CoT es insuficiente | La latencia es una restricción dura (N veces las llamadas de inferencia son inaceptables) |
+| Aritmética o razonamiento algebraico en múltiples pasos con tasas de error conocidas | El coste de tokens es la preocupación principal y no puedes permitirte N completaciones |
+| Clasificación de alto riesgo donde unos pocos puntos porcentuales de precisión importan | La tarea es generación abierta donde el voto mayoritario no tiene significado |
+| Quieres mejora de precisión sin fine-tuning ni modelos adicionales | El modelo ya logra precisión cercana al techo con N=1 — rendimientos decrecientes |
+| Los caminos de razonamiento necesitan ser auditables (puedes inspeccionar todas las N cadenas) | La extracción de respuestas es poco fiable debido a formato de salida inconsistente |
+
+## Comparaciones
+
+| Criterio | Self-consistency | Chain-of-thought (CoT) | Auto-evaluación |
+|----------|-----------------|------------------------|-----------------|
+| Número de llamadas al LLM | N (típicamente 10–40) | 1 | 2 (generar + criticar) |
+| Mejora de precisión | Alta — 10–20pp en benchmarks de razonamiento | Moderada — sustancial sobre el prompting directo | Moderada — depende de la calidad de autocrítica del modelo |
+| Coste | Alto — lineal en N | Bajo | Bajo-moderado |
+| Complejidad de implementación | Baja — muestrea N veces y vota | Muy baja | Moderada — requiere diseñar un prompt de crítica |
+| Funciona sin retroalimentación externa | Sí | Sí | Sí |
+| Mejor tipo de tarea | Matemáticas, razonamiento simbólico, QA factual | La mayoría de las tareas de razonamiento | Tareas donde el modelo puede detectar sus propios errores |
+| Nota | Más fiable que CoT pero proporcionalmente más caro | Línea base más simple — prueba antes de self-consistency | Complementario — puede combinarse para mayores ganancias |
+
+## Ejemplos de código
+
+### Self-consistency con la API de OpenAI
+
+```python
+# Self-consistency: sample N CoT paths and take majority vote
+# pip install openai
+
+import os, re
+from collections import Counter
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+FEW_SHOT = """Q: Roger has 5 tennis balls. He buys 2 cans with 3 each. How many now?
+A: 5 + (2 x 3) = 5 + 6 = 11. The answer is 11.
+
+Q: Cafeteria had 23 apples, used 20, bought 6 more. How many now?
+A: 23 - 20 = 3. 3 + 6 = 9. The answer is 9.
+
+Q: {question}
+A:"""
+
+
+def extract_answer(text: str) -> str | None:
+    m = re.search(r"[Tt]he answer is\s+([^.\n]+)", text)
+    return m.group(1).strip().rstrip(".,;") if m else None
+
+
+def self_consistency(question: str, n: int = 10, temp: float = 0.7) -> dict:
+    """Sample n CoT paths and return majority vote answer with confidence."""
+    answers, completions = [], []
+    for i in range(n):
+        resp = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": FEW_SHOT.format(question=question)}],
+            temperature=temp,
+            max_tokens=300,
+        )
+        text = resp.choices[0].message.content.strip()
+        completions.append(text)
+        ans = extract_answer(text)
+        if ans:
+            answers.append(ans)
+        print(f"  Path {i+1:>2}: {ans!r}")
+
+    if not answers:
+        return {"answer": None, "votes": {}}
+    counts = Counter(answers)
+    winner, votes = counts.most_common(1)[0]
+    return {"answer": winner, "confidence": votes / len(answers), "votes": dict(counts)}
+
+
+if __name__ == "__main__":
+    q = ("Janet's ducks lay 16 eggs per day. She eats 3 and bakes with 4. "
+         "She sells the rest at $2/egg. How much does she make daily?")
+    r = self_consistency(q, n=10)
+    print(f"\nAnswer    : {r['answer']}")
+    print(f"Confidence: {r['confidence']:.0%}")
+    print(f"Votes     : {r['votes']}")
+```
+
+### Normalización de respuestas numéricas para votación robusta
+
+```python
+# Normalize numeric answers before majority voting
+# Handles fractions, decimals, currency, and percentage strings
+
+import re
+from collections import Counter
+from fractions import Fraction
+
+
+def normalize_numeric(raw: str) -> str:
+    """Canonicalize a raw answer string to a float string for voting."""
+    raw = raw.strip().lower()
+    raw = re.sub(r"[$%,]", "", raw)
+    m = re.match(r"^(\d+)/(\d+)$", raw)
+    if m:
+        return str(float(Fraction(int(m.group(1)), int(m.group(2)))))
+    try:
+        return str(float(raw))
+    except ValueError:
+        return raw
+
+
+def majority_vote(answers: list[str]) -> str | None:
+    normalized = [normalize_numeric(a) for a in answers]
+    return Counter(normalized).most_common(1)[0][0] if normalized else None
+
+
+if __name__ == "__main__":
+    raw = ["18", "18.0", "$18", "18", "17", "18", "18", "17", "18", "18"]
+    print("Majority:", majority_vote(raw))  # -> "18.0"
+```
+
+## Recursos prácticos
+
+- [Self-Consistency Improves Chain of Thought Reasoning in Language Models (Wang et al., 2022)](https://arxiv.org/abs/2203.11171) — Paper original con benchmarks en GSM8K, AQuA, SVAMP, StrategyQA y ARC.
+- [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models (Wei et al., 2022)](https://arxiv.org/abs/2201.11903) — El paper de CoT sobre el que se construye la self-consistency; trasfondo esencial.
+- [OpenAI — Referencia de API: chat completions](https://platform.openai.com/docs/api-reference/chat/create) — Referencia para los parámetros `temperature`, `n` y `logprobs` usados en implementaciones de self-consistency.
+- [Anthropic — Resumen de ingeniería de prompts](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Incluye orientación sobre muestreo y chain-of-thought para los modelos Claude.
+
+## Ver también
+
+- [Ingeniería de prompts](/docs/prompt-engineering)
+- [Chain-of-thought (CoT)](/docs/reasoning-patterns/cot)
+- [Prompt ensembling](/docs/prompt-engineering/prompt-ensembling)

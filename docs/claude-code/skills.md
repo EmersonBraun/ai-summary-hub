@@ -172,6 +172,7 @@ If the error references a file path, read that file to provide more specific adv
 - [Claude Code settings](https://docs.anthropic.com/en/docs/claude-code/settings) — Configuration options including custom skill directory paths.
 - [Anthropic Claude Code GitHub](https://github.com/anthropics/claude-code) — Source and community-contributed examples.
 - [Claude Code slash commands reference](https://docs.anthropic.com/en/docs/claude-code/cli-reference) — Full list of built-in slash commands alongside the custom skill system.
+- [Skills repository](https://github.com/EmersonBraun/skills) — Curated collection of reusable AI skills for Claude Code and other AI coding assistants
 
 ## See also
 

@@ -1,0 +1,15 @@
+/**
+ * DocSidebar/Desktop adds padding-top: var(--ifm-navbar-height) so the menu
+ * clears the navbar. Our wrapper places SidebarSwitcher above the sidebar, so
+ * that offset must not apply to the inner desktop sidebar.
+ */
+@media (min-width: 997px) {
+  .scrollWrap > :global(div) {
+    padding-top: 1rem !important;
+  }
+}
+
+.scrollWrap {
+  flex: 1;
+  overflow: auto;
+}
