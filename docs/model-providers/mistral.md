@@ -81,19 +81,14 @@ flowchart LR
 | Embedding API | Mistral Embed (1024-dim, multilingual) | Not available via Meta directly | text-embedding-3-small/large |
 | Context window (open models) | 32k tokens | 128k tokens (Llama 3.1+) | 128k tokens |
 
-## Pros and Cons
+## Pros and cons
 
-**Pros**
-- Strong efficiency-to-quality ratio, especially Mixtral 8x7B vs dense models of similar quality
-- EU-hosted API with strong GDPR positioning; appeals to European enterprise customers
-- OpenAI-compatible interface minimizes migration effort
-- Genuinely useful open-weights releases that punch above their weight class
-
-**Cons**
-- Open-weights context window (32k) is shorter than Llama 3.1's 128k
-- Smaller community ecosystem and fewer community fine-tunes compared to Llama
-- No native multimodal capability in production-ready open-weights models
-- Mistral Large still trails the top-tier models from OpenAI and Anthropic on hardest benchmarks
+| Pros | Cons |
+|------|------|
+| Strong efficiency-to-quality ratio, especially Mixtral 8x7B vs dense models of similar quality | Open-weights context window (32k) is shorter than Llama 3.1's 128k |
+| EU-hosted API with strong GDPR positioning; appeals to European enterprise customers | Smaller community ecosystem and fewer community fine-tunes compared to Llama |
+| OpenAI-compatible interface minimizes migration effort | No native multimodal capability in production-ready open-weights models |
+| Genuinely useful open-weights releases that punch above their weight class | Mistral Large still trails the top-tier models from OpenAI and Anthropic on hardest benchmarks |
 
 ## Code examples
 
