@@ -4,6 +4,8 @@ import type DocSidebarDesktopType from '@theme/DocSidebar/Desktop';
 import type {WrapperProps} from '@docusaurus/types';
 import SidebarSwitcher from '@site/src/components/SidebarSwitcher';
 
+import styles from './styles.module.css';
+
 type Props = WrapperProps<typeof DocSidebarDesktopType>;
 
 export default function DocSidebarDesktopWrapper(props: Props): React.ReactElement {
@@ -11,7 +13,7 @@ export default function DocSidebarDesktopWrapper(props: Props): React.ReactEleme
   return (
     <div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
       <SidebarSwitcher currentSidebarId={sidebarId} />
-      <div style={{flex: 1, overflow: 'auto'}}>
+      <div className={styles.scrollWrap}>
         <DocSidebarDesktop {...props} />
       </div>
     </div>

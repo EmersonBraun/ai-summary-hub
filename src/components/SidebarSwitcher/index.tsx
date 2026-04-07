@@ -69,15 +69,7 @@ export default function SidebarSwitcher({
   );
 
   return (
-    <div className={styles.switcher}>
-      <button
-        className={`${styles.categoryButton} ${isCategory ? styles.active : ''}`}
-        onClick={handleSelectCategory}
-        type="button"
-      >
-        Browse by Category
-      </button>
-
+    <div style={{padding: '4rem 0.5rem 0 0.5rem'}}>
       <button
         className={styles.toggleButton}
         onClick={() => setIsExpanded((prev) => !prev)}

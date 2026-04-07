@@ -151,7 +151,7 @@ function ProjectBanners(): ReactNode {
       <div className="container">
         <div className={styles.bannersGrid}>
           <Link
-            to="https://github.com/EmersonBraun/agentskit"
+            to="https://emersonbraun.github.io/agentskit/"
             className={styles.banner}
             target="_blank"
             rel="noopener noreferrer"
@@ -168,7 +168,7 @@ function ProjectBanners(): ReactNode {
                 </Translate>
               </p>
               <span className={styles.bannerCta}>
-                View on GitHub &rarr;
+                <Translate id="home.banner.agentskitCta">Visit documentation &rarr;</Translate>
               </span>
             </div>
           </Link>

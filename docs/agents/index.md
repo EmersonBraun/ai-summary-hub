@@ -114,7 +114,7 @@ print(result["output"])
 - [LlamaIndex – Agents](https://docs.llamaindex.ai/en/stable/module_guides/deploying/agents/) — Agent and query engine guides
 - [OpenAI Assistants API](https://platform.openai.com/docs/assistants/overview) — Managed agents with built-in tools (code interpreter, file search)
 - [Anthropic – Build with Claude: Agents](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Claude tool use and agentic patterns
-- [AgentsKit](https://github.com/EmersonBraun/agentskit) — Production-ready framework for building AI agents with memory, tools, and multi-agent orchestration
+- [AgentsKit](https://emersonbraun.github.io/agentskit/) — Production-ready framework for building AI agents with memory, tools, and multi-agent orchestration
 
 ## See also
 

@@ -125,7 +125,7 @@ print("\nCritique:\n", critique)
 - [From Prototypes to Agents with ADK – Google Codelabs](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — ADK supports composing multiple agents into a multi-agent system
 - [LangChain – Multi-agent orchestration](https://python.langchain.com/docs/concepts/multi_agent/) — Multi-agent patterns including supervisor and swarm topologies
 - [Microsoft AutoGen](https://microsoft.github.io/autogen/) — Framework for building multi-agent conversational systems
-- [AgentsKit](https://github.com/EmersonBraun/agentskit) — Production-ready framework for building AI agents with memory, tools, and multi-agent orchestration
+- [AgentsKit](https://emersonbraun.github.io/agentskit/) — Production-ready framework for building AI agents with memory, tools, and multi-agent orchestration
 
 ## See also
 
