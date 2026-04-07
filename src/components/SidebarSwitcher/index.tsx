@@ -1,5 +1,6 @@
 import React, {useState, useCallback} from 'react';
 import {useLocation} from '@docusaurus/router';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import {
   learningPaths,
   CATEGORY_SIDEBAR_ID,
@@ -17,8 +18,8 @@ function storeSidebar(id: string): void {
   }
 }
 
-/** First doc URL for each learning path */
-const firstDocMap: Record<string, string> = {
+/** First doc URL for each learning path (relative, will be resolved with useBaseUrl) */
+const firstDocPaths: Record<string, string> = {
   aiFundamentals: '/docs/intro',
   ragFromZero: '/docs/llms',
   masteringAgents: '/docs/agents',
@@ -39,9 +40,19 @@ export default function SidebarSwitcher({
   const [isExpanded, setIsExpanded] = useState(false);
   const activeSidebar = currentSidebarId || CATEGORY_SIDEBAR_ID;
   const location = useLocation();
+  const baseUrl = useBaseUrl('/');
 
   const isCategory = activeSidebar === CATEGORY_SIDEBAR_ID;
   const activePath = learningPaths.find((p) => p.sidebarId === activeSidebar);
+
+  /** Resolve a docs path with the site's baseUrl */
+  const resolveUrl = useCallback(
+    (path: string) => {
+      // baseUrl ends with '/', path starts with '/' — avoid double slash
+      return baseUrl.replace(/\/$/, '') + path;
+    },
+    [baseUrl],
+  );
 
   const handleSelectCategory = useCallback(() => {
     storeSidebar(CATEGORY_SIDEBAR_ID);
@@ -51,10 +62,10 @@ export default function SidebarSwitcher({
   const handleSelectPath = useCallback(
     (path: LearningPath) => {
       storeSidebar(path.sidebarId);
-      const targetUrl = firstDocMap[path.sidebarId] || '/docs/intro';
-      window.location.href = targetUrl;
+      const docPath = firstDocPaths[path.sidebarId] || '/docs/intro';
+      window.location.href = resolveUrl(docPath);
     },
-    [],
+    [resolveUrl],
   );
 
   return (

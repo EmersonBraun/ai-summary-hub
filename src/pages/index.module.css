@@ -191,6 +191,15 @@
   font-weight: 500;
   background: var(--ifm-color-emphasis-100);
   color: var(--ifm-color-emphasis-800);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+}
+
+.topicTag:hover {
+  background: var(--ifm-color-primary);
+  color: #fff;
+  text-decoration: none;
 }
 
 /* Learning paths section */
@@ -215,11 +224,16 @@
   flex-direction: column;
   gap: 0.25rem;
   transition: box-shadow 0.2s, transform 0.2s;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
 }
 
 .pathCard:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   transform: translateY(-2px);
+  text-decoration: none;
+  color: inherit;
 }
 
 .pathLevel {
@@ -238,6 +252,87 @@
 .pathDocs {
   font-size: 0.8rem;
   color: var(--ifm-color-emphasis-600);
+}
+
+/* Project banners */
+.bannersSection {
+  padding: 3rem 0;
+  background: var(--ifm-background-color);
+}
+
+.bannersGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.banner {
+  display: block;
+  position: relative;
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  border-radius: 12px;
+  padding: 2rem;
+  color: #fff;
+  text-decoration: none;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.banner::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(66, 133, 244, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.banner:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  color: #fff;
+}
+
+.bannerContent {
+  position: relative;
+  z-index: 1;
+}
+
+.bannerBadge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(66, 133, 244, 0.3);
+  color: #7eadf6;
+  margin-bottom: 0.75rem;
+}
+
+.bannerTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: #fff;
+}
+
+.bannerDesc {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  opacity: 0.85;
+  margin: 0 0 1rem;
+}
+
+.bannerCta {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #7eadf6;
 }
 
 /* Contribute section */
@@ -289,6 +384,10 @@
 
   .pathsGrid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .bannersGrid {
+    grid-template-columns: 1fr;
   }
 
   .contributeInner {

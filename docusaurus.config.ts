@@ -83,6 +83,11 @@ const config: Config = {
           position: 'left',
           label: 'Docs',
         },
+        {
+          to: '/all-topics',
+          position: 'left',
+          label: 'All Topics',
+        },
         {type: 'localeDropdown', position: 'right'},
         {
           href: 'https://github.com/EmersonBraun/ai-summary-hub',

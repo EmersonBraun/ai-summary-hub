@@ -80,36 +80,36 @@ function StatsBar(): ReactNode {
 }
 
 /* ------------------------------------------------------------------ */
-/*  What you get (features / benefits)                                 */
+/*  Features / benefits                                                */
 /* ------------------------------------------------------------------ */
 const features = [
   {
-    icon: '🗺️',
+    icon: '\u{1F5FA}\uFE0F',
     title: 'Curated Learning Paths',
     desc: 'Follow step-by-step sequences like "RAG from Zero" or "Mastering Agents" — from beginner to advanced, in the right order.',
   },
   {
-    icon: '🏷️',
+    icon: '\u{1F3F7}\uFE0F',
     title: 'Difficulty Levels',
     desc: 'Every article is tagged Beginner, Intermediate, or Advanced. Filter by level to find content that matches your experience.',
   },
   {
-    icon: '💻',
+    icon: '\u{1F4BB}',
     title: 'Runnable Code Examples',
     desc: 'Functional Python and TypeScript snippets you can copy-paste. No pseudocode — real SDK calls with OpenAI, Anthropic, LangChain, and more.',
   },
   {
-    icon: '⚖️',
+    icon: '\u2696\uFE0F',
     title: 'Head-to-Head Comparisons',
     desc: 'Side-by-side tables compare LangChain vs LlamaIndex, RAG vs Fine-tuning, PyTorch vs TensorFlow, and dozens more — right inside each article.',
   },
   {
-    icon: '📐',
+    icon: '\u{1F4D0}',
     title: 'Architecture Diagrams',
     desc: 'Mermaid diagrams with labeled edges explain how things work visually — RAG pipelines, agent loops, MCP architecture, MLOps workflows.',
   },
   {
-    icon: '✅',
+    icon: '\u2705',
     title: '"When to Use" Guidance',
     desc: 'Every article includes a practical "When to use / When NOT to use" table so you know exactly when a technique or tool fits your problem.',
   },
@@ -143,15 +143,132 @@ function Features(): ReactNode {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Topic highlights                                                   */
+/*  Project banners (AgentsKit + Skills)                               */
 /* ------------------------------------------------------------------ */
-const topicGroups = [
-  {label: 'Fundamentals & LLMs', topics: ['Machine Learning', 'Deep Learning', 'Transformers', 'BERT', 'GPT', 'Fine-tuning']},
-  {label: 'Prompt Engineering', topics: ['Temperature & Top-P', 'Self-consistency', 'Step-back Prompting', 'Structured Outputs', 'APE']},
-  {label: 'RAG & Search', topics: ['RAG Architecture', 'Vector Databases', 'Embeddings', 'Semantic Search', 'Reranking']},
-  {label: 'AI Agents', topics: ['Multi-Agent Systems', 'Memory', 'Planner-Executor', 'LangGraph', 'CrewAI', 'MCP']},
-  {label: 'MLOps', topics: ['MLflow', 'Airflow', 'Kubernetes', 'Prometheus', 'Terraform', 'DVC']},
-  {label: 'Model Providers', topics: ['OpenAI', 'Anthropic', 'Google Gemini', 'Meta Llama', 'Mistral', 'Cohere']},
+function ProjectBanners(): ReactNode {
+  return (
+    <section className={styles.bannersSection}>
+      <div className="container">
+        <div className={styles.bannersGrid}>
+          <Link
+            to="https://github.com/EmersonBraun/agentskit"
+            className={styles.banner}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div className={styles.bannerContent}>
+              <span className={styles.bannerBadge}>Open Source</span>
+              <Heading as="h3" className={styles.bannerTitle}>
+                AgentsKit
+              </Heading>
+              <p className={styles.bannerDesc}>
+                <Translate id="home.banner.agentskit">
+                  The most complete library for building AI agents. Production-ready
+                  framework with memory, tools, multi-agent orchestration, and more.
+                </Translate>
+              </p>
+              <span className={styles.bannerCta}>
+                View on GitHub &rarr;
+              </span>
+            </div>
+          </Link>
+
+          <Link
+            to="https://github.com/EmersonBraun/skills"
+            className={styles.banner}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div className={styles.bannerContent}>
+              <span className={styles.bannerBadge}>Open Source</span>
+              <Heading as="h3" className={styles.bannerTitle}>
+                Skills
+              </Heading>
+              <p className={styles.bannerDesc}>
+                <Translate id="home.banner.skills">
+                  A curated repository of reusable AI skills for Claude Code
+                  and other AI coding assistants. Boost your dev workflow instantly.
+                </Translate>
+              </p>
+              <span className={styles.bannerCta}>
+                View on GitHub &rarr;
+              </span>
+            </div>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Topic highlights (clickable)                                       */
+/* ------------------------------------------------------------------ */
+const topicGroups: {label: string; topics: {name: string; path: string}[]}[] = [
+  {
+    label: 'Fundamentals & LLMs',
+    topics: [
+      {name: 'Machine Learning', path: '/docs/fundamentals/machine-learning'},
+      {name: 'Deep Learning', path: '/docs/fundamentals/deep-learning'},
+      {name: 'Transformers', path: '/docs/transformers'},
+      {name: 'BERT', path: '/docs/transformers/bert'},
+      {name: 'GPT', path: '/docs/transformers/gpt'},
+      {name: 'Fine-tuning', path: '/docs/llms/fine-tuning'},
+    ],
+  },
+  {
+    label: 'Prompt Engineering',
+    topics: [
+      {name: 'Temperature & Top-P', path: '/docs/prompt-engineering/temperature-top-k-top-p'},
+      {name: 'Self-consistency', path: '/docs/prompt-engineering/self-consistency'},
+      {name: 'Step-back Prompting', path: '/docs/prompt-engineering/step-back-prompting'},
+      {name: 'Structured Outputs', path: '/docs/prompt-engineering/structured-outputs'},
+      {name: 'APE', path: '/docs/prompt-engineering/automatic-prompt-engineering'},
+    ],
+  },
+  {
+    label: 'RAG & Search',
+    topics: [
+      {name: 'RAG Architecture', path: '/docs/rag/architecture'},
+      {name: 'Vector Databases', path: '/docs/rag/vector-databases'},
+      {name: 'Embeddings', path: '/docs/rag/embeddings'},
+      {name: 'Semantic Search', path: '/docs/semantic-search'},
+      {name: 'Cohere Rerank', path: '/docs/model-providers/cohere'},
+    ],
+  },
+  {
+    label: 'AI Agents',
+    topics: [
+      {name: 'Multi-Agent Systems', path: '/docs/agents/multi-agent-systems'},
+      {name: 'Memory', path: '/docs/agents/memory'},
+      {name: 'Planner-Executor', path: '/docs/agents/planner-executor'},
+      {name: 'LangGraph', path: '/docs/agents/langgraph'},
+      {name: 'CrewAI', path: '/docs/agents/crewai'},
+      {name: 'MCP', path: '/docs/mcp'},
+    ],
+  },
+  {
+    label: 'MLOps',
+    topics: [
+      {name: 'MLflow', path: '/docs/mlops/mlflow'},
+      {name: 'Airflow', path: '/docs/mlops/data-engineering/airflow'},
+      {name: 'Kubernetes', path: '/docs/mlops/deployment/ml-kubernetes'},
+      {name: 'Prometheus', path: '/docs/mlops/monitoring/prometheus'},
+      {name: 'Terraform', path: '/docs/mlops/iac/terraform'},
+      {name: 'DVC', path: '/docs/mlops/cicd/dvc'},
+    ],
+  },
+  {
+    label: 'Model Providers',
+    topics: [
+      {name: 'OpenAI', path: '/docs/model-providers/openai'},
+      {name: 'Anthropic', path: '/docs/model-providers/anthropic'},
+      {name: 'Google Gemini', path: '/docs/model-providers/google-gemini'},
+      {name: 'Meta Llama', path: '/docs/model-providers/meta-llama'},
+      {name: 'Mistral', path: '/docs/model-providers/mistral'},
+      {name: 'Cohere', path: '/docs/model-providers/cohere'},
+    ],
+  },
 ];
 
 function TopicHighlights(): ReactNode {
@@ -171,7 +288,7 @@ function TopicHighlights(): ReactNode {
               </Heading>
               <div className={styles.topicTags}>
                 {group.topics.map((t) => (
-                  <span key={t} className={styles.topicTag}>{t}</span>
+                  <TopicLink key={t.name} name={t.name} path={t.path} />
                 ))}
               </div>
             </div>
@@ -182,19 +299,37 @@ function TopicHighlights(): ReactNode {
   );
 }
 
+function TopicLink({name, path}: {name: string; path: string}): ReactNode {
+  return (
+    <Link to={useBaseUrl(path)} className={styles.topicTag}>
+      {name}
+    </Link>
+  );
+}
+
 /* ------------------------------------------------------------------ */
-/*  Learning paths preview                                             */
+/*  Learning paths preview (clickable)                                 */
 /* ------------------------------------------------------------------ */
 const paths = [
-  {name: 'AI Fundamentals', level: 'Beginner', docs: 14, color: '#34a853'},
-  {name: 'RAG from Zero', level: 'Beginner \u2192 Intermediate', docs: 15, color: '#4285f4'},
-  {name: 'Mastering Agents', level: 'Intermediate \u2192 Advanced', docs: 22, color: '#ea4335'},
-  {name: 'Prompt Engineering Mastery', level: 'Beginner \u2192 Advanced', docs: 13, color: '#fbbc04'},
-  {name: 'Practical MLOps', level: 'Intermediate \u2192 Advanced', docs: 20, color: '#ea4335'},
-  {name: 'AI Tools & Frameworks', level: 'Beginner \u2192 Intermediate', docs: 16, color: '#4285f4'},
-  {name: 'AI Safety & Ethics', level: 'Beginner \u2192 Intermediate', docs: 7, color: '#4285f4'},
-  {name: 'Claude Code Deep Dive', level: 'Beginner \u2192 Advanced', docs: 12, color: '#fbbc04'},
+  {name: 'AI Fundamentals', level: 'Beginner', docs: 14, color: '#34a853', firstDoc: '/docs/intro'},
+  {name: 'RAG from Zero', level: 'Beginner \u2192 Intermediate', docs: 15, color: '#4285f4', firstDoc: '/docs/llms'},
+  {name: 'Mastering Agents', level: 'Intermediate \u2192 Advanced', docs: 22, color: '#ea4335', firstDoc: '/docs/agents'},
+  {name: 'Prompt Engineering Mastery', level: 'Beginner \u2192 Advanced', docs: 13, color: '#fbbc04', firstDoc: '/docs/prompt-engineering'},
+  {name: 'Practical MLOps', level: 'Intermediate \u2192 Advanced', docs: 20, color: '#ea4335', firstDoc: '/docs/mlops'},
+  {name: 'AI Tools & Frameworks', level: 'Beginner \u2192 Intermediate', docs: 16, color: '#4285f4', firstDoc: '/docs/model-providers'},
+  {name: 'AI Safety & Ethics', level: 'Beginner \u2192 Intermediate', docs: 7, color: '#4285f4', firstDoc: '/docs/ai-safety'},
+  {name: 'Claude Code Deep Dive', level: 'Beginner \u2192 Advanced', docs: 12, color: '#fbbc04', firstDoc: '/docs/tools/claude-code'},
 ];
+
+function PathCard({name, level, docs, color, firstDoc}: typeof paths[number]): ReactNode {
+  return (
+    <Link to={useBaseUrl(firstDoc)} className={styles.pathCard}>
+      <span className={styles.pathLevel} style={{color}}>{level}</span>
+      <Heading as="h3" className={styles.pathName}>{name}</Heading>
+      <span className={styles.pathDocs}>{docs} articles</span>
+    </Link>
+  );
+}
 
 function LearningPaths(): ReactNode {
   return (
@@ -212,22 +347,8 @@ function LearningPaths(): ReactNode {
         </p>
         <div className={styles.pathsGrid}>
           {paths.map((p) => (
-            <div key={p.name} className={styles.pathCard}>
-              <span className={styles.pathLevel} style={{color: p.color}}>{p.level}</span>
-              <Heading as="h3" className={styles.pathName}>{p.name}</Heading>
-              <span className={styles.pathDocs}>{p.docs} articles</span>
-            </div>
+            <PathCard key={p.name} {...p} />
           ))}
-        </div>
-        <div className={styles.buttons} style={{marginTop: '2rem'}}>
-          <Link
-            className="button button--primary button--lg"
-            to={useBaseUrl('/docs/intro')}
-          >
-            <Translate id="home.paths.cta">
-              Pick a Path and Start
-            </Translate>
-          </Link>
         </div>
       </div>
     </section>
@@ -288,6 +409,7 @@ export default function Home(): ReactNode {
       <main>
         <StatsBar />
         <Features />
+        <ProjectBanners />
         <TopicHighlights />
         <LearningPaths />
         <Contribute />

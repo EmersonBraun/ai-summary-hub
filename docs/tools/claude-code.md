@@ -108,6 +108,7 @@ claude "Add an endpoint to list users with pagination"
 - [Claude Code — IDE integrations](https://docs.anthropic.com/en/docs/claude-code/ide-integrations) — VS Code and JetBrains setup
 - [Claude Code — CLAUDE.md](https://docs.anthropic.com/en/docs/claude-code/memory) — Project-level instructions and memory
 - [Anthropic Agent SDK](https://docs.anthropic.com/en/docs/agents) — Building subagents and autonomous workflows
+- [Skills repository](https://github.com/EmersonBraun/skills) — Curated collection of reusable AI skills for Claude Code and other AI coding assistants
 
 ## See also
 

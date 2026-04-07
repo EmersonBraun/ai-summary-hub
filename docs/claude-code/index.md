@@ -110,6 +110,7 @@ claude
 - [Claude Code quickstart](https://docs.anthropic.com/en/docs/claude-code/quickstart) — Step-by-step guide to installing, authenticating, and running your first session.
 - [Claude Code GitHub repository](https://github.com/anthropics/claude-code) — Source, issue tracker, and release notes for the CLI and extensions.
 - [Anthropic Claude Code product page](https://www.anthropic.com/claude-code) — High-level overview and use case examples from Anthropic.
+- [Skills repository](https://github.com/EmersonBraun/skills) — Curated collection of reusable AI skills for Claude Code and other AI coding assistants
 
 ## See also
 
