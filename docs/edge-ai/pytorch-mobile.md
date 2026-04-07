@@ -55,7 +55,7 @@ PyTorch Mobile's GPU delegate for Android works through the Vulkan backend (`tor
 | Use when | Avoid when |
 |---|---|
 | Your training codebase is PyTorch and you want minimal conversion friction | Your models originate in TensorFlow/Keras and conversion overhead is a concern |
-| You need to deploy to Android or iOS with a Python-familiar workflow | You need microcontroller targets with <256 KB RAM (TFLM is better suited) |
+| You need to deploy to Android or iOS with a Python-familiar workflow | You need microcontroller targets with &lt;256 KB RAM (TFLM is better suited) |
 | You want ExecuTorch for next-gen hardware NPU delegation (Qualcomm, Apple ANE) | Your model uses Python-level dynamic control flow that TorchScript cannot capture via tracing |
 | Rapid iteration: reuse the same model class for training and mobile inference | You need mature production tooling with broad hardware delegate coverage today (TFLite is more mature) |
 | You are building on top of the Hugging Face ecosystem (many models export via TorchScript) | Binary size is extremely constrained and the LibTorch runtime footprint (~3-8 MB compressed) is too large |

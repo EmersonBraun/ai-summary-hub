@@ -55,6 +55,21 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Model Providers',
+      collapsed: true,
+      items: [
+        'model-providers/index',
+        'model-providers/openai',
+        'model-providers/anthropic',
+        'model-providers/google-gemini',
+        'model-providers/meta-llama',
+        'model-providers/mistral',
+        'model-providers/cohere',
+        'model-providers/deepseek',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Retrieval & RAG',
       collapsed: true,
       items: [
@@ -117,6 +132,16 @@ const sidebars: SidebarsConfig = {
             'agents/prompt-engineering',
           ],
         },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Model Context Protocol (MCP)',
+      collapsed: true,
+      items: [
+        'mcp/index',
+        'mcp/building-servers',
+        'mcp/building-clients',
       ],
     },
     {

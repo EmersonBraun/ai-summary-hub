@@ -53,7 +53,7 @@ ORT Mobile is a slimmed-down build of ONNX Runtime for Android and iOS that remo
 
 | Use when | Avoid when |
 |---|---|
-| You need framework-agnostic inference — serving models from PyTorch, TF, and scikit-learn through one runtime | Your deployment target is a microcontroller with <256 KB RAM (TFLM covers this better) |
+| You need framework-agnostic inference — serving models from PyTorch, TF, and scikit-learn through one runtime | Your deployment target is a microcontroller with &lt;256 KB RAM (TFLM covers this better) |
 | You are building enterprise ML pipelines on Windows/Azure where Microsoft tooling is already in place | You need deep Android hardware delegation with mature tooling today (TFLite is more battle-tested for Android) |
 | You need NVIDIA TensorRT acceleration without directly managing the TensorRT API | Your model uses custom ops that have no ONNX equivalent and are impractical to register |
 | You want browser/WASM inference for the same model that runs server-side | Your team is PyTorch-native and wants the tightest possible loop from training to mobile (PyTorch Mobile / ExecuTorch may be simpler) |
