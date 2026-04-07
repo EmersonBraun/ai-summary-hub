@@ -1,0 +1,231 @@
+---
+title: OpenAI
+description: OpenAI as a developer platform — GPT-4o, o1/o3 reasoning, DALL-E, Whisper, API features, function calling, and SDKs.
+keywords: [OpenAI, GPT-4o, o1, o3, function calling, embeddings, DALL-E, Whisper, API, SDK]
+tags: [beginner]
+authors: [EmersonBraun]
+---
+
+# OpenAI
+
+## Definition
+
+**OpenAI** is an AI research company and developer platform headquartered in San Francisco. Founded in 2015 and widely known for releasing ChatGPT in late 2022, OpenAI operates one of the most widely used model APIs in the industry. The platform gives developers programmatic access to a family of models spanning language, vision, audio, and image generation — making it a one-stop shop for most generative AI use cases.
+
+The OpenAI model lineup as of 2025 includes: **GPT-4o** (flagship multimodal model handling text, images, and audio in a single model), **GPT-4o-mini** (cost-optimized variant for high-volume tasks), the **o-series** reasoning models — **o1**, **o1-mini**, **o3**, and **o3-mini** — which use extended chain-of-thought reasoning for math, coding, and complex analysis, **DALL-E 3** for text-to-image generation, **Whisper** for speech-to-text transcription, and **TTS** (text-to-speech) for audio synthesis. Embeddings models (text-embedding-3-small and text-embedding-3-large) power semantic search and RAG pipelines.
+
+From a platform perspective, OpenAI offers a tiered API with usage-based pricing, a Playground for interactive testing, a Batch API for async bulk inference at 50% cost reduction, fine-tuning for GPT-4o-mini and GPT-3.5-turbo, an Assistants API for stateful agent-style interactions, and an Evals framework for systematic model evaluation. The Python SDK (`openai`) and a TypeScript/Node.js SDK are the primary client libraries, and the API format has become a de facto standard that other providers (Mistral, Together, Groq) partially mirror.
+
+## How it works
+
+### Chat completions API
+
+The chat completions endpoint (`POST /v1/chat/completions`) is the core of the OpenAI platform. You send an array of messages with roles (`system`, `user`, `assistant`) and receive a completion. The `system` message sets the assistant's persona and constraints; `user` messages carry user input; `assistant` messages represent prior model turns for multi-turn conversation. Streaming is supported via server-sent events so the response can be displayed token-by-token. Temperature and top-p control response randomness; `max_tokens` caps output length.
+
+```mermaid
+flowchart LR
+  Client[Client app] -->|POST messages array| ChatAPI[/v1/chat/completions]
+  ChatAPI -->|model routing| Selector{Model\nselector}
+  Selector -->|standard| GPT4o[GPT-4o]
+  Selector -->|reasoning| O3[o3 / o1]
+  Selector -->|budget| Mini[GPT-4o-mini]
+  GPT4o -->|stream or complete| Resp[JSON response]
+  O3 --> Resp
+  Mini --> Resp
+  Resp --> Client
+```
+
+### Function calling and tools
+
+Function calling (also called "tool use") lets the model invoke external tools by outputting structured JSON instead of free text. You declare tool schemas in the request; the model decides when to call a tool and populates its arguments. Your code executes the function and returns the result as a `tool` message; the model then uses that result to produce its final answer. This is the foundation of most agent frameworks: the model acts as a reasoning and routing layer while actual computation happens in your code.
+
+```mermaid
+flowchart LR
+  User[User query] --> LLM[GPT-4o]
+  LLM -->|decides to call tool| ToolCall[tool_calls JSON]
+  ToolCall -->|your code executes| ExtFn[External function\nor API]
+  ExtFn -->|result as tool message| LLM
+  LLM -->|final answer| User
+```
+
+### Embeddings API
+
+The embeddings endpoint (`POST /v1/embeddings`) converts text into dense numerical vectors. These vectors encode semantic meaning: similar texts produce similar vectors. `text-embedding-3-large` (3072 dimensions) delivers the best retrieval quality; `text-embedding-3-small` (1536 dimensions) is faster and cheaper. Embeddings are the backbone of [RAG](/docs/rag) pipelines: you embed documents at index time and embed queries at search time, then retrieve documents by cosine similarity.
+
+### Image and audio APIs
+
+**DALL-E 3** (`POST /v1/images/generations`) generates images from text prompts. You specify size (1024×1024, 1792×1024, or 1024×1792), quality (standard or HD), and style (vivid or natural). **Whisper** (`POST /v1/audio/transcriptions`) transcribes audio files with high accuracy across 57+ languages. **TTS** (`POST /v1/audio/speech`) converts text to natural-sounding speech with six built-in voices. These APIs share the same authentication and billing model as the text APIs, making it straightforward to build multimodal pipelines in a single application.
+
+## When to use / When NOT to use
+
+| Use OpenAI when | Avoid or consider alternatives when |
+|-----------------|--------------------------------------|
+| You need the broadest ecosystem: libraries, tutorials, and community support all default to OpenAI | Your workload involves highly sensitive or regulated data and you cannot send it to a third-party US provider |
+| You want multimodal support (text + image + audio) from a single vendor | You need to fine-tune deeply or control every aspect of the model — open-weights models offer more flexibility |
+| You need advanced reasoning on math, code, or logic problems (o1, o3 series) | Costs at scale are prohibitive — at very high token volumes, open-weights hosting often beats per-token pricing |
+| You are building function-calling or agent workflows — OpenAI's structured outputs and tool calling are mature | You need a non-English-first experience — Qwen or Mistral may outperform on certain languages |
+| You want the Assistants API for stateful, file-enabled agents without building the state layer yourself | You need reproducible deterministic outputs from a frozen model version — OpenAI updates models on a rolling basis |
+
+## Comparisons
+
+| Criteria | OpenAI | Anthropic | Google Gemini |
+|----------|--------|-----------|---------------|
+| Flagship model | GPT-4o | Claude 3.7 Sonnet / Opus | Gemini 2.5 Pro |
+| Reasoning model | o3, o1 | Extended thinking (Claude 3.7) | Gemini 2.5 Pro (thinking) |
+| Context window | 128K (GPT-4o), 200K (o1) | 200K | Up to 1M (Gemini 1.5 Pro) |
+| Multimodal input | Text, image, audio, video | Text, image | Text, image, audio, video, code |
+| Open-weights option | No | No | Gemma (partial) |
+| Function / tool calling | Mature, widely adopted | Strong, with computer use | Mature, Google ecosystem |
+| Pricing (flagship) | ~$2.50/1M input tokens (GPT-4o) | ~$3/1M input tokens (Sonnet) | ~$1.25/1M input tokens (Gemini 1.5 Pro) |
+| Safety approach | Moderation API, usage policies | Constitutional AI, refusal tuning | Responsible AI guidelines |
+| Data residency | US (default), enterprise options | US (default), enterprise options | Multi-region, Google Cloud |
+| Best for | Broadest ecosystem, agent tooling, reasoning | Long docs, safety, nuanced instruction | Long context, multimodal, Google Cloud users |
+
+## Pros and cons
+
+| Pros | Cons |
+|------|------|
+| Industry-standard API adopted by most frameworks and libraries | Closed model — no visibility into weights or training data |
+| Widest model lineup: language, vision, audio, image in one platform | US-hosted by default; data residency is limited |
+| o-series reasoning models excel at math, code, and logic | Pricing can be high at scale compared to self-hosted open models |
+| Strong ecosystem: cookbook, evals, fine-tuning, batch API | Model versions change on a rolling basis — behavior may shift without notice |
+| Reliable rate limits and enterprise SLAs | No true open-weights offering |
+
+## Code examples
+
+### Chat completion with streaming
+
+```python
+from openai import OpenAI
+
+client = OpenAI(api_key="sk-...")  # or set OPENAI_API_KEY env var
+
+# Basic completion
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "system", "content": "You are a concise technical assistant."},
+        {"role": "user", "content": "Explain embeddings in two sentences."},
+    ],
+    temperature=0.2,
+    max_tokens=256,
+)
+print(response.choices[0].message.content)
+
+# Streaming response
+with client.chat.completions.stream(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Write a haiku about APIs."}],
+) as stream:
+    for text in stream.text_stream:
+        print(text, end="", flush=True)
+```
+
+### Function calling
+
+```python
+import json
+from openai import OpenAI
+
+client = OpenAI()
+
+# Define a tool schema
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Get the current weather for a city",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "city": {"type": "string", "description": "City name"},
+                    "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+                },
+                "required": ["city"],
+            },
+        },
+    }
+]
+
+messages = [{"role": "user", "content": "What's the weather in Tokyo?"}]
+
+# First call — model may decide to call a tool
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=messages,
+    tools=tools,
+    tool_choice="auto",
+)
+
+msg = response.choices[0].message
+messages.append(msg)
+
+# If the model called a tool, execute it and return the result
+if msg.tool_calls:
+    for tc in msg.tool_calls:
+        args = json.loads(tc.function.arguments)
+        # Simulated function execution
+        result = {"city": args["city"], "temp": "18°C", "condition": "Partly cloudy"}
+        messages.append({
+            "role": "tool",
+            "tool_call_id": tc.id,
+            "content": json.dumps(result),
+        })
+
+# Second call — model uses the tool result to answer
+final = client.chat.completions.create(model="gpt-4o", messages=messages)
+print(final.choices[0].message.content)
+```
+
+### Embeddings for semantic search
+
+```python
+from openai import OpenAI
+import numpy as np
+
+client = OpenAI()
+
+def embed(texts: list[str], model: str = "text-embedding-3-small") -> list[list[float]]:
+    response = client.embeddings.create(input=texts, model=model)
+    return [item.embedding for item in response.data]
+
+# Index documents
+docs = [
+    "Python is a high-level programming language.",
+    "OpenAI provides a REST API for language models.",
+    "RAG combines retrieval with generation.",
+]
+doc_vectors = embed(docs)
+
+# Query
+query = "How do I call OpenAI from Python?"
+query_vector = embed([query])[0]
+
+# Cosine similarity
+def cosine_sim(a, b):
+    a, b = np.array(a), np.array(b)
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+scores = [(cosine_sim(query_vector, dv), doc) for dv, doc in zip(doc_vectors, docs)]
+scores.sort(reverse=True)
+for score, doc in scores:
+    print(f"{score:.3f}  {doc}")
+```
+
+## Practical resources
+
+- [OpenAI API reference](https://platform.openai.com/docs/api-reference) — Complete endpoint documentation with request/response schemas
+- [OpenAI pricing](https://openai.com/api/pricing/) — Per-token pricing for all models including batch discounts
+- [OpenAI Cookbook](https://cookbook.openai.com/) — Practical examples covering function calling, RAG, fine-tuning, evals, and more
+- [OpenAI models overview](https://platform.openai.com/docs/models) — Model IDs, context windows, capabilities, and deprecation timelines
+- [OpenAI Python SDK on GitHub](https://github.com/openai/openai-python) — Source, changelog, and migration guides
+
+## See also
+
+- [Model providers](/docs/model-providers) — Overview and comparison of all providers
+- [Case study: ChatGPT](/docs/case-studies/chatgpt) — For a deeper look at model architecture, see the ChatGPT case study
+- [Anthropic](/docs/model-providers/anthropic) — Claude model family, tool use, long context
+- [Prompt engineering](/docs/prompt-engineering) — Techniques that apply across all OpenAI models
+- [Agents](/docs/agents) — Building agentic workflows with function calling
+- [RAG](/docs/rag) — Using OpenAI embeddings in retrieval-augmented generation

@@ -55,6 +55,21 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Model Providers',
+      collapsed: true,
+      items: [
+        'model-providers/index',
+        'model-providers/openai',
+        'model-providers/anthropic',
+        'model-providers/google-gemini',
+        'model-providers/meta-llama',
+        'model-providers/mistral',
+        'model-providers/cohere',
+        'model-providers/deepseek',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Retrieval & RAG',
       collapsed: true,
       items: [
@@ -117,6 +132,16 @@ const sidebars: SidebarsConfig = {
             'agents/prompt-engineering',
           ],
         },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Model Context Protocol (MCP)',
+      collapsed: true,
+      items: [
+        'mcp/index',
+        'mcp/building-servers',
+        'mcp/building-clients',
       ],
     },
     {
@@ -196,6 +221,20 @@ const sidebars: SidebarsConfig = {
         'tools/claude-code',
         'tools/antigravity',
         'tools/kiro',
+        {
+          type: 'category',
+          label: 'Claude Code Deep Dive',
+          collapsed: true,
+          items: [
+            'claude-code/index',
+            'claude-code/claude-md',
+            'claude-code/skills',
+            'claude-code/thinking-modes',
+            'claude-code/prompt-caching',
+            'claude-code/context-management',
+            'claude-code/mcp-plugins',
+          ],
+        },
       ],
     },
     {
@@ -272,6 +311,16 @@ const sidebars: SidebarsConfig = {
         'quantization/index',
         'pruning/index',
         'knowledge-distillation/index',
+        {
+          type: 'category',
+          label: 'Edge AI',
+          collapsed: true,
+          items: [
+            'edge-ai/tflite',
+            'edge-ai/pytorch-mobile',
+            'edge-ai/onnx',
+          ],
+        },
       ],
     },
     {
