@@ -2,6 +2,7 @@
 title: TensorFlow
 description: Deep learning framework by Google.
 keywords: [TensorFlow, Keras, deep learning]
+tags: [beginner]
 ---
 
 # TensorFlow

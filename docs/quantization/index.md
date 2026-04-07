@@ -2,6 +2,7 @@
 title: Quantization
 description: Using lower precision (e.g. int8) for weights and activations.
 keywords: [quantization, int8, precision]
+tags: [advanced]
 ---
 
 # Quantization

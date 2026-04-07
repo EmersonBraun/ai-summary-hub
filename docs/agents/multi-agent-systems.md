@@ -2,6 +2,7 @@
 title: Multi-agent systems
 description: Multiple agents collaborating or competing.
 keywords: [multi-agent, collaboration, orchestration]
+tags: [intermediate]
 ---
 
 # Multi-agent systems

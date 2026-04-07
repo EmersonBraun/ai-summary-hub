@@ -2,6 +2,7 @@
 title: Natural language processing (NLP)
 description: AI for understanding and generating human language.
 keywords: [NLP, language, text, transformers]
+tags: [beginner]
 ---
 
 # Natural language processing (NLP)

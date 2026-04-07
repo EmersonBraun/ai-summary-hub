@@ -2,6 +2,7 @@
 title: Transfer learning
 description: Reusing pretrained models for new tasks.
 keywords: [transfer learning, pretraining, fine-tuning]
+tags: [beginner]
 ---
 
 # Transfer learning

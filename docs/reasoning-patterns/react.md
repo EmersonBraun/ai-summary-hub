@@ -2,6 +2,7 @@
 title: ReAct (Reasoning + Acting)
 description: Interleaving reasoning and action in agents.
 keywords: [ReAct, reasoning, acting, agents]
+tags: [intermediate]
 ---
 
 # ReAct (Reasoning + Acting)

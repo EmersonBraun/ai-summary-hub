@@ -2,6 +2,7 @@
 title: Kiro
 description: AI IDE with spec-driven development and agent hooks from prototype to production.
 keywords: [Kiro, spec-driven, AI IDE, agent hooks]
+tags: [beginner]
 ---
 
 # Kiro

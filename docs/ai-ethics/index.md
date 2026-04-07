@@ -2,6 +2,7 @@
 title: AI ethics
 description: Ethical principles and governance for AI.
 keywords: [AI ethics, governance, responsibility]
+tags: [beginner]
 ---
 
 # AI ethics

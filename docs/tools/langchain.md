@@ -2,6 +2,7 @@
 title: LangChain
 description: Framework for LLM applications and agents.
 keywords: [LangChain, chains, agents, RAG]
+tags: [intermediate]
 ---
 
 # LangChain

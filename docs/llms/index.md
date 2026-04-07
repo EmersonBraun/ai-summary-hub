@@ -2,6 +2,7 @@
 title: Large language models (LLMs)
 description: What LLMs are, how they are trained and used.
 keywords: [LLM, large language model, foundation model]
+tags: [beginner]
 ---
 
 # Large language models (LLMs)

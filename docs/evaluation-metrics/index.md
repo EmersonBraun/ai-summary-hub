@@ -2,6 +2,7 @@
 title: Evaluation metrics
 description: Measuring model performance across tasks.
 keywords: [evaluation, metrics, accuracy, F1]
+tags: [intermediate]
 ---
 
 # Evaluation metrics

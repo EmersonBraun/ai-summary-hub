@@ -2,6 +2,7 @@
 title: Case study — Claude
 description: Anthropic's instruction-following LLM with long context and safety.
 keywords: [Claude, Anthropic, constitutional AI, long context]
+tags: [beginner]
 ---
 
 # Case study: Claude

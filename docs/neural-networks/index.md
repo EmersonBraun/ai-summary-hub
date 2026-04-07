@@ -2,6 +2,7 @@
 title: Neural networks
 description: Introduction to artificial neural networks and their building blocks.
 keywords: [neural networks, ANN, layers, activation]
+tags: [beginner]
 ---
 
 # Neural networks

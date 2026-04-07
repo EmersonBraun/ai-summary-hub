@@ -2,6 +2,7 @@
 title: AI agents
 description: Systems that perceive, reason, and act toward goals.
 keywords: [AI agents, autonomous, tools, ReAct]
+tags: [beginner]
 ---
 
 # AI agents

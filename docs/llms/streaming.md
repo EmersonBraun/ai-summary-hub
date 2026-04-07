@@ -2,6 +2,7 @@
 title: Streaming (LLMs)
 description: Token-by-token output for lower perceived latency and better UX.
 keywords: [streaming, token streaming, SSE, chat UX]
+tags: [intermediate]
 ---
 
 # Streaming (LLMs)
