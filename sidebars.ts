@@ -1,5 +1,8 @@
 import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
 
+/** Shorthand for a doc ref (doc already claimed by docsSidebar) */
+const ref = (id: string) => ({type: 'ref' as const, id});
+
 const sidebars: SidebarsConfig = {
   docsSidebar: [
     {
@@ -346,6 +349,213 @@ const sidebars: SidebarsConfig = {
     },
     'glossary',
     'changelog',
+  ],
+
+  // Learning Path 1: AI Fundamentals (beginner)
+  aiFundamentals: [
+    {
+      type: 'category',
+      label: 'AI Fundamentals',
+      collapsed: false,
+      items: [
+        ref('intro'),
+        ref('fundamentals/index'),
+        ref('fundamentals/machine-learning'),
+        ref('fundamentals/deep-learning'),
+        ref('neural-networks/index'),
+        ref('neural-networks/cnn'),
+        ref('neural-networks/rnn'),
+        ref('transformers/index'),
+        ref('transformers/bert'),
+        ref('transformers/gpt'),
+        ref('llms/index'),
+        ref('nlp/index'),
+        ref('cv/index'),
+        ref('glossary'),
+      ],
+    },
+  ],
+
+  // Learning Path 2: RAG from Zero (beginner → intermediate)
+  ragFromZero: [
+    {
+      type: 'category',
+      label: 'RAG from Zero',
+      collapsed: false,
+      items: [
+        ref('llms/index'),
+        ref('prompt-engineering/index'),
+        ref('prompt-engineering/system-role-contextual-prompting'),
+        ref('prompt-engineering/temperature-top-k-top-p'),
+        ref('prompt-engineering/structured-outputs'),
+        ref('semantic-search/index'),
+        ref('rag/index'),
+        ref('rag/embeddings'),
+        ref('rag/vector-databases'),
+        ref('rag/architecture'),
+        ref('rag/examples'),
+        ref('model-providers/openai'),
+        ref('model-providers/cohere'),
+        ref('tools/langchain'),
+        ref('tools/llamaindex'),
+      ],
+    },
+  ],
+
+  // Learning Path 3: Mastering Agents (intermediate → advanced)
+  masteringAgents: [
+    {
+      type: 'category',
+      label: 'Mastering Agents',
+      collapsed: false,
+      items: [
+        ref('agents/index'),
+        ref('reasoning-patterns/cot'),
+        ref('reasoning-patterns/react'),
+        ref('agents/tools-actions'),
+        ref('agents/memory'),
+        ref('agents/conversational-memory'),
+        ref('agents/planner-executor'),
+        ref('agents/dag-agents'),
+        ref('agents/self-critique'),
+        ref('agents/multi-agent-systems'),
+        ref('subagents/index'),
+        ref('agents/frameworks-overview'),
+        ref('agents/langgraph'),
+        ref('agents/crewai'),
+        ref('agents/autogen'),
+        ref('agents/anthropic-tool-use'),
+        ref('agents/evaluation'),
+        ref('agents/debugging'),
+        ref('agents/security'),
+        ref('mcp/index'),
+        ref('mcp/building-servers'),
+        ref('mcp/building-clients'),
+      ],
+    },
+  ],
+
+  // Learning Path 4: Prompt Engineering Mastery (beginner → advanced)
+  promptEngineeringMastery: [
+    {
+      type: 'category',
+      label: 'Prompt Engineering Mastery',
+      collapsed: false,
+      items: [
+        ref('prompt-engineering/index'),
+        ref('prompt-engineering/system-role-contextual-prompting'),
+        ref('prompt-engineering/temperature-top-k-top-p'),
+        ref('prompt-engineering/max-tokens-stop-sequences'),
+        ref('prompt-engineering/structured-outputs'),
+        ref('reasoning-patterns/cot'),
+        ref('reasoning-patterns/tot'),
+        ref('prompt-engineering/self-consistency'),
+        ref('prompt-engineering/step-back-prompting'),
+        ref('prompt-engineering/prompt-ensembling'),
+        ref('prompt-engineering/debiasing-techniques'),
+        ref('prompt-engineering/self-evaluation-calibration'),
+        ref('prompt-engineering/automatic-prompt-engineering'),
+      ],
+    },
+  ],
+
+  // Learning Path 5: Practical MLOps (intermediate → advanced)
+  practicalMlops: [
+    {
+      type: 'category',
+      label: 'Practical MLOps',
+      collapsed: false,
+      items: [
+        ref('mlops/index'),
+        ref('mlops/experiment-tracking'),
+        ref('mlops/mlflow'),
+        ref('mlops/wandb'),
+        ref('mlops/feature-stores'),
+        ref('mlops/data-engineering/index'),
+        ref('mlops/data-engineering/airflow'),
+        ref('mlops/data-engineering/spark'),
+        ref('mlops/data-engineering/kafka'),
+        ref('mlops/cicd/index'),
+        ref('mlops/cicd/dvc'),
+        ref('mlops/cicd/model-registry'),
+        ref('mlops/deployment/model-serving'),
+        ref('mlops/deployment/kubeflow'),
+        ref('mlops/deployment/ml-kubernetes'),
+        ref('mlops/monitoring/index'),
+        ref('mlops/monitoring/prometheus'),
+        ref('mlops/monitoring/grafana'),
+        ref('mlops/iac/terraform'),
+        ref('mlops/iac/ansible'),
+      ],
+    },
+  ],
+
+  // Learning Path 6: AI Tools & Frameworks (beginner → intermediate)
+  aiToolsFrameworks: [
+    {
+      type: 'category',
+      label: 'AI Tools & Frameworks',
+      collapsed: false,
+      items: [
+        ref('model-providers/index'),
+        ref('model-providers/openai'),
+        ref('model-providers/anthropic'),
+        ref('model-providers/google-gemini'),
+        ref('model-providers/meta-llama'),
+        ref('model-providers/mistral'),
+        ref('model-providers/cohere'),
+        ref('model-providers/deepseek'),
+        ref('frameworks/pytorch'),
+        ref('frameworks/tensorflow'),
+        ref('tools/huggingface'),
+        ref('tools/langchain'),
+        ref('tools/llamaindex'),
+        ref('tools/cursor'),
+        ref('tools/github-copilot'),
+        ref('tools/claude-code'),
+      ],
+    },
+  ],
+
+  // Learning Path 7: AI Safety & Ethics (beginner → intermediate)
+  aiSafetyEthics: [
+    {
+      type: 'category',
+      label: 'AI Safety & Ethics',
+      collapsed: false,
+      items: [
+        ref('ai-safety/index'),
+        ref('ai-ethics/index'),
+        ref('bias-in-ai/index'),
+        ref('xai/index'),
+        ref('prompt-engineering/debiasing-techniques'),
+        ref('agents/security'),
+        ref('agents/evaluation'),
+      ],
+    },
+  ],
+
+  // Learning Path 8: Claude Code Deep Dive (beginner → advanced)
+  claudeCodeDeepDive: [
+    {
+      type: 'category',
+      label: 'Claude Code Deep Dive',
+      collapsed: false,
+      items: [
+        ref('tools/claude-code'),
+        ref('claude-code/index'),
+        ref('claude-code/claude-md'),
+        ref('claude-code/skills'),
+        ref('claude-code/thinking-modes'),
+        ref('claude-code/prompt-caching'),
+        ref('claude-code/context-management'),
+        ref('claude-code/mcp-plugins'),
+        ref('mcp/index'),
+        ref('mcp/building-servers'),
+        ref('mcp/building-clients'),
+        ref('model-providers/anthropic'),
+      ],
+    },
   ],
 };
 

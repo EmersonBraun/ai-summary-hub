@@ -35,7 +35,7 @@ You start from a **base model** (e.g. a pretrained [LLM](/docs/llms)) and a **da
 
 ### LoRA: low-rank adaptation
 
-Instead of updating all parameters, LoRA adds trainable matrices A and B (where rank r << d) to weight matrices. Only A and B are trained; the original weights are frozen. This reduces trainable parameters by 99%+ while achieving near-full fine-tuning quality. Adapters can be merged into the base model at inference time for zero overhead.
+Instead of updating all parameters, LoRA adds trainable matrices A and B (where rank r ≪ d) to weight matrices. Only A and B are trained; the original weights are frozen. This reduces trainable parameters by 99%+ while achieving near-full fine-tuning quality. Adapters can be merged into the base model at inference time for zero overhead.
 
 ### Validation and stopping
 
@@ -50,7 +50,7 @@ Instead of updating all parameters, LoRA adds trainable matrices A and B (where 
 | Frequently changing knowledge | No | RAG is cheaper and more up-to-date |
 | One-off question answering | No | Few-shot prompting is sufficient |
 | Reduce hallucination on known facts | Partially | Combine with RAG for best results |
-| Budget constrained (< $50) | Yes (LoRA) | QLoRA makes it feasible on consumer hardware |
+| Budget constrained (&lt; $50) | Yes (LoRA) | QLoRA makes it feasible on consumer hardware |
 
 ## Comparisons
 
@@ -83,8 +83,8 @@ from datasets import Dataset
 
 # Small toy dataset — replace with your domain data
 data = [
-    {"text": "<|user|>What is LoRA?<|assistant|>LoRA is a parameter-efficient fine-tuning technique that injects trainable low-rank matrices into frozen model weights."},
-    {"text": "<|user|>Why use LoRA?<|assistant|>LoRA reduces trainable parameters by 99%+ while achieving near-full fine-tuning quality, making it feasible on consumer GPUs."},
+    {"text": "USER: What is LoRA? ASSISTANT: LoRA is a parameter-efficient fine-tuning technique that injects trainable low-rank matrices into frozen model weights."},
+    {"text": "USER: Why use LoRA? ASSISTANT: LoRA reduces trainable parameters by 99%+ while achieving near-full fine-tuning quality, making it feasible on consumer GPUs."},
 ]
 dataset = Dataset.from_list(data)
 
