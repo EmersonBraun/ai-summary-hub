@@ -21,7 +21,7 @@ flowchart LR
   DecoderLayers --> NextToken["Next token"]
 ```
 
-Les **tokens** sont encodés et envoyés dans des **couches de décodeur causales** : chaque position ne peut attendre qu'à elle-même et aux positions précédentes (auto-attention masquée), donc le modèle ne peut pas « voir » le futur. Le **token suivant** est prédit à partir de la représentation de la dernière position (souvent avec une couche linéaire et softmax sur le vocabulaire). L'**entraînement** maximise la probabilité du token suivant étant donné le contexte précédent (teacher forcing). L'**inférence** génère autorégressivement : échantillonner ou choisir avidement le token suivant, l'ajouter et répéter jusqu'à une condition d'arrêt. Le [prompt engineering](/docs/llms/prompt-engineering) et l'[affinage](/docs/llms/fine-tuning) façonnent la façon dont le modèle utilise ce mécanisme pour les tâches.
+Les **tokens** sont encodés et envoyés dans des **couches de décodeur causales** : chaque position ne peut attendre qu'à elle-même et aux positions précédentes (auto-attention masquée), donc le modèle ne peut pas « voir » le futur. Le **token suivant** est prédit à partir de la représentation de la dernière position (souvent avec une couche linéaire et softmax sur le vocabulaire). L'**entraînement** maximise la probabilité du token suivant étant donné le contexte précédent (teacher forcing). L'**inférence** génère autorégressivement : échantillonner ou choisir avidement le token suivant, l'ajouter et répéter jusqu'à une condition d'arrêt. Le [prompt engineering](/docs/prompt-engineering) et l'[affinage](/docs/llms/fine-tuning) façonnent la façon dont le modèle utilise ce mécanisme pour les tâches.
 
 ## Cas d'utilisation
 
@@ -40,4 +40,4 @@ Les modèles décodeur seul sont la base du chat, du code et de toute tâche bé
 
 - [Transformers](/docs/transformers)
 - [LLMs](/docs/llms)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

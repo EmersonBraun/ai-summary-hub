@@ -14,7 +14,7 @@ Um modelo mental útil: **pré-treinamento** aprende previsão do próximo token
 
 ## Como funciona
 
-**Pré-treinamento** aprende previsão do próximo token em grandes corpus e produz um modelo base. **Fine-tuning opcional** (por ex. [fine-tuning](/docs/llms/fine-tuning)) adapts it to tasks or instruction formats; **alignment** (por ex. RLHF, DPO) optimizes human preference and safety. The **deployed model** is then used at **inference** time. You can call it zero-shot (no examples), few-shot (with [prompt engineering](/docs/llms/prompt-engineering)), or augment it with [RAG](/docs/rag) (recuperação as context) or [agents](/docs/agents) (tools and loops). The diagram summarizes the training pipeline and the two main inference augmentations.
+**Pré-treinamento** aprende previsão do próximo token em grandes corpus e produz um modelo base. **Fine-tuning opcional** (por ex. [fine-tuning](/docs/llms/fine-tuning)) adapts it to tasks or instruction formats; **alignment** (por ex. RLHF, DPO) optimizes human preference and safety. The **deployed model** is then used at **inference** time. You can call it zero-shot (no examples), few-shot (with [prompt engineering](/docs/prompt-engineering)), or augment it with [RAG](/docs/rag) (recuperação as context) or [agents](/docs/agents) (tools and loops). The diagram summarizes the training pipeline and the two main inference augmentations.
 
 ```mermaid
 flowchart LR
@@ -54,6 +54,6 @@ LLMs are used wherever you need flexible language understanding or generation, f
 ## Veja também
 
 - [Fine-tuning](/docs/llms/fine-tuning)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)
 - [RAG](/docs/rag)
 - [Agents](/docs/agents)

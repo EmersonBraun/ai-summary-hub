@@ -14,7 +14,7 @@ They illustrate the same core stack (pretraining, ajuste de instruções, alignm
 
 ## Como funciona
 
-**Modelos base** são pré-treinados em grandes corpus de texto e código; **ajuste de instruções** e **otimização de preferências** (por ex. DPO) os alinham para chat and tool use. **MoE** variants activate a subset of parameters per token to scale capacity without proportionally increasing compute. Weights are published in standard formats (por ex. SafeTensors); teams run them with [quantization](/docs/quantization) on consumer GPUs or deploy via [local inference](/docs/local-inference) runtimes (vLLM, Ollama, etc.). [Prompt engineering](/docs/llms/prompt-engineering) and [fine-tuning](/docs/llms/fine-tuning) extend use for specific domains.
+**Modelos base** são pré-treinados em grandes corpus de texto e código; **ajuste de instruções** e **otimização de preferências** (por ex. DPO) os alinham para chat and tool use. **MoE** variants activate a subset of parameters per token to scale capacity without proportionally increasing compute. Weights are published in standard formats (por ex. SafeTensors); teams run them with [quantization](/docs/quantization) on consumer GPUs or deploy via [local inference](/docs/local-inference) runtimes (vLLM, Ollama, etc.). [Prompt engineering](/docs/prompt-engineering) and [fine-tuning](/docs/llms/fine-tuning) extend use for specific domains.
 
 ## Casos de uso
 

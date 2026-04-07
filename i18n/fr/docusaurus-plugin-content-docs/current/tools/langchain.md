@@ -10,11 +10,11 @@ keywords: [LangChain, chains, agents, RAG]
 
 LangChain est un framework for building [LLM](/docs/llms) applications: chains, [agents](/docs/agents), tools, and [RAG](/docs/rag) pipelines. It abstracts providers, prompts, and récupération for quick prototyping and production.
 
-Il complète [LlamaIndex](/docs/tools/llamaindex) (which emphasizes les données et l'indexation); LangChain emphasizes chaînes composables et boucles d'agents. Utilisez-le quand you need [RAG](/docs/rag), [agents](/docs/agents) with tools, or multi-step [prompt](/docs/llms/prompt-engineering) workflows with minimal glue code.
+Il complète [LlamaIndex](/docs/tools/llamaindex) (which emphasizes les données et l'indexation); LangChain emphasizes chaînes composables et boucles d'agents. Utilisez-le quand you need [RAG](/docs/rag), [agents](/docs/agents) with tools, or multi-step [prompt](/docs/prompt-engineering) workflows with minimal glue code.
 
 ## Comment ça fonctionne
 
-On **compose** des composants : LLM (OpenAI, Anthropic, local, etc.), [prompts](/docs/llms/prompt-engineering), récupérateurs ([vector stores](/docs/rag/vector-databases), [embeddings](/docs/rag/embeddings)), and tools (APIs, search, code). **Chains** wire them in sequence (par ex. prompt → LLM → parser). **Agents** add a loop: LLM decides which tool to call, you execute it and append the result, repeat until the LLM returns a final answer. LangSmith provides tracing and evaluation. Integrations cover many [vector databases](/docs/rag/vector-databases), document loaders, and tool APIs. Start with a template (par ex. RAG, agent) and swap or add components as needed.
+On **compose** des composants : LLM (OpenAI, Anthropic, local, etc.), [prompts](/docs/prompt-engineering), récupérateurs ([vector stores](/docs/rag/vector-databases), [embeddings](/docs/rag/embeddings)), and tools (APIs, search, code). **Chains** wire them in sequence (par ex. prompt → LLM → parser). **Agents** add a loop: LLM decides which tool to call, you execute it and append the result, repeat until the LLM returns a final answer. LangSmith provides tracing and evaluation. Integrations cover many [vector databases](/docs/rag/vector-databases), document loaders, and tool APIs. Start with a template (par ex. RAG, agent) and swap or add components as needed.
 
 ## Cas d'utilisation
 

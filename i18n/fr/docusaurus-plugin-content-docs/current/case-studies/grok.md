@@ -14,7 +14,7 @@ Comme [ChatGPT](/docs/case-studies/chatgpt) et [Claude](/docs/case-studies/claud
 
 ## Comment ça fonctionne
 
-Un **modèle de base** ([transformer](/docs/transformers) décodeur seul) est pré-entraîné sur du texte à grande échelle (et optionnellement d'autres données). **L'ajustement d'instructions** and **alignment** (par ex. preference optimization) shape helpfulness and safety. **Real-time or live knowledge** is provided by retrieving and conditioning on fresh content (par ex. from X) so answers can reflect recent events. The product exposes Grok via chat and API; [prompt engineering](/docs/llms/prompt-engineering) and tool use extend it for [agents](/docs/agents) and custom workflows.
+Un **modèle de base** ([transformer](/docs/transformers) décodeur seul) est pré-entraîné sur du texte à grande échelle (et optionnellement d'autres données). **L'ajustement d'instructions** and **alignment** (par ex. preference optimization) shape helpfulness and safety. **Real-time or live knowledge** is provided by retrieving and conditioning on fresh content (par ex. from X) so answers can reflect recent events. The product exposes Grok via chat and API; [prompt engineering](/docs/prompt-engineering) and tool use extend it for [agents](/docs/agents) and custom workflows.
 
 ## Cas d'utilisation
 
@@ -33,4 +33,4 @@ Grok fits use cases where up-to-date information and raisonnement matter more th
 
 - [LLMs](/docs/llms)
 - [RAG](/docs/rag)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

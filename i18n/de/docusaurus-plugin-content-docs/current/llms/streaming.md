@@ -10,7 +10,7 @@ keywords: [streaming, token streaming, SSE, chat UX]
 
 Streaming bedeutet die Rückgabe von [LLM](/docs/llms) Ausgabe **Token für Token** (oder Stück für Stück) bei der Generierung, anstatt auf die vollständige Antwort zu warten. Benutzer sehen Text inkrementell erscheinen, was die **wahrgenommene Latenz** senkt und Chat- und Assistenz- [use cases](/docs/llms).
 
-Es ist supported by most LLM APIs (OpenAI, Anthropic, Gemini, open-source servers like vLLM) via Server-Sent Events (SSE) or similar protocols. The same [prompt engineering](/docs/llms/prompt-engineering) and [RAG](/docs/rag) or [agents](/docs/agents) patterns apply; only the response delivery is incremental.
+Es ist supported by most LLM APIs (OpenAI, Anthropic, Gemini, open-source servers like vLLM) via Server-Sent Events (SSE) or similar protocols. The same [prompt engineering](/docs/prompt-engineering) and [RAG](/docs/rag) or [agents](/docs/agents) patterns apply; only the response delivery is incremental.
 
 ## Funktionsweise
 
@@ -44,5 +44,5 @@ Streaming ist der Standard für chat and any interactive use where users expect 
 ## Siehe auch
 
 - [LLMs](/docs/llms)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)
 - [Local inference](/docs/local-inference)

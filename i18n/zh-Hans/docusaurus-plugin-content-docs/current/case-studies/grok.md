@@ -14,7 +14,7 @@ Like [ChatGPT](/docs/case-studies/chatgpt) and [Claude](/docs/case-studies/claud
 
 ## 工作原理
 
-一个**基础模型**（仅解码器 [transformer](/docs/transformers)）在大规模文本（和可选的其他数据）上预训练。**指令调优** and **alignment** (例如 preference optimization) shape helpfulness and safety. **Real-time or live knowledge** is provided by retrieving and conditioning on fresh content (例如 from X) so answers can reflect recent events. The product exposes Grok via chat and API; [prompt engineering](/docs/llms/prompt-engineering) and tool use extend it for [agents](/docs/agents) and custom workflows.
+一个**基础模型**（仅解码器 [transformer](/docs/transformers)）在大规模文本（和可选的其他数据）上预训练。**指令调优** and **alignment** (例如 preference optimization) shape helpfulness and safety. **Real-time or live knowledge** is provided by retrieving and conditioning on fresh content (例如 from X) so answers can reflect recent events. The product exposes Grok via chat and API; [prompt engineering](/docs/prompt-engineering) and tool use extend it for [agents](/docs/agents) and custom workflows.
 
 ## 应用场景
 
@@ -33,4 +33,4 @@ Grok fits use cases where up-to-date information and 推理 matter more than a s
 
 - [LLMs](/docs/llms)
 - [RAG](/docs/rag)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

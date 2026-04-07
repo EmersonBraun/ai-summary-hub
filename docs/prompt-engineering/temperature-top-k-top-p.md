@@ -1,0 +1,156 @@
+---
+title: Temperature, Top-K, Top-P
+description: How temperature, Top-K, and Top-P sampling parameters control randomness and creativity in LLM outputs.
+keywords: [temperature, top-k, top-p, nucleus sampling, sampling parameters, LLM configuration, randomness, creativity]
+tags: [beginner]
+authors: [EmersonBraun]
+---
+
+# Temperature, Top-K, Top-P
+
+## Definition
+
+Temperature, Top-K, and Top-P are sampling parameters that control how an LLM selects the next token during text generation. After the model computes a probability distribution over its entire vocabulary (via softmax over logits), these parameters shape which tokens are candidates for selection and how likely each candidate is to be chosen. Together they govern the trade-off between determinism and diversity: low values make the model predictable and focused, high values make it creative and varied.
+
+**Temperature** rescales the raw logits before the softmax step, effectively flattening or sharpening the probability distribution. A temperature of 1.0 leaves the distribution unchanged. Values below 1.0 make the distribution more peaked — the model almost always picks the highest-probability token. Values above 1.0 flatten the distribution — more tokens become plausible candidates, producing more surprising and varied outputs. At temperature 0, generation becomes deterministic (argmax decoding).
+
+**Top-K** and **Top-P** are truncation strategies applied after temperature scaling. Top-K keeps only the K most probable tokens and redistributes probability mass among them, discarding all others. Top-P (also called nucleus sampling) dynamically selects the smallest set of tokens whose cumulative probability mass reaches a threshold P, then samples from that set. Top-P is generally preferred over Top-K because the size of the candidate set adapts to the shape of the distribution: when the model is confident, the nucleus is small; when the model is uncertain, the nucleus expands to include more alternatives.
+
+## How it works
+
+```mermaid
+flowchart LR
+  L[Raw logits] -->|"divide by temperature T"| TS[Temperature-scaled logits]
+  TS -->|softmax| SM[Full probability distribution]
+  SM -->|"keep top-K tokens"| TK[Top-K filtered distribution]
+  TK -->|"keep tokens until cumulative p ≥ P"| TP[Top-P nucleus]
+  TP -->|"sample one token"| TOK[Next token]
+```
+
+The parameters are applied sequentially: temperature scaling first, then Top-K truncation, then Top-P nucleus selection, then sampling. In practice, most APIs apply only temperature + Top-P (the OpenAI default) or temperature + Top-K (the Anthropic default); applying both Top-K and Top-P together is possible but unusual.
+
+### Temperature
+
+Temperature `T` divides each raw logit `z_i` before the softmax: `p_i = softmax(z / T)`. When `T < 1`, the logit differences are amplified — the highest-probability token gets an even larger share of the probability mass. When `T > 1`, logit differences shrink — probability mass spreads out more evenly. Common presets: `T = 0` for deterministic extraction tasks, `T = 0.2–0.4` for factual Q&A, `T = 0.7–1.0` for creative writing, `T > 1.0` for maximum diversity (though quality degrades at extreme values).
+
+### Top-K
+
+Top-K sampling restricts the candidate pool to the K tokens with the highest probability after temperature scaling. All tokens outside the top K are assigned probability zero before renormalization. The key limitation is that K is fixed regardless of how the distribution looks: when the model is very confident, even K=50 might include many near-zero-probability tokens that introduce noise; when the model is uncertain, a small K might cut off reasonable alternatives. Anthropic's API exposes `top_k` as a direct parameter; OpenAI's API does not support it natively.
+
+### Top-P (nucleus sampling)
+
+Top-P sampling builds the candidate set dynamically. Starting from the most probable token and working downward, tokens are added to the nucleus until their cumulative probability reaches the threshold P. Only tokens in the nucleus are considered for sampling. With `P = 0.9`, the model samples from whichever tokens together account for 90% of the probability mass. Because the nucleus contracts when the model is confident (a few tokens dominate) and expands when it is uncertain (probability mass is spread thin), Top-P naturally adapts to the model's internal state. Top-P is supported by both OpenAI (`top_p`) and Anthropic (`top_p`) APIs.
+
+## When to use / When NOT to use
+
+| Scenario | Recommended settings | Avoid |
+|----------|----------------------|-------|
+| Factual Q&A, data extraction, classification | `temperature=0–0.2`, `top_p=1.0` for near-deterministic output | High temperature; introduces hallucinations and format errors |
+| Creative writing, brainstorming, ideation | `temperature=0.8–1.0`, `top_p=0.95` for diverse, novel outputs | Temperature=0; produces repetitive, predictable text |
+| Code generation | `temperature=0.2–0.4`, `top_p=0.95`; some variation helps avoid local optima | Temperature > 0.8; syntax errors and logic drift increase |
+| Self-consistency (multiple reasoning paths) | `temperature=0.6–1.0`; diversity is intentional | Temperature=0; all paths would be identical, defeating the purpose |
+| Structured output extraction (JSON, tables) | `temperature=0`, `top_p=1.0` for strict schema adherence | Top-P < 0.9 combined with high temperature; schema violations spike |
+| Dialogue / chatbots | `temperature=0.5–0.7`, `top_p=0.9`; balances coherence with naturalness | Extreme temperature in either direction; too robotic or too incoherent |
+
+## Code examples
+
+### OpenAI — temperature and Top-P
+
+```python
+# OpenAI API call with temperature and top_p
+# pip install openai
+
+import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+
+def generate(prompt: str, temperature: float = 0.7, top_p: float = 0.95) -> str:
+    """Generate text with configurable sampling parameters."""
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=temperature,
+        top_p=top_p,
+        max_tokens=512,
+    )
+    return response.choices[0].message.content
+
+
+if __name__ == "__main__":
+    # Deterministic factual extraction
+    factual = generate(
+        "List the three primary colors.",
+        temperature=0.0,
+        top_p=1.0,
+    )
+    print("Factual:", factual)
+
+    # Creative brainstorming
+    creative = generate(
+        "Suggest five unusual names for a café that serves only breakfast.",
+        temperature=0.9,
+        top_p=0.95,
+    )
+    print("Creative:", creative)
+```
+
+### Anthropic — temperature and Top-K
+
+```python
+# Anthropic API call with temperature and top_k
+# pip install anthropic
+
+import os
+import anthropic
+
+client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+
+
+def generate(prompt: str, temperature: float = 0.7, top_k: int = 50) -> str:
+    """Generate text with configurable temperature and top-k sampling."""
+    message = client.messages.create(
+        model="claude-opus-4-5",
+        max_tokens=512,
+        temperature=temperature,
+        top_k=top_k,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return message.content[0].text
+
+
+if __name__ == "__main__":
+    # Near-deterministic output for structured tasks
+    deterministic = generate(
+        "Translate 'hello world' into French, German, and Japanese.",
+        temperature=0.0,
+        top_k=1,
+    )
+    print("Deterministic:", deterministic)
+
+    # Creative output with broader candidate pool
+    creative = generate(
+        "Write the opening sentence of a science fiction novel set on Europa.",
+        temperature=1.0,
+        top_k=250,
+    )
+    print("Creative:", creative)
+```
+
+## Practical resources
+
+- [OpenAI — API reference: temperature and top_p](https://platform.openai.com/docs/api-reference/chat/create) — Official parameter documentation with valid ranges and defaults
+- [Anthropic — API reference: temperature, top_k, top_p](https://docs.anthropic.com/en/api/messages) — Anthropic's parameter reference including top_k (not available in OpenAI)
+- [The Nucleus Sampling paper (Holtzman et al., 2020)](https://arxiv.org/abs/1904.09751) — Original paper introducing Top-P / nucleus sampling with motivation and empirical results
+- [Hugging Face — Text generation strategies](https://huggingface.co/docs/transformers/generation_strategies) — Comprehensive guide to sampling strategies including greedy, beam search, temperature, Top-K, and Top-P
+- [Lilian Weng — Controllable text generation](https://lilianweng.github.io/posts/2021-01-02-controllable-text-generation/) — Deep-dive blog post covering sampling methods in the context of controllable generation
+
+## See also
+
+- [Prompt engineering](/docs/prompt-engineering)
+- [Max tokens and stop sequences](/docs/prompt-engineering/max-tokens-stop-sequences)
+- [Structured outputs](/docs/prompt-engineering/structured-outputs)
+- [Self-consistency](/docs/prompt-engineering/self-consistency)
+- [Chain-of-thought](/docs/reasoning-patterns/cot)
+- [LLMs](/docs/llms)

@@ -12,7 +12,7 @@ authors: [EmersonBraun]
 
 Reasoning patterns are structured ways to elicit or organize model reasoning: chain-of-thought (step-by-step), tree-of-thoughts (explore branches), ReAct (reason + act), and RDD (retrieval-decision-design), among others. Using a clear pattern improves **reliability** (more consistent reasoning) and **debuggability** (you can inspect steps or actions).
 
-They are used in [prompt engineering](/docs/llms/prompt-engineering) (e.g. CoT) and inside [agents](/docs/agents) (e.g. ReAct, RDD). Choosing a pattern depends on the task: CoT for math/reasoning, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
+They are used in [prompt engineering](/docs/prompt-engineering) (e.g. CoT) and inside [agents](/docs/agents) (e.g. ReAct, RDD). Choosing a pattern depends on the task: CoT for math/reasoning, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
 
 ## How it works
 

@@ -24,7 +24,7 @@ flowchart LR
   More --> Answer[Answer]
 ```
 
-You give the model a **question** (or task) and ask it to reason step by step. The model produces **Step1**, **Step2**, … (intermediate reasoning) and then the **answer**. **Zero-shot CoT**: add “Let’s think step by step” (or similar) to the prompt. **Few-shot CoT**: include example (question, steps, answer) triples so the model mimics the format. The model generates the sequence in one pass; you can optionally parse the steps and verify or score them. Quality depends on [prompt engineering](/docs/llms/prompt-engineering) and model capability.
+You give the model a **question** (or task) and ask it to reason step by step. The model produces **Step1**, **Step2**, … (intermediate reasoning) and then the **answer**. **Zero-shot CoT**: add “Let’s think step by step” (or similar) to the prompt. **Few-shot CoT**: include example (question, steps, answer) triples so the model mimics the format. The model generates the sequence in one pass; you can optionally parse the steps and verify or score them. Quality depends on [prompt engineering](/docs/prompt-engineering) and model capability.
 
 ## Use cases
 
@@ -34,6 +34,16 @@ Chain-of-thought is most useful when the task benefits from explicit intermediat
 - Logic puzzles and multi-step deduction
 - Code or design reasoning where showing steps aids debugging
 
+## Comparisons
+
+| Criteria | CoT | Self-consistency | Step-back prompting |
+|----------|-----|-----------------|---------------------|
+| Core idea | Single reasoning chain | Multiple CoT paths + majority vote | Abstract question first, then answer |
+| Reliability | Moderate — one path may err | High — voting filters errors | High — abstraction reduces confusion |
+| Cost (API calls) | 1 call | N calls (typically 5–20) | 2 calls |
+| Best for | Math, logic, multi-step tasks | Tasks with verifiable answers | Knowledge-heavy, complex questions |
+| Composability | Standalone or as building block | Builds on CoT | Builds on CoT |
+
 ## External documentation
 
 - [Chain-of-Thought Prompting (Wei et al.)](https://arxiv.org/abs/2201.11903) — CoT paper
@@ -42,4 +52,6 @@ Chain-of-thought is most useful when the task benefits from explicit intermediat
 ## See also
 
 - [Tree of thoughts](/docs/reasoning-patterns/tot)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)
+- [Self-consistency](/docs/prompt-engineering/self-consistency)
+- [Step-back prompting](/docs/prompt-engineering/step-back-prompting)

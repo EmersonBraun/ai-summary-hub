@@ -10,7 +10,7 @@ keywords: [vibe codificación, AI-assisted codificación, iterative development]
 
 Vibe codificación es un estilo de desarrollo de software donde trabajas **iterativamente con asistencia de IA**: se describe la intención en lenguaje natural, get code or edits from an [LLM](/docs/llms) or codificación tool, then refine by feedback and context rather than writing every line from scratch. The “vibe” is the loose, exploratory flow—you steer by intent and feel, and the model fills in implementation details.
 
-It contrasts with fully spec-first or plan-then-code approaches (por ej. [spec-driven development](/docs/spec-driven-development)): you often start with a rough idea and let [prompt engineering](/docs/llms/prompt-engineering), [agents](/docs/agents), and tools (por ej. [Cursor](/docs/tools/cursor), [Claude Code](/docs/tools/claude-code)) suggest and edit code. Useful for prototypes, scripting, and tasks where speed and iteration matter more than upfront diseño.
+It contrasts with fully spec-first or plan-then-code approaches (por ej. [spec-driven development](/docs/spec-driven-development)): you often start with a rough idea and let [prompt engineering](/docs/prompt-engineering), [agents](/docs/agents), and tools (por ej. [Cursor](/docs/tools/cursor), [Claude Code](/docs/tools/claude-code)) suggest and edit code. Useful for prototypes, scripting, and tasks where speed and iteration matter more than upfront diseño.
 
 ## Cómo funciona
 
@@ -52,4 +52,4 @@ Vibe codificación encaja cuando quieres avanzar rápido con asistencia de IA y 
 - [Spec-driven development](/docs/spec-driven-development) — More structured, spec-first approach
 - [Agents](/docs/agents) — AI that can write and edit code
 - [Cursor](/docs/tools/cursor) — IDE built for AI-assisted codificación
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

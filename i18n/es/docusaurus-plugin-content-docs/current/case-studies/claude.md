@@ -10,7 +10,7 @@ keywords: [Claude, Anthropic, constitutional AI, long context]
 
 Claude is Anthropic’s familia de modelos conversacionales [LLMs](/docs/llms). Los modelos están construidos para seguimiento de instrucciones, contexto largo y seguridad, using techniques such as constitutional AI and RLHF-style alignment.
 
-They share the same broad stack as [ChatGPT](/docs/case-studies/chatgpt): pretrained base, ajuste de instrucciones, and preference-alineamiento basado en. Claude emphasizes long-context windows, [prompt engineering](/docs/llms/prompt-engineering)-friendly behavior, and safety constraints. Use case: chat, long-document analysis, codificación, and [agent](/docs/agents)-style workflows via API and products like [Claude Code](/docs/tools/claude-code).
+They share the same broad stack as [ChatGPT](/docs/case-studies/chatgpt): pretrained base, ajuste de instrucciones, and preference-alineamiento basado en. Claude emphasizes long-context windows, [prompt engineering](/docs/prompt-engineering)-friendly behavior, and safety constraints. Use case: chat, long-document analysis, codificación, and [agent](/docs/agents)-style workflows via API and products like [Claude Code](/docs/tools/claude-code).
 
 ## Cómo funciona
 
@@ -32,5 +32,5 @@ Claude fits applications that need long context, careful instruction-following, 
 ## Ver también
 
 - [LLMs](/docs/llms)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)
 - [Claude Code](/docs/tools/claude-code)

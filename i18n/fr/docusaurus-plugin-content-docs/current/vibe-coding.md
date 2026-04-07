@@ -10,7 +10,7 @@ keywords: [vibe coding, AI-assisted coding, iterative development]
 
 Vibe coding est un style de développement logiciel où l'on travaille **de manière itérative avec l'assistance de l'IA**: on décrit son intention en langage naturel, get code or edits from an [LLM](/docs/llms) or coding tool, then refine by feedback and context rather than writing every line from scratch. The “vibe” is the loose, exploratory flow—you steer by intent and feel, and the model fills in implementation details.
 
-It contrasts with fully spec-first or plan-then-code approaches (par ex. [spec-driven development](/docs/spec-driven-development)): you often start with a rough idea and let [prompt engineering](/docs/llms/prompt-engineering), [agents](/docs/agents), and tools (par ex. [Cursor](/docs/tools/cursor), [Claude Code](/docs/tools/claude-code)) suggest and edit code. Useful for prototypes, scripting, and tasks where speed and iteration matter more than upfront conception.
+It contrasts with fully spec-first or plan-then-code approaches (par ex. [spec-driven development](/docs/spec-driven-development)): you often start with a rough idea and let [prompt engineering](/docs/prompt-engineering), [agents](/docs/agents), and tools (par ex. [Cursor](/docs/tools/cursor), [Claude Code](/docs/tools/claude-code)) suggest and edit code. Useful for prototypes, scripting, and tasks where speed and iteration matter more than upfront conception.
 
 ## Comment ça fonctionne
 
@@ -52,4 +52,4 @@ Vibe coding convient quand on veut avancer vite avec l'IA et qu'on accepte d'it�
 - [Spec-driven development](/docs/spec-driven-development) — More structured, spec-first approach
 - [Agents](/docs/agents) — AI that can write and edit code
 - [Cursor](/docs/tools/cursor) — IDE built for AI-assisted coding
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

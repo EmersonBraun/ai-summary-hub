@@ -22,7 +22,7 @@ flowchart LR
   More --> Answer[Answer]
 ```
 
-你给模型一个**问题**（或任务），让它逐步推理。模型产生**步骤1**、**步骤2**、… (intermediate 推理) and then the **answer**. **Zero-shot CoT**: add “Let’s think 逐步” (or similar) to the prompt. **Few-shot CoT**: include example (question, steps, answer) triples so the model mimics the format. The model generates the sequence in one pass; you can optionally parse the steps and verify or score them. Quality depends on [prompt engineering](/docs/llms/prompt-engineering) and model capability.
+你给模型一个**问题**（或任务），让它逐步推理。模型产生**步骤1**、**步骤2**、… (intermediate 推理) and then the **answer**. **Zero-shot CoT**: add “Let’s think 逐步” (or similar) to the prompt. **Few-shot CoT**: include example (question, steps, answer) triples so the model mimics the format. The model generates the sequence in one pass; you can optionally parse the steps and verify or score them. Quality depends on [prompt engineering](/docs/prompt-engineering) and model capability.
 
 ## 应用场景
 
@@ -40,4 +40,4 @@ Chain-of-thought 在任务受益于明确的中间步骤时最有用 (数学、�
 ## 另请参阅
 
 - [Tree of thoughts](/docs/reasoning-patterns/tot)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

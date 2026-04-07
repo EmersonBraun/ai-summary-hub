@@ -10,7 +10,7 @@ keywords: [raisonnement, CoT, ReAct, ToT, RDD]
 
 Les patterns de raisonnement sont des moyens structurés pour susciter ou organiser le raisonnement du modèle: chain-of-thought (step-by-step), tree-of-thoughts (explore branches), ReAct (reason + act), and RDD (récupération-décision-conception), among others. Using a clear pattern improves **reliability** (more consistent raisonnement) and **debuggability** (you can inspect steps or actions).
 
-Ils sont used in [prompt engineering](/docs/llms/prompt-engineering) (par ex. CoT) and inside [agents](/docs/agents) (par ex. ReAct, RDD). Choosing a pattern depends on the task: CoT for math/raisonnement, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
+Ils sont used in [prompt engineering](/docs/prompt-engineering) (par ex. CoT) and inside [agents](/docs/agents) (par ex. ReAct, RDD). Choosing a pattern depends on the task: CoT for math/raisonnement, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
 
 ## Comment ça fonctionne
 

@@ -23,7 +23,7 @@ flowchart LR
   Decoder --> Output[Output]
 ```
 
-**Entradas multimodais** (texto, imagem, áudio, vídeo) são codificadas e fundidas em um [transformer](/docs/transformers) unificadotack. The **decoder** generates text (or structured output) conditioned on all modalities. **Scale tiers**: smaller models (por ex. Nano) for [edge](/docs/edge-reasoning) and on-device; larger (Pro, Ultra) for maximum capability in the cloud. **Integration**: same models power Gemini in Search, Workspace, and Vertex AI APIs. [Prompt engineering](/docs/llms/prompt-engineering) and [RAG](/docs/rag) or tools extend use in applications.
+**Entradas multimodais** (texto, imagem, áudio, vídeo) são codificadas e fundidas em um [transformer](/docs/transformers) unificadotack. The **decoder** generates text (or structured output) conditioned on all modalities. **Scale tiers**: smaller models (por ex. Nano) for [edge](/docs/edge-reasoning) and on-device; larger (Pro, Ultra) for maximum capability in the cloud. **Integration**: same models power Gemini in Search, Workspace, and Vertex AI APIs. [Prompt engineering](/docs/prompt-engineering) and [RAG](/docs/rag) or tools extend use in applications.
 
 ## Casos de uso
 

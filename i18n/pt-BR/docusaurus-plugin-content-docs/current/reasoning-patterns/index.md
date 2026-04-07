@@ -10,7 +10,7 @@ keywords: [raciocínio, CoT, ReAct, ToT, RDD]
 
 Padrões de raciocínio são formas estruturadas de provocar ou organizar o raciocínio do modelo: chain-of-thought (step-by-step), tree-of-thoughts (explore branches), ReAct (reason + act), and RDD (recuperação-decisão-projeto), among others. Using a clear pattern improves **reliability** (more consistent raciocínio) and **debuggability** (you can inspect steps or actions).
 
-Eles são used in [prompt engineering](/docs/llms/prompt-engineering) (por ex. CoT) and inside [agents](/docs/agents) (por ex. ReAct, RDD). Choosing a pattern depends on the task: CoT for math/raciocínio, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
+Eles são used in [prompt engineering](/docs/prompt-engineering) (por ex. CoT) and inside [agents](/docs/agents) (por ex. ReAct, RDD). Choosing a pattern depends on the task: CoT for math/raciocínio, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
 
 ## Como funciona
 
