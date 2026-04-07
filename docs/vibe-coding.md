@@ -3,6 +3,7 @@ title: Vibe coding
 description: Iterative, AI-assisted coding driven by intent and quick feedback.
 keywords: [vibe coding, AI-assisted coding, iterative development]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Vibe coding

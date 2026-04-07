@@ -3,6 +3,7 @@ title: Retrieval-decision-design (RDD)
 description: Spec-driven reasoning pattern combining retrieval and decision design.
 keywords: [RDD, retrieval-decision-design, spec-driven, reasoning]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Retrieval-decision-design (RDD)

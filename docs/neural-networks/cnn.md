@@ -3,6 +3,7 @@ title: Convolutional neural networks (CNN)
 description: CNNs for spatial and image data.
 keywords: [CNN, convolution, computer vision]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Convolutional neural networks (CNN)

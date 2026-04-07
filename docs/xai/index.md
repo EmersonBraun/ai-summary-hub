@@ -3,6 +3,7 @@ title: Explainable AI (XAI)
 description: Making AI decisions interpretable and explainable.
 keywords: [explainable AI, XAI, interpretability]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Explainable AI (XAI)

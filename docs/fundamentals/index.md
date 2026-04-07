@@ -3,6 +3,7 @@ title: AI fundamentals
 description: Core concepts in artificial intelligence and machine learning.
 keywords: [AI, fundamentals, basics]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # AI fundamentals

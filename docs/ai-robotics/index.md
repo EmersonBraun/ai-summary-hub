@@ -3,6 +3,7 @@ title: AI and robotics
 description: AI for perception, planning, and control in robotics.
 keywords: [robotics, control, perception, RL]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # AI and robotics

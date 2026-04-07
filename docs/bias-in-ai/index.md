@@ -3,6 +3,7 @@ title: Bias in AI
 description: Sources and mitigation of bias in ML systems.
 keywords: [bias, fairness, discrimination]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Bias in AI

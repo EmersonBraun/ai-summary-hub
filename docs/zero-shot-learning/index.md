@@ -3,6 +3,7 @@ title: Zero-shot learning
 description: Performing tasks without task-specific training examples.
 keywords: [zero-shot, generalization, prompts]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Zero-shot learning

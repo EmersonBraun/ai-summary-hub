@@ -3,6 +3,7 @@ title: Fine-tuning
 description: Adapting LLMs to specific tasks and domains.
 keywords: [fine-tuning, adaptation, LoRA, instruction tuning]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Fine-tuning

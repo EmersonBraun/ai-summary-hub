@@ -13,7 +13,11 @@
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
     "typecheck": "tsc",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx"
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "validate:frontmatter": "node scripts/validate-frontmatter.mjs",
+    "validate:links": "node scripts/validate-links.mjs",
+    "validate:markdown": "markdownlint-cli2",
+    "validate": "npm run validate:frontmatter && npm run validate:links && npm run validate:markdown"
   },
   "dependencies": {
     "@docusaurus/core": "3.9.2",
@@ -27,17 +31,27 @@
   },
   "devDependencies": {
     "@docusaurus/eslint-plugin": "3.9.2",
-    "@typescript-eslint/parser": "^7.0.0",
     "@docusaurus/module-type-aliases": "3.9.2",
     "@docusaurus/tsconfig": "3.9.2",
     "@docusaurus/types": "3.9.2",
     "@types/react": "^19.0.0",
     "eslint": "^10.2.0",
+    "glob": "^13.0.6",
+    "gray-matter": "^4.0.3",
+    "markdownlint-cli2": "^0.22.0",
     "typescript": "~5.6.2"
   },
   "browserslist": {
-    "production": [">0.5%", "not dead", "not op_mini all"],
-    "development": ["last 3 chrome version", "last 3 firefox version", "last 5 safari version"]
+    "production": [
+      ">0.5%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 3 chrome version",
+      "last 3 firefox version",
+      "last 5 safari version"
+    ]
   },
   "engines": {
     "node": ">=18.0"

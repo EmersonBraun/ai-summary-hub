@@ -3,6 +3,7 @@ title: Case study — BART
 description: Encoder-decoder predecessor to Gemini; denoising pretraining for summarization and generation.
 keywords: [BART, encoder-decoder, denoising, summarization]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Case study: BART

@@ -3,6 +3,7 @@ title: Variational autoencoders (VAEs)
 description: Probabilistic autoencoders for generation and representation.
 keywords: [VAE, variational, autoencoder, latent]
 tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Variational autoencoders (VAEs)

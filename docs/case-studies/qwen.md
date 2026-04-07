@@ -3,6 +3,7 @@ title: Case study — Qwen
 description: Alibaba's LLM family; multilingual, coding, and long-context support.
 keywords: [Qwen, Alibaba, multilingual, coding, long context]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Case study: Qwen

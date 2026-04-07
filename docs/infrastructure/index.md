@@ -3,6 +3,7 @@ title: Infrastructure
 description: "Hardware and systems for training and serving AI: GPUs, TPUs, clusters."
 keywords: [infrastructure, GPU, TPU, training]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Infrastructure

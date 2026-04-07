@@ -3,6 +3,7 @@ title: Chain-of-thought (CoT)
 description: Step-by-step reasoning to improve LLM outputs.
 keywords: [chain-of-thought, CoT, reasoning]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Chain-of-thought (CoT)

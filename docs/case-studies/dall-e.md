@@ -3,6 +3,7 @@ title: Case study — DALL·E
 description: Text-to-image generation with diffusion and language.
 keywords: [DALL-E, text-to-image, diffusion]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Case study: DALL·E

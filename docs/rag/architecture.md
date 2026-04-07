@@ -3,6 +3,7 @@ title: RAG architecture
 description: Components and design choices in RAG systems.
 keywords: [RAG, architecture, chunks, retrieval]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # RAG architecture

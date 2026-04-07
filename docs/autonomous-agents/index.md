@@ -3,6 +3,7 @@ title: Autonomous agents
 description: Agents that operate with minimal human intervention.
 keywords: [autonomous agents, long-horizon, self-directed]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Autonomous agents

@@ -3,6 +3,7 @@ title: Embeddings
 description: Dense vector representations for text and retrieval.
 keywords: [embeddings, vector, semantic similarity]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Embeddings

@@ -3,6 +3,7 @@ title: Deep learning
 description: Deep neural networks and representation learning.
 keywords: [deep learning, neural networks, representation learning]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Deep learning

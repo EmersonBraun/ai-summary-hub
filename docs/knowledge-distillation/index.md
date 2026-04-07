@@ -3,6 +3,7 @@ title: Knowledge distillation
 description: Training a small student model to mimic a large teacher.
 keywords: [knowledge distillation, distillation, student-teacher]
 tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Knowledge distillation

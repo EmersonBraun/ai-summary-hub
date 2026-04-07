@@ -3,6 +3,7 @@ title: Antigravity
 description: Agent-first IDE for autonomous execution and vibe coding.
 keywords: [Antigravity, agent-first IDE, autonomous coding]
 tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Antigravity

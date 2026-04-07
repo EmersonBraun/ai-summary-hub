@@ -3,6 +3,7 @@ title: Case study — DeepSeek
 description: DeepSeek AI's open-weight LLMs with strong reasoning and code; MoE and efficient scaling.
 keywords: [DeepSeek, open weights, reasoning, code, MoE]
 tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Case study: DeepSeek

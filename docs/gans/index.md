@@ -3,6 +3,7 @@ title: Generative adversarial networks (GANs)
 description: Adversarial training for generative models.
 keywords: [GAN, generative, discriminator, generator]
 tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Generative adversarial networks (GANs)
