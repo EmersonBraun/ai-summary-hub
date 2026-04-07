@@ -10,7 +10,7 @@ keywords: [fine-tuning, adaptation, LoRA, ajuste de instruções]
 
 O ajuste fino continua o treinamento de um modelo pré-treinado com dados específicos de tarefa ou domínio. Full fine-tuning updates all parameters; parameter-efficient methods (por ex. LoRA, adapters) update a small subset to reduce cost.
 
-Use quando you need stable, task-specific behavior or style (por ex. domain language, output format) and have enough labeled data. For frequently updated knowledge or one-off questions, [RAG](/docs/rag) or [prompt engineering](/docs/llms/prompt-engineering) are often better. See [LLMs](/docs/llms) for the full training pipeline.
+Use quando you need stable, task-specific behavior or style (por ex. domain language, output format) and have enough labeled data. For frequently updated knowledge or one-off questions, [RAG](/docs/rag) or [prompt engineering](/docs/prompt-engineering) are often better. See [LLMs](/docs/llms) for the full training pipeline.
 
 ## Como funciona
 
@@ -39,4 +39,4 @@ Fine-tuning is the right tool when you need a model to follow a specific style, 
 ## Veja também
 
 - [LLMs](/docs/llms)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

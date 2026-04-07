@@ -10,7 +10,7 @@ keywords: [fine-tuning, adaptation, LoRA, 指令调优]
 
 微调在任务特定或领域数据上继续训练预训练模型。 Full fine-tuning updates all parameters; parameter-efficient methods (例如 LoRA, adapters) update a small subset to reduce cost.
 
-当…时使用 you need stable, task-specific behavior or style (例如 domain language, output format) and have enough labeled data. For frequently updated knowledge or one-off questions, [RAG](/docs/rag) or [prompt engineering](/docs/llms/prompt-engineering) are often better. See [LLMs](/docs/llms) for the full training pipeline.
+当…时使用 you need stable, task-specific behavior or style (例如 domain language, output format) and have enough labeled data. For frequently updated knowledge or one-off questions, [RAG](/docs/rag) or [prompt engineering](/docs/prompt-engineering) are often better. See [LLMs](/docs/llms) for the full training pipeline.
 
 ## 工作原理
 
@@ -39,4 +39,4 @@ Fine-tuning is the right tool when you need a model to follow a specific style, 
 ## 另请参阅
 
 - [LLMs](/docs/llms)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

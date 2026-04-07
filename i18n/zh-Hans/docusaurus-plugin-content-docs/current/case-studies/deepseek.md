@@ -14,7 +14,7 @@ They illustrate the same core stack (pretraining, 指令调优, alignment) as [C
 
 ## 工作原理
 
-**Base models** 在...上预训练 large text and code corpora; **指令调优** and **preference optimization** (例如 DPO) align them for chat and tool use. **MoE** variants activate a subset of parameters per token to scale capacity without proportionally increasing compute. Weights are published in standard formats (例如 SafeTensors); teams run them with [quantization](/docs/quantization) on consumer GPUs or deploy via [local inference](/docs/local-inference) runtimes (vLLM, Ollama, etc.). [Prompt engineering](/docs/llms/prompt-engineering) and [fine-tuning](/docs/llms/fine-tuning) extend use for specific domains.
+**Base models** 在...上预训练 large text and code corpora; **指令调优** and **preference optimization** (例如 DPO) align them for chat and tool use. **MoE** variants activate a subset of parameters per token to scale capacity without proportionally increasing compute. Weights are published in standard formats (例如 SafeTensors); teams run them with [quantization](/docs/quantization) on consumer GPUs or deploy via [local inference](/docs/local-inference) runtimes (vLLM, Ollama, etc.). [Prompt engineering](/docs/prompt-engineering) and [fine-tuning](/docs/llms/fine-tuning) extend use for specific domains.
 
 ## 应用场景
 

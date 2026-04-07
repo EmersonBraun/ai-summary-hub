@@ -22,7 +22,7 @@ flowchart LR
   More --> Answer[Answer]
 ```
 
-Você dá ao modelo uma **pergunta** (ou tarefa) e pede para raciocinar passo a passo. O modelo produz **Passo1**, **Passo2**, … (intermediate raciocínio) and then the **answer**. **Zero-shot CoT**: add “Let’s think passo a passo” (or similar) to the prompt. **Few-shot CoT**: include example (question, steps, answer) triples so the model mimics the format. The model generates the sequence in one pass; you can optionally parse the steps and verify or score them. Quality depends on [prompt engineering](/docs/llms/prompt-engineering) and model capability.
+Você dá ao modelo uma **pergunta** (ou tarefa) e pede para raciocinar passo a passo. O modelo produz **Passo1**, **Passo2**, … (intermediate raciocínio) and then the **answer**. **Zero-shot CoT**: add “Let’s think passo a passo” (or similar) to the prompt. **Few-shot CoT**: include example (question, steps, answer) triples so the model mimics the format. The model generates the sequence in one pass; you can optionally parse the steps and verify or score them. Quality depends on [prompt engineering](/docs/prompt-engineering) and model capability.
 
 ## Casos de uso
 
@@ -40,4 +40,4 @@ Chain-of-thought é mais útil quando a tarefa se beneficia de etapas intermedi�
 ## Veja também
 
 - [Tree of thoughts](/docs/reasoning-patterns/tot)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

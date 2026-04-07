@@ -10,7 +10,7 @@ keywords: [NLP, language, text, transformers]
 
 NLP 涵盖文本上的任务：分类、NER、QA、摘要、翻译和生成。 Modern NLP is dominated by pretrained [transformers](/docs/transformers) (BERT, GPT, etc.) and [LLMs](/docs/llms).
 
-Inputs are discrete (tokens); models learn from large corpora and are then adapted via [fine-tuning](/docs/llms/fine-tuning) or [prompting](/docs/llms/prompt-engineering). [RAG](/docs/rag) and [agents](/docs/agents) add 检索 and tools on top of NLP models for grounded QA and task completion.
+Inputs are discrete (tokens); models learn from large corpora and are then adapted via [fine-tuning](/docs/llms/fine-tuning) or [prompting](/docs/prompt-engineering). [RAG](/docs/rag) and [agents](/docs/agents) add 检索 and tools on top of NLP models for grounded QA and task completion.
 
 ## 工作原理
 

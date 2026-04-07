@@ -10,7 +10,7 @@ keywords: [vibe coding, AI-assisted coding, iterative development]
 
 Vibe coding 是一种软件开发风格，通过 **AI 辅助进行迭代工作**: you describe intent in natural language, get code or edits from an [LLM](/docs/llms) or coding tool, then refine by feedback and context rather than writing every line from scratch. The “vibe” is the loose, exploratory flow—you steer by intent and feel, and the model fills in implementation details.
 
-It contrasts with fully spec-first or plan-then-code approaches (例如 [spec-driven development](/docs/spec-driven-development)): you often start with a rough idea and let [prompt engineering](/docs/llms/prompt-engineering), [agents](/docs/agents), and tools (例如 [Cursor](/docs/tools/cursor), [Claude Code](/docs/tools/claude-code)) suggest and edit code. Useful for prototypes, scripting, and tasks where speed and iteration matter more than upfront 设计.
+It contrasts with fully spec-first or plan-then-code approaches (例如 [spec-driven development](/docs/spec-driven-development)): you often start with a rough idea and let [prompt engineering](/docs/prompt-engineering), [agents](/docs/agents), and tools (例如 [Cursor](/docs/tools/cursor), [Claude Code](/docs/tools/claude-code)) suggest and edit code. Useful for prototypes, scripting, and tasks where speed and iteration matter more than upfront 设计.
 
 ## 工作原理
 
@@ -52,4 +52,4 @@ Vibe coding 适用于想要借助 AI 快速推进、愿意在循环中迭代而�
 - [Spec-driven development](/docs/spec-driven-development) — More structured, spec-first approach
 - [Agents](/docs/agents) — AI that can write and edit code
 - [Cursor](/docs/tools/cursor) — IDE built for AI-assisted coding
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

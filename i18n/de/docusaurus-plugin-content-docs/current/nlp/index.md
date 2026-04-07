@@ -10,7 +10,7 @@ keywords: [NLP, language, text, transformers]
 
 NLP umfasst Aufgaben an Text: Klassifikation, NER, QA, Zusammenfassung, Übersetzung und Generierung. Modern NLP is dominated by pretrained [transformers](/docs/transformers) (BERT, GPT, etc.) and [LLMs](/docs/llms).
 
-Inputs sind diskret (Token); Modelle lernen aus großen Korpora und werden dann angepasst über [Feinabstimmung](/docs/llms/fine-tuning) or [prompting](/docs/llms/prompt-engineering). [RAG](/docs/rag) and [agents](/docs/agents) add Abruf and tools on top of NLP models for grounded QA and task completion.
+Inputs sind diskret (Token); Modelle lernen aus großen Korpora und werden dann angepasst über [Feinabstimmung](/docs/llms/fine-tuning) or [prompting](/docs/prompt-engineering). [RAG](/docs/rag) and [agents](/docs/agents) add Abruf and tools on top of NLP models for grounded QA and task completion.
 
 ## Funktionsweise
 

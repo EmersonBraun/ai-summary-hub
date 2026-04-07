@@ -25,7 +25,7 @@ flowchart LR
   Decoder --> Output[Output]
 ```
 
-**Multimodal inputs** (text, image, audio, video) are encoded and fused in a unified [transformer](/docs/transformers) stack. The **decoder** generates text (or structured output) conditioned on all modalities. **Scale tiers**: smaller models (e.g. Nano) for [edge](/docs/edge-reasoning) and on-device; larger (Pro, Ultra) for maximum capability in the cloud. **Integration**: same models power Gemini in Search, Workspace, and Vertex AI APIs. [Prompt engineering](/docs/llms/prompt-engineering) and [RAG](/docs/rag) or tools extend use in applications.
+**Multimodal inputs** (text, image, audio, video) are encoded and fused in a unified [transformer](/docs/transformers) stack. The **decoder** generates text (or structured output) conditioned on all modalities. **Scale tiers**: smaller models (e.g. Nano) for [edge](/docs/edge-reasoning) and on-device; larger (Pro, Ultra) for maximum capability in the cloud. **Integration**: same models power Gemini in Search, Workspace, and Vertex AI APIs. [Prompt engineering](/docs/prompt-engineering) and [RAG](/docs/rag) or tools extend use in applications.
 
 ## Use cases
 

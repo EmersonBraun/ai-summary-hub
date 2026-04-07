@@ -14,7 +14,7 @@ Like [DeepSeek](/docs/case-studies/deepseek) and [Claude](/docs/case-studies/cla
 
 ## 工作原理
 
-**Base models** 在...上预训练 large multilingual and code corpora. **Instruction tuning** and **alignment** (例如 DPO, RLHF-style) produce chat and tool-use variants. **Specialized versions**: Qwen-Coder for code, Qwen-VL for vision-language. **Long context** is supported via extended context windows and optional [RAG](/docs/rag). Weights are published for [local inference](/docs/local-inference) and [fine-tuning](/docs/llms/fine-tuning); API access is also offered. [Prompt engineering](/docs/llms/prompt-engineering) and [agents](/docs/agents) extend the system for applications.
+**Base models** 在...上预训练 large multilingual and code corpora. **Instruction tuning** and **alignment** (例如 DPO, RLHF-style) produce chat and tool-use variants. **Specialized versions**: Qwen-Coder for code, Qwen-VL for vision-language. **Long context** is supported via extended context windows and optional [RAG](/docs/rag). Weights are published for [local inference](/docs/local-inference) and [fine-tuning](/docs/llms/fine-tuning); API access is also offered. [Prompt engineering](/docs/prompt-engineering) and [agents](/docs/agents) extend the system for applications.
 
 ## 应用场景
 

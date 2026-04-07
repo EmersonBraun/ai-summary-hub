@@ -23,7 +23,7 @@ flowchart LR
   Generate --> Validate[Validate]
 ```
 
-You **write specs** (natural language, schemas, or structured rules) and index them for récupération (par ex. in a vector store or structured repo). At runtime, the **task** (and optionally the current state) is used to **retrieve** relevant spec fragments. The model or agent **decides** (par ex. next step, allowed actions) and **generates** (output, tool call) with the spec in context. **Validate** checks the output against the spec (par ex. schema, rules); if validation fails, you can retry or surface an error. This keeps generation and décisions aligned with the spec without baking everything into [prompt engineering](/docs/llms/prompt-engineering) or [fine-tuning](/docs/llms/fine-tuning).
+You **write specs** (natural language, schemas, or structured rules) and index them for récupération (par ex. in a vector store or structured repo). At runtime, the **task** (and optionally the current state) is used to **retrieve** relevant spec fragments. The model or agent **decides** (par ex. next step, allowed actions) and **generates** (output, tool call) with the spec in context. **Validate** checks the output against the spec (par ex. schema, rules); if validation fails, you can retry or surface an error. This keeps generation and décisions aligned with the spec without baking everything into [prompt engineering](/docs/prompt-engineering) or [fine-tuning](/docs/llms/fine-tuning).
 
 ## Cas d'utilisation
 
@@ -42,4 +42,4 @@ Spec-driven development fits when behavior must stay aligned with retrievable re
 
 - [RDD](/docs/reasoning-patterns/rdd)
 - [Agents](/docs/agents)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

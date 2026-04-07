@@ -21,7 +21,7 @@ flowchart LR
   DecoderLayers --> NextToken["Next token"]
 ```
 
-**Token** 被嵌入并送入**因果解码器层**：每个位置只能关注自身和之前的位置（掩码自注意力），因此模型无法"看到"未来。**下一个 token** 从最后一个位置的表示中预测（通常使用线性层和词汇表上的 softmax）。**训练**最大化给定前面上下文时下一个 token 的概率（teacher forcing）。**推理**自回归生成：采样或贪婪选择下一个 token，追加并重复直到停止条件。[提示工程](/docs/llms/prompt-engineering)和[微调](/docs/llms/fine-tuning)塑造模型如何使用这一机制完成任务。
+**Token** 被嵌入并送入**因果解码器层**：每个位置只能关注自身和之前的位置（掩码自注意力），因此模型无法"看到"未来。**下一个 token** 从最后一个位置的表示中预测（通常使用线性层和词汇表上的 softmax）。**训练**最大化给定前面上下文时下一个 token 的概率（teacher forcing）。**推理**自回归生成：采样或贪婪选择下一个 token，追加并重复直到停止条件。[提示工程](/docs/prompt-engineering)和[微调](/docs/llms/fine-tuning)塑造模型如何使用这一机制完成任务。
 
 ## 应用场景
 
@@ -40,4 +40,4 @@ flowchart LR
 
 - [Transformer](/docs/transformers)
 - [LLM](/docs/llms)
-- [提示工程](/docs/llms/prompt-engineering)
+- [提示工程](/docs/prompt-engineering)

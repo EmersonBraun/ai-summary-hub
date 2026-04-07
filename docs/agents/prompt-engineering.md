@@ -321,6 +321,6 @@ if __name__ == "__main__":
 ## See also
 
 - [Agents](/docs/agents)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)
 - [Agent tools and actions](/docs/agents/tools-actions)
 - [Anthropic tool use](/docs/agents/anthropic-tool-use)

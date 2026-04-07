@@ -10,11 +10,11 @@ keywords: [ChatGPT, OpenAI, conversational AI]
 
 ChatGPT is a 对话式模型家族 [LLMs](/docs/llms) 来自 OpenAI. 它们是 trained with supervised [fine-tuning](/docs/llms/fine-tuning) and reinforcement learning from human feedback (RLHF) to follow instructions and converse safely.
 
-它们展示了完整的 [LLM](/docs/llms) stack: pretrained base model, 指令调优, and [RL](/docs/rl)-based alignment (RLHF). The same ideas (指令调优, preference optimization) appear in open and other proprietary models. Use case: chat, [prompt](/docs/llms/prompt-engineering)-driven tasks, and [agent](/docs/agents)-like workflows with tools.
+它们展示了完整的 [LLM](/docs/llms) stack: pretrained base model, 指令调优, and [RL](/docs/rl)-based alignment (RLHF). The same ideas (指令调优, preference optimization) appear in open and other proprietary models. Use case: chat, [prompt](/docs/prompt-engineering)-driven tasks, and [agent](/docs/agents)-like workflows with tools.
 
 ## 工作原理
 
-Start from a **base model** (例如 GPT-4): a [decoder-only](/docs/transformers/gpt) [transformer](/docs/transformers) 预训练于 下一个 token 预测. **Instruction tuning**: fine-tune on (instruction, response) pairs so the model follows user intent. **RLHF**: train a **reward model** on human preference data (which of two responses is better); then optimize the **policy** (the LLM) with [reinforcement learning](/docs/rl) (例如 PPO) to maximize the reward. 结果是一个 model that is helpful, follows instructions, and is less likely to produce harmful or off-policy content. **Safety and guardrails** (content filters, refusals, monitoring) are applied in the product. [Prompt engineering](/docs/llms/prompt-engineering) and [RAG](/docs/rag) or [agents](/docs/agents) extend the system for specific use cases.
+Start from a **base model** (例如 GPT-4): a [decoder-only](/docs/transformers/gpt) [transformer](/docs/transformers) 预训练于 下一个 token 预测. **Instruction tuning**: fine-tune on (instruction, response) pairs so the model follows user intent. **RLHF**: train a **reward model** on human preference data (which of two responses is better); then optimize the **policy** (the LLM) with [reinforcement learning](/docs/rl) (例如 PPO) to maximize the reward. 结果是一个 model that is helpful, follows instructions, and is less likely to produce harmful or off-policy content. **Safety and guardrails** (content filters, refusals, monitoring) are applied in the product. [Prompt engineering](/docs/prompt-engineering) and [RAG](/docs/rag) or [agents](/docs/agents) extend the system for specific use cases.
 
 ## 应用场景
 
@@ -33,6 +33,6 @@ ChatGPT-style systems fit chat, writing, code help, and task automation that ben
 
 - [LLMs](/docs/llms)
 - [Reinforcement learning](/docs/rl)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)
 - [Claude](/docs/case-studies/claude) — Comparable conversational LLM
 - [Gemini](/docs/case-studies/gemini) — Multimodal LLM family

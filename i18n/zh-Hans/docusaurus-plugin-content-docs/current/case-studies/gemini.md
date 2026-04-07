@@ -23,7 +23,7 @@ flowchart LR
   Decoder --> Output[Output]
 ```
 
-**多模态输入**（文本、图像、音频、视频）在统一的 [transformer](/docs/transformers) 中编码和融合tack. The **decoder** generates text (or structured output) conditioned on all modalities. **Scale tiers**: smaller models (例如 Nano) for [edge](/docs/edge-reasoning) and on-device; larger (Pro, Ultra) for maximum capability in the cloud. **Integration**: same models power Gemini in Search, Workspace, and Vertex AI APIs. [Prompt engineering](/docs/llms/prompt-engineering) and [RAG](/docs/rag) or tools extend use in applications.
+**多模态输入**（文本、图像、音频、视频）在统一的 [transformer](/docs/transformers) 中编码和融合tack. The **decoder** generates text (or structured output) conditioned on all modalities. **Scale tiers**: smaller models (例如 Nano) for [edge](/docs/edge-reasoning) and on-device; larger (Pro, Ultra) for maximum capability in the cloud. **Integration**: same models power Gemini in Search, Workspace, and Vertex AI APIs. [Prompt engineering](/docs/prompt-engineering) and [RAG](/docs/rag) or tools extend use in applications.
 
 ## 应用场景
 

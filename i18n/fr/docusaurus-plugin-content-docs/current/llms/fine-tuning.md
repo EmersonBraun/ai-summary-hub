@@ -10,7 +10,7 @@ keywords: [fine-tuning, adaptation, LoRA, ajustement d'instructions]
 
 L'affinage poursuit l'entraînement d'un modèle pré-entraîné sur des données spécifiques à une tâche ou un domaine. Full fine-tuning updates all parameters; parameter-efficient methods (par ex. LoRA, adapters) update a small subset to reduce cost.
 
-Utilisez-le quand you need stable, task-specific behavior or style (par ex. domain language, output format) and have enough labeled data. For frequently updated knowledge or one-off questions, [RAG](/docs/rag) or [prompt engineering](/docs/llms/prompt-engineering) are often better. See [LLMs](/docs/llms) for the full training pipeline.
+Utilisez-le quand you need stable, task-specific behavior or style (par ex. domain language, output format) and have enough labeled data. For frequently updated knowledge or one-off questions, [RAG](/docs/rag) or [prompt engineering](/docs/prompt-engineering) are often better. See [LLMs](/docs/llms) for the full training pipeline.
 
 ## Comment ça fonctionne
 
@@ -39,4 +39,4 @@ Fine-tuning is the right tool when you need a model to follow a specific style, 
 ## Voir aussi
 
 - [LLMs](/docs/llms)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

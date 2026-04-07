@@ -10,7 +10,7 @@ keywords: [razonamiento, CoT, ReAct, ToT, RDD]
 
 Los patrones de razonamiento son formas estructuradas de provocar u organizar el razonamiento del modelo: chain-of-thought (step-by-step), tree-of-thoughts (explore branches), ReAct (reason + act), and RDD (recuperación-decisión-diseño), among others. Using a clear pattern improves **reliability** (more consistent razonamiento) and **debuggability** (you can inspect steps or actions).
 
-Son used in [prompt engineering](/docs/llms/prompt-engineering) (por ej. CoT) and inside [agents](/docs/agents) (por ej. ReAct, RDD). Choosing a pattern depends on the task: CoT for math/razonamiento, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
+Son used in [prompt engineering](/docs/prompt-engineering) (por ej. CoT) and inside [agents](/docs/agents) (por ej. ReAct, RDD). Choosing a pattern depends on the task: CoT for math/razonamiento, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
 
 ## Cómo funciona
 

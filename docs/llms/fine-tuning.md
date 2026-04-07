@@ -12,7 +12,7 @@ authors: [EmersonBraun]
 
 Fine-tuning continues training a pretrained model on task-specific or domain data. Full fine-tuning updates all parameters; parameter-efficient methods (e.g. LoRA, adapters) update a small subset to reduce cost.
 
-Use it when you need stable, task-specific behavior or style (e.g. domain language, output format) and have enough labeled data. For frequently updated knowledge or one-off questions, [RAG](/docs/rag) or [prompt engineering](/docs/llms/prompt-engineering) are often better. See [LLMs](/docs/llms) for the full training pipeline.
+Use it when you need stable, task-specific behavior or style (e.g. domain language, output format) and have enough labeled data. For frequently updated knowledge or one-off questions, [RAG](/docs/rag) or [prompt engineering](/docs/prompt-engineering) are often better. See [LLMs](/docs/llms) for the full training pipeline.
 
 ## How it works
 
@@ -41,4 +41,4 @@ Fine-tuning is the right tool when you need a model to follow a specific style, 
 ## See also
 
 - [LLMs](/docs/llms)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

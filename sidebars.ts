@@ -32,8 +32,25 @@ const sidebars: SidebarsConfig = {
       items: [
         'llms/index',
         'llms/fine-tuning',
-        'llms/prompt-engineering',
         'llms/streaming',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Prompt Engineering',
+      collapsed: true,
+      items: [
+        'prompt-engineering/index',
+        'prompt-engineering/temperature-top-k-top-p',
+        'prompt-engineering/max-tokens-stop-sequences',
+        'prompt-engineering/structured-outputs',
+        'prompt-engineering/system-role-contextual-prompting',
+        'prompt-engineering/self-consistency',
+        'prompt-engineering/step-back-prompting',
+        'prompt-engineering/automatic-prompt-engineering',
+        'prompt-engineering/debiasing-techniques',
+        'prompt-engineering/prompt-ensembling',
+        'prompt-engineering/self-evaluation-calibration',
       ],
     },
     {

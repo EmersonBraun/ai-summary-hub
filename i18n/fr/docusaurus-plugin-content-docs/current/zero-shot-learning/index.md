@@ -14,7 +14,7 @@ No [fine-tuning](/docs/llms/fine-tuning) or [few-shot](/docs/few-shot-learning) 
 
 ## Comment ça fonctionne
 
-The **task** is described in natural language (par ex. [prompt](/docs/llms/prompt-engineering): “Classify the sentiment as positive or negative”) or via a shared representation (par ex. attribute vectors, text embeddings). **Input** (par ex. a sentence or image) is fed to the **model** along with the task description. The **model** produces an **output** (par ex. label, summary) using only what it learned at pretraining—no gradient updates on the target task. For CLIP: image and text are embedded in a shared space; zero-shot classification is done by comparing the image embedding to class name embeddings. For LLMs: the prompt states the task and format; the model completes accordingly.
+The **task** is described in natural language (par ex. [prompt](/docs/prompt-engineering): “Classify the sentiment as positive or negative”) or via a shared representation (par ex. attribute vectors, text embeddings). **Input** (par ex. a sentence or image) is fed to the **model** along with the task description. The **model** produces an **output** (par ex. label, summary) using only what it learned at pretraining—no gradient updates on the target task. For CLIP: image and text are embedded in a shared space; zero-shot classification is done by comparing the image embedding to class name embeddings. For LLMs: the prompt states the task and format; the model completes accordingly.
 
 ## Cas d'utilisation
 
@@ -32,5 +32,5 @@ Zero-shot learning fits when you want to run a task with no target-task training
 ## Voir aussi
 
 - [Few-shot learning](/docs/few-shot-learning)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)
 - [LLMs](/docs/llms)

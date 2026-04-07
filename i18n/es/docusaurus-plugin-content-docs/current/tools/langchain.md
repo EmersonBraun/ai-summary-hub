@@ -10,11 +10,11 @@ keywords: [LangChain, chains, agents, RAG]
 
 LangChain es un framework for building [LLM](/docs/llms) applications: chains, [agents](/docs/agents), tools, and [RAG](/docs/rag) pipelines. It abstracts providers, prompts, and recuperación for quick prototyping and production.
 
-Complementa [LlamaIndex](/docs/tools/llamaindex) (que enfatiza datos e indexación); LangChain enfatiza cadenas componibles y bucles de agentes. Úselo cuando you need [RAG](/docs/rag), [agents](/docs/agents) with tools, or multi-step [prompt](/docs/llms/prompt-engineering) workflows with minimal glue code.
+Complementa [LlamaIndex](/docs/tools/llamaindex) (que enfatiza datos e indexación); LangChain enfatiza cadenas componibles y bucles de agentes. Úselo cuando you need [RAG](/docs/rag), [agents](/docs/agents) with tools, or multi-step [prompt](/docs/prompt-engineering) workflows with minimal glue code.
 
 ## Cómo funciona
 
-Se **componen** componentes: LLM (OpenAI, Anthropic, local, etc.), [prompts](/docs/llms/prompt-engineering), recuperadores ([vector stores](/docs/rag/vector-databases), [embeddings](/docs/rag/embeddings)), and tools (APIs, search, code). **Chains** wire them in sequence (por ej. prompt → LLM → parser). **Agents** add a loop: LLM decides which tool to call, you execute it and append the result, repeat until the LLM returns a final answer. LangSmith provides tracing and evaluation. Integrations cover many [vector databases](/docs/rag/vector-databases), document loaders, and tool APIs. Start with a template (por ej. RAG, agent) and swap or add components as needed.
+Se **componen** componentes: LLM (OpenAI, Anthropic, local, etc.), [prompts](/docs/prompt-engineering), recuperadores ([vector stores](/docs/rag/vector-databases), [embeddings](/docs/rag/embeddings)), and tools (APIs, search, code). **Chains** wire them in sequence (por ej. prompt → LLM → parser). **Agents** add a loop: LLM decides which tool to call, you execute it and append the result, repeat until the LLM returns a final answer. LangSmith provides tracing and evaluation. Integrations cover many [vector databases](/docs/rag/vector-databases), document loaders, and tool APIs. Start with a template (por ej. RAG, agent) and swap or add components as needed.
 
 ## Casos de uso
 

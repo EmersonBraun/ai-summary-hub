@@ -10,7 +10,7 @@ keywords: [推理, CoT, ReAct, ToT, RDD]
 
 推理模式是引出或组织模型推理的结构化方法: chain-of-thought (step-by-step), tree-of-thoughts (explore branches), ReAct (reason + act), and RDD (检索-决策-设计), among others. Using a clear pattern improves **reliability** (more consistent 推理) and **debuggability** (you can inspect steps or actions).
 
-它们是 used in [prompt engineering](/docs/llms/prompt-engineering) (例如 CoT) and inside [agents](/docs/agents) (例如 ReAct, RDD). Choosing a pattern depends on the task: CoT for math/推理, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
+它们是 used in [prompt engineering](/docs/prompt-engineering) (例如 CoT) and inside [agents](/docs/agents) (例如 ReAct, RDD). Choosing a pattern depends on the task: CoT for math/推理, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
 
 ## 工作原理
 

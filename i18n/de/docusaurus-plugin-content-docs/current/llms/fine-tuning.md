@@ -10,7 +10,7 @@ keywords: [Feinabstimmung, adaptation, LoRA, Instruktions-Tuning]
 
 Feinabstimmung setzt das Training eines vortrainierten Modells mit aufgaben- oder domänenspezifischen Daten fort. Full Feinabstimmung updates all parameters; parameter-efficient methods (z. B. LoRA, adapters) update a small subset to reduce cost.
 
-Verwenden Sie es, wenn Sie brauchen stable, task-specific behavior or style (z. B. domain language, output format) and have enough labeled data. For frequently updated knowledge or one-off questions, [RAG](/docs/rag) or [prompt engineering](/docs/llms/prompt-engineering) werden oft better. See [LLMs](/docs/llms) for die vollständige training pipeline.
+Verwenden Sie es, wenn Sie brauchen stable, task-specific behavior or style (z. B. domain language, output format) and have enough labeled data. For frequently updated knowledge or one-off questions, [RAG](/docs/rag) or [prompt engineering](/docs/prompt-engineering) werden oft better. See [LLMs](/docs/llms) for die vollständige training pipeline.
 
 ## Funktionsweise
 
@@ -39,4 +39,4 @@ Fine-tuning is das richtige tool wenn Sie need a model to follow a specific styl
 ## Siehe auch
 
 - [LLMs](/docs/llms)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

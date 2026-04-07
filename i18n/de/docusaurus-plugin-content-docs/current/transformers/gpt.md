@@ -21,7 +21,7 @@ flowchart LR
   DecoderLayers --> NextToken["Next token"]
 ```
 
-**Tokens** werden eingebettet und in **kausale Decoder-Schichten** eingespeist: jede Position kann nur sich selbst und vorherige Positionen beachten (maskierte Self-Attention), sodass das Modell die Zukunft nicht „sehen" kann. Das **nächste Token** wird aus der Repräsentation der letzten Position vorhergesagt (oft mit einer linearen Schicht und Softmax über das Vokabular). **Training** maximiert die Wahrscheinlichkeit des nächsten Tokens bei gegebenem vorherigem Kontext (Teacher Forcing). **Inferenz** generiert autoregressiv: das nächste Token wird gesampelt oder gierig gewählt, angehängt und wiederholt bis zu einer Stoppbedingung. [Prompt Engineering](/docs/llms/prompt-engineering) und [Feinabstimmung](/docs/llms/fine-tuning) formen, wie das Modell diesen Mechanismus für Aufgaben nutzt.
+**Tokens** werden eingebettet und in **kausale Decoder-Schichten** eingespeist: jede Position kann nur sich selbst und vorherige Positionen beachten (maskierte Self-Attention), sodass das Modell die Zukunft nicht „sehen" kann. Das **nächste Token** wird aus der Repräsentation der letzten Position vorhergesagt (oft mit einer linearen Schicht und Softmax über das Vokabular). **Training** maximiert die Wahrscheinlichkeit des nächsten Tokens bei gegebenem vorherigem Kontext (Teacher Forcing). **Inferenz** generiert autoregressiv: das nächste Token wird gesampelt oder gierig gewählt, angehängt und wiederholt bis zu einer Stoppbedingung. [Prompt Engineering](/docs/prompt-engineering) und [Feinabstimmung](/docs/llms/fine-tuning) formen, wie das Modell diesen Mechanismus für Aufgaben nutzt.
 
 ## Anwendungsfälle
 
@@ -40,4 +40,4 @@ Nur-Decoder-Modelle sind das Rückgrat von Chat, Code und jeder Aufgabe, die von
 
 - [Transformer](/docs/transformers)
 - [LLMs](/docs/llms)
-- [Prompt Engineering](/docs/llms/prompt-engineering)
+- [Prompt Engineering](/docs/prompt-engineering)

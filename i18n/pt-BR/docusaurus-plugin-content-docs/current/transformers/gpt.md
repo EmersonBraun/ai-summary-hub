@@ -21,7 +21,7 @@ flowchart LR
   DecoderLayers --> NextToken["Next token"]
 ```
 
-Os **tokens** são embutidos e alimentados em **camadas causais de decoder**: cada posição só pode atender a si mesma e posições anteriores (auto-atenção mascarada), então o modelo não pode "ver" o futuro. O **próximo token** é previsto a partir da representação da última posição (geralmente com uma camada linear e softmax sobre o vocabulário). O **treinamento** maximiza a probabilidade do próximo token dado o contexto anterior (teacher forcing). A **inferência** gera autorregressivamente: amostrar ou escolher avidamente o próximo token, adicioná-lo e repetir até uma condição de parada. [Prompt engineering](/docs/llms/prompt-engineering) e [ajuste fino](/docs/llms/fine-tuning) moldam como o modelo usa esse mecanismo para tarefas.
+Os **tokens** são embutidos e alimentados em **camadas causais de decoder**: cada posição só pode atender a si mesma e posições anteriores (auto-atenção mascarada), então o modelo não pode "ver" o futuro. O **próximo token** é previsto a partir da representação da última posição (geralmente com uma camada linear e softmax sobre o vocabulário). O **treinamento** maximiza a probabilidade do próximo token dado o contexto anterior (teacher forcing). A **inferência** gera autorregressivamente: amostrar ou escolher avidamente o próximo token, adicioná-lo e repetir até uma condição de parada. [Prompt engineering](/docs/prompt-engineering) e [ajuste fino](/docs/llms/fine-tuning) moldam como o modelo usa esse mecanismo para tarefas.
 
 ## Casos de uso
 
@@ -40,4 +40,4 @@ Modelos somente-decoder são a base do chat, código e qualquer tarefa que se be
 
 - [Transformers](/docs/transformers)
 - [LLMs](/docs/llms)
-- [Prompt engineering](/docs/llms/prompt-engineering)
+- [Prompt engineering](/docs/prompt-engineering)

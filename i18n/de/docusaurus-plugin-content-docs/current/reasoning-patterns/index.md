@@ -10,7 +10,7 @@ keywords: [Schlussfolgern, CoT, ReAct, ToT, RDD]
 
 Reasoning-Muster sind strukturierte Wege, um Modell-Reasoning zu entlocken oder zu organisieren: chain-of-thought (schrittweise), tree-of-thoughts (explore branches), ReAct (reason + act), and RDD (Abruf-Entscheidung-Entwurf), among others. Using a clear pattern improves **reliability** (more consistent Schlussfolgern) and **debuggability** (you can inspect steps or actions).
 
-Sie sind used in [prompt engineering](/docs/llms/prompt-engineering) (z. B. CoT) and inside [agents](/docs/agents) (z. B. ReAct, RDD). Choosing a pattern depends auf dem task: CoT for math/Schlussfolgern, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
+Sie sind used in [prompt engineering](/docs/prompt-engineering) (z. B. CoT) and inside [agents](/docs/agents) (z. B. ReAct, RDD). Choosing a pattern depends auf dem task: CoT for math/Schlussfolgern, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
 
 ## Funktionsweise
 
