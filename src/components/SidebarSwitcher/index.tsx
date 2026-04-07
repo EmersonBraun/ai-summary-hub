@@ -1,5 +1,4 @@
 import React, {useState, useCallback} from 'react';
-import {useLocation} from '@docusaurus/router';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import {
   learningPaths,
@@ -39,10 +38,8 @@ export default function SidebarSwitcher({
 }: SidebarSwitcherProps): React.ReactElement {
   const [isExpanded, setIsExpanded] = useState(false);
   const activeSidebar = currentSidebarId || CATEGORY_SIDEBAR_ID;
-  const location = useLocation();
   const baseUrl = useBaseUrl('/');
 
-  const isCategory = activeSidebar === CATEGORY_SIDEBAR_ID;
   const activePath = learningPaths.find((p) => p.sidebarId === activeSidebar);
 
   /** Resolve a docs path with the site's baseUrl */
@@ -53,11 +50,6 @@ export default function SidebarSwitcher({
     },
     [baseUrl],
   );
-
-  const handleSelectCategory = useCallback(() => {
-    storeSidebar(CATEGORY_SIDEBAR_ID);
-    window.location.href = location.pathname;
-  }, [location.pathname]);
 
   const handleSelectPath = useCallback(
     (path: LearningPath) => {
