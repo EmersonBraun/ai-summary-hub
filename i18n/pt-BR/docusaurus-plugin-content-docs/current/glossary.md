@@ -1,22 +1,23 @@
 ---
-title: Glossário
-description: Glossário de termos de IA e ML usados na wiki.
+title: Glossary
+description: Glossary of AI and ML terms used across the wiki.
 keywords: [glossary, definitions, terms]
+authors: [EmersonBraun]
 ---
 
 # Glossário
 
-A quick reference for key terms used in AI Summary Hub.
+Uma referência rápida para termos-chave utilizados no AI Summary Hub.
 
-| Term | Definition |
-|------|------------|
-| **RAG** | Retrieval-augmented generation — combining recuperação with LLM generation. |
-| **LLM** | Large language model. |
-| **Transformer** | Architecture based on self-attention (por ex. BERT, GPT). |
-| **Agent** | System that perceives and acts toward goals. |
-| **Subagent** | Agent within a hierarchical agent system. |
-| **RDD** | Retrieval-decisão-projeto — spec-driven raciocínio pattern. |
-| **CoT** | Chain-of-thought — step-by-step raciocínio. |
-| **ReAct** | Reasoning + acting in interleaved steps. |
+| Termo | Definição |
+|-------|-----------|
+| **RAG** | Geração aumentada por recuperação — combina recuperação com geração por LLM. |
+| **LLM** | Modelo de linguagem de grande porte. |
+| **Transformer** | Arquitetura baseada em auto-atenção (p. ex. BERT, GPT). |
+| **Agent** | Sistema que percebe e age em direção a objetivos. |
+| **Subagent** | Agente dentro de um sistema hierárquico de agentes. |
+| **RDD** | Recuperação-Decisão-Design — padrão de raciocínio guiado por especificações. |
+| **CoT** | Chain-of-thought — raciocínio passo a passo. |
+| **ReAct** | Raciocínio + ação em etapas intercaladas. |
 
-_More terms will be added as topics are expanded. See individual topic docs for detailed definitions._
+_Mais termos serão adicionados conforme os tópicos forem expandidos. Consulte os documentos individuais de cada tópico para definições detalhadas._

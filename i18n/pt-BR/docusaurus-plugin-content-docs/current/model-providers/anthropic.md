@@ -1,24 +1,26 @@
 ---
 title: Anthropic
-description: Anthropic como plataforma para desenvolvedores — família de modelos Claude, Messages API, uso de ferramentas, extended thinking, prompt caching e contexto longo.
-keywords: [Anthropic, Claude, Claude Opus, Claude Sonnet, Claude Haiku, uso de ferramentas, extended thinking, prompt caching, contexto longo, API, SDK]
+description: Anthropic as a developer platform — Claude model family, Messages API, tool use, extended thinking, prompt caching, and long context.
+keywords: [Anthropic, Claude, Claude Opus, Claude Sonnet, Claude Haiku, tool use, extended thinking, prompt caching, long context, API, SDK]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Anthropic
 
 ## Definição
 
-**Anthropic** é uma empresa de segurança em IA e provedora de modelos fundada em 2021 por ex-pesquisadores da OpenAI. Sua tese central é que construir modelos de IA capazes e resolver o problema de alinhamento são objetivos inseparáveis — a empresa persegue capacidade de ponta junto com pesquisas de segurança como IA Constitucional, interpretabilidade e compreensão mecanicista dos internos dos modelos. O produto comercial dessa pesquisa é a família de modelos **Claude**, disponível por meio da API da Anthropic e produtos empresariais.
+**Anthropic** é uma empresa de segurança em IA e provedora de modelos fundada em 2021 por ex-pesquisadores da OpenAI. Sua tese central é que construir modelos de IA capazes e resolver o problema de alinhamento são objetivos inseparáveis — a empresa persegue capacidades de ponta junto com pesquisas de segurança como Constitutional AI, interpretabilidade e compreensão mecanística dos internos do modelo. O produto comercial dessa pesquisa é a família de modelos **Claude**, disponível por meio da API da Anthropic e produtos empresariais.
 
-A linha de modelos Claude segue uma convenção de nomenclatura em três níveis refletindo trade-offs entre capacidade e custo: **Opus** (maior qualidade, raciocínio complexo), **Sonnet** (qualidade e velocidade equilibradas) e **Haiku** (mais rápido e com melhor custo-benefício). Em 2025, a geração atual é o **Claude 3.7 Sonnet** — o modelo principal com capacidades de extended thinking — junto com **Claude 3 Opus**, **Claude 3.5 Sonnet** e **Claude 3.5 Haiku**. Todos os modelos Claude 3+ suportam entrada visual (imagens), e toda a família é projetada em torno de uma janela de contexto de 200K tokens, capaz de processar livros, grandes bases de código e longos históricos de conversas sem truncamento.
+A linha de modelos Claude segue uma convenção de nomenclatura de três níveis que reflete os compromissos entre capacidade e custo: **Opus** (maior qualidade, raciocínio complexo), **Sonnet** (qualidade e velocidade equilibradas) e **Haiku** (mais rápido e econômico). A partir de 2025, a geração atual é o **Claude 3.7 Sonnet** — o modelo carro-chefe com capacidades de pensamento estendido — juntamente com **Claude 3 Opus**, **Claude 3.5 Sonnet** e **Claude 3.5 Haiku**. Todos os modelos Claude 3+ suportam entrada de imagens, e toda a família é projetada em torno de uma janela de contexto de 200K tokens que pode processar livros, grandes bases de código e longos históricos de conversação sem truncamento.
 
-Da perspectiva de plataforma, a API da Anthropic é centrada na **Messages API** — uma interface limpa e específica para conversas multiturno. A plataforma inclui uso de ferramentas (termo da Anthropic para chamadas de função), extended thinking (raciocínio em cadeia visível), prompt caching (reduz custo e latência para grandes contextos repetidos) e processamento em lote. O SDK Python (`anthropic`) e o SDK TypeScript são as principais bibliotecas clientes. Os modelos Claude também estão disponíveis pelo Amazon Bedrock, Google Cloud Vertex AI e contratos empresariais com opções de residência de dados.
+De uma perspectiva de plataforma, a API da Anthropic é centrada na **Messages API** — uma interface limpa e de propósito específico para conversas de múltiplos turnos. A plataforma inclui uso de ferramentas (o termo da Anthropic para chamadas de função), pensamento estendido (raciocínio de cadeia de pensamento visível), cache de prompts (reduz custos e latência para contextos repetidos grandes) e processamento em lote. O SDK Python (`anthropic`) e o SDK TypeScript são as principais bibliotecas cliente. Os modelos Claude também estão disponíveis por meio do Amazon Bedrock, Google Cloud Vertex AI e contratos empresariais com opções de residência de dados.
 
 ## Como funciona
 
 ### Messages API
 
-A Messages API (`POST /v1/messages`) é a interface principal da Anthropic. Diferentemente de algumas APIs que usam uma string `prompt` simples, a Messages API é conversation-first: você envia um array `messages` de turnos alternados de `user` e `assistant`, com um parâmetro opcional `system` para contexto e persona. O modelo retorna um objeto `Message` contendo uma lista `content` — blocos de texto por padrão, blocos de uso de ferramentas quando o modelo decide chamar uma ferramenta. O streaming é suportado e recomendado para uso interativo; o SDK oferece tanto helpers de streaming quanto acesso SSE bruto.
+A Messages API (`POST /v1/messages`) é a interface principal da Anthropic. Ao contrário de algumas APIs que usam uma string `prompt` plana, a Messages API é orientada a conversação: você envia um array `messages` de turnos alternados `user` e `assistant`, com um parâmetro `system` opcional para contexto e persona. O modelo retorna um objeto `Message` contendo uma lista `content` — blocos de texto por padrão, blocos de uso de ferramentas quando o modelo decide chamar uma ferramenta. Streaming é suportado e recomendado para uso interativo; o SDK fornece tanto auxiliares de streaming quanto acesso SSE bruto.
 
 ```mermaid
 flowchart LR
@@ -36,7 +38,7 @@ flowchart LR
 
 ### Uso de ferramentas
 
-O uso de ferramentas permite que o Claude chame funções externas emitindo blocos de conteúdo `tool_use` estruturados. Você declara ferramentas como schemas JSON no parâmetro `tools`. Quando o Claude decide que uma ferramenta é necessária, a resposta contém um bloco `tool_use` com o nome da ferramenta e a entrada; seu código executa a função e retorna um `tool_result` no próximo turno do usuário. O Claude então usa o resultado para completar sua resposta. Esse padrão habilita agentes, ambientes de execução de código, consultas a bancos de dados e integrações de API sem que o modelo precise ter acesso direto a nenhum sistema.
+O uso de ferramentas permite ao Claude chamar funções externas emitindo blocos de conteúdo `tool_use` estruturados. Você declara ferramentas como esquemas JSON no parâmetro `tools`. Quando o Claude decide que uma ferramenta é necessária, a resposta contém um bloco `tool_use` com o nome da ferramenta e a entrada; seu código executa a função e retorna um `tool_result` no próximo turno de usuário. O Claude então usa o resultado para completar sua resposta. Esse padrão habilita agentes, ambientes de execução de código, consultas de banco de dados e integrações de API sem que o modelo precise de acesso direto a qualquer sistema.
 
 ```mermaid
 flowchart LR
@@ -48,17 +50,17 @@ flowchart LR
   Claude -->|final text response| UserMsg
 ```
 
-### Extended thinking
+### Pensamento estendido
 
-Extended thinking é um modo disponível no Claude 3.7 Sonnet que permite ao modelo raciocinar extensivamente antes de produzir sua resposta final. Quando você define `thinking: {type: "enabled", budget_tokens: N}`, o modelo emite blocos de conteúdo `thinking` contendo seu rascunho interno — semelhante a chain-of-thought, mas nativo e estruturado. O extended thinking melhora significativamente o desempenho em competições de matemática, código complexo, raciocínio em múltiplas etapas e tarefas que exigem análise cuidadosa passo a passo. Os tokens de pensamento contam para o orçamento de tokens, mas ficam visíveis na resposta, dando transparência sobre como o modelo chegou à sua resposta.
+O pensamento estendido é um modo disponível no Claude 3.7 Sonnet que permite ao modelo raciocinar extensamente antes de produzir sua resposta final. Quando você define `thinking: {type: "enabled", budget_tokens: N}`, o modelo emite blocos de conteúdo `thinking` contendo seu rascunho interno — similar à cadeia de pensamento, mas nativo e estruturado. O pensamento estendido melhora significativamente o desempenho em competições de matemática, código complexo, raciocínio de múltiplos passos e tarefas que requerem análise cuidadosa passo a passo. Os tokens de pensamento contam para o orçamento de tokens, mas são visíveis na resposta, dando transparência sobre como o modelo chegou à sua resposta.
 
-### Prompt caching
+### Cache de prompts
 
-O prompt caching reduz dramaticamente o custo e a latência para cargas de trabalho que usam repetidamente grandes prompts de sistema ou contextos de documentos. Você marca seções de prefixo da sua requisição com `cache_control: {type: "ephemeral"}`. Na primeira chamada, a Anthropic armazena em cache o prefixo do prompt em sua infraestrutura; chamadas subsequentes que correspondam ao prefixo são servidas do cache com 90% de desconto no custo de tokens de entrada e tempo significativamente reduzido até o primeiro token. Isso é especialmente valioso para pipelines de RAG (grande contexto passado com cada consulta), loops de agentes (grandes prompts de sistema repetidos a cada turno) e processamento em lote de documentos.
+O cache de prompts reduz drasticamente o custo e a latência para cargas de trabalho que usam repetidamente grandes prompts de sistema ou contextos de documentos. Você marca seções de prefixo de sua requisição com `cache_control: {type: "ephemeral"}`. Na primeira chamada, a Anthropic armazena em cache o prefixo do prompt em sua infraestrutura; chamadas subsequentes que correspondem ao prefixo são servidas do cache com 90% menos custo de tokens de entrada e tempo até o primeiro token significativamente reduzido. Isso é especialmente valioso para pipelines de RAG (contexto grande passado com cada consulta), loops de agentes (grandes prompts de sistema repetidos a cada turno) e processamento em lote de documentos.
 
 ### Contexto longo (200K tokens)
 
-Todos os modelos Claude 3 e posteriores suportam uma janela de contexto de 200K tokens — equivalente a aproximadamente 150.000 palavras ou ~500 páginas de texto. O contexto longo permite que bases de código inteiras, documentos legais, artigos de pesquisa ou históricos completos de conversas sejam processados em uma única chamada sem chunking. As pesquisas da Anthropic sobre desempenho em contexto longo (avaliações "needle in a haystack") mostram que o Claude mantém forte precisão de recuperação em todo o intervalo de 200K, tornando-o confiável para Q&A de documentos, análise de contratos e revisão de código em grandes repositórios. Este é um dos diferenciais mais claros da Anthropic em relação à janela de 128K do GPT-4o.
+Todos os modelos Claude 3 e posteriores suportam uma janela de contexto de 200K tokens — equivalente a aproximadamente 150.000 palavras ou ~500 páginas de texto. O contexto longo permite que bases de código inteiras, documentos legais, artigos de pesquisa ou históricos completos de conversação sejam processados em uma única chamada sem fragmentação. A pesquisa da Anthropic sobre desempenho em contexto longo (avaliações de "agulha no palheiro") mostra que o Claude mantém forte precisão de recuperação em toda a faixa de 200K, tornando-o confiável para perguntas e respostas sobre documentos, análise de contratos e revisão de código em grandes repositórios. Este é um dos diferenciadores mais claros da Anthropic em relação à janela de 128K do GPT-4o.
 
 ```mermaid
 flowchart LR
@@ -71,40 +73,40 @@ flowchart LR
 
 ## Quando usar / Quando NÃO usar
 
-| Use a Anthropic quando | Evite ou considere alternativas quando |
-|--------------------|--------------------------------------|
-| Você precisa de uma janela de contexto de 200K para processar documentos longos, bases de código ou conversas extensas sem chunking | Sua carga de trabalho exige geração de imagens, transcrição de áudio ou texto-para-fala — o Claude é apenas texto/visão; a OpenAI cobre áudio |
-| Restrições de segurança e comportamento de recusa previsível são críticos (conformidade, saúde, finanças) | Você precisa de modelos de pesos abertos para auto-hospedagem, fine-tuning ou residência de dados — a Anthropic não oferece opção de pesos abertos |
-| Você quer extended thinking para tarefas de raciocínio profundo (matemática, código complexo, análise em múltiplas etapas) | Seu caso de uso principal é geração de embeddings em alto volume — a Anthropic não oferece API de embeddings |
-| O prompt caching vai reduzir significativamente os custos (grandes contextos repetidos, prompts de sistema de agentes) | Você depende muito de ferramentas específicas da OpenAI (Assistants API, DALL-E, Whisper) que não têm equivalente na Anthropic |
-| Você está construindo fluxos de trabalho de uso de ferramentas ou uso de computador e quer um modelo bem calibrado para saídas estruturadas | Você precisa do custo-por-token absolutamente mais baixo em escala — Claude Haiku compete em preço, mas GPT-4o-mini e modelos abertos são mais baratos |
+| Usar Anthropic quando | Evitar ou considerar alternativas quando |
+|-----------------------|------------------------------------------|
+| Você precisa de uma janela de contexto de 200K para processar documentos longos, bases de código ou conversas estendidas sem fragmentação | Sua carga de trabalho requer geração de imagens, transcrição de áudio ou texto para fala — Claude é somente texto/visão; OpenAI cobre áudio |
+| Restrições de segurança e comportamento de rejeição previsível são críticos (conformidade, saúde, finanças) | Você precisa de modelos de pesos abertos para auto-hospedagem, ajuste fino ou residência de dados — Anthropic não oferece opção de pesos abertos |
+| Você quer pensamento estendido para tarefas de raciocínio profundo (matemática, código complexo, análise de múltiplos passos) | Seu caso de uso principal é a geração de embeddings em alto volume — Anthropic não oferece uma API de embeddings |
+| O cache de prompts reduzirá significativamente os custos (contextos repetidos grandes, prompts de sistema de agentes) | Você depende fortemente de ferramentas específicas da OpenAI (Assistants API, DALL-E, Whisper) que não têm equivalente na Anthropic |
+| Você está construindo fluxos de trabalho de uso de ferramentas ou uso de computador e quer um modelo bem calibrado para saídas estruturadas | Você precisa do menor custo absoluto por token em escala — Claude Haiku compete em preço, mas GPT-4o-mini e modelos abertos são mais baratos |
 
 ## Comparações
 
 | Critério | Anthropic | OpenAI | Google Gemini |
 |----------|-----------|--------|---------------|
-| Modelo principal | Claude 3.7 Sonnet | GPT-4o | Gemini 2.5 Pro |
+| Modelo carro-chefe | Claude 3.7 Sonnet | GPT-4o | Gemini 2.5 Pro |
 | Janela de contexto | 200K (todos Claude 3+) | 128K (GPT-4o) | Até 1M (Gemini 1.5 Pro) |
-| Raciocínio / thinking | Extended thinking (CoT nativo) | Série o1, o3 | Gemini 2.5 Pro thinking |
+| Raciocínio / pensamento | Pensamento estendido (CoT nativo) | Série o1, o3 | Pensamento Gemini 2.5 Pro |
 | Entrada multimodal | Texto, imagem | Texto, imagem, áudio, vídeo | Texto, imagem, áudio, vídeo |
 | Áudio / fala | Não | Sim (Whisper, TTS) | Sim (Gemini) |
-| Geração de imagem | Não | Sim (DALL-E 3) | Sim (Imagen) |
+| Geração de imagens | Não | Sim (DALL-E 3) | Sim (Imagen) |
 | API de embeddings | Não | Sim | Sim |
 | Pesos abertos | Não | Não | Gemma (parcial) |
-| Prompt caching | Sim (nativo, 90% de desconto) | Cache de contexto (limitado) | Sim (Gemini) |
-| Uso de ferramentas / function calling | Maduro, suporte a computer use | Maduro, amplamente adotado | Maduro |
-| Filosofia de segurança | IA Constitucional, calibração de recusas | API de moderação, política de uso | Diretrizes de IA responsável |
+| Cache de prompts | Sim (nativo, 90% de desconto) | Cache de contexto (limitado) | Sim (Gemini) |
+| Uso de ferramentas / chamada de função | Maduro, suporte a computer use | Maduro, amplamente adotado | Maduro |
+| Filosofia de segurança | Constitutional AI, ajustado para rejeições | API de moderação, política de uso | Diretrizes de IA responsável |
 | Opções de residência de dados | Contrato empresarial | Contrato empresarial | Regiões do Google Cloud |
 
 ## Prós e contras
 
 | Prós | Contras |
-|------|------|
+|------|---------|
 | Janela de contexto de 200K em todos os modelos — melhor da categoria para documentos longos | Sem APIs de áudio, fala ou geração de imagens |
-| Extended thinking dá raciocínio em cadeia transparente para tarefas difíceis | Sem API de embeddings — você precisa de um segundo provedor para RAG |
-| Prompt caching reduz significativamente os custos para grandes contextos repetidos | Modelo fechado sem opção de pesos abertos |
-| Design com segurança em primeiro lugar, calibração cuidadosa de recusas e IA Constitucional | Ecossistema menor que o da OpenAI — menos tutoriais e integrações de terceiros |
-| Computer use (beta) habilita controle agêntico de GUIs desktop | Os preços podem ser mais altos que GPT-4o-mini ou alternativas de pesos abertos para tarefas simples |
+| O pensamento estendido oferece cadeia de pensamento transparente para tarefas de raciocínio difícil | Sem API de embeddings — você precisa de um segundo provedor para RAG |
+| O cache de prompts reduz significativamente os custos para contextos grandes repetidos | Modelo fechado sem opção de pesos abertos |
+| Design voltado para segurança com calibração cuidadosa de rejeições e Constitutional AI | Ecossistema menor que a OpenAI — menos tutoriais e integrações de terceiros |
+| Computer use (beta) permite controle agêntico de GUIs de desktop | Os preços podem ser mais altos que GPT-4o-mini ou alternativas de pesos abertos para tarefas simples |
 
 ## Exemplos de código
 
@@ -201,7 +203,7 @@ if response.stop_reason == "tool_use":
     print(final.content[0].text)
 ```
 
-### Extended thinking
+### Pensamento estendido
 
 ```python
 import anthropic
@@ -234,7 +236,7 @@ for block in response.content:
         print(block.text)
 ```
 
-### Prompt caching para contexto grande repetido
+### Cache de prompts para contexto grande repetido
 
 ```python
 import anthropic
@@ -269,17 +271,17 @@ print(response.usage)
 
 ## Recursos práticos
 
-- [Referência da API Anthropic](https://docs.anthropic.com/en/api/getting-started) — Documentação completa dos endpoints com schemas de requisição/resposta e referência de parâmetros
-- [Guia de engenharia de prompts da Anthropic](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Melhores práticas oficiais para prompts de sistema, chain-of-thought e técnicas específicas por tarefa
-- [Anthropic Cookbook](https://github.com/anthropics/anthropic-cookbook) — Notebooks executáveis cobrindo uso de ferramentas, RAG, multimodal, prompt caching e agentes
-- [Visão geral dos modelos Claude](https://docs.anthropic.com/en/docs/about-claude/models) — IDs de modelos atuais, janelas de contexto, comparação de capacidades e cronograma de descontinuação
-- [Anthropic Python SDK no GitHub](https://github.com/anthropics/anthropic-sdk-python) — Código-fonte, changelog, type stubs e guias de migração
+- [Referência da API Anthropic](https://docs.anthropic.com/en/api/getting-started) — Documentação completa de endpoints com esquemas de requisição/resposta e referência de parâmetros
+- [Guia de engenharia de prompts da Anthropic](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Melhores práticas oficiais para prompts de sistema, cadeia de pensamento e técnicas específicas de tarefas
+- [Anthropic Cookbook](https://github.com/anthropics/anthropic-cookbook) — Notebooks executáveis cobrindo uso de ferramentas, RAG, multimodal, cache de prompts e agentes
+- [Visão geral do modelo Claude](https://docs.anthropic.com/en/docs/about-claude/models) — IDs de modelos atuais, janelas de contexto, comparação de capacidades e cronograma de descontinuação
+- [SDK Python da Anthropic no GitHub](https://github.com/anthropics/anthropic-sdk-python) — Código fonte, changelog, stubs de tipo e guias de migração
 
 ## Veja também
 
-- [Provedores de modelos](/docs/model-providers) — Visão geral e comparação de todos os provedores incluindo uma tabela de comparação de 7 provedores
-- [Estudo de caso: Claude](/docs/case-studies/claude) — Para uma análise mais profunda da arquitetura e metodologia de treinamento do modelo, veja o estudo de caso do Claude
-- [OpenAI](/docs/model-providers/openai) — GPT-4o, raciocínio da série o, function calling, DALL-E, Whisper
+- [Provedores de modelos](/docs/model-providers) — Visão geral e comparação de todos os provedores
+- [Estudo de caso: Claude](/docs/case-studies/claude) — Para uma análise mais profunda da arquitetura do modelo e metodologia de treinamento
+- [OpenAI](/docs/model-providers/openai) — GPT-4o, raciocínio da série o, chamada de função, DALL-E, Whisper
 - [Engenharia de prompts](/docs/prompt-engineering) — Técnicas aplicáveis a todos os modelos Claude
-- [Ferramentas](/docs/tools/claude-code) — Claude Code, o agente de codificação de IA da Anthropic construído sobre a API Claude
-- [Agentes](/docs/agents) — Construindo fluxos de trabalho agênticos com uso de ferramentas do Claude
+- [Ferramentas](/docs/tools/claude-code) — Claude Code, o agente de codificação de IA da Anthropic
+- [Agentes](/docs/agents) — Construção de fluxos de trabalho agênticos com uso de ferramentas do Claude

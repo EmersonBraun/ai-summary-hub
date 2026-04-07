@@ -1,18 +1,20 @@
 ---
 title: PyTorch Mobile
-description: PyTorch-Modelle auf Mobil- und Edge-Geräten mit TorchScript und der nächsten Generation ExecuTorch-Laufzeit bereitstellen.
-keywords: [PyTorch Mobile, TorchScript, ExecuTorch, Mobile-Inferenz, Edge AI, Quantisierung, Android, iOS]
+description: Deploy PyTorch models on mobile and edge devices using TorchScript and the next-generation ExecuTorch runtime.
+keywords: [PyTorch Mobile, TorchScript, ExecuTorch, mobile inference, edge AI, quantization, Android, iOS]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # PyTorch Mobile
 
 ## Definition
 
-PyTorch Mobile ist die Familie von Tools und Laufzeitumgebungen, die PyTorch-trainierte Modelle auf Android- und iOS-Geräte bringt, ohne einen Server oder eine Cloud-Verbindung zu benötigen. Es bewahrt die PyTorch-Entwicklungserfahrung — Forscher und Ingenieure trainieren in der vertrauten Eager-Mode Python-API und exportieren dann ihre Modelle entweder über den **TorchScript**- oder den neueren **ExecuTorch**-Pfad für die On-Device-Bereitstellung. Diese enge Kopplung zwischen Trainings- und Deployment-Umgebungen reduziert die Angriffsfläche für numerische Diskrepanz-Bugs, die beim Wechsel zwischen Frameworks oft auftreten.
+PyTorch Mobile ist die Familie von Tools und Runtimes, die PyTorch-trainierte Modelle ohne Server oder Cloud-Verbindung auf Android- und iOS-Geräte bringt. Es bewahrt die PyTorch-Entwicklungserfahrung – Forscher und Ingenieure trainieren in der vertrauten Eager-Mode-Python-API und exportieren ihre Modelle dann entweder über den **TorchScript**- oder den neueren **ExecuTorch**-Pfad für die On-Device-Bereitstellung. Diese enge Kopplung zwischen Trainings- und Bereitstellungsumgebungen reduziert die Angriffsfläche für numerische Diskrepanzfehler, die oft auftreten, wenn zwischen Frameworks gewechselt wird.
 
-Der historische Deployment-Pfad konzentriert sich auf TorchScript, eine statisch typisierte Teilmenge von Python, die in ein plattformunabhängiges Format kompiliert und serialisiert werden kann (`.ptl` für Mobile). TorchScript unterstützt zwei Kompilierungsmodi: **Tracing**, bei dem ein Beispiel-Input durch das Modell geführt und der ausgeführte Pfad aufgezeichnet wird, und **Scripting**, bei dem Python-Kontrollfluss statisch analysiert wird. Beide erzeugen ein `ScriptModule`, das von der LibTorch C++ Laufzeit geladen werden kann, die in das Mobile-SDK eingebettet ist.
+Der historische Bereitstellungspfad zentriert sich auf TorchScript, eine statisch-typisierte Teilmenge von Python, die kompiliert und in ein plattformunabhängiges Format serialisiert werden kann (`.ptl` für Mobile). TorchScript unterstützt zwei Kompilierungsmodi: **Tracing**, bei dem eine Beispieleingabe durch das Modell geleitet wird und der ausgeführte Pfad aufgezeichnet wird, und **Scripting**, bei dem Python-Kontrollfluss statisch analysiert wird. Beide erzeugen ein `ScriptModule`, das von der LibTorch C++ Runtime geladen werden kann, die im mobilen SDK eingebettet ist.
 
-Google und Meta haben gemeinsam **ExecuTorch** als Framework der nächsten Generation für die Ausführung von PyTorch-Modellen am Edge entwickelt. ExecuTorch führt ein portables Ausführungsformat (`.pte`), eine minimale C++ Laufzeit (unter 50 KB für einfache Modelle) und erstklassige Unterstützung für die Delegation an Hardware-Backends einschließlich Qualcomm AI Engine, Apple Neural Engine, Arm Ethos NPUs und Cadence DSPs ein. ExecuTorch ist für den Produktionseinsatz konzipiert und löst die ursprüngliche PyTorch Mobile-Laufzeit für neue Projekte ab, die breite Hardware-Portabilität und minimale Binärgröße erfordern.
+Google und Meta haben **ExecuTorch** gemeinsam als das Framework der nächsten Generation für die Ausführung von PyTorch-Modellen am Edge entwickelt. ExecuTorch führt ein portables Ausführungsformat (`.pte`), eine minimale C++ Runtime (unter 50 KB für einfache Modelle) und erstklassige Unterstützung für die Delegation an Hardware-Backends ein, einschließlich Qualcomm AI Engine, Apple Neural Engine, Arm Ethos NPUs und Cadence DSPs. ExecuTorch ist für den Produktionseinsatz konzipiert und ersetzt die ursprüngliche PyTorch Mobile Runtime für neue Projekte, die breite Hardware-Portabilität und minimale Binärgröße erfordern.
 
 ## Funktionsweise
 
@@ -24,71 +26,71 @@ flowchart LR
   ExportedProgram -->|"to_edge + link + serialize"| PTE[".pte Bundle\n(ExecuTorch)"]
   PTL -->|"Module.load()"| LibTorch["LibTorch\nMobile Runtime"]
   PTE -->|"Module::load()"| ETRuntime["ExecuTorch\nRuntime"]
-  LibTorch -->|"forward()"| Device["Android / iOS Device"]
+  LibTorch -->|"forward()"| Device["Android / iOS Gerät"]
   ETRuntime -->|"execute()"| Device
 ```
 
 ### TorchScript Tracing und Scripting
 
-Tracing (`torch.jit.trace`) führt einen Beispiel-Input durch das Modell und zeichnet die Abfolge der Tensor-Operationen auf, wodurch ein statischer Berechnungsgraph entsteht. Tracing ist einfach und deckt die meisten Standardarchitekturen ab, erfasst aber nur den Ausführungspfad für den angegebenen Input — datenabhängiger Kontrollfluss (if-Anweisungen, Schleifen, die mit Eingabewerten variieren) wird stillschweigend eingebettet. Scripting (`torch.jit.script`) analysiert den Python-Quellcode mit einem TorchScript-Typ-Checker und bewahrt den Kontrollfluss, wodurch es korrekt für Modelle mit Verzweigungslogik ist. In der Praxis sind hybride Ansätze üblich: das Top-Level-Modul scripten, während innere Submodule ohne dynamischen Kontrollfluss getracet werden.
+Tracing (`torch.jit.trace`) führt eine Beispieleingabe durch das Modell und zeichnet die Sequenz der Tensor-Operationen auf, was einen statischen Berechnungsgraph erzeugt. Tracing ist einfach und deckt die meisten Standardarchitekturen ab, erfasst aber nur den Ausführungspfad für die gegebene Eingabe – datenabhängiger Kontrollfluss (if-Anweisungen, Schleifen, die mit Eingabewerten variieren) wird stillschweigend fest eingebacken. Scripting (`torch.jit.script`) analysiert den Python-Quellcode mit einem TorchScript-Typ-Checker und bewahrt den Kontrollfluss, was es für Modelle mit verzweigter Logik korrekt macht. In der Praxis sind Hybridansätze üblich: Das Top-Level-Modul scripten, während innere Sub-Module, die keinen dynamischen Kontrollfluss haben, getraced werden.
 
 ### ExecuTorch Export-Pipeline
 
-ExecuTorch verwendet `torch.export.export`, um eine strikte, seiteneffektfreie Darstellung des Modells in ATen IR zu erfassen — einen kanonischen Satz von PyTorch-Operatoren mit garantiert wohldefinierten Semantiken. Das exportierte Programm wird dann über `to_edge` auf die **Edge IR** heruntergestuft, die backend-spezifische Graph-Passes durchführt (Operator-Dekomposition, Layout-Propagierung). Backends (Delegation-Ziele) können Subgraphen während des `to_backend`-Schritts beanspruchen und diese durch hardware-spezifische Implementierungen ersetzen. Das finale Artefakt wird in ein `.pte`-Flatbuffer serialisiert, das von der ExecuTorch C++ Laufzeit geladen wird, die während der Inferenz keine dynamische Speicherallokierung erfordert.
+ExecuTorch verwendet `torch.export.export`, um eine strikte, seiteneffektfreie Repräsentation des Modells in ATen IR zu erfassen – ein kanonischer Satz von PyTorch-Operatoren mit garantiert wohldefinierten Semantiken. Das exportierte Programm wird dann durch `to_edge` auf die **Edge IR** abgesenkt, was Backend-spezifische Graph-Passes durchführt (Operator-Dekompositionen, Layout-Propagation). Backends (Delegationsziele) können Subgraphen während des `to_backend`-Schritts beanspruchen und sie durch Hardware-spezifische Implementierungen ersetzen. Das finale Artefakt wird in ein `.pte`-Flatbuffer serialisiert, das von der ExecuTorch C++ Runtime geladen wird, die während der Inferenz keine dynamische Speicherzuweisung benötigt.
 
 ### Optimierung: Quantisierung und Pruning
 
-PyTorch bietet Post-Training-statische und dynamische Quantisierung durch `torch.quantization` (Legacy) und den neueren `torch.ao.quantization`-Namespace. Statische INT8-Quantisierung erfordert einen repräsentativen Kalibrierungsdatensatz und reduziert die Modellgröße um ~4x mit 2-3x Latenzverbesserung auf ARM-CPUs. Quantisierungs-bewusstes Training (QAT) fügt `FakeQuantize`-Knoten in den Forward-Graph während des Fine-Tunings ein, wodurch das Modell seine Gewichte an INT8-Präzision anpassen kann. Pruning (`torch.nn.utils.prune`) entfernt einzelne Gewichte oder ganze Kanäle basierend auf Magnitude- oder strukturierten Kriterien und reduziert die effektive Rechenlast vor der Quantisierung. Beide Techniken können kombiniert werden: zuerst prunen um Kanäle zu reduzieren, dann quantisieren um die Präzision zu reduzieren.
+PyTorch bietet Post-Training statische und dynamische Quantisierung über `torch.quantization` (legacy) und den neueren `torch.ao.quantization`-Namespace. Statische INT8-Quantisierung erfordert ein repräsentatives Kalibrierungsdataset und reduziert die Modellgröße um ~4x mit 2–3x Latenzverbesserung auf ARM-CPUs. Quantization-Aware Training (QAT) fügt `FakeQuantize`-Knoten in den Vorwärts-Graph während des Fine-Tunings ein, was es dem Modell ermöglicht, seine Gewichte an INT8-Präzision anzupassen. Pruning (`torch.nn.utils.prune`) entfernt individuelle Gewichte oder ganze Kanäle basierend auf Magnitude- oder strukturierten Kriterien, was die effektive Rechenlast vor der Quantisierung reduziert. Beide Techniken können kombiniert werden: zuerst prunen, um Kanäle zu reduzieren, dann quantisieren, um die Präzision zu reduzieren.
 
-### Mobile-Laufzeit und Plattform-Integration
+### Mobile Runtime und Plattform-Integration
 
-Das `.ptl`-Bundle, das von `optimize_for_mobile` erzeugt wird, umfasst Operator-Fusing-Optimierungen und entfernt ungenutzte Operatoren aus der Operator-Registry, was den Binär-Footprint reduziert. Das Android SDK (`pytorch_android`) wird auf Maven Central veröffentlicht und bietet eine Kotlin/Java-API. Das iOS SDK wird als CocoaPod oder Swift Package vertrieben und stellt Objective-C und Swift Bindings bereit. Beide SDKs umhüllen denselben LibTorch C++ Kern. ExecuTorch zielt auf dieselben Plattformen ab, bietet aber eine schlankere C-API und unterstützt auch Bare-Metal-Embedded-Ziele. Die `torch::executor::Module`-Klasse bietet eine minimale `execute()`-API, die direkt auf vorallokierten `EValue`-Tensoren arbeitet und JNI-artigen Overhead vermeidet.
+Das `.ptl`-Bundle, das durch `optimize_for_mobile` erzeugt wird, enthält Operator-Fusions-Optimierungen und entfernt unbenutzte Operatoren aus der Operator-Registry, was den Binary-Footprint reduziert. Das Android SDK (`pytorch_android`) wird auf Maven Central veröffentlicht und stellt eine Kotlin/Java API bereit. Das iOS SDK wird als CocoaPod oder Swift Package verteilt und bietet Objective-C- und Swift-Bindungen. Beide SDKs umhüllen denselben LibTorch C++ Kern. ExecuTorch zielt auf dieselben Plattformen ab, stellt aber eine schlankere C-API bereit und unterstützt auch Bare-Metal-eingebettete Ziele. Die `torch::executor::Module`-Klasse bietet eine minimale `execute()`-API, die direkt auf vorzugewiesenen `EValue`-Tensoren operiert, um JNI-ähnlichen Overhead zu vermeiden.
 
 ### GPU- und NPU-Beschleunigung
 
-Der GPU-Delegate von PyTorch Mobile für Android funktioniert über das Vulkan-Backend (`torch.backends.vulkan`), das Konvolutionen und Matrix-Multiplikationen auf die GPU auslagert. ExecuTorchs XNNPACK-Backend beschleunigt Gleitkomma- und INT8-Operationen auf ARM-CPUs über NEON-SIMD-Instruktionen und ist die empfohlene Standard-Option für CPU-Beschleunigung. Das Qualcomm AI Engine Direct-Backend und das Apple Core ML-Backend bieten NPU-Beschleunigung durch ExecuTorchs Delegations-API und erzielen typischerweise 5-15x Beschleunigungen gegenüber Referenz-CPU-Pfaden für Standard-Vision- und NLP-Modelle.
+PyTorch Mobiles GPU-Delegate für Android funktioniert über das Vulkan-Backend (`torch.backends.vulkan`), das Konvolutionen und Matrizenmultiplikationen auf die GPU verlagert. ExecuTorchs XNNPACK-Backend beschleunigt Gleitkomma- und INT8-Operationen auf ARM-CPUs über NEON-SIMD-Anweisungen und ist das empfohlene Standard für CPU-Beschleunigung. Das Qualcomm AI Engine Direct-Backend und das Apple Core ML-Backend bieten NPU-Beschleunigung über ExecuTorchs Delegations-API und erzielen typischerweise 5–15x Beschleunigungen gegenüber Referenz-CPU-Pfaden für Standard-Vision- und NLP-Modelle.
 
 ## Wann verwenden / Wann NICHT verwenden
 
 | Verwenden wenn | Vermeiden wenn |
 |---|---|
-| Ihre Trainingscode-Basis PyTorch ist und Sie minimale Konvertierungs-Reibung möchten | Ihre Modelle aus TensorFlow/Keras stammen und der Konvertierungs-Overhead ein Problem ist |
-| Sie auf Android oder iOS mit einem Python-vertrauten Workflow deployen müssen | Sie Mikrocontroller-Ziele mit &lt;256 KB RAM benötigen (TFLM ist besser geeignet) |
-| Sie ExecuTorch für NPU-Delegation der nächsten Generation möchten (Qualcomm, Apple ANE) | Ihr Modell Python-Level-dynamischen Kontrollfluss verwendet, den TorchScript via Tracing nicht erfassen kann |
-| Schnelle Iteration: dieselbe Modellklasse für Training und Mobile-Inferenz wiederverwenden | Sie ausgereifte Produktions-Tooling mit breiter Hardware-Delegate-Abdeckung heute benötigen (TFLite ist ausgereifter) |
-| Sie auf dem Hugging Face-Ökosystem aufbauen (viele Modelle exportieren via TorchScript) | Die Binärgröße extrem eingeschränkt ist und der LibTorch-Laufzeit-Footprint (~3-8 MB komprimiert) zu groß ist |
+| Ihre Trainingscode-Basis PyTorch ist und Sie minimale Konvertierungsreibung möchten | Ihre Modelle in TensorFlow/Keras entstehen und der Konvertierungsaufwand ein Problem ist |
+| Sie auf Android oder iOS mit einem Python-vertrauten Workflow bereitstellen müssen | Sie Mikrocontroller-Ziele mit \<256 KB RAM benötigen (TFLM ist besser geeignet) |
+| Sie ExecuTorch für Next-Gen-Hardware-NPU-Delegation wünschen (Qualcomm, Apple ANE) | Ihr Modell Python-Ebene dynamischen Kontrollfluss verwendet, den TorchScript nicht über Tracing erfassen kann |
+| Schnelle Iteration: dasselbe Modell für Training und mobiles Inferenz wiederverwenden | Sie ausgereifte Produktions-Tooling mit breiter Hardware-Delegate-Abdeckung heute benötigen (TFLite ist ausgereifter) |
+| Sie auf dem Hugging Face-Ökosystem aufbauen (viele Modelle exportieren über TorchScript) | Die Binärgröße extrem eingeschränkt ist und der LibTorch-Runtime-Footprint (~3–8 MB komprimiert) zu groß ist |
 
 ## Vergleiche
 
-Vergleich von PyTorch Mobile mit TFLite und ONNX Runtime für Edge-Deployment-Szenarien.
+Vergleich von PyTorch Mobile mit TFLite und ONNX Runtime für Edge-Bereitstellungsszenarien.
 
 | Kriterium | PyTorch Mobile | TensorFlow Lite | ONNX Runtime |
 |---|---|---|---|
-| Plattformunterstützung | Android, iOS; ExecuTorch erweitert auf Embedded und Bare-Metal | Android, iOS, eingebettetes Linux, Mikrocontroller (TFLM) | Windows, Linux, macOS, Android, iOS, WebAssembly |
-| Modellkonvertierung | torch.jit.trace / script (PyTorch-nativ) oder torch.export (ExecuTorch) | TFLite Converter von TF/Keras SavedModel | Beliebiges Framework → ONNX-Export (interoperabelster Pfad) |
-| On-Device-Performance | XNNPACK auf ARM-CPUs; Vulkan GPU; ExecuTorch NPU-Delegation | Ausgezeichnet auf Android via NNAPI/GPU-Delegate; beste Leistung für Mikrocontroller | Wettbewerbsfähige CPU EP; CUDA/TensorRT EPs glänzen in GPU-fähigen Edge-Geräten |
-| Ökosystem | Stark in Forschung; Hugging Face-Integration; wachsende ExecuTorch-Community | Ausgereift: MediaPipe, TF Hub, Model Garden; größte Mobile-ML-Community | Breite Enterprise-Unterstützung; framework-agnostisch; starke Microsoft/Azure-Integration |
-| Quantisierungsunterstützung | PTQ (dynamisch + statisch INT8) und QAT via torch.ao.quantization; ExecuTorch backend-spezifische Quantisierung | Umfassend: Dynamic-Range, INT8, FP16, QAT mit vollständigen INT8-Pfaden | INT8 via QDQ-Knoten; Hardware-INT8 hängt vom Execution Provider ab |
+| Plattformunterstützung | Android, iOS; ExecuTorch erweitert auf eingebettete und Bare-Metal-Ziele | Android, iOS, eingebettetes Linux, Mikrocontroller (TFLM) | Windows, Linux, macOS, Android, iOS, WebAssembly |
+| Modellkonvertierung | torch.jit.trace / script (PyTorch-nativ) oder torch.export (ExecuTorch) | TFLite Converter von TF/Keras SavedModel | Beliebiges Framework → ONNX-Export (interoperabelster Weg) |
+| On-Device-Leistung | XNNPACK auf ARM-CPUs; Vulkan GPU; ExecuTorch NPU-Delegation | Ausgezeichnet auf Android über NNAPI/GPU-Delegate; best-in-class für Mikrocontroller | Wettbewerbsfähiger CPU EP; CUDA/TensorRT EPs glänzen in GPU-fähigen Edge-Geräten |
+| Ökosystem | Stark in der Forschung; Hugging Face-Integration; wachsende ExecuTorch-Community | Ausgereift: MediaPipe, TF Hub, Model Garden; größte mobile ML-Community | Breite Enterprise-Unterstützung; Framework-agnostisch; starke Microsoft/Azure-Integration |
+| Quantisierungsunterstützung | PTQ (dynamisch + statisch INT8) und QAT über torch.ao.quantization; ExecuTorch Backend-spezifische Quantisierung | Umfassend: dynamischer Bereich, INT8, FP16, QAT mit vollen INT8-Pfaden | INT8 über QDQ-Knoten; Hardware-INT8 hängt vom Ausführungsanbieter ab |
 
 ## Vor- und Nachteile
 
 | Vorteile | Nachteile |
 |---|---|
-| Nahtloser Workflow für PyTorch-Nutzer — dieselbe Modellklasse trainiert und deployt | LibTorch Mobile Binary fügt ~3-8 MB zur App-Größe komprimiert hinzu |
+| Nahtloser Workflow für PyTorch-Benutzer — dieselbe Modellklasse trainiert und bereitstellt | LibTorch Mobile Binary fügt der App-Größe komprimiert ~3–8 MB hinzu |
 | ExecuTorch bietet eine moderne, erweiterbare Architektur für NPU-Delegation | TorchScript-Tracing übersieht stillschweigend datenabhängigen Kontrollfluss |
-| Starke Hugging Face-Ökosystem-Integration | Weniger ausgereift als TFLite für Produktions-Android/iOS-Deployments |
-| QAT ist gut in die Standard-Trainingsschleife integriert | Vulkan-GPU-Delegate-Abdeckung ist enger als TFLites GPU-Delegate |
-| Aktive Entwicklung mit starker Meta- und Community-Unterstützung | ONNX-Interoperabilität erfordert einen zusätzlichen Konvertierungsschritt durch den ONNX-Exporter |
+| Starke Hugging Face-Ökosystem-Integration | Weniger ausgereift als TFLite für Produktions-Android/iOS-Bereitstellungen |
+| QAT ist gut in den Standardtrainings-Loop integriert | Vulkan-GPU-Delegate-Abdeckung ist schmaler als TFLites GPU-Delegate |
+| Aktive Entwicklung mit starker Meta- und Community-Unterstützung | ONNX-Interoperabilität erfordert einen zusätzlichen Konvertierungsschritt über den ONNX-Exporter |
 
-## Codebeispiele
+## Code-Beispiele
 
 ```python
 import torch
 import torch.nn as nn
 
-# ── 1. Define a simple convolutional model ────────────────────────────────────
+# ── 1. Ein einfaches Faltungsmodell definieren ────────────────────────────
 class SmallCNN(nn.Module):
-    """Minimal CNN for demonstration. Replace with your real model."""
+    """Minimales CNN zur Demonstration. Durch Ihr echtes Modell ersetzen."""
 
     def __init__(self, num_classes: int = 10):
         super().__init__()
@@ -107,37 +109,34 @@ class SmallCNN(nn.Module):
         x = x.flatten(1)
         return self.classifier(x)
 
-model = SmallCNN(num_classes=10)
-model.eval()  # set model to inference mode (disables dropout, batch-norm tracks running stats)
 
-# ── 2. Export with TorchScript tracing ───────────────────────────────────────
-# Provide a representative input with the expected shape (batch=1, C=1, H=28, W=28)
+model = SmallCNN(num_classes=10)
+model.eval()  # Modell in Inferenzmodus setzen
+
+# ── 2. Mit TorchScript Tracing exportieren ───────────────────────────────
 example_input = torch.rand(1, 1, 28, 28)
 
-# trace() records the ops executed for example_input
 scripted_model = torch.jit.trace(model, example_input)
 
-# optimize_for_mobile fuses ops and strips unused kernels for a smaller bundle
 from torch.utils.mobile_optimizer import optimize_for_mobile
 
 optimized_model = optimize_for_mobile(scripted_model)
 optimized_model._save_for_lite_interpreter("model.ptl")
 print("Saved model.ptl")
 
-# ── 3. Apply post-training dynamic quantization ───────────────────────────────
+# ── 3. Post-Training Dynamic Quantisierung anwenden ───────────────────────
 quantized_model = torch.quantization.quantize_dynamic(
     model,
-    qconfig_spec={nn.Linear, nn.Conv2d},  # quantize these layer types to INT8
+    qconfig_spec={nn.Linear, nn.Conv2d},
     dtype=torch.qint8,
 )
 quantized_model.eval()
 
-# Verify quantized inference produces sensible output
 with torch.no_grad():
     output = quantized_model(example_input)
 print(f"Output shape: {output.shape}, predicted class: {output.argmax(dim=1).item()}")
 
-# ── 4. Load .ptl on Python (mirrors Android/iOS Module.load() behavior) ───────
+# ── 4. .ptl auf Python laden ──────────────────────────────────────────────
 loaded = torch.jit.load("model.ptl")
 loaded.eval()
 with torch.no_grad():
@@ -147,11 +146,11 @@ print(f"Loaded mobile model predicted class: {result.argmax(dim=1).item()}")
 
 ## Praktische Ressourcen
 
-- [PyTorch Mobile Dokumentation](https://pytorch.org/mobile/home/) — offizieller Leitfaden zu TorchScript-Export, Android- und iOS-SDKs, Modelloptimierung und Performance-Profiling auf Geräten.
-- [ExecuTorch Dokumentation](https://pytorch.org/executorch/) — die Dokumentation der nächsten Generation für Edge-Laufzeitumgebungen, die den Export-Pipeline, Backend-Delegation und Hardware-Integrations-Leitfäden für Qualcomm-, Apple- und ARM-Ziele abdeckt.
-- [torch.ao.quantization Leitfaden](https://pytorch.org/docs/stable/quantization.html) — umfassende Referenz für PyTorchs Quantisierungs-API, die PTQ, QAT und den neueren `torch.ao`-Namespace für ExecuTorch-Workflows abdeckt.
-- [PyTorch Android Demo-Apps](https://github.com/pytorch/android-demo-app) — Open-Source-Android-Apps, die Bildklassifizierung, Objekterkennung, Spracherkennung und NLP mit PyTorch Mobile demonstrieren; nützlich als Integrations-Templates.
-- [ExecuTorch Tutorials](https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html) — schrittweise Tutorials zum Exportieren von Modellen durch die ExecuTorch-Pipeline und zum Ausführen mit der C++ Laufzeit.
+- [PyTorch Mobile Dokumentation](https://pytorch.org/mobile/home/) — offizieller Leitfaden zum TorchScript-Export, den Android- und iOS-SDKs, Modelloptimierung und Leistungs-Profiling auf Geräten.
+- [ExecuTorch Dokumentation](https://pytorch.org/executorch/) — die Next-Generation-Edge-Runtime-Dokumentation, die die Export-Pipeline, Backend-Delegation und Hardware-Integrationsanleitungen für Qualcomm, Apple und ARM-Ziele abdeckt.
+- [torch.ao.quantization Leitfaden](https://pytorch.org/docs/stable/quantization.html) — umfassende Referenz für PyTorchs Quantisierungs-API.
+- [PyTorch Android Demo-Apps](https://github.com/pytorch/android-demo-app) — Open-Source-Android-Apps als Integrations-Templates.
+- [ExecuTorch Tutorials](https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html) — Schritt-für-Schritt-Tutorials zum Exportieren von Modellen durch die ExecuTorch-Pipeline.
 
 ## Siehe auch
 

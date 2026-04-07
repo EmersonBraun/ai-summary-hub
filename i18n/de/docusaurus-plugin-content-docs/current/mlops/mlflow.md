@@ -1,36 +1,38 @@
 ---
 title: MLflow
-description: Open-Source-Plattform für den gesamten ML-Lebenszyklus, mit Experiment-Tracking, Projects, Models und der Registry.
-keywords: [MLflow, Experiment-Tracking, Modell-Registry, MLflow Projects, MLflow Models, self-hosted, Databricks]
+description: Open-source platform for the complete ML lifecycle, covering experiment tracking, projects, models, and the registry.
+keywords: [MLflow, experiment tracking, model registry, MLflow Projects, MLflow Models, self-hosted, Databricks]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # MLflow
 
 ## Definition
 
-MLflow ist eine Open-Source-Plattform zur Verwaltung des End-to-End-Lebenszyklus des maschinellen Lernens. Ursprünglich 2018 von Databricks veröffentlicht, hat es sich dank seiner Einfachheit, Framework-Agnostik und der Möglichkeit, vollständig ohne Cloud-Abhängigkeit On-Premise betrieben zu werden, zu einem der am weitesten verbreiteten MLOps-Werkzeuge entwickelt. Ein einziges `pip install mlflow` und eine zweizellige Code-Änderung reichen aus, um mit dem Experiment-Tracking zu beginnen.
+MLflow ist eine Open-Source-Plattform, die darauf ausgelegt ist, den gesamten Machine-Learning-Lebenszyklus zu verwalten. Ursprünglich 2018 von Databricks veröffentlicht, ist sie dank ihrer Einfachheit, Framework-Unabhängigkeit und der Tatsache, dass sie vollständig on-premise ohne Cloud-Abhängigkeit betrieben werden kann, zu einem der am weitesten verbreiteten MLOps-Tools geworden. Ein einfaches `pip install mlflow` und eine Änderung von zwei Zeilen im Code reichen aus, um mit dem Tracking von Experimenten zu beginnen.
 
-MLflow organisiert die Funktionalität in vier eng integrierten Komponenten. **Tracking** zeichnet Parameter, Metriken und Artefakte für jeden Trainingslauf auf. **Projects** packen ML-Code in reproduzierbare, ausführbare Einheiten, die durch eine `MLproject`-Datei definiert sind. **Models** bieten ein Standardformat zur Verpackung von Modellen, die von jedem unterstützten Deployment-Ziel bereitgestellt werden können. **Model Registry** bietet einen zentralisierten Modell-Store mit Lifecycle-Management (Staging-, Production- und Archived-Zustände) und Versionshistorie. Zusammen decken diese Komponenten den Weg vom rohen Experiment zur Produktionsbereitstellung ab.
+MLflow organisiert seine Funktionalität in vier eng integrierten Komponenten. **Tracking** erfasst Parameter, Metriken und Artefakte für jeden Trainingslauf. **Projects** verpacken ML-Code in reproduzierbare, ausführbare Einheiten, die durch eine `MLproject`-Datei definiert werden. **Models** bieten ein Standardformat zum Verpacken von Modellen, die von jedem unterstützten Deployment-Ziel bereitgestellt werden können. **Model Registry** bietet einen zentralen Modell-Store mit Lifecycle-Management (Staging-, Production-, Archived-Zustände) und Versionshistorie. Zusammen decken diese Komponenten den Weg vom rohen Experiment bis zur Produktionsbereitstellung ab.
 
-MLflow kann lokal (SQLite-Backend, lokale Dateisystem-Artefakte), auf einem selbst verwalteten Server (PostgreSQL + S3) oder als vollständig verwalteter Service über Databricks Managed MLflow betrieben werden. Der Open-Source-Kern ist unter Apache 2.0 lizenziert, was ihn für regulierte Branchen geeignet macht, in denen Daten die On-Premise-Infrastruktur nicht verlassen dürfen.
+MLflow kann lokal (SQLite-Backend, lokales Dateisystem für Artefakte), auf einem selbstverwalteten Server (PostgreSQL + S3) oder als vollständig verwalteter Dienst über Databricks Managed MLflow betrieben werden. Der Open-Source-Kern ist unter Apache 2.0 lizenziert, was ihn für regulierte Branchen geeignet macht, in denen Daten die eigene Infrastruktur nicht verlassen dürfen.
 
 ## Funktionsweise
 
 ### Tracking-Server
 
-Wenn `mlflow.start_run()` aufgerufen wird, öffnet der Client einen Lauf auf dem Tracking-Server und beginnt, Protokolle zu puffern. Parameter (`log_param`, `log_params`) und Metriken (`log_metric`, `log_metrics`) werden in den Backend-Store (SQLite oder PostgreSQL) geschrieben. Artefakte werden in den Artefakt-Store hochgeladen (lokales Dateisystem, S3, GCS, Azure Blob, HDFS). Der Server stellt eine REST-API bereit, die vom Client-SDK und der Web-UI verwendet wird.
+Wenn Sie `mlflow.start_run()` aufrufen, öffnet der Client einen Lauf auf dem Tracking-Server und beginnt damit, Logs zu puffern. Parameter (`log_param`, `log_params`) und Metriken (`log_metric`, `log_metrics`) werden in den Backend-Store (SQLite oder PostgreSQL) geschrieben. Artefakte werden in den Artefakt-Store hochgeladen (lokales Dateisystem, S3, GCS, Azure Blob, HDFS). Der Server stellt eine REST-API bereit, die vom Client-SDK und der Web-UI genutzt wird.
 
 ### MLflow Projects
 
-Ein Projekt ist ein Verzeichnis (oder Git-Repository) mit einer `MLproject`-YAML-Datei, die die Einstiegspunkte, Parameter und die conda/pip-Umgebung deklariert. Das Ausführen von `mlflow run . -P lr=0.01` löst die Umgebung auf, setzt Parameter und startet den Einstiegspunkt — was automatisch einen verfolgten Lauf erzeugt. Dadurch werden Experimente für jeden mit Zugang zum Repository reproduzierbar.
+Ein Projekt ist ein Verzeichnis (oder ein Git-Repository) mit einer `MLproject`-YAML-Datei, die die Einstiegspunkte, Parameter und die conda/pip-Umgebung deklariert. Das Ausführen von `mlflow run . -P lr=0.01` löst die Umgebung auf, setzt Parameter und startet den Einstiegspunkt — wodurch automatisch ein getrackte Lauf erzeugt wird. Dies macht Experimente für jeden mit Zugriff auf das Repository reproduzierbar.
 
 ### MLflow Models
 
-Ein mit `mlflow.<flavor>.log_model()` gespeichertes Modell wird im MLmodel-Format gespeichert: ein Verzeichnis mit dem serialisierten Modell, einem `MLmodel`-YAML-Deskriptor und einer `conda.yaml`/`requirements.txt`. Der `pyfunc`-Flavor bietet eine einheitliche `model.predict(data)`-Schnittstelle unabhängig vom zugrunde liegenden Framework, sodass dasselbe Modell von verschiedenen Serving-Backends geladen werden kann.
+Ein mit `mlflow.<flavor>.log_model()` gespeichertes Modell wird im MLmodel-Format gespeichert: ein Verzeichnis, das das serialisierte Modell, einen `MLmodel`-YAML-Deskriptor und eine `conda.yaml` / `requirements.txt` enthält. Die `pyfunc`-Variante bietet eine einheitliche `model.predict(data)`-Schnittstelle unabhängig vom zugrunde liegenden Framework, sodass dasselbe Modell von verschiedenen Serving-Backends geladen werden kann.
 
 ### Model Registry
 
-Die Registry speichert benannte Modellversionen mit Übergangszuständen. Automatisierte CI/CD-Systeme fragen die Registry nach der neuesten `Production`-Version ab. Menschliche Genehmiger oder automatisierte Validierungsjobs verschieben Versionen zwischen Zuständen. Jede Version verweist auf ihren Quell-Lauf und bewahrt so die vollständige Herkunft.
+Die Registry speichert benannte Modellversionen mit Übergangszuständen. Automatisierte CI/CD-Systeme fragen die Registry nach der neuesten `Production`-Version für die Bereitstellung ab. Menschliche Genehmiger oder automatisierte Validierungsjobs übertragen Versionen zwischen Zuständen. Jede Version verweist zurück auf ihren Quelllauf und bewahrt so die vollständige Herkunft.
 
 ```mermaid
 flowchart LR
@@ -46,22 +48,22 @@ flowchart LR
 ## Wann verwenden / Wann NICHT verwenden
 
 | Verwenden wenn | Vermeiden wenn |
-|----------------|----------------|
-| Eine vollständig self-gehostete, Open-Source-MLOps-Plattform benötigt wird | Das Team umfangreiche kollaborative Features benötigt (gemeinsame Berichte, Slack-Benachrichtigungen) out-of-the-box |
-| Daten die Infrastruktur nicht verlassen dürfen (regulierte Branchen) | Ein SaaS-Produkt ohne zu verwaltende Infrastruktur bevorzugt wird |
-| Databricks bereits verwendet wird und native Integration gewünscht wird | Der Workflow nur auf Notebooks basiert ohne geplante Produktionsbereitstellung |
-| Framework-Agnostik wichtig ist (sklearn, XGBoost, PyTorch, TF usw.) | Erweiterte Sweep/Hyperparameter-Optimierung eingebaut benötigt wird |
-| Kostenkontrolle kritisch ist; Open-Source-Lizenzierung erforderlich ist | Das Team nicht die Engineering-Kapazität hat, einen Server und Artefakt-Store zu verwalten |
+|----------|------------|
+| Eine vollständig selbst gehostete, Open-Source-MLOps-Plattform benötigt wird | Das Team umfangreiche kollaborative Funktionen (gemeinsame Berichte, Slack-Benachrichtigungen) out of the box benötigt |
+| Daten die eigene Infrastruktur nicht verlassen dürfen (regulierte Branchen) | Ein SaaS-Produkt ohne eigene Infrastruktur bevorzugt wird |
+| Databricks bereits verwendet wird und native Integration gewünscht ist | Der Workflow nur aus Notebooks besteht und kein Produktionsdeployment geplant ist |
+| Framework-Unabhängigkeit wichtig ist (sklearn, XGBoost, PyTorch, TF usw.) | Fortgeschrittene integrierte Hyperparameter-Optimierung benötigt wird |
+| Kostenkontrolle entscheidend ist und Open-Source-Lizenzierung erforderlich ist | Das Team keine Engineering-Ressourcen hat, um einen Server und Artefakt-Store zu verwalten |
 
 ## Vergleiche
 
 | Kriterium | MLflow | Weights & Biases (W&B) |
 |-----------|--------|------------------------|
-| Einrichtungsfreundlichkeit | Self-hostbar mit einem Befehl; kein Konto erforderlich | SaaS; kostenloses Konto erforderlich; keine Infrastruktur zu verwalten |
-| UI-Qualität | Sauber aber grundlegend; fokussiert auf tabellarische Metriken und Lauf-Vergleich | Hochwertig; ausgezeichnetes Medien-Logging, benutzerdefinierte Charts, Berichte |
-| Zusammenarbeit | Gemeinsamer Server erforderlich; kein eingebautes RBAC in OSS | Eingebaute Team-Arbeitsbereiche, Sharing-Links und rollenbasierter Zugriff |
-| Preisgestaltung | Kostenlos und Open Source; Databricks Managed MLflow kostet extra | Kostenlos für Einzelpersonen; kostenpflichtige Pläne für Teams |
-| Hyperparameter-Optimierung | Integriert sich extern mit Optuna, Ray Tune | Sweeps eingebaut mit Bayesian/Gitter/Zufallssuche |
+| Einrichtungsaufwand | Selbst hostbar mit einem Befehl; kein Account erforderlich | SaaS; kostenloser Account erforderlich; keine Infrastruktur zu verwalten |
+| UI-Qualität | Sauber, aber einfach; fokussiert auf tabellarische Metriken und Lauf-Vergleiche | Sehr poliert; exzellentes Media-Logging, benutzerdefinierte Charts, Berichte |
+| Zusammenarbeit | Geteilter Server erforderlich; kein integriertes RBAC in OSS | Integrierte Team-Workspaces, Sharing-Links und rollenbasierter Zugriff |
+| Preisgestaltung | Kostenlos und Open-Source; Databricks Managed MLflow kostet extra | Kostenlos für Einzelpersonen; bezahlte Pläne für Teams |
+| Hyperparameter-Optimierung | Integration mit Optuna, Ray Tune extern | Sweeps integriert mit Bayesian/Grid/Random Search |
 
 ## Code-Beispiele
 
@@ -162,13 +164,13 @@ with mlflow.start_run(run_name="gbt-tuned") as run:
 
 ## Praktische Ressourcen
 
-- [MLflow offizielle Dokumentation](https://mlflow.org/docs/latest/index.html) — Vollständige Referenz aller vier Komponenten, REST-API und Deployment-Ziele.
-- [MLflow GitHub-Repository](https://github.com/mlflow/mlflow) — Quellcode, Issue-Tracker und Beispiele; nützlich zum Verstehen von Interna und zum Mitwirken.
-- [Databricks – MLflow-Tutorials](https://docs.databricks.com/en/mlflow/index.html) — Produktionsreife MLflow-Nutzung auf Databricks mit Unity Catalog Integration.
-- [Towards Data Science – MLflow in Production](https://towardsdatascience.com/deploy-mlflow-with-docker-compose-8059f16b6039) — Community-Anleitung zur Bereitstellung eines selbst gehosteten MLflow-Servers mit Docker Compose, PostgreSQL und MinIO.
+- [MLflow Official Documentation](https://mlflow.org/docs/latest/index.html) — Vollständige Referenz aller vier Komponenten, REST-API und Deployment-Ziele.
+- [MLflow GitHub Repository](https://github.com/mlflow/mlflow) — Quellcode, Issue-Tracker und Beispiele; nützlich zum Verstehen der Internals und für Beiträge.
+- [Databricks – MLflow Tutorials](https://docs.databricks.com/en/mlflow/index.html) — Produktionsreife MLflow-Nutzung auf Databricks mit Unity Catalog-Integration.
+- [Towards Data Science – MLflow in Production](https://towardsdatascience.com/deploy-mlflow-with-docker-compose-8059f16b6039) — Community-Walkthrough zur Bereitstellung eines selbst gehosteten MLflow-Servers mit Docker Compose, PostgreSQL und MinIO.
 
 ## Siehe auch
 
-- [Experiment-Tracking](/docs/mlops/experiment-tracking)
+- [Experiment tracking](/docs/mlops/experiment-tracking)
 - [Weights & Biases](/docs/mlops/wandb)
 - [MLOps](/docs/mlops)

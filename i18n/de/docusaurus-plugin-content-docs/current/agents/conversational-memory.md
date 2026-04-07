@@ -1,36 +1,38 @@
 ---
-title: "Konversationsgedächtnis"
-description: Gedächtnismuster für Chat-Agenten – Buffer-, Summary-, Vektor- und Entity-Gedächtnis.
-keywords: [Konversationsgedächtnis, Buffer-Gedächtnis, Summary-Gedächtnis, Vektor-Gedächtnis, Entity-Gedächtnis, LangChain, Chat-Verlauf]
+title: "Conversational memory"
+description: Memory patterns for chat agents — buffer, summary, vector, and entity memory.
+keywords: [conversational memory, buffer memory, summary memory, vector memory, entity memory, LangChain, chat history]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Konversationsgedächtnis
 
 ## Definition
 
-Konversationsgedächtnis bezeichnet die Gesamtheit der Techniken, die es einem Chat-Agenten ermöglichen, Informationen aus früheren Gesprächsrunden zu behalten und zu nutzen. Anders als Retrieval-Augmented Generation, das externe Dokumente einbezieht, befasst sich das Konversationsgedächtnis ausschließlich damit, was zwischen dem Benutzer und dem Agenten bereits gesagt wurde. Dies richtig umzusetzen trennt einen frustrierenden Chatbot, der einen auffordert, sich zu wiederholen, von einem Agenten, der sich wirklich aufmerksam anfühlt.
+Konversationsgedächtnis bezeichnet die Menge an Techniken, die einem Chat-Agenten ermöglichen, Informationen aus früheren Gesprächsrunden zu behalten und zu nutzen. Im Gegensatz zur Retrieval-Augmented Generation, die externe Dokumente einbezieht, befasst sich das Konversationsgedächtnis ausschließlich damit, was bereits zwischen dem Benutzer und dem Agenten gesagt wurde. Dies richtig umzusetzen trennt einen frustrierenden Chatbot, der Sie bittet, sich zu wiederholen, von einem Agenten, der sich aufmerksam anfühlt.
 
-Es gibt mehrere unterschiedliche Strategien zur Verwaltung des Konversationsverlaufs, jede mit unterschiedlichen Kompromissen zwischen Kosten, Wiedergabetreue und Skalierbarkeit. Der einfachste Ansatz – jede Nachricht wörtlich zu behalten – funktioniert gut für kurze Gespräche, erschöpft aber schnell das Kontextfenster des Modells. Ausgefeiltere Muster verwenden Zusammenfassung oder semantische Indexierung, um den Verlauf zu komprimieren oder selektiv das abzurufen, was für die aktuelle Runde am relevantesten ist.
+Es gibt verschiedene Strategien zur Verwaltung des Gesprächsverlaufs, jede mit unterschiedlichen Abwägungen zwischen Kosten, Wiedergabetreue und Skalierbarkeit. Der einfachste Ansatz — jede Nachricht wörtlich beizubehalten — funktioniert bei kurzen Gesprächen gut, erschöpft aber schnell das Kontextfenster des Modells. Ausgefeiltere Muster verwenden Zusammenfassung oder semantische Indizierung, um den relevantesten Verlauf für den aktuellen Gesprächszug zu komprimieren oder selektiv abzurufen.
 
-Die Wahl des richtigen Gedächtnismusters hängt stark von der erwarteten Gesprächslänge, der Bedeutung des genauen Wortlauts gegenüber der semantischen Bedeutung und den Kostenbeschränkungen des Deployments ab. In der Praxis kombinieren Produktions-Chat-Agenten oft zwei oder mehr Muster: einen kurzfristigen wörtlichen Puffer für unmittelbare Kohärenz und eine Zusammenfassungs- oder Vektorschicht für Langzeit-Erinnerung.
+Die Wahl des richtigen Gedächtnismusters hängt stark von der erwarteten Gesprächslänge, der Bedeutung genauer Formulierungen gegenüber semantischer Bedeutung und den Kostenbeschränkungen der Bereitstellung ab. In der Praxis kombinieren produktive Chat-Agenten häufig zwei oder mehr Muster: einen kurzfristigen wörtlichen Puffer für unmittelbare Kohärenz und eine Zusammenfassungs- oder Vektorschicht für langfristiges Abrufen.
 
 ## Funktionsweise
 
-### Buffer-Gedächtnis
+### Puffergedächtnis
 
-Buffer-Gedächtnis ist das direkteste Muster: Der Agent hält eine geordnete Liste der letzten N Nachrichtenpaare und stellt sie jedem neuen Kontextfenster voran. Wenn der Puffer die Kapazität erreicht, wird das älteste Paar verworfen (FIFO). Dies garantiert, dass der Agent immer Zugang zu den jüngsten Austauschen hat, ohne Transformation oder verlustbehaftete Komprimierung. Buffer-Gedächtnis ist ideal für kurze bis mittlere Gespräche, bei denen Aktualität das primäre Signal ist, und verursacht keine zusätzlichen LLM-Aufrufe. Sein Hauptnachteil ist, dass älterer Kontext stillschweigend verloren geht, ohne jede Zusammenfassung.
+Puffergedächtnis ist das unkomplizierteste Muster: Der Agent führt eine geordnete Liste der letzten N Nachrichtenpaare und stellt sie jedem neuen Kontextfenster voran. Wenn der Puffer voll ist, wird das älteste Paar verworfen (FIFO). Dies garantiert, dass der Agent immer Zugang zu den jüngsten Austauschen hat, ohne Transformation oder verlustbehaftete Komprimierung. Puffergedächtnis ist ideal für kurze bis mittlere Gespräche und verursacht keine zusätzlichen LLM-Aufrufe. Der Hauptnachteil ist, dass älterer Kontext still verworfen wird, ohne eine Zusammenfassung.
 
-### Summary-Gedächtnis
+### Zusammenfassungsgedächtnis
 
-Summary-Gedächtnis löst das Vergessen-Problem, indem es ein LLM verwendet, um periodisch eine laufende Zusammenfassung des bisherigen Gesprächs zu generieren. Wenn der Puffer zu groß wird, verdichtet der Agent ihn zu einer kompakten Erzählung – er erfasst wichtige Fakten, Entscheidungen und Stimmung – und verwirft dann die rohen Nachrichten. Die Zusammenfassung belegt weit weniger Tokens als die ursprünglichen Gesprächsrunden, was lange Gespräche handhabbar macht. Der Kompromiss ist ein sekundärer LLM-Aufruf für jeden Zusammenfassungsschritt, der Latenz und Kosten erhöht, und einige Informationen gehen beim Komprimieren unvermeidlich verloren.
+Zusammenfassungsgedächtnis behebt das Vergessen-Problem, indem ein LLM periodisch eine laufende Zusammenfassung des bisherigen Gesprächs generiert. Wenn der Puffer zu groß wird, verdichtet der Agent ihn zu einer kompakten Erzählung — erfasst Schlüsselfakten, Entscheidungen und Stimmung — und verwirft dann die Rohnachrichten. Die Zusammenfassung belegt weit weniger Token als die ursprünglichen Gesprächszüge. Der Kompromiss ist ein sekundärer LLM-Aufruf für jeden Zusammenfassungsschritt, was Latenz und Kosten erhöht.
 
-### Vektor-Gedächtnis
+### Vektorgedächtnis
 
-Vektor-Gedächtnis bettet jede Gesprächsrunde ein und speichert sie in einer Vektordatenbank. Bei jeder neuen Runde werden die semantisch relevantesten vergangenen Austausche durch Ähnlichkeitssuche abgerufen und zusammen mit den jüngsten Puffer-Nachrichten in das Kontextfenster eingefügt. Dieses Muster eignet sich hervorragend, wenn Gespräche sehr lang sind oder wenn die aktuelle Frage auf etwas bezogen ist, das viele Runden zuvor gesagt wurde. Vektor-Gedächtnis ist der Ansatz mit der höchsten Wiedergabetreue für Langzeiterinnerung, erfordert aber Embedding-Infrastruktur und führt Abruf-Latenz ein.
+Vektorgedächtnis bettet jeden Gesprächszug ein und speichert ihn in einer Vektordatenbank. Bei jedem neuen Gesprächszug werden die semantisch relevantesten vergangenen Austausche durch Ähnlichkeitssuche abgerufen und in das Kontextfenster eingefügt. Dieses Muster glänzt, wenn Gespräche sehr lang sind oder wenn die aktuelle Frage etwas betrifft, das viele Gesprächszüge zurückliegt. Vektorgedächtnis erfordert Einbettungsinfrastruktur und führt zu Abruflatenz.
 
-### Entity-Gedächtnis
+### Entitätsgedächtnis
 
-Entity-Gedächtnis extrahiert benannte Entitäten – Personen, Orte, Produkte, Präferenzen – aus dem Gespräch und führt einen strukturierten Datensatz darüber, was der Agent über jede Entität weiß. Wenn eine Entität wieder erwähnt wird, wird ihr gespeichertes Profil in den Kontext eingefügt. Entity-Gedächtnis ist ideal für persönliche Assistenten, bei denen es wertvoller ist, sich zu erinnern, dass "Alice morgendliche Meetings bevorzugt" oder "der Projekttermin der 10. Juni ist", als sich an den genauen Wortlaut vergangener Nachrichten zu erinnern.
+Entitätsgedächtnis extrahiert benannte Entitäten — Personen, Orte, Produkte, Präferenzen — aus dem Gespräch und pflegt einen strukturierten Datensatz darüber, was der Agent über jede Entität weiß. Wenn eine Entität erneut erwähnt wird, wird ihr gespeichertes Profil in den Kontext eingefügt. Entitätsgedächtnis ist ideal für persönliche Assistenten, bei denen es wertvoller ist, sich zu erinnern, dass "Alice morgendliche Meetings bevorzugt" oder "der Projekttermin der 10. Juni ist".
 
 ```mermaid
 flowchart TD
@@ -52,21 +54,21 @@ flowchart TD
 
 | Verwenden wenn | Vermeiden wenn |
 |---|---|
-| Gespräche mehr als eine Handvoll Runden umfassen | Die Aufgabe Single-Turn ist, ohne Verlaufsbedarf |
-| Benutzer erwarten, dass der Agent sich an frühere Aussagen erinnert | Konversationsdaten aus Datenschutz- oder Compliance-Gründen nicht gespeichert werden können |
-| Kontextfenster-Kosten erheblich sind und der Verlauf lang ist | Das Gespräch immer kurz genug ist, um vollständig ins Kontextfenster zu passen |
-| Benutzer über mehrere Entitäten oder Themen in der Sitzung diskutieren | Zusammenfassungs-Latenz für den Anwendungsfall inakzeptabel ist |
-| Sitzungsübergreifende Erinnerung erforderlich ist (Vektor-/Entity-Muster) | Zusätzliche Infrastruktur-Komplexität den Wiedergabetreue-Nutzen überwiegt |
+| Gespräche sich über mehr als ein paar Gesprächszüge erstrecken | Die Aufgabe ein einzelner Gesprächszug ohne Verlaufsbedarf ist |
+| Benutzer erwarten, dass der Agent sich an ihre früheren Aussagen erinnert | Gesprächsdaten aus Datenschutz- oder Compliance-Gründen nicht gespeichert werden können |
+| Kontextfensterkosten erheblich sind und der Verlauf lang ist | Das Gespräch immer kurz genug ist, um vollständig ins Kontextfenster zu passen |
+| Benutzer mehrere Entitäten oder Themen in der Sitzung besprechen | Zusammenfassungslatenz für den Anwendungsfall inakzeptabel ist |
+| Sitzungsübergreifendes Abrufen erforderlich ist (Vektor-/Entitätsmuster) | Die zusätzliche Infrastrukturkomplexität den Wiedergabetreue-Nutzen überwiegt |
 
 ## Vergleiche
 
-| Kriterium | Buffer-Gedächtnis | Summary-Gedächtnis | Vektor-Gedächtnis |
+| Kriterium | Puffergedächtnis | Zusammenfassungsgedächtnis | Vektorgedächtnis |
 |---|---|---|---|
-| Kosten pro Runde | Niedrig (kein zusätzlicher LLM-Aufruf) | Mittel (gelegentlicher Zusammenfasser-Aufruf) | Mittel (Embedding-Aufruf + DB-Abfrage) |
-| Wiedergabetreue der Erinnerung | Exakt, aber auf letzte N Runden begrenzt | Verlustbehaftete Komprimierung älterer Runden | Hoch für semantisch relevante Inhalte |
-| Behandlung der Kontextlänge | Schlecht – älteste Runden stillschweigend verworfen | Gut – Zusammenfassung komprimiert alte Runden | Ausgezeichnet – ruft nur relevante Chunks ab |
-| Latenz | Minimal | Moderat (Zusammenfassung fügt einen Schritt hinzu) | Moderat (Embedding + Nearest-Neighbor-Suche) |
-| Sitzungsübergreifende Erinnerung | Nein (In-Memory-Puffer) | Möglich, wenn Zusammenfassung gespeichert wird | Ja (Vektorspeicher ist persistent) |
+| Kosten pro Gesprächszug | Niedrig (kein zusätzlicher LLM-Aufruf) | Mittel (gelegentlicher Zusammenfassungsaufruf) | Mittel (Einbettungsaufruf + DB-Abfrage) |
+| Wiedergabetreue des Abrufens | Genau aber auf die letzten N Gesprächszüge begrenzt | Verlustbehaftete Komprimierung älterer Gesprächszüge | Hoch für semantisch relevante Inhalte |
+| Kontextlängenverarbeitung | Schlecht — älteste Gesprächszüge werden still verworfen | Gut — Zusammenfassung komprimiert alte Gesprächszüge | Ausgezeichnet — ruft nur relevante Teile ab |
+| Latenz | Minimal | Mäßig (Zusammenfassung fügt einen Schritt hinzu) | Mäßig (Einbettung + Nächster-Nachbar-Suche) |
+| Sitzungsübergreifendes Abrufen | Nein (In-Memory-Puffer) | Möglich wenn Zusammenfassung persistiert wird | Ja (Vektorspeicher ist persistent) |
 | Implementierungskomplexität | Sehr niedrig | Niedrig–mittel | Mittel–hoch |
 
 ## Code-Beispiele
@@ -188,13 +190,13 @@ if __name__ == "__main__":
 
 ## Praktische Ressourcen
 
-- [LangChain Gedächtnis-Dokumentation](https://python.langchain.com/docs/concepts/memory/) — Umfassende Referenz für alle LangChain-Gedächtnisklassen mit Verwendungsbeispielen.
-- [Rethinking Memory in Conversational AI (Lilian Weng)](https://lilianweng.github.io/posts/2023-06-23-agent/#memory) — Ausführlicher Blog-Beitrag zur Gedächtnis-Taxonomie und Design-Kompromissen in Agentensystemen.
-- [MemoryOS: Memory-based Operating System for LLM Agents](https://arxiv.org/abs/2506.06326) — Forschung über hierarchisches Gedächtnismanagement, inspiriert vom OS-Design.
-- [OpenAI Assistants Thread Management](https://platform.openai.com/docs/assistants/how-it-works/managing-threads) — Wie OpenAIs verwaltete API persistente Konversations-Threads handhabt.
+- [LangChain Speicher-Dokumentation](https://python.langchain.com/docs/concepts/memory/) — Umfassende Referenz für alle LangChain-Speicherklassen mit Verwendungsbeispielen.
+- [Rethinking Memory in Conversational AI (Lilian Weng)](https://lilianweng.github.io/posts/2023-06-23-agent/#memory) — Ausführlicher Blog-Beitrag über Gedächtnis-Taxonomie und Design-Abwägungen in Agentensystemen.
+- [MemoryOS: Memory-based Operating System for LLM Agents](https://arxiv.org/abs/2506.06326) — Forschung zur hierarchischen Speicherverwaltung, inspiriert vom OS-Design.
+- [OpenAI Assistants Thread Management](https://platform.openai.com/docs/assistants/how-it-works/managing-threads) — Wie die verwaltete API von OpenAI persistente Gesprächs-Threads behandelt.
 
 ## Siehe auch
 
 - [Agentengedächtnis](/docs/agents/memory)
 - [KI-Agenten](/docs/agents)
-- [RAG-Embeddings](/docs/rag/embeddings)
+- [RAG-Einbettungen](/docs/rag/embeddings)

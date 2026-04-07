@@ -1,46 +1,60 @@
 ---
 sidebar_position: 1
-title: Introducción
-description: Cómo empezar con AI Summary Hub y visión general de los campos de IA.
-keywords: [AI, introducción, visión general, fundamentos]
+title: Introduction
+description: Getting started with AI Summary Hub and an overview of AI fields.
+keywords: [AI, introduction, overview, fundamentals]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Introducción
 
-Bienvenido a **AI Summary Hub**: tu fuente única de verdad para conceptos modernos de IA.
+Bienvenido a **AI Summary Hub** — su fuente única de referencia para conceptos modernos de IA.
 
-Este hub está pensado para **conocimiento profundo**: cada tema ofrece definiciones claras, cómo funciona (con diagramas y código cuando aplica) y enlaces a documentación oficial y codelabs para pasar de la comprensión a la construcción.
+Este hub está construido para el **conocimiento profundo**: cada tema le proporciona definiciones claras, cómo funciona (con diagramas y código donde sea útil), y enlaces a documentación oficial y codelabs para que pueda pasar de entender a construir.
 
-## Qué encontrarás aquí
+## Qué encontrará aquí
 
-Esta wiki cubre **más de 50 temas** en:
+Este wiki cubre **más de 50 temas** en:
 
 - **Fundamentos** — Aprendizaje automático, aprendizaje profundo, redes neuronales
-- **Transformers y LLMs** — Arquitectura, BERT, GPT, fine-tuning, ingeniería de prompts, streaming
+- **Transformers y LLMs** — Arquitectura, BERT, GPT, ajuste fino, ingeniería de prompts, streaming
 - **RAG** — Generación aumentada por recuperación, bases de datos vectoriales, embeddings
 - **Agentes y subagentes** — Agentes de IA, sistemas multiagente, jerarquías
-- **Patrones de razonamiento** — Cadena de pensamiento, árbol de pensamientos, ReAct, RDD
-- **Desarrollo orientado a especificaciones** — Construcción de sistemas de IA desde especificaciones
-- **Campos** — PLN, visión por computador, voz, robótica, **IA multimodal**
-- **Seguridad, ética, evaluación** — Seguridad en IA, sesgo, explicabilidad, benchmarks
-- **Infraestructura y despliegue** — Inferencia local, razonamiento en el edge, compresión de modelos, cuantización
+- **Patrones de razonamiento** — Chain-of-thought, tree-of-thoughts, ReAct, RDD (recuperación-decisión-diseño)
+- **Desarrollo guiado por especificaciones** — Construcción de sistemas de IA a partir de especificaciones
+- **Campos** — NLP, visión por computadora, voz, robótica, **IA multimodal**
+- **Seguridad, ética, evaluación** — Seguridad de IA, sesgo, explicabilidad, benchmarks
+- **Infraestructura y despliegue** — Inferencia local, razonamiento en el borde, compresión de modelos, cuantización
 - **Herramientas** — Hugging Face, LangChain, Cursor, Claude Code, Antigravity, Kiro, PyTorch, TensorFlow
-- **Casos de estudio** — ChatGPT, DALL·E, Claude, Gemini, BART, Grok, DeepSeek, Qwen
+- **Estudios de caso** — ChatGPT, DALL·E, Claude, Gemini, BART, Grok, DeepSeek, Qwen
 
-Cada tema incluye definiciones, ejemplos (código y diagramas), pros/contras, benchmarks y enlaces a **documentación externa** (docs oficiales, codelabs y artículos).
+Cada tema incluye definiciones, ejemplos (código y diagramas), pros/contras, benchmarks y **recursos prácticos** con enlaces a documentación oficial, codelabs y papers.
 
-## Aprende más
+## Cuándo usar este hub
 
-- [Google AI for Developers](https://ai.google.dev/) — Gemini, APIs y guías
-- [Hugging Face NLP Course](https://huggingface.co/learn/nlp-course/) — De transformers a LLMs
-- [From Prototypes to Agents with ADK (Codelab)](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — Construye tu primer agente con el Agent Development Kit de Google
+| Objetivo | Por dónde empezar |
+|---|---|
+| Nuevo en IA | [Fundamentos](/docs/fundamentals) luego [Redes Neuronales](/docs/neural-networks) |
+| Construir con LLMs | [LLMs](/docs/llms), [RAG](/docs/rag) y [Agentes](/docs/agents) |
+| Explorar razonamiento | [Patrones de Razonamiento](/docs/reasoning-patterns) y [RDD](/docs/reasoning-patterns/rdd) |
+| Ejecutar modelos localmente o en el borde | [Inferencia local](/docs/local-inference) y [Razonamiento en el borde](/docs/edge-reasoning) |
+| Multimodal (texto + imagen, etc.) | [IA Multimodal](/docs/multimodal-ai) |
+| Desplegar modelos en producción | [MLOps](/docs/mlops) e [Infraestructura](/docs/infrastructure) |
 
-## Cómo empezar
+## Comenzando
 
-- **¿Nuevo en IA?** Empieza con [Fundamentos](/docs/fundamentals) y [Redes neuronales](/docs/neural-networks).
-- **¿Construyes con LLMs?** Consulta [LLMs](/docs/llms), [RAG](/docs/rag) y [Agentes](/docs/agents).
-- **¿Explorando razonamiento?** Revisa [Patrones de razonamiento](/docs/reasoning-patterns) y [RDD](/docs/reasoning-patterns/rdd).
-- **¿Ejecutas modelos en local o en el edge?** Ver [Inferencia local](/docs/local-inference) y [Razonamiento en el edge](/docs/edge-reasoning).
-- **¿Multimodal (texto + imagen, etc.)?** Ver [IA multimodal](/docs/multimodal-ai).
+- **¿Nuevo en IA?** Empiece con [Fundamentos](/docs/fundamentals) y [Redes Neuronales](/docs/neural-networks).
+- **¿Construyendo con LLMs?** Vea [LLMs](/docs/llms), [RAG](/docs/rag) y [Agentes](/docs/agents).
+- **¿Explorando razonamiento?** Revise [Patrones de Razonamiento](/docs/reasoning-patterns) y [RDD](/docs/reasoning-patterns/rdd).
+- **¿Ejecutando modelos localmente o en el borde?** Vea [Inferencia local](/docs/local-inference) y [Razonamiento en el borde](/docs/edge-reasoning).
+- **¿Multimodal (texto + imagen, etc.)?** Vea [IA Multimodal](/docs/multimodal-ai).
 
-Usa la barra lateral para explorar todos los temas o la búsqueda para conceptos concretos.
+Use la barra lateral para navegar por todos los temas o la barra de búsqueda para encontrar conceptos específicos.
+
+## Recursos prácticos
+
+- [Google AI for Developers](https://ai.google.dev/) — Gemini, APIs y guías para construir aplicaciones de IA
+- [Hugging Face NLP Course](https://huggingface.co/learn/nlp-course/) — Curso práctico desde transformers hasta LLMs de producción
+- [From Prototypes to Agents with ADK (Codelab)](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — Construya su primer agente con el Kit de Desarrollo de Agentes de Google
+- [fast.ai – Practical Deep Learning](https://course.fast.ai/) — Curso de aprendizaje profundo práctico, de arriba hacia abajo y orientado al código

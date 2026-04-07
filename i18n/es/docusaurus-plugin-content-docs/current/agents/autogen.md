@@ -1,36 +1,38 @@
 ---
 title: AutoGen
-description: Framework de conversación multi-agente de Microsoft que permite a agentes potenciados por LLM colaborar mediante intercambios de mensajes estructurados, con ejecución de código integrada y soporte para humano en el bucle.
-keywords: [AutoGen, multi-agente, ConversableAgent, AssistantAgent, UserProxyAgent, chat grupal, ejecución de código, humano en el bucle, Microsoft]
+description: Microsoft's multi-agent conversation framework enabling LLM-powered agents to collaborate via structured message exchanges, with built-in code execution and human-in-the-loop support.
+keywords: [AutoGen, multi-agent, ConversableAgent, AssistantAgent, UserProxyAgent, group chat, code execution, human-in-the-loop, Microsoft]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # AutoGen
 
 ## Definición
 
-AutoGen es un framework de código abierto desarrollado por Microsoft Research para construir **sistemas de IA conversacional multi-agente**. Su idea central es simple: los agentes se comunican intercambiando mensajes en una conversación estructurada, y el framework maneja el enrutamiento, la gestión de turnos y la lógica de terminación. A diferencia de los frameworks basados en roles como CrewAI que definen a los agentes como personas con tareas, los agentes de AutoGen se definen principalmente por su **comportamiento en la conversación** — cómo responden a los mensajes, si pueden ejecutar código, y cuándo transfieren el control a otro agente o a un humano.
+AutoGen es un framework de código abierto desarrollado por Microsoft Research para construir **sistemas de IA conversacional multi-agente**. Su idea central es simple: los agentes se comunican intercambiando mensajes en una conversación estructurada, y el framework maneja la lógica de enrutamiento, turno y terminación. A diferencia de frameworks basados en roles como CrewAI que definen agentes como personas con tareas, los agentes AutoGen se definen principalmente por su **comportamiento conversacional** — cómo responden a los mensajes, si pueden ejecutar código y cuándo ceden el control a otro agente o a un humano.
 
-El primitivo más importante del framework es el `ConversableAgent` — una clase base que puede desempeñar cualquier rol dependiendo de su configuración. Dos especializaciones cubren los patrones más comunes: `AssistantAgent` (respaldado por un LLM, responde con planes y código) y `UserProxyAgent` (opcionalmente respaldado por un humano o ejecutor de código, ejecuta código localmente y alimenta los resultados de vuelta). Este patrón de dos agentes es poderoso de inmediato: obtienes un bucle de escritura de código donde el asistente propone soluciones y el proxy ejecuta e informa resultados, sin necesidad de scaffolding adicional.
+El primitivo más importante del framework es el `ConversableAgent` — una clase base que puede desempeñar cualquier rol dependiendo de su configuración. Dos especializaciones cubren los patrones más comunes: `AssistantAgent` (respaldado por un LLM, responde con planes y código) y `UserProxyAgent` (opcionalmente respaldado por un humano o un ejecutor de código, ejecuta código localmente y devuelve los resultados). Este patrón de dos agentes es poderoso de entrada: se obtiene un bucle de escritura de código donde el asistente propone soluciones y el proxy las ejecuta e informa resultados, sin andamiaje adicional.
 
-AutoGen también admite **chats grupales**, donde tres o más agentes se turnan para contribuir a una conversación compartida gestionada por un `GroupChatManager`. Esto permite patrones como paneles de expertos, bucles de debate y canalizaciones modulares donde cada agente maneja un paso específico. El humano en el bucle es una característica de primera clase: el `UserProxyAgent` puede pausar y pedir información a un humano en cualquier momento, lo que lo hace muy adecuado para flujos de trabajo de investigación y experimentación donde se desea inspeccionar o redirigir al agente durante la ejecución.
+AutoGen también admite **chats grupales**, donde tres o más agentes se turnan para contribuir a una conversación compartida gestionada por un `GroupChatManager`. Human-in-the-loop es una característica de primera clase: el `UserProxyAgent` puede pausar y pedir información humana en cualquier momento, lo que lo hace adecuado para flujos de trabajo de investigación y experimentación.
 
 ## Cómo funciona
 
 ### ConversableAgent: el bloque de construcción universal
 
-`ConversableAgent` es la clase base para todos los agentes de AutoGen. Mantiene un mensaje de sistema, una configuración opcional de LLM, una lista de funciones registradas (herramientas) y un conjunto de reglas sobre cuándo terminar una conversación (`is_termination_msg`). Cada agente tiene un método `generate_reply` que decide qué mensaje enviar a continuación dado el historial de conversación. Los agentes pueden ser agentes proxy humanos (pausan y piden entrada), agentes LLM (generan respuestas con un LLM) o agentes ejecutores (ejecutan código sin llamadas a LLM). Esta flexibilidad significa que una sola clase base cubre todo el espectro desde agentes completamente automatizados hasta completamente manuales.
+`ConversableAgent` es la clase base para todos los agentes AutoGen. Contiene un mensaje de sistema, una configuración LLM opcional, una lista de funciones registradas (herramientas) y un conjunto de reglas para cuándo terminar una conversación (`is_termination_msg`). Cada agente tiene un método `generate_reply` que decide qué mensaje enviar a continuación dado el historial de conversación. Los agentes pueden ser agentes proxy humanos (pausan y piden entrada), agentes LLM (generan respuestas con un LLM) o agentes ejecutores (ejecutan código sin llamadas LLM). Esta flexibilidad significa que una sola clase base cubre todo el espectro desde agentes completamente automatizados hasta completamente manuales.
 
 ### AssistantAgent y UserProxyAgent
 
-`AssistantAgent` es un `ConversableAgent` preconfigurado como un asistente de IA útil: tiene un mensaje de sistema predeterminado que lo incentiva a proponer bloques de código Python para tareas que requieren cómputo. `UserProxyAgent` está preconfigurado para ejecutar bloques de código en un contenedor Docker local o subproceso, informar resultados y opcionalmente pedir entrada humana cuando no puede proceder automáticamente. Juntos forman el bucle canónico de dos agentes de AutoGen: el asistente sugiere código, el proxy lo ejecuta, la salida vuelve al asistente y el bucle continúa hasta que la tarea está completa o se activa una condición de terminación. Este patrón es particularmente poderoso para análisis de datos, scripting de automatización y experimentación en ML.
+`AssistantAgent` es un `ConversableAgent` preconfigurado como asistente de IA útil: tiene un mensaje de sistema predeterminado que lo anima a proponer bloques de código Python para tareas que requieren cómputo. `UserProxyAgent` está preconfigurado para ejecutar bloques de código en un contenedor Docker local o subproceso, informar resultados y opcionalmente pedir entrada humana cuando no puede proceder automáticamente. Juntos forman el bucle canónico de dos agentes AutoGen: el asistente sugiere código, el proxy lo ejecuta, la salida vuelve al asistente, y el bucle continúa hasta que la tarea está completa o se activa una condición de terminación. Este patrón es particularmente poderoso para análisis de datos, scripts de automatización y experimentación de ML.
 
 ### Chats grupales y GroupChatManager
 
-Para flujos de trabajo con tres o más agentes, AutoGen proporciona `GroupChat` y `GroupChatManager`. `GroupChat` mantiene la lista de agentes participantes y el historial de mensajes compartido. `GroupChatManager` es en sí mismo un `ConversableAgent` que actúa como moderador: después de cada mensaje, selecciona al siguiente orador (ya sea por una regla de turno rotativo, una función de selección personalizada, o una estrategia de selección basada en LLM). Los chats grupales permiten patrones de panel de expertos donde un investigador, un programador y un revisor se turnan, o canalizaciones de múltiples pasos donde cada agente maneja una fase. El administrador también puede terminar la conversación cuando se cumple una condición global.
+Para flujos de trabajo con tres o más agentes, AutoGen proporciona `GroupChat` y `GroupChatManager`. `GroupChat` contiene la lista de agentes participantes y el historial de mensajes compartido. `GroupChatManager` es en sí mismo un `ConversableAgent` que actúa como moderador: después de cada mensaje selecciona al siguiente orador (ya sea por una regla de round-robin, una función selectora personalizada o una estrategia de selección basada en LLM). Los chats grupales permiten patrones de panel de expertos donde un investigador, un programador y un revisor se turnan, o pipelines de múltiples pasos donde cada agente maneja una fase.
 
-### Ejecución de código y humano en el bucle
+### Ejecución de código y human-in-the-loop
 
-La capa de ejecución de código de AutoGen es configurable: los agentes pueden ejecutar código localmente (subproceso), en un contenedor Docker (aislado) o mediante un ejecutor personalizado. El `UserProxyAgent` detecta bloques de código en los mensajes del asistente y los ejecuta automáticamente cuando `human_input_mode="NEVER"`. Configurar `human_input_mode="ALWAYS"` o `"TERMINATE"` pone la ejecución detrás de la aprobación humana, lo que permite patrones seguros de humano en el bucle para flujos de trabajo de producción o sensibles. Esto hace que AutoGen sea particularmente adecuado para tareas de codificación agéntica, automatización de ciencia de datos y entornos de investigación donde se desea que un humano revise las salidas antes de que surtan efecto.
+La capa de ejecución de código de AutoGen es configurable: los agentes pueden ejecutar código localmente (subproceso), en un contenedor Docker (aislado) o a través de un ejecutor personalizado. El `UserProxyAgent` detecta bloques de código en los mensajes del asistente y los ejecuta automáticamente cuando `human_input_mode="NEVER"`. Establecer `human_input_mode="ALWAYS"` o `"TERMINATE"` pone la ejecución detrás de la aprobación humana, permitiendo patrones seguros de human-in-the-loop para flujos de trabajo de producción o sensibles.
 
 ```mermaid
 flowchart LR
@@ -52,21 +54,21 @@ flowchart LR
 
 | Usar cuando | Evitar cuando |
 |---|---|
-| Necesitas agentes que escriban y ejecuten código como parte del flujo de trabajo | La ejecución de código no es necesaria y la sobrecarga de conversación no es bienvenida |
-| Quieres humano en el bucle en puntos de control configurables | Canalizaciones completamente automatizadas donde la intervención humana es indeseable |
-| Tu flujo de trabajo involucra investigación, experimentación o refinamiento iterativo | Necesitas una API declarativa y con opinión — AutoGen requiere más configuración manual |
-| Quieres un panel de expertos multi-agente o un patrón de debate (chat grupal) | Necesitas canalizaciones deterministas y testeables — las conversaciones no deterministas son más difíciles de probar unitariamente |
-| Estás prototipando asistentes de codificación agéntica o automatización de ciencia de datos | La latencia de producción es crítica — los bucles de conversación de múltiples turnos añaden una sobrecarga significativa |
+| Necesitas agentes que escriban y ejecuten código como parte del flujo de trabajo | La ejecución de código no es necesaria y el overhead conversacional no es deseado |
+| Quieres human-in-the-loop en puntos de control configurables | Pipelines completamente automatizados donde la intervención humana es indeseable |
+| Tu flujo de trabajo implica investigación, experimentación o refinamiento iterativo | Necesitas una API declarativa y opinada — AutoGen requiere más configuración manual |
+| Quieres un panel de expertos multi-agente o patrón de debate (chat grupal) | Necesitas pipelines deterministas y comprobables — los flujos conversacionales no deterministas son más difíciles de probar unitariamente |
+| Estás prototipando asistentes de codificación agénticos o automatización de ciencia de datos | La latencia de producción es crítica — los bucles de conversación de múltiples turnos añaden overhead significativo |
 
 ## Comparaciones
 
 | Criterio | AutoGen | CrewAI | LangGraph |
 |---|---|---|---|
-| **Metáfora central** | Agentes como participantes conversacionales | Agentes como miembros de una tripulación con roles | Comportamiento del agente como un grafo con estado |
-| **Gestión de estado** | Implícita: historial de mensajes compartido en GroupChat | Implícita: contexto de tarea y memoria de la tripulación | Explícita: estado TypedDict compartido entre nodos |
-| **Ejecución de código** | Primera clase: UserProxyAgent ejecuta bloques de código automáticamente | Solo mediante herramientas externas | Mediante nodos de herramientas en el grafo |
-| **Humano en el bucle** | Primera clase: `human_input_mode` en cada agente | Limitado: solo intervención manual | Primera clase: `interrupt_before` / `interrupt_after` en nodos del grafo |
-| **Curva de aprendizaje** | Media: intuitivo para desarrolladores Python, pero el enrutamiento del chat grupal puede ser complejo | Baja: la API declarativa es fácil de aprender | Alta: requiere pensar en términos de grafos |
+| **Metáfora central** | Agentes como participantes conversacionales | Agentes como miembros de la tripulación que juegan roles | Comportamiento del agente como grafo con estado |
+| **Gestión de estado** | Implícita: historial de mensajes compartido en GroupChat | Implícita: contexto de tarea y memoria de la tripulación | Explícita: estado TypedDict compartido entre todos los nodos |
+| **Ejecución de código** | De primera clase: UserProxyAgent ejecuta bloques de código automáticamente | Solo a través de herramientas externas | A través de nodos de herramientas en el grafo |
+| **Human-in-the-loop** | De primera clase: `human_input_mode` en cada agente | Limitado: solo intervención manual | De primera clase: `interrupt_before` / `interrupt_after` en nodos del grafo |
+| **Curva de aprendizaje** | Media: intuitivo para desarrolladores Python, pero el enrutamiento de chat grupal puede ser complejo | Baja: la API declarativa es fácil de aprender | Alta: requiere pensamiento basado en grafos |
 
 ## Ejemplos de código
 
@@ -186,9 +188,9 @@ group_proxy.initiate_chat(
 ## Recursos prácticos
 
 - [Documentación oficial de AutoGen](https://microsoft.github.io/autogen/) — Referencia completa del framework que cubre agentes, chat grupal, ejecución de código y uso de herramientas.
-- [Repositorio de AutoGen en GitHub](https://github.com/microsoft/autogen) — Código fuente, rastreador de problemas y un rico conjunto de notebooks de ejemplo.
-- [Artículo de AutoGen: "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation" (Wu et al., 2023)](https://arxiv.org/abs/2308.08155) — Artículo de investigación original que motiva el diseño multi-agente basado en conversación.
-- [AutoGen Studio](https://microsoft.github.io/autogen/docs/autogen-studio/getting-started) — Interfaz de usuario sin código para construir y probar flujos de trabajo de AutoGen, útil para prototipado.
+- [Repositorio GitHub de AutoGen](https://github.com/microsoft/autogen) — Código fuente, rastreador de problemas y un rico conjunto de notebooks de ejemplo.
+- [Paper de AutoGen: "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation" (Wu et al., 2023)](https://arxiv.org/abs/2308.08155) — Paper de investigación original que motiva el diseño multi-agente basado en conversación.
+- [AutoGen Studio](https://microsoft.github.io/autogen/docs/autogen-studio/getting-started) — UI sin código para construir y probar flujos de trabajo AutoGen, útil para prototipos.
 
 ## Ver también
 

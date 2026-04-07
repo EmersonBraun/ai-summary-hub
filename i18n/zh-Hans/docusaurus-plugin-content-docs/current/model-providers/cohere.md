@@ -1,36 +1,38 @@
 ---
 title: Cohere
-description: 专注于企业级 AI 平台，专注于用于大规模搜索和信息检索的嵌入、重排和 RAG。
-keywords: [cohere, 嵌入, 重排, RAG, 企业搜索, 多语言, Command R, Embed, Rerank, 语义搜索]
+description: Enterprise-focused AI platform specializing in embeddings, reranking, and RAG for search and information retrieval at scale.
+keywords: [cohere, embeddings, reranking, RAG, enterprise search, multilingual, Command R, Embed, Rerank, semantic search]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Cohere
 
 ## 定义
 
-**Cohere** 是一家企业级 AI 公司，专门为商业应用构建语言模型和 API，专注于搜索、信息检索和检索增强生成（RAG）。与提供广泛消费者和开发者功能的通用提供商不同，Cohere 面向需要可靠、生产就绪的 NLP 基础设施的企业客户——特别是对于*查找和呈现正确信息*是核心问题的用例。
+**Cohere** 是一家企业 AI 公司，专门为商业应用构建语言模型和 API，具有鲜明的搜索、信息检索和检索增强生成（RAG）焦点。与提供广泛消费者和开发者功能的通用提供商不同，Cohere 针对需要可靠的生产就绪 NLP 基础设施的企业客户——特别是*找到并呈现正确信息*是核心问题的用例。
 
-Cohere 的模型系列反映了这一重点。**Command R** 和 **Command R+** 是专门针对 RAG 工作流优化的对话和指令遵循模型——它们支持长上下文窗口，并经过训练能可靠地遵循基于检索的提示。**Embed** 提供跨 100 多种语言的最先进的多语言密集向量嵌入，是全球企业搜索应用的首选。**Rerank** 是一个交叉编码器模型，它接收一组初始检索的文档，并根据原始查询重新对它们进行评分，以实现单纯稀疏和密集检索无法达到的精确度。
+Cohere 的模型阵容反映了这一重点。**Command R** 和 **Command R+** 是专门针对 RAG 工作流程优化的对话式和指令跟随模型——它们支持长上下文窗口，并经过训练能够可靠地遵循基于检索的提示。**Embed** 在 100 多种语言中提供最先进的多语言密集向量嵌入，使其成为全球企业搜索应用的首选。**Rerank** 是一个交叉编码器模型，对初始检索到的文档集进行重新评分，实现稀疏和密集检索单独无法达到的精度。
 
-Cohere 与 OpenAI 等通用提供商的区别在于，其整个产品套件都围绕检索管道作为一等工作流而设计。Embed、Rerank 和 Command R 模型被构建为协同工作的整体技术栈，Cohere 还提供满足严格企业数据治理和合规要求的本地部署和私有云部署选项——这对于金融、医疗和政府等受监管行业是关键区别。
+Cohere 与 OpenAI 等通用提供商的区别在于，其整个产品套件都是围绕检索管道作为一流工作流程设计的。Embed、Rerank 和 Command R 模型被构建为协同工作的一致堆栈，Cohere 提供满足严格企业数据治理和合规要求的本地部署和私有云部署选项——这是金融、医疗和政府等受监管行业的关键区别。
 
 ## 工作原理
 
 ### 聊天和生成 API
 
-Command R 和 Command R+ 模型通过 Cohere 的聊天 API 访问，同时支持对话式多轮交互和单轮生成任务。Command R+ 是更大、功能更强的变体，适用于复杂推理和重文档的 RAG；而 Command R 针对高吞吐量生产管道中的低延迟和低成本进行了优化。两个模型都接受 `documents` 参数，允许您将检索到的上下文直接传入提示，实现原生 RAG 模式，其中模型被指示基于提供的内容回答并引用来源。
+Command R 和 Command R+ 模型通过 Cohere 的聊天 API 访问，支持多轮对话交互和单轮生成任务。Command R+ 是更大、更有能力的变体，适合复杂推理和文档密集型 RAG，而 Command R 在高吞吐量生产管道中针对更低的延迟和成本进行了优化。两个模型都接受 `documents` 参数，允许您将检索到的上下文直接传递到提示中，启用原生 RAG 模式，指示模型将其答案基于提供的内容并引用来源。
 
-### 嵌入 API（多语言嵌入）
+### Embed API（多语言嵌入）
 
-嵌入 API 将文本转换为适合语义相似性搜索的密集向量表示。Cohere 的嵌入模型在单一模型中支持 100 多种语言，使得跨语言搜索和多语言文档检索无需单独的语言特定模型即可实现。嵌入可以使用不同的 `input_type` 值生成——`search_document` 用于索引时内容，`search_query` 用于运行时查询编码——这种区分应用了非对称训练信号，通常比对称嵌入方案提高检索准确性。
+Embed API 将文本转换为适合语义相似性搜索的密集向量表示。Cohere 的嵌入模型在单个模型中支持 100 多种语言，使得跨语言搜索和多语言文档检索无需单独的语言特定模型成为可能。嵌入可以使用不同的 `input_type` 值生成——`search_document` 用于索引静态内容，`search_query` 用于在运行时编码查询——这种区别应用了不对称的训练信号，通常比对称嵌入方案提高检索准确率。
 
-### 重排 API
+### Rerank API
 
-重排 API 接受查询和候选文档列表（通常是向量或关键词搜索的 top-k 结果），并通过交叉编码器计算的相关性分数返回每个文档。交叉编码器在单次前向传播中联合评估查询和文档，比分别编码查询和文档的双编码器具有更高的精确度。重排是一个轻量但高效的步骤，能显著提高 precision@k——当初始检索相对廉价（BM25 或 ANN 搜索）但在将上下文传递给 LLM 之前需要最大化精确度时，它最具价值。
+Rerank API 接受一个查询和一组候选文档（通常是向量或关键字搜索的 top-k 结果），并返回每个文档及由交叉编码器计算的相关性分数。交叉编码器在单次前向传递中联合评估查询和文档，提供比分别编码查询和文档的双编码器高得多的精度。重排序是一个轻量但高效的步骤，可以显著提高精度@k——当初始检索相对便宜（BM25 或 ANN 搜索）但在将上下文传递给 LLM 之前需要最大化精度时，它最有价值。
 
 ### RAG 集成
 
-Cohere 的 RAG 集成将 Embed、Rerank 和 Command R 连接成统一管道。典型流程是：嵌入查询、在向量数据库中运行近似最近邻搜索、对 top 候选进行重排以获取最相关文档，然后将这些文档与原始查询一起传递给 Command R 以进行有依据的生成。模型返回答案以及引用检索文档中特定段落的引用对象，使构建可审计、有来源的 AI 应用变得简单。
+Cohere 的 RAG 集成将 Embed、Rerank 和 Command R 整合到统一的管道中。典型流程是：嵌入查询，在向量数据库中运行近似最近邻搜索，对顶部候选进行重排序以获得最相关的文档，然后将这些文档与原始查询一起传递给 Command R 进行基础生成。模型返回答案以及引用对象，这些对象引用检索到的文档中的特定段落，使构建可审计的、有来源引用的 AI 应用变得简单。
 
 ```mermaid
 flowchart LR
@@ -45,37 +47,37 @@ flowchart LR
   E2 -->|document vectors| VDB
 ```
 
-## 何时使用 / 何时不使用
+## 何时使用 / 何时不用
 
 | 使用场景 | 避免场景 |
-|----------|------------|
-| 构建企业搜索或知识库问答，检索精确度至关重要 | 需要没有检索组件的通用聊天助手 |
-| 内容跨多种语言，需要单一嵌入模型处理所有语言 | 主要用例是图像、音频或多模态——Cohere 仅支持文本 |
-| 希望在初始向量或 BM25 搜索后添加重排步骤以提高精确度 | 独立任务需要高强度推理、数学或编码能力（GPT-4o 或 Claude 可能表现更好） |
-| 数据治理要求必须在本地或私有云部署 | 项目是快速原型，需要最广泛的集成生态系统 |
-| 需要在模型输出中原生支持来源引用和文档接地 | 预算极为紧张——Cohere 的企业定价高于某些替代方案 |
+|---------|---------|
+| 构建企业搜索或知识库问答，检索精度至关重要 | 需要无检索组件的通用聊天助手 |
+| 内容跨多种语言，需要一个模型覆盖所有语言 | 用例主要是图像、音频或多模态——Cohere 仅支持文本 |
+| 想在初始向量或 BM25 搜索后添加重排序步骤以提高精度 | 需要高能力推理、数学或编码用于独立任务 |
+| 数据治理要求要求本地或私有云部署 | 项目是快速原型，需要最广泛的集成生态系统 |
+| 需要模型输出中原生的来源引用和文档基础 | 预算极其紧张——Cohere 的企业定价高于一些替代品 |
 
-## 比较
+## 对比
 
 | 标准 | Cohere | OpenAI | Mistral |
-|----------|--------|--------|---------|
-| 嵌入质量（MTEB） | 多语言顶级，100+ 种语言 | 强大的英语优先（text-embedding-3-large） | 有竞争力；mistral-embed 可用 |
-| 重排 | 原生重排 API（交叉编码器） | 无原生重排端点 | 无原生重排端点 |
-| RAG 原生模型 | Command R/R+ 专为带引用的 RAG 设计 | GPT-4o 与 RAG 提示配合良好，但非 RAG 原生 | Mixtral/Mistral 与 RAG 提示配合使用 |
-| 开放权重 | 否（仅专有 API） | 否（仅专有 API） | 是（Mistral 模型在 Hugging Face 上） |
+|-----|--------|--------|---------|
+| 嵌入质量（MTEB） | 顶级多语言，100+ 种语言 | 英语优先较强（text-embedding-3-large） | 有竞争力；mistral-embed 可用 |
+| 重排序 | 原生 Rerank API（交叉编码器） | 无原生重排序端点 | 无原生重排序端点 |
+| RAG 原生模型 | Command R/R+ 专为带引用的 RAG 设计 | GPT-4o 与 RAG 提示配合良好但非 RAG 原生 | Mixtral/Mistral 与 RAG 提示配合 |
+| 开放权重 | 否（仅专有 API） | 否（仅专有 API） | 是（Hugging Face 上的 Mistral 模型） |
 | 本地/私有云 | 是（企业合同） | Azure OpenAI（有限） | 是（自托管开放权重） |
-| 多语言嵌入 | 单一模型，100+ 种语言 | 单独或有限的多语言支持 | 有限的多语言嵌入支持 |
-| 定价模式 | 企业/按 token | 按 token，文档完善 | 按 token；自托管选项免费 |
+| 多语言嵌入 | 单一模型，100+ 种语言 | 独立或有限的多语言支持 | 有限的多语言嵌入支持 |
+| 定价模式 | 企业级/按 token 付费 | 按 token 付费，文档详细 | 按 token 付费；自托管选项免费 |
 
 ## 优缺点
 
 | 优点 | 缺点 |
 |------|------|
-| 单一模型中业界一流的多语言嵌入 | 与 OpenAI 相比，通用生态系统较小 |
-| 原生重排 API 显著提高检索精确度 | 没有用于自托管的开放权重选项 |
-| Command R/R+ 专为有依据、带引用的 RAG 构建 | 在复杂的独立推理方面不如 GPT-4o/Claude |
-| 企业级部署选项，包括私有云 | 文档和社区资源比 OpenAI 少 |
-| RAG 管道组件（Embed + Rerank + Command R）作为整体技术栈协同工作 | 小规模实验的定价可能较高 |
+| 单一模型中的顶级多语言嵌入 | 与 OpenAI 相比，通用生态系统较小 |
+| 原生 Rerank API 显著提高检索精度 | 无自托管的开放权重选项 |
+| Command R/R+ 专为基础性带引用的 RAG 构建 | 对于独立的复杂推理，不如 GPT-4o / Claude 有能力 |
+| 企业级部署选项，包括私有云 | 文档和社区资源不如 OpenAI 丰富 |
+| RAG 管道组件（Embed + Rerank + Command R）作为一致堆栈协同工作 | 小规模实验的定价可能较高 |
 
 ## 代码示例
 
@@ -93,7 +95,7 @@ response = co.chat(
 print(response.text)
 ```
 
-### 用于语义搜索的嵌入
+### 语义搜索的嵌入
 
 ```python
 import cohere
@@ -131,7 +133,7 @@ top_idx = int(np.argmax(scores))
 print(f"Most relevant: '{documents[top_idx]}' (score: {scores[top_idx]:.4f})")
 ```
 
-### 对检索候选进行重排
+### 对检索候选进行重排序
 
 ```python
 import cohere
@@ -185,15 +187,15 @@ for citation in response.citations:
 
 ## 实用资源
 
-- [Cohere API 文档](https://docs.cohere.com/) — 所有 Cohere API 的完整参考，包括 Chat、Embed 和 Rerank
+- [Cohere API 文档](https://docs.cohere.com/) — 所有 Cohere API 的完整参考，包括聊天、嵌入和重排序
 - [Cohere Embed 文档](https://docs.cohere.com/docs/embeddings) — 嵌入模型、输入类型和多语言支持的详细指南
-- [Cohere Rerank 文档](https://docs.cohere.com/docs/reranking) — 重排 API 指南，包含示例和模型选择建议
-- [Cohere RAG 指南](https://docs.cohere.com/docs/retrieval-augmented-generation-rag) — 使用 Command R 构建 RAG 管道的端到端演示
-- [MTEB 排行榜](https://huggingface.co/spaces/mteb/leaderboard) — 包括 Cohere Embed 在内的嵌入模型独立基准测试
+- [Cohere Rerank 文档](https://docs.cohere.com/docs/reranking) — 带示例和模型选择建议的 Rerank API 指南
+- [Cohere RAG 指南](https://docs.cohere.com/docs/retrieval-augmented-generation-rag) — 使用 Command R 构建 RAG 管道的端到端演练
+- [MTEB Leaderboard](https://huggingface.co/spaces/mteb/leaderboard) — 比较包括 Cohere Embed 在内的嵌入模型的独立基准测试
 
 ## 另请参阅
 
 - [模型提供商](/docs/model-providers)
 - [RAG](/docs/rag)
-- [嵌入](/docs/rag/embeddings)
+- [Embeddings](/docs/rag/embeddings)
 - [语义搜索](/docs/semantic-search)

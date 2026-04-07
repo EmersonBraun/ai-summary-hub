@@ -1,36 +1,38 @@
 ---
 title: DeepSeek
-description: Chinesisches KI-Labor, das Open-Weights-Modelle mit modernsten Schlussfolgerungs- und Codierungsfähigkeiten zu deutlich niedrigeren Kosten als proprietäre Alternativen anbietet.
-keywords: [deepseek, DeepSeek-V3, DeepSeek-R1, Schlussfolgerungsmodell, Chain-of-Thought, offene Gewichte, Codegenerierung, kosteneffizientes LLM, chinesische KI]
+description: Chinese AI lab offering open-weights models with state-of-the-art reasoning and coding capabilities at significantly lower cost than proprietary alternatives.
+keywords: [deepseek, DeepSeek-V3, DeepSeek-R1, reasoning model, chain-of-thought, open weights, code generation, cost-efficient LLM, Chinese AI]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # DeepSeek
 
 ## Definition
 
-**DeepSeek** ist ein chinesisches KI-Forschungslabor und eine kommerzielle Plattform, die internationale Aufmerksamkeit für die Entwicklung von Modellen erregt hat, die mit den besten proprietären Modellen konkurrenzfähige Leistung erzielen, während die Gewichte offen veröffentlicht werden und zu einem Bruchteil der Kosten betrieben werden. DeepSeek wurde 2023 als Tochterunternehmen von High-Flyer (einem quantitativen Hedgefonds) gegründet und zeichnet sich durch rigorose Forschung zur Trainingseffizienz aus – einschließlich Innovationen in Mixture-of-Experts-(MoE-)Architekturen, Reinforcement Learning from Human Feedback und neuartigen Ansätzen zum Schlussfolgern, die nicht auf massive Rechenbudgets angewiesen sind.
+**DeepSeek** ist ein chinesisches KI-Forschungslabor und eine kommerzielle Plattform, die international erhebliche Aufmerksamkeit erlangt hat, indem sie Modelle produziert, die mit den besten proprietären Modellen konkurrenzfähig sind, die Gewichte offen veröffentlicht und zu einem Bruchteil der Kosten betrieben werden. DeepSeek wurde 2023 als Tochtergesellschaft von High-Flyer (einem quantitativen Hedgefonds) gegründet und zeichnet sich durch rigorose Forschung zur Trainingseffizienz aus — einschließlich Innovationen in Mixture-of-Experts (MoE)-Architekturen, Reinforcement Learning from Human Feedback und neuartigen Ansätzen zum Reasoning, die nicht auf massive Rechenbudgets angewiesen sind.
 
-Die Modellreihe umfasst drei große Fähigkeitsbereiche. **DeepSeek-V3** ist ein Allzweck-Chat- und Anweisungsfolgemodell, das GPT-4o und Claude 3.5 Sonnet auf Standardbenchmarks übertrifft und dabei deutlich günstiger über die API zugänglich ist. **DeepSeek-R1** ist ein dediziertes Schlussfolgerungsmodell, das erweitertes Chain-of-Thought (CoT) verwendet – das Modell generiert explizite Schlussfolgerungsspuren vor einer endgültigen Antwort –, was es besonders stark bei Mathematik, logischer Deduktion und mehrstufigem Problemlösen macht. **DeepSeek-Coder** (und seine Nachfolgervarianten, die in V3/R1 integriert sind) ist auf Codegenerierung, Vervollständigung und Debugging in einer Vielzahl von Programmiersprachen spezialisiert.
+Die Modellpalette umfasst drei Hauptfähigkeitsbereiche. **DeepSeek-V3** ist ein Allzweck-Chat- und Instruktionsfolgemodell, das GPT-4o und Claude 3.5 Sonnet auf Standard-Benchmarks annähernd erreicht, während es über die API dramatisch günstiger zugänglich ist. **DeepSeek-R1** ist ein dediziertes Reasoning-Modell, das erweitertes Chain-of-Thought (CoT) verwendet — das Modell generiert explizite Reasoning-Traces vor der endgültigen Antwort — was es besonders stark in Mathematik, logischer Deduktion und mehrstufiger Problemlösung macht. **DeepSeek-Coder** (und seine Nachfolgervarianten, die in V3/R1 integriert sind) spezialisiert sich auf Code-Generierung, -Vervollständigung und Debugging in einer Vielzahl von Programmiersprachen.
 
-DeepSeeks Open-Weights-Ansatz bedeutet, dass alle wichtigen Modelle auf Hugging Face unter permissiven Lizenzen verfügbar sind und auf Ihrer eigenen Infrastruktur selbst gehostet werden können – eine kritische Fähigkeit für Organisationen mit Datensouveränitätsanforderungen oder solche, die per-Token-API-Kosten im großen Maßstab vermeiden möchten. Die DeepSeek-Plattform stellt auch eine API bereit, die mit dem OpenAI-API-Format kabelkompatibel ist, was bedeutet, dass jede Anwendung, die mit dem OpenAI-Python-SDK erstellt wurde, durch Änderung der `base_url` und des API-Schlüssels ohne weitere Codeänderungen zu DeepSeek-Modellen wechseln kann.
+DeepSeeks Open-Weights-Ansatz bedeutet, dass alle wichtigen Modelle auf Hugging Face unter permissiven Lizenzen verfügbar sind und auf eigener Infrastruktur selbst gehostet werden können — eine kritische Fähigkeit für Organisationen mit Datensouveränitätsanforderungen oder solche, die API-Kosten pro Token bei großem Volumen vermeiden möchten. Die DeepSeek-Plattform stellt auch eine API bereit, die wire-kompatibel mit dem OpenAI-API-Format ist, was bedeutet, dass jede mit dem OpenAI-Python-SDK erstellte Anwendung durch Änderung der `base_url` und des API-Schlüssels ohne sonstige Codeänderungen auf DeepSeek-Modelle umstellen kann.
 
 ## Funktionsweise
 
 ### API-Plattform
 
-DeepSeek hostet eine Cloud-Inferenz-API unter `api.deepseek.com`, die Anfragen im OpenAI-Chat-Completions-Format akzeptiert. Diese Kompatibilitätsschicht bedeutet, dass der Integrationsaufwand minimal ist – Entwickler, die mit dem OpenAI-SDK vertraut sind, können DeepSeek-Modelle in Minuten migrieren oder testen. Die Plattform unterstützt Streaming-Antworten, Funktionsaufrufe und System-Prompts. Die Preise sind tokenbasiert und öffentlich aufgeführt, wobei die Raten typischerweise 90–95 % niedriger sind als bei gleichwertigen OpenAI-Modellen, was Hochvolumen-Produktionsbereitstellungen erheblich günstiger macht.
+DeepSeek hostet eine Cloud-Inferenz-API unter `api.deepseek.com`, die Anfragen im OpenAI-Chat-Completions-Format akzeptiert. Diese Kompatibilitätsschicht bedeutet, dass der Integrationsaufwand minimal ist — mit dem OpenAI-SDK vertraute Entwickler können DeepSeek-Modelle in Minuten migrieren oder testen. Die Plattform unterstützt Streaming-Antworten, Funktionsaufruf und System-Prompts. Die Preise sind tokenbasiert und öffentlich gelistet, mit Tarifen, die typischerweise 90–95% niedriger als gleichwertige OpenAI-Modelle sind, was hochvolumige Produktionsbereitstellungen erheblich günstiger macht.
 
-### Schlussfolgerungsmodelle (DeepSeek-R1)
+### Reasoning-Modelle (DeepSeek-R1)
 
-DeepSeek-R1 wird mit einem mehrstufigen Prozess trainiert, der Reinforcement Learning einbezieht, um das Modell dafür zu belohnen, korrekte Endantworten zu produzieren – ohne sich in der Kerntainingsstufe auf überwachte Chain-of-Thought-Daten zu verlassen. Das Modell generiert einen `<think>`-Block mit seiner Schlussfolgerungsspur vor der endgültigen Antwort. Dieses explizite Notizbuch ermöglicht es dem Modell, mehrstufige Deduktionen durchzuführen, seine Arbeit zu überprüfen und von falschen Pfaden zurückzukehren – Verhaltensweisen, die die Leistung bei Mathematikolympiade-Problemen, formaler Logik und komplexen Codierungsaufgaben, die Planung über viele Schritte hinweg erfordern, dramatisch verbessern.
+DeepSeek-R1 wird mit einem mehrstufigen Prozess trainiert, der Reinforcement Learning einsetzt, um das Modell für die Produktion korrekter endgültiger Antworten zu belohnen — entscheidend, ohne auf überwachte Chain-of-Thought-Daten in der Kerntrain-Phase zu setzen. Das Modell generiert einen `<think>`-Block mit seinem Reasoning-Trace vor der endgültigen Antwort. Dieser explizite Notizblock ermöglicht es dem Modell, mehrstufige Deduktion durchzuführen, seine Arbeit zu überprüfen und von falschen Pfaden zurückzukehren — Verhaltensweisen, die die Leistung bei Mathematik-Olympiade-Problemen, formaler Logik und komplexen Codierungsaufgaben, die eine Planung über viele Schritte erfordern, dramatisch verbessern.
 
-### Codemodelle und DeepSeek-Coder
+### Code-Modelle und DeepSeek-Coder
 
-DeepSeeks codespecialisierte Modelle werden auf großen Corpora von Quellcode (GitHub, Wettkampfprogrammierplattformen, Dokumentation) vortrainiert und für das Befolgen von Anweisungen bei Codierungsaufgaben feinabgestimmt. Sie unterstützen Fill-in-the-Middle-(FIM-)Vervollständigung, das Standardformat für IDE-Autovervollständigungstools wie Copilot. DeepSeek-Coder erreicht Spitzenleistung bei HumanEval, MBPP und SWE-bench und übertrifft oft Modelle, die von anderen Anbietern mehrfach größer sind. Die Codierungsfähigkeiten sind auch in DeepSeek-V3 und R1 integriert, sodass Allzweckmodelle ebenfalls gut bei Codeaufgaben abschneiden.
+DeepSeeks code-spezialisierte Modelle werden auf großen Korpora von Quellcode (GitHub, Wettbewerbsprogrammierungsplattformen, Dokumentation) vortrainiert und für das Befolgen von Codierungsaufgaben feinabgestimmt. Sie unterstützen Fill-in-the-Middle (FIM)-Vervollständigung, das Standardformat für IDE-Autovervollständigungs-Tools wie Copilot. DeepSeek-Coder erzielt Top-Leistungen auf HumanEval, MBPP und SWE-bench und übertrifft häufig Modelle, die von anderen Anbietern mehrfach größer sind. Die Codierungsfähigkeiten sind auch in DeepSeek-V3 und R1 integriert, sodass Allzweckmodelle auch bei Code-Aufgaben gut abschneiden.
 
 ### Open-Weights-Bereitstellung
 
-Alle wichtigen DeepSeek-Modelle haben ihre Gewichte unter permissiven Lizenzen auf Hugging Face veröffentlicht, was selbst gehostete Inferenz auf Consumer- oder Enterprise-GPU-Hardware ermöglicht. DeepSeek-V3 verwendet eine Mixture-of-Experts-Architektur, bei der nur ein Teilsatz der Parameter pro Token aktiviert wird, was die Inferenzkosten im Vergleich zu dichten Modellen vergleichbarer Fähigkeit erheblich reduziert. Beliebte Bereitstellungsoptionen umfassen vLLM, Ollama (für quantisierte Versionen) und NVIDIA NIM-Container. Selbst gehostete Bereitstellung ist besonders attraktiv für Großbatch-Workloads, Feinabstimmung auf proprietären Daten oder Szenarien, in denen alle Daten On-Premises verbleiben müssen.
+Alle wichtigen DeepSeek-Modelle haben ihre Gewichte auf Hugging Face unter permissiven Lizenzen veröffentlicht, was selbst gehostete Inferenz auf Consumer- oder Enterprise-GPU-Hardware ermöglicht. DeepSeek-V3 verwendet eine Mixture-of-Experts-Architektur, bei der nur eine Teilmenge der Parameter pro Token aktiviert wird, was die Inferenzkosten im Vergleich zu dichten Modellen vergleichbarer Leistungsfähigkeit erheblich reduziert. Beliebte Bereitstellungsoptionen sind vLLM, Ollama (für quantisierte Versionen) und NVIDIA NIM-Container. Die selbst gehostete Bereitstellung ist besonders attraktiv für groß angelegte Batch-Workloads, Feinabstimmung auf proprietären Daten oder Szenarien, in denen alle Daten On-Premises bleiben müssen.
 
 ```mermaid
 flowchart TD
@@ -41,7 +43,7 @@ flowchart TD
   API -->|reasoning tasks| R1[DeepSeek-R1]
   SH -->|open weights| HF[Hugging Face\nModel Weights]
 
-  R1 -->|generates reasoning trace| THINK["&lt;think&gt; block\n(chain-of-thought)"]
+  R1 -->|generates reasoning trace| THINK["\<think\> block\n(chain-of-thought)"]
   THINK -->|produces| ANS[Final Answer]
   V3 -->|direct response| ANS
 ```
@@ -49,34 +51,34 @@ flowchart TD
 ## Wann verwenden / Wann NICHT verwenden
 
 | Verwenden wenn | Vermeiden wenn |
-|----------|------------|
-| Kosten eine primäre Einschränkung sind — DeepSeek-API ist 90 %+ günstiger als GPT-4o bei vergleichbarer Qualität | Sie einen Anbieter mit einem etablierten Enterprise-SLA, Compliance-Zertifizierungen (SOC 2, HIPAA) oder US-basierter Datenverarbeitung benötigen |
-| Aufgaben tiefes mehrstufiges Schlussfolgern erfordern: Mathematik, Logik, formale Beweise, komplexe Codierung | Ihre Aufgabe primär multimodal ist — DeepSeek-V3/R1 sind nur Text-Modelle |
+|----------------|----------------|
+| Kosten eine primäre Einschränkung sind — DeepSeek-API ist 90%+ günstiger als GPT-4o bei vergleichbarer Qualität | Sie einen Anbieter mit etabliertem Enterprise-SLA, Compliance-Zertifizierungen (SOC 2, HIPAA) oder US-basierter Datenverarbeitung benötigen |
+| Aufgaben tiefes mehrstufiges Reasoning erfordern: Mathematik, Logik, formale Beweise, komplexe Codierung | Ihre Aufgabe primär multimodal ist — DeepSeek-V3/R1 sind nur-Text-Modelle |
 | Sie Open-Weight-Modelle für Datensouveränität oder benutzerdefinierte Feinabstimmung selbst hosten möchten | Sie das breitestmögliche Plugin-/Tool-Ökosystem und Drittanbieter-Integrationen benötigen |
-| Sie Hochvolumen-Batch-Pipelines aufbauen, bei denen die Reduzierung der per-Token-Kosten erheblich zunimmt | Latenzempfindliche Verbraucheranwendungen, bei denen R1s Schlussfolgerungsspur die Antwortzeit verlängert |
-| Codegenerierung, Code-Review oder Debugging Ihre primären Anwendungsfälle sind | Sie sich in einer Rechtsordnung mit regulatorischen Anforderungen an den Ursprung von KI-Modellen befinden |
+| Hochvolumige Batch-Pipelines aufgebaut werden, bei denen sich die Reduzierung der Pro-Token-Kosten erheblich ansammelt | Latenz-kritische Consumer-Anwendungen, bei denen R1s Reasoning-Trace die Antwortzeit verlängert |
+| Code-Generierung, Code-Review oder Debugging Ihre primären Anwendungsfälle sind | Sie sich in einer Jurisdiktion mit regulatorischen Anforderungen bezüglich der Herkunft von KI-Modellen befinden |
 
 ## Vergleiche
 
 | Kriterium | DeepSeek (V3 / R1) | OpenAI (GPT-4o / o1) | Meta / Llama |
-|----------|--------------------|----------------------|--------------|
-| Schlussfolgerungsleistung | R1 wettbewerbsfähig mit o1 bei Mathematik-/Logik-Benchmarks | o1 ist erstklassig; GPT-4o stark bei allgemeinem Schlussfolgern | Llama 3.x wettbewerbsfähig, aber unter R1/o1 bei hartem Schlussfolgern |
-| Allgemeine Chat-Qualität | V3 wettbewerbsfähig mit GPT-4o | GPT-4o bestklassige allgemeine Qualität | Llama 3.3 70B wettbewerbsfähig für die Größe |
-| Offene Gewichte | Ja (alle Modelle auf Hugging Face) | Nein (nur proprietär) | Ja (Meta veröffentlicht Llama als Open Source) |
-| API-Kosten | Sehr niedrig (~0,27 $/M Eingabe-Token für V3) | Hoch (~2,50 $/M für GPT-4o-Eingabe) | Kostenlos (self-host); Fireworks/Together API erschwinglich |
-| Ökosystem & Integrationen | Wachsend; OpenAI-kompatible API erleichtert die Übernahme | Größtes Ökosystem, die meisten Integrationen | Großes Open-Source-Ökosystem |
-| Datensouveränität | Self-Host möglich; API-Daten in China verarbeitet | Azure OpenAI für US-Regionalverarbeitung | Vollständiges Self-Host möglich |
+|-----------|--------------------|----------------------|--------------|
+| Reasoning-Leistung | R1 konkurrenzfähig mit o1 bei Mathematik-/Logik-Benchmarks | o1 ist erstklassig; GPT-4o stark beim allgemeinen Reasoning | Llama 3.x konkurrenzfähig, aber unterhalb R1/o1 bei hartem Reasoning |
+| Allgemeine Chat-Qualität | V3 konkurrenzfähig mit GPT-4o | GPT-4o beste allgemeine Qualität | Llama 3.3 70B konkurrenzfähig für seine Größe |
+| Open Weights | Ja (alle Modelle auf Hugging Face) | Nein (nur proprietär) | Ja (Meta Open-Sources Llama) |
+| API-Kosten | Sehr niedrig (~$0,27/M Eingabe-Token für V3) | Hoch (~$2,50/M für GPT-4o-Eingabe) | Kostenlos (selbst gehostet); Fireworks/Together API erschwinglich |
+| Ökosystem & Integrationen | Wachsend; OpenAI-kompatible API erleichtert Adoption | Größtes Ökosystem, meiste Integrationen | Großes Open-Source-Ökosystem |
+| Datensouveränität | Selbst-Host möglich; API-Daten in China verarbeitet | Azure OpenAI für US-Regionsverarbeitung | Vollständiges Selbst-Hosting möglich |
 | Multimodal | Nur Text (V3/R1) | Ja (GPT-4o, DALL-E) | Llama 3.2 hat Vision-Fähigkeiten |
 
 ## Vor- und Nachteile
 
 | Vorteile | Nachteile |
-|------|------|
+|----------|-----------|
 | Dramatisch niedrigere API-Kosten als OpenAI/Anthropic | API-Daten werden über chinesische Server geleitet — Bedenken für einige regulierte Branchen |
-| R1 liefert Schlussfolgerungsleistung auf Frontier-Niveau | R1-Schlussfolgerungsspuren erhöhen Latenz und Token-Nutzung |
+| R1 liefert frontier-level Reasoning-Leistung | R1-Reasoning-Traces fügen Latenz und Token-Nutzung hinzu |
 | OpenAI-kompatible API — nahezu null Wechselkosten | Geringere Vertrauens-/Markenbekanntheit in westlichen Enterprise-Verkaufszyklen |
-| Offene Gewichte ermöglichen Self-Hosting und Feinabstimmung | V3/R1 sind nur Text; keine nativen Bild- oder Audiofähigkeiten |
-| Starke Codegenerierung über die meisten gängigen Sprachen hinweg | Community und Dokumentation hauptsächlich auf Chinesisch; englische Ressourcen holen noch auf |
+| Open Weights ermöglichen Self-Hosting und Feinabstimmung | V3/R1 sind nur-Text; keine nativen Bild- oder Audiofähigkeiten |
+| Starke Code-Generierung in den meisten gängigen Programmiersprachen | Community und Dokumentation primär auf Chinesisch; englische Ressourcen holen noch auf |
 
 ## Codebeispiele
 
@@ -104,7 +106,7 @@ response = client.chat.completions.create(
 print(response.choices[0].message.content)
 ```
 
-### Schlussfolgern mit DeepSeek-R1 (Chain-of-Thought)
+### Reasoning mit DeepSeek-R1 (Chain-of-Thought)
 
 ```python
 from openai import OpenAI
@@ -190,14 +192,14 @@ print(response.choices[0].message.content)
 
 ## Praktische Ressourcen
 
-- [DeepSeek-API-Dokumentation](https://platform.deepseek.com/api-docs/) — Offizielle Referenz für die DeepSeek-Plattform-API einschließlich Modelle, Parameter und Preise
-- [DeepSeek GitHub](https://github.com/deepseek-ai) — Open-Source-Repositories für DeepSeek-Modelle, Trainings-Code und Forschungsarbeiten
+- [DeepSeek-API-Dokumentation](https://platform.deepseek.com/api-docs/) — Offizielle Referenz für die DeepSeek-Plattform-API einschließlich Modellen, Parametern und Preisen
+- [DeepSeek GitHub](https://github.com/deepseek-ai) — Open-Source-Repositories für DeepSeek-Modelle, Trainingscode und Forschungsarbeiten
 - [DeepSeek-R1 auf Hugging Face](https://huggingface.co/deepseek-ai/DeepSeek-R1) — Modellkarte mit Gewichten, Benchmark-Ergebnissen und Bereitstellungsanweisungen
-- [DeepSeek-V3 technischer Bericht](https://arxiv.org/abs/2412.19437) — Forschungsarbeit zur V3-Architektur, Trainingsansatz und Benchmark-Vergleiche
-- [vLLM DeepSeek-Bereitstellungsleitfaden](https://docs.vllm.ai/en/latest/models/supported_models.html) — Anweisungen für Self-Hosting von DeepSeek-Modellen mit vLLM für Produktionsinferenz
+- [DeepSeek-V3 technischer Bericht](https://arxiv.org/abs/2412.19437) — Forschungsarbeit zur V3-Architektur, Trainingsansatz und Benchmark-Vergleichen
+- [vLLM DeepSeek Bereitstellungsleitfaden](https://docs.vllm.ai/en/latest/models/supported_models.html) — Anweisungen für das Selbst-Hosten von DeepSeek-Modellen mit vLLM für Produktionsinferenz
 
 ## Siehe auch
 
 - [Modellanbieter](/docs/model-providers)
-- [DeepSeek-Fallstudie](/docs/case-studies/deepseek)
-- [Schlussfolgerungsmuster](/docs/reasoning-patterns)
+- [DeepSeek Fallstudie](/docs/case-studies/deepseek)
+- [Reasoning-Muster](/docs/reasoning-patterns)

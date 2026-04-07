@@ -1,40 +1,108 @@
 ---
-title: Reasoning-Muster
-description: "Muster für strukturiertes KI-Reasoning: CoT, ToT, ReAct, RDD."
-keywords: [Schlussfolgern, CoT, ReAct, ToT, RDD]
+title: Reasoning patterns
+description: How LLMs and agents structure reasoning and action.
+keywords: [reasoning, CoT, ReAct, ToT, RDD]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Reasoning-Muster
 
 ## Definition
 
-Reasoning-Muster sind strukturierte Wege, um Modell-Reasoning zu entlocken oder zu organisieren: chain-of-thought (schrittweise), tree-of-thoughts (explore branches), ReAct (reason + act), and RDD (Abruf-Entscheidung-Entwurf), among others. Using a clear pattern improves **reliability** (more consistent Schlussfolgern) and **debuggability** (you can inspect steps or actions).
+Reasoning-Muster sind strukturierte Wege, Modell-Schlussfolgerungen zu entlocken oder zu organisieren: Chain-of-Thought (Schritt für Schritt), Tree-of-Thoughts (Zweige erkunden), ReAct (Schlussfolgern + Handeln) und RDD (Abruf-Entscheidung-Entwurf), unter anderem. Die Verwendung eines klaren Musters verbessert die **Zuverlässigkeit** (konsistenteres Schlussfolgern) und die **Debuggbarkeit** (Sie können Schritte oder Aktionen inspizieren).
 
-Sie sind used in [prompt engineering](/docs/prompt-engineering) (z. B. CoT) and inside [agents](/docs/agents) (z. B. ReAct, RDD). Choosing a pattern depends auf dem task: CoT for math/Schlussfolgern, ReAct for tool use, ToT for search/planning, RDD for spec compliance.
+Sie werden im [Prompt Engineering](/docs/prompt-engineering) (z. B. CoT) und innerhalb von [Agenten](/docs/agents) (z. B. ReAct, RDD) verwendet. Ohne ein Reasoning-Muster neigen Modelle dazu, flache, unstrukturierte Antworten zu produzieren, die Schritte überspringen — ein Reasoning-Muster fungiert als Gerüst, das den Denkprozess des Modells explizit, inspizierbar und korrigierbar macht. Muster können auch kombiniert werden: CoT kann innerhalb des Gedankenschritts eines ReAct-Agenten laufen, und ToT kann Kandidaten in eine RDD-Entscheidungsschleife einspeisen.
+
+Die Wahl eines Musters hängt von der Aufgabenkomplexität, dem verfügbaren Rechenaufwand und davon ab, ob das System Zugang zu externen Werkzeugen oder Wissen hat. CoT ist der kostengünstigste Ausgangspunkt; ReAct fügt Werkzeugnutzung hinzu; ToT fügt die Suche über mehrere Pfade hinzu; RDD fügt spezifikationsgesteuerte Compliance hinzu. Die meisten Produktionssysteme kombinieren mindestens zwei Muster.
 
 ## Funktionsweise
 
+### Musterauswahl
+
 ```mermaid
 flowchart LR
-  Input[Input] --> Pattern["Pattern CoT/ReAct/ToT"]
-  Pattern --> Output[Output]
+  Input[Input task] -->|classification or router| Pattern["Pattern selector"]
+  Pattern -->|math / logic| CoT[Chain-of-Thought]
+  Pattern -->|tool use| ReAct[ReAct loop]
+  Pattern -->|multi-path planning| ToT[Tree of Thoughts]
+  Pattern -->|spec-driven| RDD[RDD]
+  CoT --> Output[Structured output]
+  ReAct --> Output
+  ToT --> Output
+  RDD --> Output
 ```
 
-You feed **input** (question, task) into a **pattern**: the pattern constrains how the model reasons or acts (z. B. “think Schritt für Schritt”, or thought–action–observation loops). The model erzeugt an **output** (answer, action sequence). Prompts or system Entwurf encourage the model to show Schlussfolgern (z. B. “Think Schritt für Schritt”) or to interleave thought and action. Patterns kombiniert werden kann (z. B. [CoT](/docs/reasoning-patterns/cot) inside an [agent](/docs/agents) loop). Siehe die verlinkten Seiten für jeden pattern’s details.
+### Generische Reasoning-Schleife
 
-## Anwendungsfälle
+```mermaid
+flowchart LR
+  Input[Input] -->|apply pattern| Reason[Reasoning steps]
+  Reason -->|optional| Tools[Tool calls / search]
+  Tools -->|observation feeds back| Reason
+  Reason -->|pattern complete| Output[Final output]
+```
 
-Different patterns suit different needs: CoT for stepwise Schlussfolgern, ReAct for tool use, ToT for search and planning.
+Sie speisen **Input** (Frage, Aufgabe) in ein **Muster** ein: das Muster schränkt ein, wie das Modell schlussfolgert oder handelt (z. B. „Denke Schritt für Schritt" oder Gedanken-Aktion-Beobachtungs-Schleifen). Das Modell erzeugt einen **Output** (Antwort, Aktionsfolge). Prompts oder System-Design ermutigen das Modell, Schlussfolgerungen zu zeigen oder Gedanken und Handlungen zu verschränken. Muster können kombiniert werden (z. B. [CoT](/docs/reasoning-patterns/cot) in einer [Agenten](/docs/agents)-Schleife). Siehe die verlinkten Seiten für Details zu jedem Muster.
 
-- CoT: math, logic, and multi-step Schlussfolgern tasks
-- ReAct: tool-using agents that reason before each action
-- ToT: search and planning over multiple solution branches
+## Wann verwenden / Wann NICHT verwenden
 
-## Externe Dokumentation
+| Szenario | Reasoning-Muster verwenden | Nicht verwenden |
+|---|---|---|
+| Mehrstufige Mathematik, Logik oder Programmierung | Ja — CoT verbessert die Genauigkeit erheblich | Nein — Single-Shot-Prompting scheitert oft bei komplexem Schlussfolgern |
+| Werkzeugnutzende Agenten | Ja — ReAct strukturiert jede Aktion mit einem Gedanken | Nein — direkter Werkzeugaufruf ohne Schlussfolgern erhöht Fehler |
+| Planung über viele Lösungszweige | Ja — ToT erkundet und bewertet Alternativen | Nein — CoT ist günstiger, wenn ein Pfad normalerweise korrekt ist |
+| Aufgaben, die Spezifikations-Compliance erfordern | Ja — RDD erzwingt abgerufene Spezifikationen | Nein — freie Generierung für kreative, offene Aufgaben |
+| Einfache Faktensuchen | Nein — Reasoning-Muster fügen unnötige Kosten hinzu | Ja — direkter Abruf oder Suche ist schneller |
 
-- [Chain-of-Thought Prompting (Wei et al.)](https://arxiv.org/abs/2201.11903) — CoT paper
-- [ReAct: Synergizing Reasoning and Acting (Yao et al.)](https://arxiv.org/abs/2210.03629) — ReAct paper
-- [Tree of Thoughts (Yao et al.)](https://arxiv.org/abs/2305.10601) — ToT paper
+## Vergleiche
+
+| Muster | Kernmechanismus | Kosten | Bester Aufgabentyp | Kombinierbar mit |
+|---|---|---|---|---|
+| Chain-of-Thought (CoT) | Sequentielle Reasoning-Schritte | Niedrig (1 Aufruf) | Mathematik, Logik, Deduktion | ReAct, ToT, RDD |
+| Tree of Thoughts (ToT) | Verzweigen, bewerten, erweitern | Hoch (N Aufrufe) | Planung, Suche, Kreatives | CoT pro Zweig |
+| ReAct | Gedanken-Aktion-Beobachtungs-Schleife | Mittel (1 Aufruf + Werkzeuge) | Werkzeugnutzende Agenten | CoT, RDD |
+| RDD | Spec abrufen → entscheiden → generieren → validieren | Mittel–hoch | Compliance, spezifikationsgesteuerte Generierung | ReAct, RAG |
+
+## Vor- und Nachteile
+
+| Vorteile | Nachteile |
+|---|---|
+| Macht Modell-Schlussfolgerungen explizit und inspizierbar | Fügt Tokens hinzu (Kosten und Latenz) |
+| Verbessert die Genauigkeit bei strukturierten Aufgaben erheblich | Falsches Reasoning-Muster für die Aufgabe kann die Qualität beeinträchtigen |
+| Ermöglicht Debugging durch Inspektion von Zwischenschritten | Nicht alle Modelle folgen Mustern zuverlässig |
+| Kombinierbar — Muster können verschachtelt oder kombiniert werden | Komplexe Kombinationen erhöhen den Prompt-Engineering-Aufwand |
+
+## Codebeispiele
+
+```python
+from openai import OpenAI
+
+client = OpenAI()
+
+def chain_of_thought(question: str) -> str:
+    """Zero-shot CoT: append 'Let's think step by step' to elicit reasoning."""
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "user",
+                "content": f"{question}\n\nLet's think step by step.",
+            }
+        ],
+    )
+    return response.choices[0].message.content
+
+answer = chain_of_thought("If a train travels 60 km/h for 2.5 hours, how far does it go?")
+print(answer)
+```
+
+## Praktische Ressourcen
+
+- [Chain-of-Thought Prompting (Wei et al.)](https://arxiv.org/abs/2201.11903) — Originales CoT-Paper, das schrittweises Schlussfolgern etabliert
+- [ReAct: Synergizing Reasoning and Acting (Yao et al.)](https://arxiv.org/abs/2210.03629) — ReAct-Paper, das Gedanken-Aktion-Beobachtungs-Schleifen einführt
+- [Tree of Thoughts (Yao et al.)](https://arxiv.org/abs/2305.10601) — ToT-Paper über mehrstufiges Schlussfolgern und Suche
+- [Anthropic – Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Praktischer Leitfaden zu CoT und strukturiertem Schlussfolgern
 
 ## Siehe auch
 

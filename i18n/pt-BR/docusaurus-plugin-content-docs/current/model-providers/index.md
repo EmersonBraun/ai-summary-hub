@@ -1,24 +1,26 @@
 ---
-title: Provedores de modelos
-description: Visão geral dos provedores de modelos de IA — abordagens baseadas em API, pesos abertos e híbridas.
-keywords: [provedores de modelos, OpenAI, Anthropic, Google, Meta, Mistral, Cohere, DeepSeek, API]
+title: Model providers
+description: Overview of AI model providers — API-based, open-weights, and hybrid approaches.
+keywords: [model providers, OpenAI, Anthropic, Google, Meta, Mistral, Cohere, DeepSeek, API]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Provedores de modelos
 
 ## Definição
 
-Um provedor de modelos é uma organização que oferece acesso a grandes modelos de linguagem, seja por meio de APIs hospedadas, pesos disponíveis para download, ou ambos. A escolha do provedor molda as capacidades da sua aplicação, estrutura de custos, postura de privacidade de dados e flexibilidade de implantação. Compreender o panorama de provedores é um pré-requisito para qualquer sistema de IA em produção.
+Um provedor de modelos é uma organização que oferece acesso a grandes modelos de linguagem, seja por meio de APIs hospedadas, pesos de código aberto para download, ou ambos. A escolha do provedor molda as capacidades de sua aplicação, a estrutura de custos, a postura de privacidade de dados e a flexibilidade de implantação. Entender o panorama dos provedores é um pré-requisito para qualquer sistema de IA em produção.
 
-O mercado se divide em três categorias. **Provedores baseados em API** como OpenAI, Anthropic e Google oferecem modelos exclusivamente por meio de APIs gerenciadas — você envia requisições e eles cuidam da infraestrutura de inferência. **Provedores de pesos abertos** como Meta e Mistral disponibilizam pesos de modelos que você pode baixar e executar em seu próprio hardware ou por meio de hospedagem de terceiros. **Provedores híbridos** como Mistral e DeepSeek oferecem tanto modelos de pesos abertos quanto acesso comercial via API, dando aos desenvolvedores flexibilidade para escolher com base em suas necessidades.
+O mercado se divide em três categorias. Os **provedores baseados em API** como OpenAI, Anthropic e Google oferecem modelos exclusivamente por meio de APIs gerenciadas — você envia requisições e eles cuidam da infraestrutura de inferência. Os **provedores de pesos abertos** como Meta e Mistral lançam pesos de modelos que você pode baixar e executar em seu próprio hardware ou por meio de hospedagem de terceiros. Os **provedores híbridos** como Mistral e DeepSeek oferecem tanto modelos de pesos abertos quanto acesso comercial à API, dando aos desenvolvedores flexibilidade para escolher com base em suas necessidades.
 
-Escolher um provedor envolve trade-offs em múltiplas dimensões: qualidade do modelo, preços, tamanho da janela de contexto, capacidades multimodais, privacidade de dados, suporte a fine-tuning e maturidade do ecossistema. Nenhum provedor domina em todos os critérios, razão pela qual a maioria dos sistemas em produção avalia múltiplas opções e, às vezes, usa provedores diferentes para tarefas diferentes dentro da mesma aplicação.
+Escolher um provedor envolve compensações em múltiplas dimensões: qualidade do modelo, preços, tamanho da janela de contexto, capacidades multimodais, privacidade de dados, suporte a ajuste fino e maturidade do ecossistema. Nenhum provedor domina em todos os critérios, razão pela qual a maioria dos sistemas em produção avalia múltiplas opções e às vezes usa diferentes provedores para diferentes tarefas dentro da mesma aplicação.
 
 ## Como funciona
 
 ### Provedores baseados em API
 
-Provedores de API hospedam modelos em sua infraestrutura e os expõem por meio de APIs REST. Você se autentica com uma chave de API, envia uma requisição com seu prompt e parâmetros de configuração, e recebe uma resposta. O provedor cuida do escalonamento, alocação de GPU, atualizações de modelos e disponibilidade. Este é o caminho mais simples para produção — sem infraestrutura para gerenciar — mas você envia seus dados para um terceiro e paga por token.
+Os provedores de API hospedam modelos em sua infraestrutura e os expõem por meio de APIs REST. Você se autentica com uma chave de API, envia uma requisição com seu prompt e parâmetros de configuração, e recebe uma resposta. O provedor lida com escalabilidade, alocação de GPU, atualizações de modelos e tempo de atividade. Este é o caminho mais simples para a produção — sem infraestrutura para gerenciar — mas você envia seus dados para um terceiro e paga por token.
 
 ```mermaid
 flowchart LR
@@ -31,7 +33,7 @@ flowchart LR
 
 ### Provedores de pesos abertos
 
-Provedores de pesos abertos disponibilizam arquivos de modelos (tipicamente no Hugging Face) que você baixa e executa localmente ou em sua infraestrutura de nuvem. Você controla toda a pilha: seleção de hardware, quantização, framework de serving (vLLM, TGI, llama.cpp) e escalonamento. Isso oferece máxima privacidade e personalização, mas requer expertise em infraestrutura de ML. Provedores de inferência de terceiros (Together AI, Groq, Fireworks) oferecem um meio-termo — eles hospedam modelos abertos com uma interface de API.
+Os provedores de pesos abertos lançam arquivos de modelos (tipicamente no Hugging Face) que você baixa e executa localmente ou em sua infraestrutura na nuvem. Você controla toda a pilha: seleção de hardware, quantização, framework de serviço (vLLM, TGI, llama.cpp) e escalabilidade. Isso oferece máxima privacidade e personalização, mas requer expertise em infraestrutura de ML. Provedores de inferência de terceiros (Together AI, Groq, Fireworks) oferecem um meio-termo — eles hospedam modelos abertos com uma interface de API.
 
 ```mermaid
 flowchart LR
@@ -45,28 +47,28 @@ flowchart LR
 
 ### Escolhendo um provedor
 
-A árvore de decisão depende das suas restrições. Comece com seus requisitos — privacidade de dados, orçamento, latência, qualidade do modelo — e afunile a partir daí. Muitas equipes começam com provedores de API para prototipagem e avaliam alternativas de pesos abertos para otimização de custos em produção ou requisitos de soberania de dados.
+A árvore de decisão depende de suas restrições. Comece com seus requisitos — privacidade de dados, orçamento, latência, qualidade do modelo — e refine a partir daí. Muitas equipes começam com provedores de API para prototipagem e avaliam alternativas de pesos abertos para otimização de custos em produção ou requisitos de soberania de dados.
 
 ## Quando usar / Quando NÃO usar
 
-| Use quando | Evite quando |
-|----------|------------|
-| **Provedores de API**: prototipagem rápida, sem equipe de infraestrutura de ML, necessidade imediata de modelos de ponta | Dados não podem sair da sua infraestrutura (indústrias regulamentadas, PII) |
-| **Pesos abertos**: requisitos de privacidade de dados, necessidade de controle de fine-tuning, otimização de custos em alto volume | Você não possui infraestrutura de GPU e expertise em operações de ML |
-| **Modelos abertos hospedados por terceiros**: quer a flexibilidade de modelos abertos sem gerenciar infraestrutura | Você precisa de SLAs garantidos e suporte empresarial (use APIs de primeira parte) |
-| **Múltiplos provedores**: diferentes tarefas têm requisitos diferentes de qualidade/custo | Seu caso de uso é simples o suficiente para que um provedor cubra tudo |
+| Usar quando | Evitar quando |
+|-------------|---------------|
+| **Provedores de API**: prototipagem rápida, sem equipe de infraestrutura de ML, necessidade imediata de modelos de ponta | Os dados não podem sair de sua infraestrutura (setores regulados, dados pessoais) |
+| **Pesos abertos**: requisitos de privacidade de dados, controle sobre ajuste fino, otimização de custos em alto volume | Falta de infraestrutura GPU e expertise em ML ops |
+| **Modelos abertos hospedados por terceiros**: flexibilidade de modelos abertos sem gerenciar infraestrutura | Necessita de SLAs garantidos e suporte empresarial (use APIs de provedores primários) |
+| **Múltiplos provedores**: diferentes tarefas têm diferentes requisitos de qualidade/custo | Seu caso de uso é simples o suficiente para que um provedor cubra tudo |
 
 ## Comparações
 
 | Critério | OpenAI | Anthropic | Google Gemini | Meta Llama | Mistral | Cohere | DeepSeek |
 |----------|--------|-----------|---------------|------------|---------|--------|----------|
-| Acesso ao modelo | Apenas API | Apenas API | API + Vertex AI | Pesos abertos | Aberto + API | Apenas API | Aberto + API |
-| Nível de modelo topo | GPT-4o, o3 | Claude Opus/Sonnet | Gemini Ultra/Pro | Llama 3.1 405B | Mistral Large | Command R+ | DeepSeek-V3 |
+| Acesso ao modelo | Somente API | Somente API | API + Vertex AI | Pesos abertos | Aberto + API | Somente API | Aberto + API |
+| Modelo de nível superior | GPT-4o, o3 | Claude Opus/Sonnet | Gemini Ultra/Pro | Llama 3.1 405B | Mistral Large | Command R+ | DeepSeek-V3 |
 | Janela de contexto | 128K | 200K | 1M+ | 128K | 128K | 128K | 128K |
-| Multimodal | Visão, áudio, geração de imagem | Visão | Visão, áudio, vídeo | Visão (3.2) | Visão | Focado em texto | Focado em texto |
-| Especialidade | Propósito geral, ecossistema | Segurança, contexto longo | Multimodal, grounding em busca | Pesos abertos, personalização | Eficiência, multilíngue | Embeddings, RAG, reranking | Raciocínio, eficiência de custo |
-| Fine-tuning | Fine-tuning via API | Não disponível | Ajuste via Vertex AI | Acesso completo aos pesos | Fine-tuning via API | Não disponível | Acesso completo aos pesos |
-| Modelo de preços | Por token | Por token | Por token + nível gratuito | Gratuito (auto-hospedado) ou terceiros | Por token + modelos gratuitos | Por token | Por token (custo muito baixo) |
+| Multimodal | Visão, áudio, geração de imagens | Visão | Visão, áudio, vídeo | Visão (3.2) | Visão | Focado em texto | Focado em texto |
+| Especialidade | Propósito geral, ecossistema | Segurança, contexto longo | Multimodal, fundamentação em busca | Pesos abertos, personalização | Eficiência, multilíngue | Embeddings, RAG, reranking | Raciocínio, eficiência de custos |
+| Ajuste fino | Ajuste fino por API | Não disponível | Ajuste fino no Vertex AI | Acesso completo aos pesos | Ajuste fino por API | Não disponível | Acesso completo aos pesos |
+| Modelo de preços | Por token | Por token | Por token + nível gratuito | Grátis (auto-hospedado) ou terceiros | Por token + modelos gratuitos | Por token | Por token (custo muito baixo) |
 
 ## Exemplos de código
 
@@ -128,11 +130,11 @@ for name, model in providers.items():
 
 ## Recursos práticos
 
-- [Artificial Analysis](https://artificialanalysis.ai/) — Benchmarks independentes de LLMs e comparação de preços
-- [LiteLLM](https://docs.litellm.ai/) — API unificada para mais de 100 provedores de LLMs
+- [Artificial Analysis](https://artificialanalysis.ai/) — Benchmarks independentes de LLM e comparação de preços
+- [LiteLLM](https://docs.litellm.ai/) — API unificada para mais de 100 provedores de LLM
 - [OpenRouter](https://openrouter.ai/) — Gateway de API único para múltiplos provedores
 - [Hugging Face Open LLM Leaderboard](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard) — Benchmarks de modelos abertos
-- [LMSYS Chatbot Arena](https://chat.lmsys.org/) — Rankings de LLMs por avaliação humana cega via crowdsourcing
+- [LMSYS Chatbot Arena](https://chat.lmsys.org/) — Rankings de LLM por avaliação humana cega colaborativa
 
 ## Veja também
 
@@ -144,5 +146,5 @@ for name, model in providers.items():
 - [Cohere](/docs/model-providers/cohere)
 - [DeepSeek](/docs/model-providers/deepseek)
 - [LLMs](/docs/llms)
-- [Infraestrutura](/docs/infrastructure)
-- [Inferência local](/docs/local-inference)
+- [Infrastructure](/docs/infrastructure)
+- [Local inference](/docs/local-inference)

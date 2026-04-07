@@ -1,22 +1,23 @@
 ---
-title: 术语表
-description: 本维基中使用的 AI 和 ML 术语表。
+title: Glossary
+description: Glossary of AI and ML terms used across the wiki.
 keywords: [glossary, definitions, terms]
+authors: [EmersonBraun]
 ---
 
 # 术语表
 
-A quick reference for key terms used in AI Summary Hub.
+AI Summary Hub 中使用的关键术语快速参考。
 
-| Term | Definition |
-|------|------------|
-| **RAG** | Retrieval-augmented generation — combining 检索 with LLM generation. |
-| **LLM** | Large language model. |
-| **Transformer** | Architecture based on self-attention (例如 BERT, GPT). |
-| **Agent** | System that perceives and acts toward goals. |
-| **Subagent** | Agent within a hierarchical agent system. |
-| **RDD** | Retrieval-决策-设计 — spec-driven 推理 pattern. |
-| **CoT** | Chain-of-thought — step-by-step 推理. |
-| **ReAct** | Reasoning + acting in interleaved steps. |
+| 术语 | 定义 |
+|------|------|
+| **RAG** | 检索增强生成 — 将检索与 LLM 生成相结合。 |
+| **LLM** | 大型语言模型。 |
+| **Transformer** | 基于自注意力机制的架构（如 BERT、GPT）。 |
+| **Agent** | 感知环境并朝目标采取行动的系统。 |
+| **Subagent** | 层级智能体系统中的子智能体。 |
+| **RDD** | 检索-决策-设计 — 规范驱动的推理模式。 |
+| **CoT** | 思维链 — 逐步推理。 |
+| **ReAct** | 推理 + 行动交替执行。 |
 
-_More terms will be added as topics are expanded. See individual topic docs for detailed definitions._
+_随着主题的扩展，将添加更多术语。有关详细定义，请参阅各主题文档。_

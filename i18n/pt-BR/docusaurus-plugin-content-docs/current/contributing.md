@@ -1,66 +1,228 @@
 ---
-title: Contribuindo
-description: Como adicionar temas, melhorar exemplos e traduzir conteúdo.
+title: Contributing
+description: How to add topics, improve examples, and translate content.
 keywords: [contributing, template, PR]
+authors: [EmersonBraun]
 ---
 
-# Contributing to AI Summary Hub
+# Contribuindo para o AI Summary Hub
 
-Thank you for helping improve this wiki. Here’s how to contribute.
+Obrigado por ajudar a melhorar este wiki. Veja como contribuir.
 
-## Topic template
+## Modelo de artigo
 
-Each topic doc should include:
+Cada artigo segue um modelo estruturado projetado para tornar o AI Summary Hub um oráculo de conhecimento abrangente. As seções são divididas em **obrigatórias** e **opcionais**.
 
-- **Frontmatter:** `title`, `description`, `keywords`
-- **Definition** — At least 2 paragraphs (or one longer paragraph covering “what it is” and “context/why it matters”). Add key terms, relation to nearby concepts, or when to use vs alternatives. Up to 3 paragraphs unless the topic is broad.
-- **How it works** — At least a short multi-sentence explanation (3–5 sentences) in addition to any diagram or code. Include a **Mermaid diagram** when it explains architecture, flow, or sequence (por ex. agent loop, RAG pipeline, attention). Add numbered steps or component-by-component explanation where it helps.
-- **Examples** — Python/JS code blocks where useful (commented if not runnable)
-- **Pros/Cons** — Table when relevant
-- **Benchmarks** — Links to benchmarks or papers (when applicable)
-- **External documentation** (required) — At least 2–3 external resources per topic: official docs, codelabs, key papers, or repos. Prefer authoritative sources (Google, OpenAI, Hugging Face, arXiv). This section is for outbound links only; use **See also** for internal links.
-- **See also** — Internal links to related docs
+### Seções obrigatórias
 
-### Link checklist (External documentation)
+Cada artigo **deve** incluir estas seções nesta ordem exata:
 
-When adding a topic, aim to include:
+1. **Frontmatter** — Bloco de metadados no topo do arquivo (veja [Especificação do Frontmatter](#especificacao-do-frontmatter) abaixo)
+2. **Definição** — O que é, contexto e por que importa. Mínimo de 2–3 parágrafos.
+3. **Como funciona** — Explicação técnica. Use subseções H3 para tópicos complexos. Inclua pelo menos um diagrama Mermaid com **arestas rotuladas** (não apenas caixas). Mínimo de 3–5 frases por subseção.
+4. **Quando usar / Quando NÃO usar** — Uma tabela de duas colunas com orientação prática. Mínimo de 3 linhas.
+5. **Exemplos de código** — Pelo menos um trecho **funcional** (sem pseudocódigo). O idioma fica a critério do autor: Python é o padrão para tópicos de ML/MLOps; TypeScript para tópicos de MCP/Claude Code; use o que for mais natural para o assunto.
+6. **Recursos práticos** — 2–5 links externos curados. Tipos aceitos: documentação oficial, cursos (gratuitos ou pagos), repositórios GitHub, papers arXiv, posts de blogs de empresas (p. ex. blog da OpenAI, blog da Anthropic).
+7. **Veja também** — Links internos para documentos relacionados dentro deste wiki.
 
-1. **Official product or framework doc** (por ex. LangChain agents, Hugging Face transformers)
-2. **Tutorial or codelab** when available (por ex. [Google ADK codelab](https://codelabs.developers.google.com/your-first-agent-with-adk#0))
-3. **Key paper or benchmark** (por ex. arXiv, benchmark leaderboard) where relevant
+### Seções opcionais
 
-## Adding new topics
+Inclua estas **apenas quando relevante**. Quando uma seção não se aplica, simplesmente omita-a completamente — não adicione o título com "N/A" ou um espaço reservado.
 
-1. Create a new file under `docs/` in the right category (por ex. `docs/tools/my-tool.md`).
-2. Use the template above and ensure a unique doc ID (path-based).
-3. Add the doc to `sidebars.ts` in the right category.
-4. Open a PR with a short description.
+- **Comparações** — Uma tabela de comparação rápida com 3–5 critérios (p. ex. facilidade de uso, comunidade, desempenho). **Regra de reciprocidade**: se o artigo A inclui uma comparação com o artigo B, então o artigo B também deve incluir uma comparação com o artigo A.
+- **Prós e Contras** — Formato de tabela com duas colunas.
+- **Benchmarks** — Links para benchmarks, classificações ou papers com dados quantitativos.
 
-## Improving examples
+### Ordem das seções
 
-- Prefer runnable code; add comments if dependencies or setup are non-obvious.
-- Use Prism-supported languages (Python, JavaScript, TypeScript, bash, yaml, docker).
-- Link to official docs or repos where relevant.
+A ordem completa quando todas as seções estão presentes:
 
-## Diagrams (Mermaid)
+```
+1. Definição
+2. Como funciona
+3. Quando usar / Quando NÃO usar
+4. Comparações (opcional)
+5. Prós e Contras (opcional)
+6. Benchmarks (opcional)
+7. Exemplos de código
+8. Recursos práticos
+9. Veja também
+```
 
-Os diagramas na documentação são escritos em [Mermaid](https://mermaid.js.org/intro/getting-started.html) e renderizados pelo site via Docusaurus. Use valid Mermaid.js syntax so diagrams display correctly. If unsure, test your diagram in the [Mermaid Live Editor](https://mermaid.live/) before submitting.
+### Diretrizes de profundidade
 
-## Translating content
+| Seção | Profundidade mínima |
+|-------|---------------------|
+| Definição | 2–3 parágrafos cobrindo o quê, contexto e por que importa |
+| Como funciona | Subseções H3 para tópicos complexos; 1+ diagrama Mermaid com arestas rotuladas; 3–5 frases por subseção |
+| Quando usar / Quando NÃO usar | Tabela com 3+ linhas |
+| Exemplos de código | 1+ trecho funcional com comentários; deve ser executável ou claramente anotado |
+| Recursos práticos | 2–5 links curados |
+| Comparações (se incluídas) | Tabela com 3–5 critérios |
 
-- UI strings: edit `i18n/<locale>/code.json` and theme JSON (navbar, footer).
-- Docs: copie a estrutura em inglês para `i18n/<locale>/docusaurus-plugin-content-docs/current/` e traduza o Markdown. Keep technical terms consistent (por ex. “RAG”, “Transformer” often stay in English).
-- Run `npm run write-translations` to regenerate keys for new locales if needed.
+### Especificação do Frontmatter
 
-## Code style and commits
+Cada documento deve incluir este bloco de frontmatter:
 
-- Follow existing formatting (por ex. 2 spaces, trailing newline).
-- Use clear commit messages (por ex. “Add doc: X”, “Fix link in Y”).
+```yaml
+---
+title: "Título completo do artigo"
+description: "Descrição de uma linha para SEO e busca"
+keywords: [keyword1, keyword2, keyword3]
+tags: [intermediate]  # exatamente um de: beginner, intermediate, advanced
+authors: [NomeUsuarioGitHub]  # nome(s) de usuário do GitHub do(s) autor(es)
+---
+```
 
-## Versioning
+**Campos obrigatórios:**
 
-Quando a base de conteúdo estiver estável, os mantenedores podem executar `npm run docusaurus docs:version 1.0.0` para criar instanpshots. The version selector will appear in the navbar. See [Docusaurus versioning](https://docusaurus.io/docs/versioning) for details.
+| Campo | Descrição |
+|-------|-----------|
+| `title` | Título completo do artigo |
+| `description` | Descrição de uma linha (usada para SEO e busca) |
+| `keywords` | Array de palavras-chave relevantes |
+| `tags` | Array contendo **exatamente uma** tag de nível: `beginner`, `intermediate` ou `advanced` |
+| `authors` | Array de nomes de usuário do GitHub que escreveram o artigo |
+
+**Campos opcionais:**
+
+| Campo | Descrição | Quando usar |
+|-------|-----------|-------------|
+| `sidebar_label` | Rótulo curto para a barra lateral | Apenas quando o título excede ~30 caracteres |
+
+**Nota:** `last_updated` é gerenciado automaticamente pelo Docusaurus via histórico do git. Não o adicione manualmente.
+
+### Exemplo completo de modelo
+
+```markdown
+---
+title: "Tópico Exemplo"
+description: "Uma breve descrição do tópico."
+keywords: [topico, exemplo, ia]
+tags: [intermediate]
+authors: [SeuNomeUsuarioGitHub]
+---
+
+# Tópico Exemplo
+
+## Definição
+
+Parágrafo 1: O que é.
+
+Parágrafo 2: Contexto e relação com outros conceitos.
+
+Parágrafo 3: Por que importa.
+
+## Como funciona
+
+### Subseção A
+
+Explicação com 3–5 frases.
+
+### Subseção B
+
+Explicação com diagrama:
+
+(Diagrama Mermaid aqui com arestas rotuladas)
+
+## Quando usar / Quando NÃO usar
+
+| Usar quando | Evitar quando |
+|-------------|--------------|
+| Cenário A | Contra-cenário A |
+| Cenário B | Contra-cenário B |
+| Cenário C | Contra-cenário C |
+
+## Comparações
+
+(Opcional — apenas se alternativas existirem)
+
+| Critério | Este tópico | Alternativa |
+|----------|-------------|-------------|
+| Critério 1 | ... | ... |
+| Critério 2 | ... | ... |
+| Critério 3 | ... | ... |
+
+## Prós e contras
+
+(Opcional)
+
+| Prós | Contras |
+|------|---------|
+| Pró 1 | Contra 1 |
+| Pró 2 | Contra 2 |
+
+## Benchmarks
+
+(Opcional — link para papers ou classificações)
+
+## Exemplos de código
+
+(Trecho de código funcional aqui)
+
+## Recursos práticos
+
+- [Documentação oficial](https://example.com) — Descrição
+- [Tutorial ou curso](https://example.com) — Descrição
+- [Repositório GitHub](https://example.com) — Descrição
+
+## Veja também
+
+- [Documento relacionado 1](/docs/caminho)
+- [Documento relacionado 2](/docs/caminho)
+```
+
+## Adicionando novos tópicos
+
+1. Crie um novo arquivo em `docs/` na categoria correta (p. ex. `docs/tools/minha-ferramenta.md`).
+2. Use o modelo acima e garanta um ID de documento único (baseado no caminho).
+3. Inclua **todas as seções obrigatórias** e seções opcionais relevantes.
+4. Adicione o documento a `sidebars.ts` na categoria correta.
+5. Se seu artigo inclui uma **Comparação** com outro artigo, atualize esse artigo com uma comparação recíproca.
+6. Abra um PR com uma breve descrição.
+
+## Melhorando exemplos
+
+- Prefira código executável; adicione comentários se dependências ou configuração não forem óbvias.
+- Use linguagens suportadas pelo Prism (Python, JavaScript, TypeScript, bash, yaml, docker).
+- Vincule à documentação oficial ou repositórios onde relevante.
+
+## Diagramas (Mermaid)
+
+Os diagramas nos docs são escritos em [Mermaid](https://mermaid.js.org/intro/getting-started.html) e renderizados pelo site via Docusaurus. Diretrizes:
+
+- Use sintaxe Mermaid.js válida — teste no [Mermaid Live Editor](https://mermaid.live/) antes de enviar.
+- **Rotule as arestas** para descrever relacionamentos (não apenas caixas conectadas por setas).
+- Use subgrafos para agrupar componentes relacionados quando os diagramas tiverem 5+ nós.
+- Prefira `flowchart LR` ou `flowchart TD` para arquitetura; `sequenceDiagram` para interações.
+
+## Traduções
+
+O site é localizado para **espanhol (es), português (pt-BR), alemão (de), francês (fr) e chinês simplificado (zh-Hans)**. O conteúdo padrão está em inglês.
+
+Novos artigos são produzidos **apenas em inglês**. As traduções são tratadas em uma fase separada.
+
+**Onde ficam os arquivos de tradução:**
+
+- **Rótulos de barra lateral e documento:** `i18n/<locale>/docusaurus-plugin-content-docs/current.json` (rótulos de categoria de barra lateral). Os títulos dos documentos vêm do frontmatter de cada documento traduzido em `i18n/<locale>/docusaurus-plugin-content-docs/current/`.
+- **Barra de navegação:** `i18n/<locale>/docusaurus-theme-classic/navbar.json`
+- **Rodapé:** `i18n/<locale>/docusaurus-theme-classic/footer.json`
+- **UI do tema e páginas personalizadas (home, all-topics):** `i18n/<locale>/code.json`
+- **Conteúdo do documento:** Espelhe a árvore `docs/` sob `i18n/<locale>/docusaurus-plugin-content-docs/current/` e traduza cada `.md` (frontmatter `title`, `description` e corpo). Mantenha links internos como `/docs/...` para que funcionem com o prefixo de locale.
+
+**Adicionando uma nova localidade:** Adicione a localidade a `i18n.locales` em `docusaurus.config.ts`, depois execute `npm run write-translations` (opcionalmente com `--locale <locale>`) para gerar a estrutura JSON. Preencha as traduções para barra de navegação, rodapé, `code.json`, barra lateral e conteúdo do documento.
+
+**Quando executar `write-translations`:** Execute `npm run write-translations` ao adicionar novos itens de barra lateral, strings de tema ou chaves de páginas personalizadas para que novas chaves apareçam nos arquivos JSON de cada locale para os tradutores.
+
+## Estilo de código e commits
+
+- Siga a formatação existente (p. ex. 2 espaços, nova linha no final).
+- Use mensagens de commit claras (p. ex. "Add doc: X", "Fix link in Y").
+
+## Versionamento
+
+Quando a base de conteúdo estiver estável, os mantenedores podem executar `npm run docusaurus docs:version 1.0.0` para criar snapshots versionados. O seletor de versão aparecerá na barra de navegação. Veja [Versionamento do Docusaurus](https://docusaurus.io/docs/versioning) para detalhes.
 
 ---
 
-Questions? Open an issue or PR on [GitHub](https://github.com/EmersonBraun/ai-summary-hub).
+Dúvidas? Abra uma issue ou PR no [GitHub](https://github.com/EmersonBraun/ai-summary-hub).

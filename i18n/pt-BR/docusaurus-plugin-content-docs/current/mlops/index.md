@@ -1,40 +1,42 @@
 ---
 title: MLOps
-description: Visão geral do MLOps, por que ele é importante e como conecta o aprendizado de máquina à engenharia de produção.
-keywords: [MLOps, operações de aprendizado de máquina, ciclo de vida de ML, reprodutibilidade, automação, monitoramento, DevOps]
+description: Overview of MLOps, why it matters, and how it bridges machine learning and production engineering.
+keywords: [MLOps, machine learning operations, ML lifecycle, reproducibility, automation, monitoring, DevOps]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # MLOps
 
 ## Definição
 
-MLOps — Machine Learning Operations — é a disciplina de aplicar princípios e práticas de DevOps ao ciclo de vida do aprendizado de máquina. Ela fornece as ferramentas, os processos e as normas culturais necessárias para construir, implantar e manter modelos de ML em produção de forma confiável. Sem MLOps, equipes frequentemente entregam modelos que funcionam em notebooks, mas se degradam silenciosamente em produção, não podem ser reproduzidos seis meses depois ou levam semanas para ser atualizados.
+MLOps — Machine Learning Operations — é a disciplina de aplicar os princípios e práticas do DevOps ao ciclo de vida do aprendizado de máquina. Ela fornece as ferramentas, os processos e as normas culturais necessárias para desenvolver, implantar e manter modelos de ML de forma confiável em produção. Sem MLOps, as equipes frequentemente entregam modelos que funcionam em notebooks mas se degradam silenciosamente em produção, não podem ser reproduzidos seis meses depois ou levam semanas para serem atualizados.
 
-Os princípios fundamentais do MLOps são **reprodutibilidade** (cada experimento e implantação pode ser recriado exatamente), **automação** (pipelines de dados, treinamento, avaliação e implantação são acionados por código, não por etapas manuais), **monitoramento** (o desempenho do modelo é acompanhado continuamente em produção) e **colaboração** (cientistas de dados, engenheiros de ML e equipes de plataforma compartilham ferramentas, padrões e responsabilidades). Esses princípios mapeiam diretamente os pilares do DevOps — integração contínua, entrega e feedback — aplicados a dados e artefatos de modelos, não apenas ao código.
+Os princípios fundamentais do MLOps são a **reprodutibilidade** (cada experimento e implantação pode ser recriado exatamente), a **automação** (pipelines de dados, treinamento, avaliação e implantação são acionados por código, não por etapas manuais), o **monitoramento** (o desempenho do modelo é rastreado continuamente em produção) e a **colaboração** (cientistas de dados, engenheiros de ML e equipes de plataforma compartilham ferramentas, padrões e responsabilidades). Esses princípios correspondem diretamente aos pilares do DevOps — integração contínua, entrega e feedback — aplicados a dados e artefatos de modelos em vez de apenas código.
 
-O MLOps surgiu quando equipes descobriram que as práticas de engenharia de software que controlam a complexidade de software não se transferem automaticamente para ML. O código é apenas uma entrada: as distribuições de dados mudam, a acurácia dos modelos decai, experimentos proliferam e um modelo que teve bom desempenho em um conjunto de validação em janeiro pode se comportar de forma imprevisível em julho. O MLOps fornece o suporte para detectar e responder a esses problemas de forma sistemática.
+O MLOps surgiu quando as equipes descobriram que as práticas de engenharia de software que dominam a complexidade do software não se transferem automaticamente para o ML. O código é apenas uma entrada: as distribuições de dados mudam, a precisão do modelo decai, os experimentos proliferam, e um modelo que teve bom desempenho num conjunto de validação em janeiro pode se comportar de forma imprevisível em julho. O MLOps fornece o suporte para detectar e responder a esses problemas de forma sistemática.
 
 ## Como funciona
 
 ### Gerenciamento de dados
 
-Os dados brutos são ingeridos, validados, versionados e armazenados em um feature store ou data lake. A validação de dados detecta desvios de esquema e mudanças de distribuição antes que corrompam uma execução de treinamento. O versionamento garante que os modelos possam ser re-treinados exatamente com os dados que produziram uma versão anterior.
+Os dados brutos são ingeridos, validados, versionados e armazenados em um feature store ou data lake. A validação de dados detecta desvios de esquema e mudanças de distribuição antes que corrompam uma execução de treinamento. O versionamento garante que os modelos possam ser retreinados exatamente com os dados que produziram uma versão anterior.
 
 ### Experimentação e treinamento
 
-Cientistas de dados executam experimentos — variando hiperparâmetros, arquiteturas e conjuntos de features — e todas as execuções são registradas em um rastreador de experimentos. A melhor execução é promovida para avaliação adicional. Pipelines de treinamento automatizados (acionados por novos dados ou um commit de código) eliminam etapas manuais e permitem re-treinamento contínuo.
+Os cientistas de dados executam experimentos — variando hiperparâmetros, arquiteturas e conjuntos de features — e todas as execuções são registradas em um rastreador de experimentos. A melhor execução é promovida para avaliação adicional. Os pipelines de treinamento automatizados (acionados por novos dados ou um commit de código) eliminam etapas manuais e permitem o retreinamento contínuo.
 
 ### Avaliação e validação
 
-Modelos candidatos são avaliados em conjuntos de teste separados, verificações de fairness e orçamentos de latência antes da promoção. Gates de avaliação impedem que regressões cheguem à produção. Testes A/B ou implantações shadow podem comparar modelos candidatos e de produção no tráfego ao vivo.
+Os modelos candidatos são avaliados em conjuntos de teste retidos, verificações de equidade e orçamentos de latência antes da promoção. Os portais de avaliação impedem que regressões cheguem à produção. Testes A/B ou implantações sombra podem comparar modelos candidatos e de produção com tráfego real.
 
-### Implantação e servição
+### Implantação e serving
 
-Modelos aprovados são empacotados, registrados em um registro de modelos e implantados via pipelines de CI/CD na infraestrutura de servição. Implantações canary e mecanismos de rollback reduzem riscos. A infraestrutura como código garante que os ambientes de servição sejam reprodutíveis.
+Os modelos aprovados são empacotados, registrados em um registro de modelos e implantados por meio de pipelines CI/CD na infraestrutura de serving. Implantações canary e mecanismos de rollback reduzem o risco. A infraestrutura como código garante que os ambientes de serving sejam reproduzíveis.
 
 ### Monitoramento e feedback
 
-Métricas de produção — distribuições de predições, desvio de dados, latência, taxas de erro — são coletadas e retornadas à equipe. Alertas acionam pipelines de re-treinamento ou rollbacks de modelos. Os loops de feedback fecham o ciclo de vida do ML, transformando sinais de produção em novos dados de treinamento.
+As métricas de produção — distribuições de previsões, desvio de dados, latência, taxas de erro — são coletadas e retroalimentadas à equipe. Os alertas acionam pipelines de retreinamento ou rollbacks de modelos. Os loops de feedback fecham o ciclo de vida do ML, transformando sinais de produção em novos dados de treinamento.
 
 ```mermaid
 flowchart LR
@@ -51,12 +53,12 @@ flowchart LR
 ## Quando usar / Quando NÃO usar
 
 | Usar quando | Evitar quando |
-|-------------|---------------|
-| Modelos são implantados em produção e atendem usuários reais | O projeto é uma análise pontual ou protótipo de pesquisa |
+|----------|------------|
+| Modelos são implantados em produção e atendem usuários reais | O projeto é uma análise pontual ou um protótipo de pesquisa |
 | Vários membros da equipe colaboram nos mesmos modelos | A equipe tem menos de duas pessoas e um único modelo |
-| Modelos requerem re-treinamento periódico conforme os dados mudam | O modelo é estático e nunca será atualizado |
+| Os modelos requerem retreinamento periódico à medida que os dados derivam | O modelo é estático e nunca será atualizado |
 | Requisitos regulatórios ou de auditoria exigem reprodutibilidade | A velocidade de exploração é a única prioridade e nenhuma implantação em produção está planejada |
-| Você tem mais de um modelo em produção para gerenciar | A sobrecarga de ferramentas supera o tempo de vida esperado do projeto |
+| Há mais de um modelo em produção para gerenciar | A sobrecarga das ferramentas supera a vida útil esperada do projeto |
 
 ## Exemplos de código
 
@@ -118,15 +120,15 @@ with mlflow.start_run(run_name="random-forest-baseline"):
 
 ## Recursos práticos
 
-- [Google – Practitioners Guide to MLOps](https://services.google.com/fh/files/misc/practitioners_guide_to_mlops_whitepaper.pdf) — Whitepaper abrangente cobrindo níveis de maturidade de MLOps, escolhas de ferramentas e padrões organizacionais do Google Cloud.
-- [MLflow Documentation](https://mlflow.org/docs/latest/index.html) — Documentação oficial da plataforma de MLOps open-source mais amplamente adotada, cobrindo rastreamento, registro, projetos e implantação.
-- [Made With ML – MLOps Course](https://madewithml.com/) — Curso gratuito de MLOps baseado em projetos que percorre todo o ciclo de vida com código real.
+- [Google – Practitioners Guide to MLOps](https://services.google.com/fh/files/misc/practitioners_guide_to_mlops_whitepaper.pdf) — Whitepaper abrangente cobrindo os níveis de maturidade do MLOps, escolhas de ferramentas e padrões organizacionais do Google Cloud.
+- [MLflow Documentation](https://mlflow.org/docs/latest/index.html) — Documentação oficial da plataforma MLOps de código aberto mais adotada, cobrindo rastreamento, registro, projetos e implantação.
+- [Made With ML – MLOps Course](https://madewithml.com/) — Curso de MLOps gratuito e baseado em projetos que percorre todo o ciclo de vida com código real.
 - [Chip Huyen – Designing Machine Learning Systems](https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/) — Livro da O'Reilly cobrindo design de sistemas de ML em produção, pipelines de dados, feature stores e monitoramento.
-- [CD Foundation – MLOps SIG](https://github.com/cdfoundation/sig-mlops) — Definições, panorama e melhores práticas para MLOps orientados pela comunidade.
+- [CD Foundation – MLOps SIG](https://github.com/cdfoundation/sig-mlops) — Definições conduzidas pela comunidade, panorama e melhores práticas para MLOps.
 
 ## Veja também
 
-- [Rastreamento de experimentos](/docs/mlops/experiment-tracking)
+- [Experiment tracking](/docs/mlops/experiment-tracking)
 - [MLflow](/docs/mlops/mlflow)
 - [Weights & Biases](/docs/mlops/wandb)
 - [Feature stores](/docs/mlops/feature-stores)

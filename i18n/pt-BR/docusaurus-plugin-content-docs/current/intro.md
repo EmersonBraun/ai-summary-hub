@@ -1,46 +1,60 @@
 ---
 sidebar_position: 1
-title: Introdução
-description: Como começar com o AI Summary Hub e visão geral dos campos de IA.
-keywords: [IA, introdução, visão geral, fundamentos]
+title: Introduction
+description: Getting started with AI Summary Hub and an overview of AI fields.
+keywords: [AI, introduction, overview, fundamentals]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Introdução
 
 Bem-vindo ao **AI Summary Hub** — sua fonte única de verdade para conceitos modernos de IA.
 
-Este hub é feito para **conhecimento profundo**: cada tópico traz definições claras, como funciona (com diagramas e código quando útil) e links para documentação oficial e codelabs para ir da compreensão à construção.
+Este hub foi construído para o **conhecimento profundo**: cada tópico oferece definições claras, como funciona (com diagramas e código onde útil) e links para documentação oficial e codelabs para que você possa ir do entendimento para a construção.
 
-## O que você encontra aqui
+## O que você encontrará aqui
 
-Esta wiki cobre **mais de 50 tópicos** em:
+Este wiki cobre **mais de 50 tópicos** em:
 
-- **Fundamentos** — Aprendizado de máquina, aprendizado profundo, redes neurais
-- **Transformers e LLMs** — Arquitetura, BERT, GPT, fine-tuning, engenharia de prompts, streaming
+- **Fundamentos** — Aprendizado de máquina, deep learning, redes neurais
+- **Transformers e LLMs** — Arquitetura, BERT, GPT, ajuste fino, engenharia de prompts, streaming
 - **RAG** — Geração aumentada por recuperação, bancos de dados vetoriais, embeddings
-- **Agentes e subagentes** — Agentes de IA, sistemas multiagente, hierarquias
-- **Padrões de raciocínio** — Chain-of-thought, tree-of-thoughts, ReAct, RDD
-- **Desenvolvimento orientado a especificações** — Construção de sistemas de IA a partir de especificações
-- **Áreas** — NLP, visão computacional, fala, robótica, **IA multimodal**
-- **Segurança, ética, avaliação** — Segurança em IA, viés, explicabilidade, benchmarks
-- **Infraestrutura e implantação** — Inferência local, raciocínio na edge, compressão de modelos, quantização
+- **Agentes e subagentes** — Agentes de IA, sistemas multi-agente, hierarquias
+- **Padrões de raciocínio** — Chain-of-thought, tree-of-thoughts, ReAct, RDD (recuperação-decisão-design)
+- **Desenvolvimento guiado por especificação** — Construindo sistemas de IA a partir de especificações
+- **Campos** — NLP, visão computacional, fala, robótica, **IA multimodal**
+- **Segurança, ética, avaliação** — Segurança de IA, viés, explicabilidade, benchmarks
+- **Infraestrutura e implantação** — Inferência local, raciocínio na borda, compressão de modelos, quantização
 - **Ferramentas** — Hugging Face, LangChain, Cursor, Claude Code, Antigravity, Kiro, PyTorch, TensorFlow
-- **Casos de estudo** — ChatGPT, DALL·E, Claude, Gemini, BART, Grok, DeepSeek, Qwen
+- **Estudos de caso** — ChatGPT, DALL·E, Claude, Gemini, BART, Grok, DeepSeek, Qwen
 
-Cada tópico inclui definições, exemplos (código e diagramas), prós/contras, benchmarks e links para **documentação externa** (docs oficiais, codelabs e artigos).
+Cada tópico inclui definições, exemplos (código e diagramas), prós/contras, benchmarks e **recursos práticos** com links para documentação oficial, codelabs e papers.
 
-## Saiba mais
+## Quando usar este hub
 
-- [Google AI for Developers](https://ai.google.dev/) — Gemini, APIs e guias
-- [Hugging Face NLP Course](https://huggingface.co/learn/nlp-course/) — De transformers a LLMs
-- [From Prototypes to Agents with ADK (Codelab)](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — Construa seu primeiro agente com o Agent Development Kit do Google
+| Objetivo | Por onde começar |
+|---|---|
+| Novo em IA | [Fundamentos](/docs/fundamentals) e depois [Redes Neurais](/docs/neural-networks) |
+| Construindo com LLMs | [LLMs](/docs/llms), [RAG](/docs/rag) e [Agentes](/docs/agents) |
+| Explorando raciocínio | [Padrões de Raciocínio](/docs/reasoning-patterns) e [RDD](/docs/reasoning-patterns/rdd) |
+| Executando modelos localmente ou na borda | [Inferência local](/docs/local-inference) e [Raciocínio na borda](/docs/edge-reasoning) |
+| Multimodal (texto + imagem, etc.) | [IA Multimodal](/docs/multimodal-ai) |
+| Implantando modelos em produção | [MLOps](/docs/mlops) e [Infraestrutura](/docs/infrastructure) |
 
-## Como começar
+## Começando
 
-- **Novo em IA?** Comece com [Fundamentos](/docs/fundamentals) e [Redes neurais](/docs/neural-networks).
+- **Novo em IA?** Comece com [Fundamentos](/docs/fundamentals) e [Redes Neurais](/docs/neural-networks).
 - **Construindo com LLMs?** Veja [LLMs](/docs/llms), [RAG](/docs/rag) e [Agentes](/docs/agents).
-- **Explorando raciocínio?** Confira [Padrões de raciocínio](/docs/reasoning-patterns) e [RDD](/docs/reasoning-patterns/rdd).
-- **Rodando modelos localmente ou na edge?** Veja [Inferência local](/docs/local-inference) e [Raciocínio na edge](/docs/edge-reasoning).
-- **Multimodal (texto + imagem, etc.)?** Veja [IA multimodal](/docs/multimodal-ai).
+- **Explorando raciocínio?** Confira [Padrões de Raciocínio](/docs/reasoning-patterns) e [RDD](/docs/reasoning-patterns/rdd).
+- **Executando modelos localmente ou na borda?** Veja [Inferência local](/docs/local-inference) e [Raciocínio na borda](/docs/edge-reasoning).
+- **Multimodal (texto + imagem, etc.)?** Veja [IA Multimodal](/docs/multimodal-ai).
 
-Use a barra lateral para navegar por todos os tópicos ou a busca para conceitos específicos.
+Use a barra lateral para navegar por todos os tópicos ou a barra de pesquisa para encontrar conceitos específicos.
+
+## Recursos práticos
+
+- [Google AI for Developers](https://ai.google.dev/) — Gemini, APIs e guias para criar aplicações de IA
+- [Hugging Face NLP Course](https://huggingface.co/learn/nlp-course/) — Curso prático de transformers a LLMs em produção
+- [From Prototypes to Agents with ADK (Codelab)](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — Construa seu primeiro agente com o Kit de Desenvolvimento de Agentes da Google
+- [fast.ai – Practical Deep Learning](https://course.fast.ai/) — Curso de deep learning prático, top-down e focado em código

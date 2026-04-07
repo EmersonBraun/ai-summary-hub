@@ -2,15 +2,16 @@
 title: Changelog / Updates
 description: Recent updates and new topics in AI Summary Hub.
 keywords: [changelog, updates, releases]
+authors: [EmersonBraun]
 ---
 
 # Changelog / Updates
 
-## Initial release
+## Lançamento inicial
 
-- Wiki structure with 50+ topic placeholders.
-- Core docs for RAG, Transformers, LLMs, Agents, Subagents, RDD.
-- 6 locales (en, es, pt-BR, de, fr, zh-Hans).
-- Dark default theme, Algolia search, GitHub Pages deployment.
+- Estrutura do wiki com mais de 50 marcadores de posição de tópicos.
+- Documentação principal para RAG, Transformers, LLMs, Agents, Subagents, RDD.
+- 6 idiomas (en, es, pt-BR, de, fr, zh-Hans).
+- Tema escuro padrão, busca Algolia, implantação no GitHub Pages.
 
-_Subscribe or watch the repo for new topics and translations._
+_Assine ou acompanhe o repositório para novos tópicos e traduções._

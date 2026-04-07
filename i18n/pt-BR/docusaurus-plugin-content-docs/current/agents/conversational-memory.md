@@ -1,36 +1,38 @@
 ---
-title: "Memória conversacional"
-description: Padrões de memória para agentes de chat — buffer, resumo, vetor e memória de entidades.
-keywords: [memória conversacional, buffer memory, summary memory, vector memory, entity memory, LangChain, histórico de chat]
+title: "Conversational memory"
+description: Memory patterns for chat agents — buffer, summary, vector, and entity memory.
+keywords: [conversational memory, buffer memory, summary memory, vector memory, entity memory, LangChain, chat history]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Memória conversacional
 
 ## Definição
 
-Memória conversacional refere-se ao conjunto de técnicas que permitem que um agente de chat retenha e utilize informações de turnos anteriores em um diálogo. Ao contrário da geração aumentada por recuperação, que busca documentos externos, a memória conversacional está exclusivamente relacionada ao que já foi dito entre o usuário e o agente. Acertar isso é o que separa um chatbot frustrante que pede para você se repetir de um agente que parece genuinamente atento.
+A memória conversacional refere-se ao conjunto de técnicas que permitem a um agente de chat reter e utilizar informações de turnos anteriores em um diálogo. Ao contrário da geração aumentada por recuperação, que traz documentos externos, a memória conversacional preocupa-se exclusivamente com o que já foi dito entre o usuário e o agente. Acertar isso é o que separa um chatbot frustrante que pede para você se repetir de um agente que parece genuinamente atento.
 
-Existem várias estratégias distintas para gerenciar o histórico de conversa, cada uma com diferentes trade-offs entre custo, fidelidade e escalabilidade. A abordagem mais simples — manter cada mensagem literalmente — funciona bem para conversas curtas, mas rapidamente esgota a janela de contexto do modelo. Padrões mais sofisticados usam sumarização ou indexação semântica para comprimir ou recuperar seletivamente o histórico mais relevante para o turno atual.
+Existem várias estratégias distintas para gerenciar o histórico de conversa, cada uma com diferentes compensações entre custo, fidelidade e escalabilidade. A abordagem mais simples — manter cada mensagem textualmente — funciona bem para conversas curtas, mas esgota rapidamente a janela de contexto do modelo. Padrões mais sofisticados usam sumarização ou indexação semântica para comprimir ou recuperar seletivamente o histórico mais relevante para o turno atual.
 
-Escolher o padrão de memória correto depende muito do comprimento esperado da conversa, da importância das palavras exatas versus o significado semântico e das restrições de custo do deployment. Na prática, agentes de chat de produção geralmente combinam dois ou mais padrões: um buffer verbatim de curto prazo para coerência imediata e uma camada de resumo ou vetor para recall de longo horizonte.
+Escolher o padrão de memória correto depende fortemente do comprimento esperado da conversa, da importância da redação exata versus o significado semântico, e das restrições de custo da implantação. Na prática, agentes de chat de produção frequentemente combinam dois ou mais padrões: um buffer textual de curto prazo para coerência imediata e uma camada de resumo ou vetor para recuperação de longo prazo.
 
 ## Como funciona
 
-### Buffer memory
+### Memória buffer
 
-Buffer memory é o padrão mais simples: o agente mantém uma lista ordenada dos últimos N pares de mensagens e os prefixa em cada nova janela de contexto. Quando o buffer atinge a capacidade, o par mais antigo é descartado (FIFO). Isso garante que o agente sempre tenha acesso às trocas mais recentes sem qualquer transformação ou compressão com perda. Buffer memory é ideal para conversas curtas a médias onde a recência é o sinal primário, e não incorre em chamadas extras ao LLM. Sua principal fraqueza é que o contexto mais antigo é perdido silenciosamente sem nenhum resumo.
+A memória buffer é o padrão mais simples: o agente mantém uma lista ordenada dos últimos N pares de mensagens e os precede em cada nova janela de contexto. Quando o buffer atinge a capacidade, o par mais antigo é descartado (FIFO). Isso garante que o agente sempre tenha acesso às trocas mais recentes sem qualquer transformação ou compressão com perda. A memória buffer é ideal para conversas curtas a médias e não incorre em chamadas LLM adicionais. Sua principal fraqueza é que o contexto mais antigo é silenciosamente perdido sem nenhum resumo.
 
-### Summary memory
+### Memória de resumo
 
-Summary memory aborda o problema de esquecimento usando um LLM para gerar periodicamente um resumo corrente da conversa até o momento. Quando o buffer fica muito grande, o agente o condensa em uma narrativa compacta — capturando fatos-chave, decisões e sentimentos — e depois descarta as mensagens brutas. O resumo ocupa muito menos tokens do que os turnos originais, tornando conversas longas viáveis. O trade-off é uma chamada secundária ao LLM para cada etapa de sumarização, o que adiciona latência e custo, e algumas informações são inevitavelmente perdidas na compressão.
+A memória de resumo aborda o problema do esquecimento usando um LLM para gerar periodicamente um resumo em execução da conversa até o momento. Quando o buffer cresce muito, o agente o condensa em uma narrativa compacta — capturando fatos-chave, decisões e sentimento — e então descarta as mensagens brutas. O resumo ocupa muito menos tokens do que os turnos originais. A compensação é uma chamada LLM secundária para cada etapa de sumarização, o que adiciona latência e custo.
 
-### Vector memory
+### Memória vetorial
 
-Vector memory embute cada turno da conversa e o armazena em um banco de dados vetorial. Em cada novo turno, as trocas passadas mais semanticamente relevantes são recuperadas por busca de similaridade e injetadas na janela de contexto junto com as mensagens recentes do buffer. Esse padrão se destaca quando as conversas são muito longas ou quando a pergunta atual se relaciona com algo dito muitos turnos atrás. Vector memory é a abordagem de maior fidelidade para recall de longo horizonte, mas requer infraestrutura de embedding e introduz latência de recuperação.
+A memória vetorial incorpora cada turno da conversa e o armazena em um banco de dados vetorial. A cada novo turno, as trocas passadas mais semanticamente relevantes são recuperadas por busca de similaridade e injetadas na janela de contexto. Esse padrão se destaca quando as conversas são muito longas ou quando a pergunta atual se relaciona com algo dito muitos turnos atrás. A memória vetorial requer infraestrutura de embedding e introduz latência de recuperação.
 
-### Entity memory
+### Memória de entidades
 
-Entity memory extrai entidades nomeadas — pessoas, lugares, produtos, preferências — da conversa e mantém um registro estruturado do que o agente sabe sobre cada entidade. Quando uma entidade é mencionada novamente, seu perfil armazenado é injetado no contexto. Entity memory é ideal para casos de uso de assistente pessoal onde lembrar que "Alice prefere reuniões pela manhã" ou "o prazo do projeto é 10 de junho" é mais valioso do que lembrar as palavras exatas de mensagens passadas.
+A memória de entidades extrai entidades nomeadas — pessoas, lugares, produtos, preferências — da conversa e mantém um registro estruturado do que o agente sabe sobre cada entidade. Quando uma entidade é mencionada novamente, seu perfil armazenado é injetado no contexto. A memória de entidades é ideal para casos de uso de assistente pessoal onde lembrar que "Alice prefere reuniões matutinas" ou "o prazo do projeto é 10 de junho" é mais valioso do que lembrar a redação exata de mensagens passadas.
 
 ```mermaid
 flowchart TD
@@ -52,21 +54,21 @@ flowchart TD
 
 | Usar quando | Evitar quando |
 |---|---|
-| As conversas se estendem por mais de alguns turnos | A tarefa é de turno único sem necessidade de histórico |
-| Os usuários esperam que o agente se lembre do que disseram antes | Os dados de conversa não podem ser armazenados por razões de privacidade ou conformidade |
-| Os custos de janela de contexto são significativos e o histórico é longo | A conversa é sempre curta o suficiente para caber completamente na janela de contexto |
-| Os usuários discutem múltiplas entidades ou tópicos ao longo da sessão | A latência de sumarização é inaceitável para o caso de uso |
-| É necessário recall entre sessões (padrões vetor/entidade) | A complexidade adicional de infraestrutura supera o benefício de fidelidade |
+| Conversas se estendem por mais de alguns turnos | A tarefa é de turno único sem necessidade de histórico |
+| Usuários esperam que o agente se lembre do que disseram antes | Dados de conversa não podem ser armazenados por motivos de privacidade ou conformidade |
+| Custos da janela de contexto são significativos e o histórico é longo | A conversa é sempre curta o suficiente para caber completamente na janela de contexto |
+| Usuários discutem múltiplas entidades ou tópicos ao longo da sessão | A latência de sumarização é inaceitável para o caso de uso |
+| Recuperação entre sessões é necessária (padrões de vetor/entidade) | A complexidade de infraestrutura adicional supera o benefício de fidelidade |
 
 ## Comparações
 
-| Critério | Buffer memory | Summary memory | Vector memory |
+| Critério | Memória buffer | Memória de resumo | Memória vetorial |
 |---|---|---|---|
-| Custo por turno | Baixo (sem chamada extra ao LLM) | Médio (chamada ocasional ao sumarizador) | Médio (chamada de embedding + consulta ao BD) |
-| Fidelidade do recall | Exata, mas limitada aos últimos N turnos | Compressão com perda de turnos mais antigos | Alta para conteúdo semanticamente relevante |
-| Tratamento de comprimento de contexto | Ruim — turnos mais antigos são descartados silenciosamente | Bom — resumo comprime turnos antigos | Excelente — recupera apenas os trechos relevantes |
-| Latência | Mínima | Moderada (sumarização adiciona uma etapa) | Moderada (embedding + busca por vizinho mais próximo) |
-| Recall entre sessões | Não (buffer em memória) | Possível se o resumo for persistido | Sim (o vetor store é persistente) |
+| Custo por turno | Baixo (sem chamada LLM adicional) | Médio (chamada ao sumarizador ocasional) | Médio (chamada de embedding + consulta DB) |
+| Fidelidade da recuperação | Exata mas limitada aos últimos N turnos | Compressão com perda de turnos mais antigos | Alta para conteúdo semanticamente relevante |
+| Tratamento do comprimento do contexto | Ruim — turnos mais antigos são silenciosamente descartados | Bom — o resumo comprime turnos antigos | Excelente — recupera apenas fragmentos relevantes |
+| Latência | Mínima | Moderada (sumarização adiciona uma etapa) | Moderada (embedding + busca de vizinho mais próximo) |
+| Recuperação entre sessões | Não (buffer em memória) | Possível se o resumo for persistido | Sim (armazenamento vetorial é persistente) |
 | Complexidade de implementação | Muito baixa | Baixa–média | Média–alta |
 
 ## Exemplos de código
@@ -188,13 +190,13 @@ if __name__ == "__main__":
 
 ## Recursos práticos
 
-- [Documentação de Memória do LangChain](https://python.langchain.com/docs/concepts/memory/) — Referência abrangente para todas as classes de memória do LangChain com exemplos de uso.
-- [Repensando a Memória em IA Conversacional (Lilian Weng)](https://lilianweng.github.io/posts/2023-06-23-agent/#memory) — Post de blog aprofundado cobrindo taxonomia de memória e trade-offs de design em sistemas de agentes.
-- [MemoryOS: Sistema Operacional Baseado em Memória para Agentes LLM](https://arxiv.org/abs/2506.06326) — Pesquisa sobre gerenciamento hierárquico de memória inspirado no design de sistemas operacionais.
-- [Gerenciamento de Threads de Assistentes OpenAI](https://platform.openai.com/docs/assistants/how-it-works/managing-threads) — Como a API gerenciada da OpenAI lida com threads de conversa persistentes.
+- [Documentação de memória do LangChain](https://python.langchain.com/docs/concepts/memory/) — Referência abrangente para todas as classes de memória do LangChain com exemplos de uso.
+- [Rethinking Memory in Conversational AI (Lilian Weng)](https://lilianweng.github.io/posts/2023-06-23-agent/#memory) — Post de blog aprofundado cobrindo taxonomia de memória e compensações de design em sistemas de agentes.
+- [MemoryOS: Memory-based Operating System for LLM Agents](https://arxiv.org/abs/2506.06326) — Pesquisa sobre gerenciamento hierárquico de memória inspirado no design de SO.
+- [OpenAI Assistants Thread Management](https://platform.openai.com/docs/assistants/how-it-works/managing-threads) — Como a API gerenciada da OpenAI lida com threads de conversa persistentes.
 
 ## Veja também
 
 - [Memória de agentes](/docs/agents/memory)
 - [Agentes de IA](/docs/agents)
-- [Embeddings RAG](/docs/rag/embeddings)
+- [Embeddings de RAG](/docs/rag/embeddings)
