@@ -1,4 +1,5 @@
 import React, {useState, useCallback} from 'react';
+import {translate} from '@docusaurus/Translate';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import {
   learningPaths,
@@ -8,6 +9,100 @@ import {
 import styles from './styles.module.css';
 
 const STORAGE_KEY = 'ai-summary-hub-sidebar';
+
+function learningPathLabel(sidebarId: string): string {
+  switch (sidebarId) {
+    case 'aiFundamentals':
+      return translate({
+        id: 'learningPath.aiFundamentals.label',
+        message: 'AI Fundamentals',
+      });
+    case 'ragFromZero':
+      return translate({
+        id: 'learningPath.ragFromZero.label',
+        message: 'RAG from Zero',
+      });
+    case 'masteringAgents':
+      return translate({
+        id: 'learningPath.masteringAgents.label',
+        message: 'Mastering Agents',
+      });
+    case 'promptEngineeringMastery':
+      return translate({
+        id: 'learningPath.promptEngineeringMastery.label',
+        message: 'Prompt Engineering Mastery',
+      });
+    case 'practicalMlops':
+      return translate({
+        id: 'learningPath.practicalMlops.label',
+        message: 'Practical MLOps',
+      });
+    case 'aiToolsFrameworks':
+      return translate({
+        id: 'learningPath.aiToolsFrameworks.label',
+        message: 'AI Tools & Frameworks',
+      });
+    case 'aiSafetyEthics':
+      return translate({
+        id: 'learningPath.aiSafetyEthics.label',
+        message: 'AI Safety & Ethics',
+      });
+    case 'claudeCodeDeepDive':
+      return translate({
+        id: 'learningPath.claudeCodeDeepDive.label',
+        message: 'Claude Code Deep Dive',
+      });
+    default:
+      return sidebarId;
+  }
+}
+
+function learningPathLevel(sidebarId: string): string {
+  switch (sidebarId) {
+    case 'aiFundamentals':
+      return translate({
+        id: 'learningPath.aiFundamentals.level',
+        message: 'beginner',
+      });
+    case 'ragFromZero':
+      return translate({
+        id: 'learningPath.ragFromZero.level',
+        message: 'beginner \u2192 intermediate',
+      });
+    case 'masteringAgents':
+      return translate({
+        id: 'learningPath.masteringAgents.level',
+        message: 'intermediate \u2192 advanced',
+      });
+    case 'promptEngineeringMastery':
+      return translate({
+        id: 'learningPath.promptEngineeringMastery.level',
+        message: 'beginner \u2192 advanced',
+      });
+    case 'practicalMlops':
+      return translate({
+        id: 'learningPath.practicalMlops.level',
+        message: 'intermediate \u2192 advanced',
+      });
+    case 'aiToolsFrameworks':
+      return translate({
+        id: 'learningPath.aiToolsFrameworks.level',
+        message: 'beginner \u2192 intermediate',
+      });
+    case 'aiSafetyEthics':
+      return translate({
+        id: 'learningPath.aiSafetyEthics.level',
+        message: 'beginner \u2192 intermediate',
+      });
+    case 'claudeCodeDeepDive':
+      return translate({
+        id: 'learningPath.claudeCodeDeepDive.level',
+        message: 'beginner \u2192 advanced',
+      });
+    default:
+      return '';
+  }
+}
 
 function storeSidebar(id: string): void {
   try {
@@ -69,7 +164,12 @@ export default function SidebarSwitcher({
         aria-expanded={isExpanded}
       >
         <span className={styles.toggleLabel}>
-          {activePath ? activePath.label : 'Learning Paths'}
+          {activePath
+            ? learningPathLabel(activePath.sidebarId)
+            : translate({
+                id: 'sidebarSwitcher.title',
+                message: 'Learning Paths',
+              })}
         </span>
         <span className={`${styles.chevron} ${isExpanded ? styles.chevronOpen : ''}`}>
           &#9660;
@@ -87,8 +187,12 @@ export default function SidebarSwitcher({
               onClick={() => handleSelectPath(path)}
               type="button"
             >
-              <span className={styles.pathLabel}>{path.label}</span>
-              <span className={styles.pathLevel}>{path.level}</span>
+              <span className={styles.pathLabel}>
+                {learningPathLabel(path.sidebarId)}
+              </span>
+              <span className={styles.pathLevel}>
+                {learningPathLevel(path.sidebarId)}
+              </span>
             </button>
           ))}
         </div>
