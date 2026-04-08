@@ -2,6 +2,8 @@
 title: TensorFlow Lite
 description: 用于在 Android、iOS、嵌入式系统和微控制器上进行设备端机器学习推理的轻量级运行时。
 keywords: [TensorFlow Lite, TFLite, 边缘 AI, 设备端推理, 模型转换, 量化, 委托, 移动 ML]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # TensorFlow Lite

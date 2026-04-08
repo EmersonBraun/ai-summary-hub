@@ -1,103 +1,111 @@
 ---
 title: Terraform
-description: Outil d'Infrastructure as Code déclaratif de HashiCorp pour provisionner et gérer des ressources cloud, largement utilisé pour créer une infrastructure ML reproductible incluant des instances GPU, des buckets de stockage et des clusters Kubernetes.
-keywords: [Terraform, IaC, infrastructure as code, déclaratif, HCL, AWS, GCP, Azure, gestion d'état, instances GPU, infrastructure ML]
+description: Outil d'infrastructure en tant que code (IaC) de HashiCorp pour provisionner et gérer l'infrastructure cloud de manière déclarative.
+keywords: [Terraform, IaC, infrastructure en tant que code, HashiCorp, HCL, fournisseurs cloud, gestion d'état, MLOps, infrastructure ML]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Terraform
 
 ## Définition
 
-Terraform est un outil d'Infrastructure as Code (IaC) open source créé par HashiCorp qui vous permet de définir, provisionner et gérer l'infrastructure cloud et sur site à l'aide d'un langage de configuration déclaratif appelé HCL (HashiCorp Configuration Language). Vous décrivez l'état final souhaité de votre infrastructure — quelles ressources doivent exister, comment elles doivent être configurées et comment elles sont liées les unes aux autres — et Terraform détermine ce qu'il faut créer, mettre à jour ou supprimer pour atteindre cet état. Ce modèle déclaratif est fondamentalement différent des approches de scripting impératif où vous décrivez la séquence d'étapes à exécuter.
+Terraform est un outil d'infrastructure en tant que code (IaC) open source développé par HashiCorp qui permet de provisionner et gérer l'infrastructure cloud à l'aide d'un langage de configuration déclaratif appelé HCL (HashiCorp Configuration Language). Plutôt que d'exécuter des commandes impératives pour créer des ressources — « lancer une VM, puis attacher un disque, puis configurer le réseau » —, on déclare l'état final souhaité dans des fichiers `.tf`, et Terraform détermine quelles appels API effectuer pour atteindre cet état.
 
-La pierre angulaire de l'architecture de Terraform est son écosystème de **providers**. Un provider est un plugin qui traduit les définitions de ressources HCL en appels API contre une plateforme spécifique : AWS, Google Cloud, Azure, Kubernetes, Datadog, GitHub et des centaines d'autres. Chaque provider maintient son propre cycle de release versionné, et Terraform télécharge les providers automatiquement en fonction des blocs `required_providers`. Cela signifie qu'une seule configuration Terraform peut simultanément provisionner un cluster d'entraînement GPU AWS, un bucket GCS pour les données d'entraînement, un namespace Kubernetes pour le service de modèles et un tableau de bord Grafana pour la surveillance — avec un outillage cohérent sur toutes les plateformes.
+La valeur fondamentale de Terraform pour les équipes ML est la reproductibilité de l'infrastructure. Les clusters GPU pour l'entraînement, les registres de conteneurs, les buckets de stockage pour les artefacts de modèles, les clusters Kubernetes pour le service et les pipelines de données peuvent tous être définis comme du code, stockés dans un dépôt Git, révisés en pull requests et appliqués de manière cohérente dans les environnements de développement, staging et production. Cela élimine la configuration manuelle hasardeuse qui conduit à la dégradation de l'environnement au fil du temps.
 
-La **gestion d'état** est ce qui rend Terraform idempotent et planifiable. Terraform maintient un fichier d'état qui mappe chaque ressource de la configuration à son équivalent dans le monde réel (identifié par les IDs de ressources du fournisseur cloud). Lorsque vous exécutez `terraform plan`, Terraform compare le fichier d'état actuel avec votre configuration et l'infrastructure en direct, produisant un diff qui montre exactement ce qui changera avant tout changement. Pour les workflows d'équipe, l'état est stocké dans un backend partagé (S3, GCS, Terraform Cloud) avec verrouillage pour prévenir les modifications concurrentes. Cette auditabilité et cette prévisibilité font de Terraform l'outil IaC dominant pour le provisionnement d'infrastructure d'entraînement et de service ML dans les environnements réglementés et collaboratifs.
+Terraform maintient un **fichier d'état** (localement dans `terraform.tfstate` ou à distance dans S3, GCS ou Terraform Cloud) qui mappe les ressources définies dans votre configuration aux objets réels dans le fournisseur cloud. Cet état permet à Terraform de calculer des plans différentiels — il ne recrée pas toutes les ressources à chaque `apply`, il compare uniquement l'état souhaité à l'état actuel et n'effectue que les changements nécessaires.
 
 ## Fonctionnement
 
-### Écriture de la configuration
-
-Les ingénieurs écrivent des fichiers HCL (`.tf`) qui déclarent des ressources, des sources de données, des variables, des sorties et des modules. Les ressources correspondent à des objets d'infrastructure (une instance EC2, un bucket S3, un déploiement Kubernetes). Les sources de données lisent l'infrastructure existante sans la gérer. Les variables paramétrisent les configurations pour leur réutilisation entre les environnements. Les modules encapsulent des ensembles réutilisables de ressources — un module « cluster d'entraînement GPU » peut être instancié plusieurs fois avec différents types d'instances et régions.
-
-### Initialisation et plan
-
-L'exécution de `terraform init` télécharge les providers et modules requis et initialise le backend. L'exécution de `terraform plan` produit un plan d'exécution lisible par l'humain : une liste de ressources à ajouter (+), modifier (~) ou supprimer (−). La phase de plan est en lecture seule — elle n'apporte aucune modification à l'infrastructure. Les équipes intègrent généralement `terraform plan` dans les pipelines CI pour examiner les changements dans les pull requests avant la fusion.
-
-### Application et gestion d'état
-
-`terraform apply` exécute le plan, appelant les API des providers pour créer, mettre à jour ou supprimer des ressources dans l'ordre des dépendances. Terraform résout automatiquement le graphe de dépendances en fonction des références entre les ressources (par exemple, un sous-réseau qui référence un ID de VPC). Après l'application, le fichier d'état est mis à jour pour refléter le nouvel état de l'infrastructure. Pour l'infrastructure ML, cela signifie que les instances GPU, les buckets de stockage, les rôles IAM et les clusters Kubernetes sont tous créés dans le bon ordre avec les bonnes configurations en une seule commande.
-
-### Destruction et gestion du cycle de vie
-
-`terraform destroy` supprime toutes les ressources gérées par la configuration — utile pour les environnements d'entraînement éphémères qui ne devraient pas fonctionner (et coûter de l'argent) entre les jobs d'entraînement. Les méta-arguments de cycle de vie (`create_before_destroy`, `prevent_destroy`, `ignore_changes`) donnent un contrôle précis sur la façon dont Terraform gère les ressources sensibles comme les buckets de stockage d'artefacts de modèles qui ne doivent jamais être accidentellement supprimés.
-
 ```mermaid
 flowchart LR
-  HCL[HCL configuration\n.tf files] -->|"terraform init"| Init[Provider & module\ndownload]
-  Init -->|"terraform plan"| Plan[Execution plan\ndiff against state]
-  Plan -->|"human review / CI approval"| Apply[terraform apply]
-  Apply -->|"API calls"| Cloud[Cloud provider APIs\nAWS / GCP / Azure]
-  Cloud -->|"resource IDs"| State[State file\nS3 / GCS backend]
-  State -->|"next plan reads state"| Plan
+  Config["Configuration HCL\n(.tf files)"] -->|"terraform init"| Init["Télécharger les fournisseurs\n& modules"]
+  Init -->|"terraform plan"| Plan["Générer le plan d'exécution\n(diff souhaité vs état)"]
+  Plan -->|"terraform apply"| Apply["Appels API fournisseur\n(créer/mettre à jour/supprimer)"]
+  Apply -->|"écrire"| State["Fichier d'état\n(tfstate local ou distant)"]
+  State -->|"lire lors du plan suivant"| Plan
+  Apply -->|"terraform destroy"| Destroy["Supprimer toutes les ressources gérées"]
 ```
+
+### Écrire la configuration
+
+La configuration Terraform est organisée en **ressources**, **sources de données**, **variables** et **sorties**. Une ressource représente un objet d'infrastructure (une VM, un bucket S3, un groupe de nœuds Kubernetes). Une source de données interroge l'infrastructure existante sans la gérer. Les variables paramètrent la configuration pour différents environnements. Les sorties exposent les valeurs pour que d'autres modules ou opérateurs lisent.
+
+### Initialisation, planification et application
+
+`terraform init` télécharge les plugins fournisseurs (AWS, GCP, Azure, Kubernetes, etc.) spécifiés dans la configuration. `terraform plan` effectue un essai à sec — il lit l'état actuel, interroge les APIs du fournisseur pour voir ce qui existe réellement, compare à la configuration souhaitée et affiche un diff lisible par l'humain indiquant ce qui sera créé, modifié ou détruit. `terraform apply` exécute le plan après confirmation. Ces trois étapes forment le cycle fondamental de Terraform.
+
+### Gestion de l'état
+
+Le fichier d'état est le modèle de données critique qui rend Terraform idempotent. Pour les équipes, l'état doit être stocké à distance (S3, GCS, Terraform Cloud) avec le verrouillage d'état activé pour éviter que plusieurs opérateurs appliquent simultanément des modifications conflictuelles. L'état contient des métadonnées sur chaque ressource gérée, notamment les IDs qui permettent à Terraform de la retrouver lors des futurs `plan`.
+
+### Destruction et cycle de vie des ressources
+
+`terraform destroy` supprime toutes les ressources gérées dans l'état. Des règles de cycle de vie sur les ressources individuelles peuvent prévenir la destruction accidentelle (`prevent_destroy = true`), forcer le remplacement lors de certains changements de configuration (`replace_triggered_by`), ou créer de nouvelles ressources avant de supprimer les anciennes lors des mises à jour (`create_before_destroy = true`).
 
 ## Quand utiliser / Quand NE PAS utiliser
 
 | Utiliser quand | Éviter quand |
-|----------|------------|
-| Provisionnement d'infrastructure cloud devant être reproductible entre les environnements | Configuration de logiciels dans des instances existantes (utilisez Ansible pour ça) |
-| Gestion d'infrastructure ML à grande échelle : clusters GPU, stockage, réseau, Kubernetes | Votre équipe n'a pas d'infrastructure cloud à gérer (pas de serveurs, pas de comptes cloud) |
-| Plusieurs membres de l'équipe doivent collaborer sur la même infrastructure | Vous devez exécuter des commandes shell arbitraires ou configurer des paramètres au niveau OS sur les instances |
-| Vous voulez que les changements d'infrastructure soient revus via des pull requests avant application | Votre infrastructure existante n'a pas été créée avec Terraform et le coût de migration est prohibitif |
-| L'infrastructure doit être versionnée, auditée et annulable de manière fiable | Vous avez besoin de changements rapides et itératifs de la config application pendant le développement |
-| Vous opérez dans plusieurs fournisseurs cloud et voulez un workflow unifié | Votre organisation standardise déjà sur un outil IaC concurrent (Pulumi, CDK) avec une connaissance institutionnelle |
+|---|---|
+| L'infrastructure ML doit être reproductible dans plusieurs environnements | Gérer un environnement local de développement ou des scripts ad hoc ponctuels |
+| Plusieurs ressources cloud doivent être provisionnées ensemble (cluster GPU + stockage + réseau) | L'équipe utilise déjà des outils IaC spécifiques au fournisseur (CloudFormation, Deployment Manager) et la migration n'apporte pas de valeur |
+| Les changements d'infrastructure doivent passer par des revues de code et des pipelines CI | La configuration s'exécute une seule fois et ne sera jamais mise à jour ou réutilisée |
+| Les ressources doivent être détruites et recréées de façon cohérente (ex. : environnements de test éphémères) | Les ingénieurs préfèrent une approche de configuration procédurale (considérer Ansible ou des scripts shell) |
+| Gouvernance et audit de l'infrastructure cloud au fil du temps | Les besoins d'infrastructure sont très simples et ne justifient pas l'apprentissage de HCL |
 
 ## Comparaisons
 
 | Critère | Terraform | Ansible |
-|-----------|-----------|---------|
-| Paradigme | Déclaratif — décrire l'état souhaité | Procédural — décrire les étapes pour atteindre l'état |
-| Gestion d'état | Fichier d'état explicite ; suit les IDs de ressources | Sans état — pas de suivi d'état intégré |
-| Cas d'utilisation principal | Provisionnement de ressources cloud (instances, réseaux, stockage) | Gestion de configuration et déploiement d'application sur des instances existantes |
-| Support des fournisseurs cloud | 1 000+ providers via l'écosystème de plugins | Modules pour les grands clouds ; moins complet que Terraform |
-| Idempotence | Native — plan/apply converge toujours vers l'état souhaité | Au niveau des tâches — chaque tâche doit être écrite pour être idempotente |
-| Courbe d'apprentissage | Syntaxe HCL + modèle mental état/plan | Playbooks YAML ; barrière initiale plus faible |
-| Quand utiliser les deux | Terraform provisionne l'infrastructure ; Ansible configure les logiciels dessus — ils se complètent | Voir ci-dessus |
+|---|---|---|
+| Paradigme | Déclaratif — définir l'état souhaité | Procédural — définir les étapes pour y parvenir |
+| Modèle d'état | Fichier d'état explicite (tfstate) | Sans état (idempotence via des modules conditionnels) |
+| Force principale | Provisionnement d'infrastructure cloud | Gestion de configuration et déploiement d'applications |
+| Support multi-cloud | Excellent (fournisseurs pour tout) | Bon (modules pour les principaux clouds) |
+| Courbe d'apprentissage | Modérée — syntaxe HCL relativement simple | Modérée — YAML et logique de module peuvent être complexes |
+| Maturité | Très élevée (écosystème large, HashiCorp) | Très élevée (Red Hat, large base d'utilisateurs) |
 
 ## Avantages et inconvénients
 
-| Aspect | Avantages | Inconvénients |
-|--------|------|------|
-| Modèle déclaratif | L'intention est claire ; le plan montre les changements exacts avant application | Ne peut pas facilement exprimer la logique conditionnelle ou les boucles complexes (bien que HCL se soit amélioré) |
-| Fichier d'état | Permet une planification précise et la détection de dérive | Le fichier d'état est sensible ; la corruption ou la perte est un incident grave |
-| Écosystème de providers | Couvre pratiquement tous les services cloud et outils SaaS | La qualité des providers varie ; certains providers communautaires sont mal maintenus |
-| Workflow plan/apply | Les changements sont revoyables avant l'exécution | Cycle d'itération plus lent que les scripts impératifs pour le prototypage rapide |
-| Réutilisation de modules | Modèles d'infrastructure DRY via des modules publiés ou internes | Les grands graphes de modules peuvent être lents à initialiser et planifier |
-| Idempotence | Sûr à exécuter plusieurs fois ; comportement convergent | Des cycles destroy/recreate pour certains changements de ressources (par exemple, renommage) causent des interruptions |
+| Avantages | Inconvénients |
+|---|---|
+| L'infrastructure en tant que code rend les environnements reproductibles et auditables | La gestion de l'état peut devenir complexe dans les grandes équipes ou organisations |
+| La planification avant application réduit les surprises des changements d'infrastructure | La dérive de l'état (changements manuels hors de Terraform) crée des incohérences difficiles à réconcilier |
+| Excellent support multi-cloud avec des centaines de fournisseurs | HCL peut devenir verbeux pour des infrastructures complexes |
+| L'architecture de modules permet la réutilisation et la standardisation | La courbe d'apprentissage pour les bonnes pratiques (backends distants, workspaces) prend du temps |
+| Ecosystem riche : registre de modules Terraform, Terraform Cloud, Atlantis pour les PR | `terraform destroy` peut supprimer des ressources de production si exécuté sans précaution |
 
 ## Exemples de code
 
 ```hcl
 # ml_infrastructure.tf
-# Provisions an AWS GPU training instance and S3 bucket for ML artifacts.
-# Prerequisites: AWS CLI configured, Terraform >= 1.5, appropriate IAM permissions.
-# Run: terraform init && terraform plan && terraform apply
+# Provisions the core ML infrastructure on AWS:
+#   - S3 bucket for model artifacts and training data
+#   - ECR repository for ML container images
+#   - EKS cluster for model training and serving
+#   - GPU node group for training workloads
+#
+# Prerequisites:
+#   terraform init   (downloads AWS provider)
+#   terraform plan   (preview changes)
+#   terraform apply  (create resources)
 
 terraform {
-  required_version = ">= 1.5"
+  required_version = ">= 1.6"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
   }
-  # Remote state backend — replace with your bucket and key
+
+  # Remote state backend — shared state for teams.
+  # Create the S3 bucket and DynamoDB table before running init.
   backend "s3" {
     bucket         = "my-org-terraform-state"
-    key            = "mlops/training/terraform.tfstate"
+    key            = "mlops/infrastructure/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "terraform-state-lock"
+    dynamodb_table = "terraform-state-lock"   # prevents concurrent applies
     encrypt        = true
   }
 }
@@ -106,7 +114,7 @@ provider "aws" {
   region = var.aws_region
 }
 
-# --- Variables ---
+# ── Variables ──────────────────────────────────────────────────────────────────
 
 variable "aws_region" {
   description = "AWS region for all resources"
@@ -115,83 +123,204 @@ variable "aws_region" {
 }
 
 variable "environment" {
-  description = "Deployment environment: dev, staging, prod"
+  description = "Deployment environment (dev | staging | prod)"
   type        = string
   default     = "dev"
 }
 
+variable "project_name" {
+  description = "Project prefix used in resource names"
+  type        = string
+  default     = "ml-platform"
+}
+
 variable "gpu_instance_type" {
-  description = "EC2 instance type for GPU training. p3.2xlarge has 1x V100."
+  description = "EC2 instance type for the GPU node group"
   type        = string
-  default     = "p3.2xlarge"
+  default     = "g4dn.xlarge"   # 1× NVIDIA T4 — good for inference and small training
 }
 
-variable "key_pair_name" {
-  description = "Name of an existing EC2 key pair for SSH access"
-  type        = string
+variable "gpu_node_desired" {
+  description = "Desired number of GPU nodes"
+  type        = number
+  default     = 1
 }
 
-# --- Data sources ---
+# ── Local values (computed from variables) ────────────────────────────────────
 
-# Use the latest Deep Learning AMI (GPU) for the region
-data "aws_ami" "dl_ami" {
-  most_recent = true
-  owners      = ["amazon"]
+locals {
+  name_prefix = "${var.project_name}-${var.environment}"
 
-  filter {
-    name   = "name"
-    values = ["Deep Learning AMI GPU PyTorch*"]
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-}
-
-# Default VPC for simplicity — use a dedicated VPC in production
-data "aws_vpc" "default" {
-  default = true
-}
-
-# --- S3 bucket for training artifacts ---
-
-resource "aws_s3_bucket" "ml_artifacts" {
-  bucket = "ml-artifacts-${var.environment}-${random_id.suffix.hex}"
-
-  tags = {
+  common_tags = {
+    Project     = var.project_name
     Environment = var.environment
-    Purpose     = "ml-training-artifacts"
     ManagedBy   = "terraform"
   }
 }
 
-resource "random_id" "suffix" {
-  byte_length = 4
+# ── S3 bucket — model artifacts & training data ───────────────────────────────
+
+resource "aws_s3_bucket" "ml_artifacts" {
+  bucket = "${local.name_prefix}-artifacts-${data.aws_caller_identity.current.account_id}"
+  tags   = local.common_tags
 }
 
-# Block all public access to the artifacts bucket
-resource "aws_s3_bucket_public_access_block" "ml_artifacts" {
-  bucket                  = aws_s3_bucket.ml_artifacts.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-# Enable versioning so artifact overwrites can be recovered
 resource "aws_s3_bucket_versioning" "ml_artifacts" {
   bucket = aws_s3_bucket.ml_artifacts.id
   versioning_configuration {
-    status = "Enabled"
+    status = "Enabled"   # keeps every version of every model artifact
   }
 }
 
-# --- IAM role for the training instance ---
+resource "aws_s3_bucket_server_side_encryption_configuration" "ml_artifacts" {
+  bucket = aws_s3_bucket.ml_artifacts.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
 
-resource "aws_iam_role" "ml_training" {
-  name = "ml-training-role-${var.environment}"
+# Prevent accidental deletion of the artifact bucket in production
+resource "aws_s3_bucket_lifecycle_configuration" "ml_artifacts" {
+  bucket = aws_s3_bucket.ml_artifacts.id
+  rule {
+    id     = "expire-old-versions"
+    status = "Enabled"
+    noncurrent_version_expiration {
+      noncurrent_days = 90   # delete non-current versions after 90 days
+    }
+  }
+}
 
+# ── ECR — container registry for ML images ───────────────────────────────────
+
+resource "aws_ecr_repository" "ml_images" {
+  name                 = "${local.name_prefix}-images"
+  image_tag_mutability = "IMMUTABLE"   # tags like "v1.0.0" cannot be overwritten
+  tags                 = local.common_tags
+
+  image_scanning_configuration {
+    scan_on_push = true   # automatic vulnerability scanning on every push
+  }
+}
+
+resource "aws_ecr_lifecycle_policy" "ml_images" {
+  repository = aws_ecr_repository.ml_images.name
+  policy = jsonencode({
+    rules = [{
+      rulePriority = 1
+      description  = "Keep only the 30 most recent images"
+      selection = {
+        tagStatus   = "any"
+        countType   = "imageCountMoreThan"
+        countNumber = 30
+      }
+      action = { type = "expire" }
+    }]
+  })
+}
+
+# ── Data sources — look up existing AWS resources ────────────────────────────
+
+data "aws_caller_identity" "current" {}   # retrieves the AWS account ID
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = aws_eks_cluster.ml_cluster.name
+}
+
+# ── EKS cluster — Kubernetes for training + serving ──────────────────────────
+
+resource "aws_eks_cluster" "ml_cluster" {
+  name     = "${local.name_prefix}-cluster"
+  role_arn = aws_iam_role.eks_cluster.arn
+  version  = "1.29"
+  tags     = local.common_tags
+
+  vpc_config {
+    subnet_ids = aws_subnet.private[*].id
+  }
+
+  depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
+}
+
+# GPU node group — runs training and GPU-based inference workloads
+resource "aws_eks_node_group" "gpu_nodes" {
+  cluster_name    = aws_eks_cluster.ml_cluster.name
+  node_group_name = "${local.name_prefix}-gpu-nodes"
+  node_role_arn   = aws_iam_role.eks_node.arn
+  subnet_ids      = aws_subnet.private[*].id
+  instance_types  = [var.gpu_instance_type]
+  tags            = local.common_tags
+
+  scaling_config {
+    desired_size = var.gpu_node_desired
+    min_size     = 0   # scale to zero when idle to save cost
+    max_size     = 4
+  }
+
+  # GPU AMI — Amazon Linux 2 with NVIDIA drivers pre-installed
+  ami_type = "AL2_x86_64_GPU"
+
+  # Taint GPU nodes so only GPU-requesting pods land here
+  taint {
+    key    = "nvidia.com/gpu"
+    value  = "true"
+    effect = "NO_SCHEDULE"
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_worker_node_policy,
+    aws_iam_role_policy_attachment.eks_cni_policy,
+    aws_iam_role_policy_attachment.ecr_read_only,
+  ]
+
+  # Prevent accidental destruction of the node group in production
+  lifecycle {
+    prevent_destroy = false   # set true in prod
+    ignore_changes  = [scaling_config[0].desired_size]   # managed by cluster autoscaler
+  }
+}
+
+# ── Networking — VPC, subnets, and NAT gateway ───────────────────────────────
+
+resource "aws_vpc" "ml_vpc" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  tags                 = merge(local.common_tags, { Name = "${local.name_prefix}-vpc" })
+}
+
+resource "aws_subnet" "private" {
+  count             = 2
+  vpc_id            = aws_vpc.ml_vpc.id
+  cidr_block        = "10.0.${count.index}.0/24"
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+  tags              = merge(local.common_tags, { Name = "${local.name_prefix}-private-${count.index}" })
+}
+
+data "aws_availability_zones" "available" {}
+
+# ── IAM roles — minimal permissions for EKS ──────────────────────────────────
+
+resource "aws_iam_role" "eks_cluster" {
+  name = "${local.name_prefix}-eks-cluster-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "eks.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
+  role       = aws_iam_role.eks_cluster.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+}
+
+resource "aws_iam_role" "eks_node" {
+  name = "${local.name_prefix}-eks-node-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -200,149 +329,57 @@ resource "aws_iam_role" "ml_training" {
       Principal = { Service = "ec2.amazonaws.com" }
     }]
   })
-
-  tags = {
-    Environment = var.environment
-    ManagedBy   = "terraform"
-  }
 }
 
-resource "aws_iam_role_policy" "ml_s3_access" {
-  name = "ml-s3-access"
-  role = aws_iam_role.ml_training.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Action = [
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:ListBucket",
-        "s3:DeleteObject"
-      ]
-      Resource = [
-        aws_s3_bucket.ml_artifacts.arn,
-        "${aws_s3_bucket.ml_artifacts.arn}/*"
-      ]
-    }]
-  })
+resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
+  role       = aws_iam_role.eks_node.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
 }
 
-resource "aws_iam_instance_profile" "ml_training" {
-  name = "ml-training-profile-${var.environment}"
-  role = aws_iam_role.ml_training.name
+resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
+  role       = aws_iam_role.eks_node.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
-# --- Security group for training instance ---
-
-resource "aws_security_group" "ml_training" {
-  name        = "ml-training-sg-${var.environment}"
-  description = "Security group for ML GPU training instances"
-  vpc_id      = data.aws_vpc.default.id
-
-  # SSH access — restrict to your IP in production
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "SSH — restrict to known IPs in production"
-  }
-
-  # JupyterLab access
-  ingress {
-    from_port   = 8888
-    to_port     = 8888
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "JupyterLab — restrict to known IPs in production"
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow all outbound traffic"
-  }
-
-  tags = {
-    Environment = var.environment
-    ManagedBy   = "terraform"
-  }
+resource "aws_iam_role_policy_attachment" "ecr_read_only" {
+  role       = aws_iam_role.eks_node.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
-# --- GPU Training EC2 instance ---
+# ── Outputs — values to use in downstream configurations ─────────────────────
 
-resource "aws_instance" "ml_training" {
-  ami                    = data.aws_ami.dl_ami.id
-  instance_type          = var.gpu_instance_type
-  key_name               = var.key_pair_name
-  iam_instance_profile   = aws_iam_instance_profile.ml_training.name
-  vpc_security_group_ids = [aws_security_group.ml_training.id]
-
-  # 100 GB root volume for datasets and model checkpoints
-  root_block_device {
-    volume_type           = "gp3"
-    volume_size           = 100
-    delete_on_termination = true
-    encrypted             = true
-  }
-
-  # Bootstrap script: export the S3 bucket name as an environment variable
-  user_data = <<-EOF
-    #!/bin/bash
-    echo "export ML_ARTIFACTS_BUCKET=${aws_s3_bucket.ml_artifacts.bucket}" >> /etc/environment
-    echo "export AWS_DEFAULT_REGION=${var.aws_region}" >> /etc/environment
-  EOF
-
-  tags = {
-    Name        = "ml-training-${var.environment}"
-    Environment = var.environment
-    Purpose     = "gpu-training"
-    ManagedBy   = "terraform"
-  }
-
-  # Prevent accidental destruction in production
-  lifecycle {
-    prevent_destroy = false # Set to true for production instances
-  }
-}
-
-# --- Outputs ---
-
-output "training_instance_id" {
-  description = "EC2 instance ID of the GPU training instance"
-  value       = aws_instance.ml_training.id
-}
-
-output "training_instance_public_ip" {
-  description = "Public IP address of the GPU training instance"
-  value       = aws_instance.ml_training.public_ip
-}
-
-output "ml_artifacts_bucket_name" {
-  description = "Name of the S3 bucket for ML artifacts"
+output "artifact_bucket_name" {
+  description = "S3 bucket name for ML artifacts"
   value       = aws_s3_bucket.ml_artifacts.bucket
 }
 
-output "ml_artifacts_bucket_arn" {
-  description = "ARN of the S3 bucket for ML artifacts"
-  value       = aws_s3_bucket.ml_artifacts.arn
+output "ecr_repository_url" {
+  description = "ECR repository URL for pushing ML images"
+  value       = aws_ecr_repository.ml_images.repository_url
+}
+
+output "eks_cluster_name" {
+  description = "EKS cluster name for kubectl configuration"
+  value       = aws_eks_cluster.ml_cluster.name
+}
+
+output "eks_cluster_endpoint" {
+  description = "EKS API server endpoint"
+  value       = aws_eks_cluster.ml_cluster.endpoint
+  sensitive   = true
 }
 ```
 
 ## Ressources pratiques
 
-- [Documentation Terraform](https://developer.hashicorp.com/terraform/docs) — Documentation officielle HashiCorp couvrant la syntaxe HCL, les providers, l'état, les workspaces et les modules.
-- [Documentation du provider Terraform AWS](https://registry.terraform.io/providers/hashicorp/aws/latest/docs) — Référence complète pour toutes les ressources et sources de données AWS disponibles dans le provider Terraform AWS.
-- [Bonnes pratiques Terraform](https://developer.hashicorp.com/terraform/language/style) — Guide de style officiel couvrant la structure des modules, les conventions de nommage et les modèles de gestion d'état.
-- [Gruntwork — Terraform: Up and Running](https://www.terraformupandrunning.com/) — Livre largement recommandé sur les modèles Terraform de production, les modules et les tests.
-- [Terraform Registry](https://registry.terraform.io/) — Registre officiel des providers et modules publiés, incluant des modules communautaires pour Kubernetes, EKS et les configurations d'instances GPU.
+- [Documentation officielle Terraform](https://developer.hashicorp.com/terraform/docs) — Guides du langage, références des commandes CLI et tutoriels pour tous les fournisseurs cloud.
+- [Registre de modules Terraform](https://registry.terraform.io/) — Modules communautaires et officiels pour AWS, GCP, Azure, Kubernetes, et bien plus.
+- [Référence du fournisseur AWS Terraform](https://registry.terraform.io/providers/hashicorp/aws/latest/docs) — Documentation complète pour toutes les ressources AWS.
+- [Meilleures pratiques Terraform](https://developer.hashicorp.com/terraform/language/style) — Style de code, structure des modules et recommandations de gestion d'état de l'équipe officielle.
+- [Atlantis](https://www.runatlantis.io/) — Automatisation des pull requests Terraform permettant les plans et applications depuis les commentaires GitHub/GitLab.
 
 ## Voir aussi
 
 - [Ansible](/docs/mlops/iac/ansible)
 - [ML sur Kubernetes](/docs/mlops/deployment/ml-kubernetes)
-- [MLOps](/docs/mlops)
+- [KubeFlow](/docs/mlops/deployment/kubeflow)

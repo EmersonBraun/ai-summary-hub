@@ -2,6 +2,8 @@
 title: PyTorch Mobile
 description: Déployer des modèles PyTorch sur des appareils mobiles et edge en utilisant TorchScript et le runtime de nouvelle génération ExecuTorch.
 keywords: [PyTorch Mobile, TorchScript, ExecuTorch, inférence mobile, IA edge, quantification, Android, iOS]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # PyTorch Mobile

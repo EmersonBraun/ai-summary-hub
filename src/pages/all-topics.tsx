@@ -11,11 +11,33 @@ import docTags from '../data/doc-tags.json';
 
 type Level = 'beginner' | 'intermediate' | 'advanced';
 
-const LEVELS: {key: Level; label: string; color: string; darkColor: string}[] = [
-  {key: 'beginner', label: 'Beginner', color: '#34a853', darkColor: '#5cd87a'},
-  {key: 'intermediate', label: 'Intermediate', color: '#4285f4', darkColor: '#7eadf6'},
-  {key: 'advanced', label: 'Advanced', color: '#ea4335', darkColor: '#f28b83'},
+const LEVEL_FILTERS: {key: Level; color: string; darkColor: string}[] = [
+  {key: 'beginner', color: '#34a853', darkColor: '#5cd87a'},
+  {key: 'intermediate', color: '#4285f4', darkColor: '#7eadf6'},
+  {key: 'advanced', color: '#ea4335', darkColor: '#f28b83'},
 ];
+
+function allTopicsLevelLabel(level: Level): string {
+  switch (level) {
+    case 'beginner':
+      return translate({
+        id: 'allTopics.level.beginner',
+        message: 'Beginner',
+      });
+    case 'intermediate':
+      return translate({
+        id: 'allTopics.level.intermediate',
+        message: 'Intermediate',
+      });
+    case 'advanced':
+      return translate({
+        id: 'allTopics.level.advanced',
+        message: 'Advanced',
+      });
+    default:
+      return level;
+  }
+}
 
 type SidebarItem =
   | string
@@ -64,7 +86,7 @@ function useActiveLevels(): [Set<Level>, (level: Level) => void] {
     if (!levelParam) return new Set<Level>();
     return new Set(
       levelParam.split(',').filter((l): l is Level =>
-        LEVELS.some((lv) => lv.key === l),
+        LEVEL_FILTERS.some((lv) => lv.key === l),
       ),
     );
   }, [location.search]);
@@ -111,7 +133,7 @@ function LevelFilter({
         marginBottom: '1.5rem',
       }}
     >
-      {LEVELS.map(({key, label, color}) => {
+      {LEVEL_FILTERS.map(({key, color}) => {
         const isActive = activeLevels.has(key);
         return (
           <button
@@ -131,7 +153,7 @@ function LevelFilter({
               letterSpacing: '0.5px',
             }}
           >
-            {label}
+            {allTopicsLevelLabel(key)}
           </button>
         );
       })}
@@ -142,16 +164,22 @@ function LevelFilter({
 function DocLink({docId}: {docId: string}): ReactNode {
   const base = docId.replace(/\/index$/, '') || docId;
   const path = useBaseUrl(`/docs/${base}`);
-  const label =
-    docId === 'intro'
-      ? 'Introduction'
-      : docId.split('/').pop()?.replace(/^index$/, 'Overview') ?? docId;
-  const displayLabel = label
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  const lastSeg = docId.split('/').pop() ?? docId;
+  let displayLabel: ReactNode;
+  if (docId === 'intro') {
+    displayLabel = translate({
+      id: 'docLink.intro',
+      message: 'Introduction',
+    });
+  } else if (lastSeg === 'index') {
+    displayLabel = translate({id: 'docLink.overview', message: 'Overview'});
+  } else {
+    const slug = lastSeg.replace(/-/g, ' ');
+    displayLabel = slug.replace(/\b\w/g, (c) => c.toUpperCase());
+  }
 
   const level = (docTags as Record<string, string>)[docId] as Level | undefined;
-  const levelInfo = LEVELS.find((l) => l.key === level);
+  const levelInfo = LEVEL_FILTERS.find((l) => l.key === level);
 
   return (
     <li>
@@ -171,7 +199,7 @@ function DocLink({docId}: {docId: string}): ReactNode {
             border: `1px solid ${levelInfo.color}44`,
           }}
         >
-          {levelInfo.label}
+          {allTopicsLevelLabel(levelInfo.key)}
         </span>
       )}
     </li>
@@ -257,7 +285,8 @@ export default function AllTopicsPage(): ReactNode {
       title={translate({id: 'allTopics.title', message: 'All topics'})}
       description={translate({
         id: 'allTopics.description',
-        message: 'Complete list of all topics in AI Summary Hub.',
+        message:
+          'Complete list of all documentation topics in AI Summary Hub, grouped by category.',
       })}
     >
       <main>
@@ -274,7 +303,16 @@ export default function AllTopicsPage(): ReactNode {
             <Translate
               id="allTopics.intro"
               description="All topics intro"
-              values={{sidebarLink: <Link to={introPath}>sidebar</Link>}}
+              values={{
+                sidebarLink: (
+                  <Link to={introPath}>
+                    {translate({
+                      id: 'allTopics.sidebarLink',
+                      message: 'sidebar',
+                    })}
+                  </Link>
+                ),
+              }}
             >
               {
                 'Browse every topic in the hub by category. You can also use the {sidebarLink} or search.'

@@ -2,6 +2,8 @@
 title: Model Context Protocol (MCP)
 description: Um padrão aberto para conectar modelos de IA a ferramentas externas, fontes de dados e serviços — habilitando uso de ferramentas portável e interoperável em qualquer aplicação de IA.
 keywords: [MCP, Model Context Protocol, ferramentas de IA, integração de IA, uso de ferramentas, function calling, ferramentas LLM, padrão aberto, Anthropic, arquitetura de IA]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Model Context Protocol (MCP)

@@ -1,18 +1,20 @@
 ---
-title: Prompt ensembling
-description: Una técnica que ejecuta múltiples variaciones de prompts estructuralmente diferentes contra el mismo LLM y agrega sus salidas, intercambiando coste de inferencia por mayor precisión y menor varianza de la que puede lograr cualquier prompt individual.
-keywords: [prompt ensembling, prompting en conjunto, variación de prompts, agregación, voto mayoritario, promedio, fiabilidad de LLM, ingeniería de prompts, self-consistency]
+title: Conjuntos de prompts
+description: Una técnica que ejecuta múltiples variaciones de prompts estructuralmente diferentes contra el mismo LLM y agrega sus resultados, intercambiando costo de inferencia por mayor precisión y menor varianza de la que puede lograr cualquier prompt individual.
+keywords: [prompt ensembling, ensemble prompting, prompt variation, aggregation, majority vote, averaging, LLM reliability, prompt engineering, self-consistency]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
-# Prompt ensembling
+# Conjuntos de prompts
 
 ## Definición
 
-El prompt ensembling es una técnica de prompting que genera múltiples formulaciones estructuralmente diferentes de la misma pregunta o tarea, las envía todas a un modelo de lenguaje y luego combina las salidas resultantes en una única respuesta final. La intuición central se toma prestada de los ensembles del machine learning clásico (bagging, boosting, stacking): ningún predictor individual es perfecto, pero un comité diverso de predictores imperfectos tiende a ser más fiable que cualquier miembro individual, porque sus errores están parcialmente no correlacionados y por tanto se cancelan en la agregación.
+Los conjuntos de prompts son una técnica de prompting que genera múltiples formulaciones estructuralmente diferentes de la misma pregunta o tarea, las envía todas a un modelo de lenguaje y luego combina los resultados en una sola respuesta final. La intuición central se toma prestada de los conjuntos de aprendizaje automático clásico (bagging, boosting, stacking): ningún predictor individual es perfecto, pero un comité diverso de predictores imperfectos tiende a ser más fiable que cualquier miembro individual, porque sus errores son parcialmente no correlacionados y por tanto se cancelan en la agregación.
 
-La distinción crítica entre prompt ensembling y self-consistency es la fuente de diversidad. En self-consistency, ejecutas el *mismo* prompt N veces con temperature > 0 y confías en el muestreo estocástico para producir caminos de razonamiento diversos. En prompt ensembling, elaboras deliberadamente *diferentes* prompts — variando el encuadre, la asignación de rol, la formulación de la instrucción, los ejemplos few-shot o el formato de salida — y ejecutas cada uno (típicamente con temperature 0 o baja) para producir salidas diversas pero deterministas. La self-consistency explota la varianza introducida por el muestreo; el prompt ensembling explota la varianza introducida por el diseño del prompt. En la práctica, los dos enfoques son complementarios y pueden combinarse.
+La distinción crítica entre los conjuntos de prompts y la autoconsistencia es la fuente de diversidad. En la autoconsistencia, ejecutas el *mismo* prompt N veces con temperatura \> 0 y confías en el muestreo estocástico para producir caminos de razonamiento diversos. En los conjuntos de prompts, deliberadamente elaboras *diferentes* prompts —variando el encuadre, la asignación de rol, la formulación de la instrucción, los ejemplos de pocos disparos, o el formato de salida— y ejecutas cada uno (típicamente con temperatura 0 o baja) para producir resultados diversos pero deterministas. La autoconsistencia explota la varianza introducida por el muestreo; los conjuntos de prompts explotan la varianza introducida por el diseño del prompt. En la práctica, los dos enfoques son complementarios y pueden combinarse.
 
-El prompt ensembling es especialmente valioso en dos escenarios. Primero, cuando no estás seguro de qué formulación de prompt es óptima para una tarea y no puedes evaluar alternativas a escala — ejecutar múltiples candidatos y votar sobre sus salidas te da el beneficio del mejor prompt sin tener que identificarlo de antemano. Segundo, cuando una tarea es de alto riesgo y el modo de fallo de un solo prompt es inaceptable — un ensemble proporciona una pista de auditoría suave, porque la distribución de votos entre diferentes respuestas es una señal directa de la incertidumbre del modelo. El coste principal es la latencia y los tokens: K variantes de prompts requieren K llamadas de inferencia, que pueden paralelizarse pero no eliminarse.
+Los conjuntos de prompts son especialmente valiosos en dos escenarios. Primero, cuando no estás seguro de qué formulación de prompt es óptima para una tarea y no puedes evaluar alternativas a escala —ejecutar múltiples candidatos y votar sobre sus resultados te da el beneficio del mejor prompt sin tener que identificarlo de antemano. Segundo, cuando una tarea es de alto riesgo y el modo de falla de un solo prompt es inaceptable —un conjunto proporciona un rastro de auditoría suave, porque la distribución de votos entre diferentes respuestas es una señal directa de la incertidumbre del modelo. El costo principal es la latencia y los tokens: K variantes de prompts requieren K llamadas de inferencia, que pueden paralelizarse pero no eliminarse.
 
 ## Cómo funciona
 
@@ -35,55 +37,55 @@ flowchart TD
 
 ### Estrategias de variación de prompts
 
-La calidad de un ensemble depende en gran medida de la *diversidad* de las variantes de prompts. Si todas las variantes son superficialmente diferentes pero estructuralmente idénticas, el ensemble degenera hacia el muestreo repetido. Las estrategias de variación efectivas incluyen:
+La calidad de un conjunto depende en gran medida de la *diversidad* de las variantes del prompt. Si todas las variantes son superficialmente diferentes pero estructuralmente idénticas, el conjunto degenera hacia el muestreo repetido. Las estrategias de variación efectivas incluyen:
 
-**Variación de rol y persona.** Asignar diferentes personas expertas (por ejemplo, "Eres un médico cauto", "Eres un científico de datos", "Eres un ingeniero pragmático") desplaza la distribución previa del modelo sobre respuestas plausibles y activa diferentes registros de conocimiento. La variación de rol es especialmente efectiva para tareas con múltiples encuadres válidos.
+**Variación de rol y persona.** Asignar diferentes personas expertas (p. ej., "Eres un médico cauteloso", "Eres un científico de datos", "Eres un ingeniero pragmático") desplaza el conocimiento previo del modelo sobre respuestas plausibles y activa diferentes registros de conocimiento. La variación de roles es especialmente efectiva para tareas con múltiples encuadres válidos.
 
-**Variación en la formulación de instrucciones.** La misma tarea puede formularse como una pregunta ("¿Cuál es el nivel de riesgo de...?"), un comando ("Evalúa el nivel de riesgo de...") o una compleción ("El nivel de riesgo de ... es"), y estas diferencias superficiales cambian measurablemente la distribución de salida del modelo. Parafrasear la instrucción central es la forma de variación con menor esfuerzo.
+**Variación en la formulación de la instrucción.** La misma tarea puede formularse como una pregunta ("¿Cuál es el nivel de riesgo de...?"), un comando ("Evalúa el nivel de riesgo de..."), o una completación ("El nivel de riesgo de ... es"), y estas diferencias superficiales cambian mensurablemente la distribución de salida del modelo. Parafrasear la instrucción central es la forma de variación de menor esfuerzo.
 
-**Variación de ejemplos few-shot.** Usar diferentes conjuntos de ejemplos en contexto cambia qué parte del conocimiento del modelo activa el contexto few-shot. Rotar entre conjuntos de ejemplos extraídos de diferentes subdominios de la distribución de entrenamiento aumenta sustancialmente la diversidad del ensemble, especialmente para tareas de clasificación.
+**Variación de ejemplos de pocos disparos.** Usar diferentes conjuntos de ejemplos en contexto cambia qué parte del conocimiento del modelo activa el contexto de pocos disparos. Rotar a través de conjuntos de ejemplos extraídos de diferentes subdominios de la distribución de entrenamiento aumenta sustancialmente la diversidad del conjunto, especialmente para tareas de clasificación.
 
-**Variación chain-of-thought vs. respuesta directa.** Incluir una o más variantes CoT junto con variantes de respuesta directa combina los beneficios de calidad de razonamiento del CoT con los beneficios de velocidad del prompting directo. Las variantes CoT típicamente reciben más peso en la agregación porque son más fiables, pero las variantes directas pueden anular en casos donde el CoT lleva al modelo a sobrepensar preguntas simples.
+**Variación de cadena de pensamiento vs. respuesta directa.** Incluir una o más variantes de CoT junto con variantes de respuesta directa combina los beneficios de calidad de razonamiento de CoT con los beneficios de velocidad del prompting directo. Las variantes de CoT típicamente reciben más peso en la agregación porque son más fiables, pero las variantes directas pueden anular en casos donde CoT lleva al modelo a sobre-pensar preguntas simples.
 
-**Variación del formato de salida.** Pedir la respuesta como un objeto JSON, como una lista numerada o como una oración en texto libre puede elicitar diferentes niveles de precisión. Las variantes de salida estructurada son más fáciles de analizar y agregar programáticamente.
+**Variación del formato de salida.** Pedir la respuesta como un objeto JSON, como una lista numerada, o como una oración de texto libre puede generar diferentes niveles de precisión. Las variantes de salida estructurada son más fáciles de analizar y agregar programáticamente.
 
 ### Métodos de agregación
 
-Una vez que tienes K salidas, necesitas reducirlas a una única respuesta. La elección del método de agregación debe coincidir con el tipo de salida:
+Una vez que tienes K resultados, necesitas reducirlos a una sola respuesta. La elección del método de agregación debe coincidir con el tipo de salida:
 
-**El voto mayoritario** funciona mejor para salidas discretas (etiquetas de clasificación, respuestas factuales cortas, selecciones de opción múltiple). Es robusto frente a variantes adversariales o confusas, no requiere llamadas adicionales al modelo y replica directamente cómo opera la self-consistency. Los empates pueden resolverse por log-probabilidad o difiriendo a una variante "confiable" designada.
+**El voto por mayoría** funciona mejor para salidas discretas (etiquetas de clasificación, respuestas factuales cortas, selecciones de opción múltiple). Es robusto ante variantes adversariales o confusas, no requiere llamadas adicionales al modelo, y refleja directamente cómo opera la autoconsistencia. Los empates pueden romperse por log-probabilidad o deferiendo a una variante "de confianza" designada.
 
-**El promedio de puntuaciones** es apropiado cuando cada variante devuelve una puntuación numérica o una probabilidad en lugar de una etiqueta. El promedio es sensible a los valores atípicos; la agregación por mediana es más robusta cuando las variantes individuales pueden producir valores extremos.
+**El promedio de puntuaciones** es apropiado cuando cada variante devuelve una puntuación numérica o probabilidad en lugar de una etiqueta. El promedio es sensible a los valores atípicos; la agregación por mediana es más robusta cuando las variantes individuales pueden producir valores extremos.
 
-**La agregación por meta-prompt (LLM-como-juez)** envía todas las K salidas a una segunda llamada al LLM que recibe la instrucción de sintetizar o seleccionar la mejor respuesta. Es el método más poderoso pero también el más costoso, e introduce un segundo punto de fallo del LLM. Es más útil cuando la tarea requiere generación abierta (resúmenes, código, ensayos) donde el voto mayoritario no es aplicable.
+**La agregación por meta-prompt (LLM como juez)** envía todos los K resultados a una segunda llamada al LLM que recibe instrucciones para sintetizar o seleccionar la mejor respuesta. Este es el método más poderoso pero más costoso, e introduce un segundo punto de falla del LLM. Es más útil cuando la tarea requiere generación de extremo abierto (resúmenes, código, ensayos) donde el voto por mayoría no es aplicable.
 
-**El voto ponderado** asigna diferentes pesos a diferentes variantes según su precisión histórica en un conjunto de validación reservado. Si tienes datos etiquetados y puedes medir qué variantes funcionan mejor, la ponderación supera significativamente la votación uniforme — pero requiere esfuerzo de calibración inicial.
+**El voto ponderado** asigna diferentes pesos a diferentes variantes basándose en su precisión histórica en un conjunto de validación reservado. Si tienes datos etiquetados y puedes medir qué variantes se desempeñan mejor, la ponderación supera significativamente al voto uniforme —pero requiere esfuerzo de calibración por adelantado.
 
 ## Cuándo usar / Cuándo NO usar
 
 | Usar cuando | Evitar cuando |
 |-------------|---------------|
-| No estás seguro de qué formulación de prompt funciona mejor y no puedes evaluarlas individualmente a escala | La latencia es una restricción dura — K llamadas paralelas siguen teniendo la latencia de la llamada más lenta |
-| La tarea es de alto riesgo y el modo de fallo de un solo prompt es inaceptable | El presupuesto de tokens es severamente limitado y no puedes permitirte K completaciones |
-| Las salidas de diferentes encuadres de prompts proporcionan perspectivas complementarias (por ejemplo, diagnóstico médico desde múltiples ángulos de especialistas) | El modelo ya logra precisión de techo con un solo prompt bien ajustado — rendimientos decrecientes |
-| Quieres una señal de incertidumbre incorporada (distribución de votos = desacuerdo del modelo) | El espacio de salida es continuo o abierto de una manera que hace que votar o promediar no tenga sentido |
-| Estás construyendo un pipeline de producción donde la sensibilidad al prompt debe amortiguarse | Careces de la infraestructura de ingeniería para ejecutar y agregar llamadas paralelas al LLM |
+| No estás seguro de qué formulación de prompt funciona mejor y no puedes evaluarlas individualmente a escala | La latencia es una restricción estricta — K llamadas paralelas aún tienen la latencia de la llamada más lenta |
+| La tarea es de alto riesgo y el modo de falla de un solo prompt es inaceptable | El presupuesto de tokens está severamente limitado y no puedes permitirte K completaciones |
+| Los resultados de diferentes encuadres de prompts proporcionan perspectivas complementarias (p. ej., diagnóstico médico desde múltiples ángulos especializados) | El modelo ya alcanza la precisión máxima con un solo prompt bien ajustado — rendimientos decrecientes |
+| Quieres una señal de incertidumbre incorporada (distribución de votos = desacuerdo del modelo) | El espacio de salida es continuo o de extremo abierto de una manera que hace que votar o promediar no tenga sentido |
+| Estás construyendo un pipeline de producción donde la sensibilidad al prompt debe amortiguarse | Careces de la infraestructura de ingeniería para ejecutar y agregar llamadas LLM paralelas |
 
 ## Comparaciones
 
-| Criterio | Prompt ensembling | Self-consistency | Prompt único |
-|----------|------------------|-----------------|--------------|
+| Criterio | Conjuntos de prompts | Autoconsistencia | Prompt único |
+|----------|---------------------|-----------------|--------------|
 | Fuente de diversidad | Diferentes diseños de prompts | Muestreo estocástico de un prompt | Ninguna |
 | Número de llamadas al LLM | K (número de variantes, típicamente 3–10) | N (típicamente 10–40) | 1 |
-| Temperature | Baja (0–0.3) por variante | Alta (0.5–0.8) | Dependiente de la tarea |
-| Mejora de precisión | Alta para tareas sensibles a la formulación del prompt | Alta para razonamiento en múltiples pasos | Línea base |
+| Temperatura | Baja (0–0.3) por variante | Alta (0.5–0.8) | Dependiente de la tarea |
+| Mejora de precisión | Alta para tareas sensibles a la formulación del prompt | Alta para razonamiento de múltiples pasos | Línea base |
 | Requiere esfuerzo de ingeniería de prompts | Sí — diseñar variantes diversas | No — solo se necesita un prompt | Moderado |
-| Maneja salida abierta | Sí, mediante agregación por meta-prompt | No — el voto mayoritario requiere respuestas discretas | Sí |
-| Mejor caso de uso | Tareas con sensibilidad al prompt o múltiples encuadres válidos | Matemáticas, razonamiento simbólico, QA factual | Tareas simples y bien definidas con un prompt bueno conocido |
+| Maneja salida de extremo abierto | Sí, mediante agregación de meta-prompt | No — el voto por mayoría requiere respuestas discretas | Sí |
+| Mejor caso de uso | Tareas con sensibilidad al prompt o múltiples encuadres válidos | Matemáticas, razonamiento simbólico, QA factual | Tareas simples y bien definidas con un buen prompt conocido |
 
 ## Ejemplos de código
 
-### Prompt ensembling con múltiples plantillas usando OpenAI
+### Conjuntos de prompts con múltiples plantillas usando OpenAI
 
 ```python
 # Prompt ensembling: run K prompt variants and aggregate by majority vote
@@ -177,7 +179,7 @@ if __name__ == "__main__":
     print(f"Vote counts  : {result['votes']}")
 ```
 
-### Ensemble ponderado con un conjunto de validación reservado
+### Conjunto ponderado con un conjunto de validación reservado
 
 ```python
 # Weighted prompt ensembling: calibrate variant weights from a validation set
@@ -230,13 +232,13 @@ if __name__ == "__main__":
 
 ## Recursos prácticos
 
-- [Diverse Demonstrations Improve In-context Compositional Generalization (Levy et al., 2022)](https://arxiv.org/abs/2212.06800) — Muestra que los ejemplos few-shot diversos, la columna vertebral de la variación de prompts, mejoran la generalización significativamente respecto a las demostraciones muestreadas aleatoriamente.
-- [Self-Consistency Improves Chain of Thought Reasoning in Language Models (Wang et al., 2022)](https://arxiv.org/abs/2203.11171) — El pariente más cercano del prompt ensembling; trasfondo esencial para entender la agregación sobre múltiples salidas de LLMs.
-- [Prompt Sensitivity and Prompt Ensembling for LLMs (Mizrahi et al., 2024)](https://arxiv.org/abs/2401.00595) — Estudia directamente cuánto varía la precisión de los LLMs entre prompts parafraseados y demuestra que el ensembling sobre paráfrasis cierra la mayor parte de la brecha.
-- [Universal Self-Consistency for Large Language Model Generation (Chen et al., 2023)](https://arxiv.org/abs/2311.17311) — Extiende la self-consistency a la generación abierta mediante agregación por meta-prompt, tendiendo un puente entre el ensembling por voto mayoritario y las salidas de forma libre.
+- [Diverse Demonstrations Improve In-context Compositional Generalization (Levy et al., 2022)](https://arxiv.org/abs/2212.06800) — Muestra que los ejemplos de pocos disparos diversos, la columna vertebral de la variación de prompts, mejoran significativamente la generalización sobre demostraciones muestreadas aleatoriamente.
+- [Self-Consistency Improves Chain of Thought Reasoning in Language Models (Wang et al., 2022)](https://arxiv.org/abs/2203.11171) — El pariente más cercano de los conjuntos de prompts; fondo esencial para comprender la agregación sobre múltiples salidas de LLM.
+- [Prompt Sensitivity and Prompt Ensembling for LLMs (Mizrahi et al., 2024)](https://arxiv.org/abs/2401.00595) — Estudia directamente cuánto varía la precisión de los LLM entre prompts parafraseados y demuestra que los conjuntos sobre paráfrasis cierran la mayor parte de la brecha.
+- [Universal Self-Consistency for Large Language Model Generation (Chen et al., 2023)](https://arxiv.org/abs/2311.17311) — Extiende la autoconsistencia a la generación de extremo abierto mediante agregación de meta-prompt, cerrando la brecha entre los conjuntos de voto por mayoría y las salidas de forma libre.
 
 ## Ver también
 
 - [Ingeniería de prompts](/docs/prompt-engineering)
-- [Self-consistency](/docs/prompt-engineering/self-consistency)
+- [Autoconsistencia](/docs/prompt-engineering/self-consistency)
 - [Ingeniería automática de prompts](/docs/prompt-engineering/automatic-prompt-engineering)

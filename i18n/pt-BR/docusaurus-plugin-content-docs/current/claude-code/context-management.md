@@ -2,6 +2,8 @@
 title: Gerenciamento de contexto
 description: Como o Claude Code gerencia a janela de contexto em sessões longas — compressão automática, estratégias de histórico de conversas e técnicas práticas para manter as sessões eficazes em escala.
 keywords: [gerenciamento de contexto, janela de contexto, histórico de conversas, /clear, compressão de contexto, limites de tokens, sessões do Claude Code, sessões longas]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Gerenciamento de contexto
@@ -18,19 +20,19 @@ O Claude Code aborda os limites de contexto por meio de uma combinação de meca
 
 ### Estrutura da janela de contexto
 
-A janela de contexto é dividida em várias zonas, cada uma contribuindo para a contagem total de tokens. A **zona do prompt de sistema** contém instruções do CLAUDE.md e definições de ferramentas — estas são relativamente estáveis e podem ser armazenadas em cache (veja prompt caching). A **zona do histórico de conversas** cresce a cada turno: cada mensagem do usuário, resposta do assistente, chamada de ferramenta e resultado de ferramenta adiciona tokens. A **zona de conteúdo de arquivo** contém o código-fonte real e o conteúdo dos arquivos que o Claude leu durante a sessão. À medida que a sessão avança, as zonas do histórico de conversas e do conteúdo de arquivo crescem até se aproximarem do limite do modelo.
+A janela de contexto é dividida em várias zonas, cada uma contribuindo para a contagem total de tokens. A **zona do prompt de sistema** contém instruções do CLAUDE.md e definições de ferramentas — estas são relativamente estáveis e podem ser armazenadas em cache (veja cache de prompts). A **zona do histórico de conversas** cresce a cada turno: cada mensagem do usuário, resposta do assistente, chamada de ferramenta e resultado de ferramenta adiciona tokens. A **zona de conteúdo de arquivos** contém o código-fonte real e os conteúdos de arquivos que o Claude leu durante a sessão. À medida que a sessão avança, as zonas de histórico de conversas e de conteúdo de arquivos crescem até se aproximarem do limite do modelo.
 
 ### Compressão automática de contexto
 
-Quando o Claude Code detecta que a janela de contexto está se aproximando do seu limite, ele aplica compressão automática ao histórico de conversas. O algoritmo de compressão identifica turnos mais antigos que têm menos probabilidade de ser necessários para a tarefa atual e os resume ou trunca. Os resultados de ferramentas — especialmente os grandes, como listagens de diretórios ou conteúdos de arquivos longos — são comprimidos preferencialmente porque contêm dados brutos que o modelo já processou. O objetivo é preservar o fio lógico da conversa enquanto descarta o conteúdo literal de turnos mais antigos. Os usuários podem notar resumos comprimidos aparecendo no lugar de trocas detalhadas anteriores.
+Quando o Claude Code detecta que a janela de contexto está se aproximando do seu limite, ele aplica compressão automática ao histórico de conversas. O algoritmo de compressão identifica turnos mais antigos com menor probabilidade de serem necessários para a tarefa atual e os resume ou trunca. Resultados de ferramentas — especialmente os grandes, como listagens de diretórios ou conteúdos longos de arquivos — são comprimidos preferencialmente porque contêm dados brutos que o modelo já processou. O objetivo é preservar o fio lógico da conversa enquanto descarta o conteúdo literal de turnos mais antigos. Os usuários podem notar resumos comprimidos aparecendo no lugar de trocas detalhadas anteriores.
 
 ### Carregamento seletivo de arquivos
 
-O Claude Code não pré-carrega todos os arquivos do projeto no contexto no início da sessão. Em vez disso, usa uma estratégia de carregamento just-in-time: os arquivos são lidos com a ferramenta `Read` ou `Glob` somente quando o Claude determina que são relevantes para a tarefa atual. Isso mantém o contexto inicial pequeno e focado. No entanto, à medida que a sessão avança e o Claude lê mais arquivos, o conteúdo dos arquivos se acumula no contexto. Para bases de código muito grandes, o Claude pode precisar reler seletivamente arquivos específicos em vez de manter todos os arquivos lidos anteriormente na janela ativa.
+O Claude Code não pré-carrega todos os arquivos do projeto no contexto ao início da sessão. Em vez disso, usa uma estratégia de carregamento just-in-time: os arquivos são lidos com a ferramenta `Read` ou `Glob` somente quando o Claude determina que são relevantes para a tarefa atual. Isso mantém o contexto inicial pequeno e focado. No entanto, à medida que a sessão avança e o Claude lê mais arquivos, os conteúdos de arquivos se acumulam no contexto. Para bases de código muito grandes, o Claude pode precisar reler arquivos específicos em vez de manter todos os arquivos lidos anteriormente na janela ativa.
 
 ### O comando /clear
 
-O comando `/clear` descarta todo o histórico de conversas e inicia uma sessão nova. É a forma mais agressiva de gerenciamento de contexto — equivalente a fechar e reabrir o terminal. Use-o entre tarefas não relacionadas, após concluir uma funcionalidade importante ou quando a deriva de contexto (informações contraditórias ou obsoletas no histórico) está causando comportamento confuso. As instruções do CLAUDE.md e a configuração do projeto sobrevivem ao `/clear` porque são recarregadas do sistema de arquivos no início de cada sessão.
+O comando `/clear` descarta todo o histórico de conversas e inicia uma sessão nova. É a forma mais agressiva de gerenciamento de contexto — equivalente a fechar e reabrir o terminal. Use-o entre tarefas não relacionadas, após concluir uma funcionalidade importante, ou quando a deriva de contexto (informações contraditórias ou desatualizadas no histórico) estiver causando comportamento confuso. As instruções do CLAUDE.md e a configuração do projeto sobrevivem ao `/clear` porque são recarregadas do sistema de arquivos no início de cada sessão.
 
 ```mermaid
 flowchart LR
@@ -47,13 +49,13 @@ flowchart LR
 
 ## Quando usar / Quando NÃO usar
 
-| Use quando | Evite quando |
+| Usar quando | Evitar quando |
 |---|---|
 | Iniciando uma nova tarefa não relacionada — use `/clear` para começar com um contexto limpo | O histórico de conversas contém decisões ou descobertas críticas que você ainda precisa |
-| A sessão tem muitos turnos e o Claude parece confuso — a deriva de contexto é um sinal | Você está no meio de uma tarefa em múltiplas etapas onde o contexto anterior é ativamente necessário |
+| A sessão está rodando por muitos turnos e o Claude parece confuso — a deriva de contexto é um sinal | Você está no meio de uma tarefa de múltiplas etapas onde o contexto anterior é ativamente necessário |
 | Você está carregando arquivos muito grandes — considere `/clear` primeiro e carregue apenas o que a tarefa atual precisa | A sessão é curta e a pressão de contexto ainda não é uma preocupação |
-| Você quer avaliar a qualidade da resposta — um contexto novo fornece uma linha de base limpa | Você depende do CLAUDE.md para contexto do projeto — o `/clear` o preserva, mas o contexto específico da sessão é perdido |
-| Você está escrevendo um CLAUDE.md que captura contexto importante do projeto para sobreviver ao `/clear` | A "confusão" é na verdade uma limitação do modelo não relacionada ao contexto — mais contexto não ajudará |
+| Você quer avaliar a qualidade das respostas — um contexto fresco fornece uma base de referência limpa | Você depende do CLAUDE.md para contexto do projeto — `/clear` o preserva, mas o contexto específico da sessão é perdido |
+| Você está escrevendo um CLAUDE.md que captura o contexto importante do projeto para sobreviver ao `/clear` | A "confusão" é na verdade uma limitação do modelo não relacionada ao contexto — mais contexto não ajudará |
 
 ## Exemplos de código
 
@@ -133,13 +135,13 @@ claude --verbose
 
 ## Recursos práticos
 
-- [Contexto e memória do Claude Code](https://docs.anthropic.com/en/docs/claude-code/memory) — Guia oficial sobre como o Claude Code gerencia contexto, incluindo /clear e CLAUDE.md para memória persistente.
-- [Janelas de contexto dos modelos Claude](https://docs.anthropic.com/en/docs/about-claude/models) — Limites de tokens para cada variante do modelo Claude.
-- [Documentação de prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) — Como fazer cache de partes estáveis do contexto para reduzir custo e latência em sessões longas.
-- [Referência da CLI do Claude Code](https://docs.anthropic.com/en/docs/claude-code/cli-reference) — Lista completa de comandos slash incluindo /clear e /compact.
+- [Contexto e memória do Claude Code](https://docs.anthropic.com/en/docs/claude-code/memory) — Guia oficial sobre como o Claude Code gerencia o contexto, incluindo /clear e CLAUDE.md para memória persistente.
+- [Janelas de contexto dos modelos Claude](https://docs.anthropic.com/en/docs/about-claude/models) — Limites de tokens para cada variante de modelo Claude.
+- [Documentação de cache de prompts](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) — Como armazenar em cache porções de contexto estáveis para reduzir custo e latência em sessões longas.
+- [Referência de CLI do Claude Code](https://docs.anthropic.com/en/docs/claude-code/cli-reference) — Lista completa de comandos slash incluindo /clear e /compact.
 
 ## Veja também
 
 - [Visão geral do Claude Code](/docs/claude-code)
-- [Prompt caching](/docs/claude-code/prompt-caching)
+- [Cache de prompts](/docs/claude-code/prompt-caching)
 - [Configuração CLAUDE.md](/docs/claude-code/claude-md)

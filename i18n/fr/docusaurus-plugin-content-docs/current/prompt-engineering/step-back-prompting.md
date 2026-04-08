@@ -1,71 +1,57 @@
 ---
-title: Step-back prompting
-description: Une technique de prompting en deux étapes qui demande d'abord au modèle une question abstraite de niveau supérieur, puis utilise cette abstraction comme contexte pour répondre à la question spécifique originale — améliorant la précision du raisonnement sur les tâches complexes.
-keywords: [step-back prompting, abstraction, raisonnement, chaîne de pensée, prompt engineering, Zheng et al, raisonnement de niveau supérieur, raisonnement LLM]
+title: Prompting par recul
+description: Comment le prompting par recul améliore le raisonnement des LLM en invitant d'abord à des questions de haut niveau avant de répondre à des questions spécifiques.
+keywords: [step-back prompting, abstraction, reasoning, LLM, problem solving, high-level concepts]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
-# Step-back prompting
+# Prompting par recul
 
 ## Définition
 
-Le step-back prompting est une technique de prompting en deux étapes introduite par Zheng et al. (2023) chez Google DeepMind. L'idée centrale est trompeusement simple : avant de demander au modèle de répondre à une question spécifique, potentiellement difficile, lui demander d'abord une version plus abstraite et de niveau supérieur de la même question — puis utiliser la réponse du modèle à cette question abstraite comme contexte pour répondre à l'originale. La technique est fondée sur l'observation que les LLM échouent souvent sur des questions factuelles ou de raisonnement spécifiques non pas parce qu'ils manquent des connaissances pertinentes, mais parce que la spécificité de la question active le mauvais « contexte de récupération » dans les représentations internes du modèle. Prendre du recul vers un niveau d'abstraction plus élevé active des connaissances plus larges et plus fiables, qui ancrent ensuite la réponse finale.
+Le prompting par recul est une technique de prompting en deux étapes développée par DeepMind dans laquelle le LLM est d'abord invité à générer une question ou un principe de haut niveau ("faire un pas en arrière") avant de résoudre la question d'origine spécifique. Cette abstraction intentionnelle force le modèle à récupérer des concepts, des principes ou des procédures généraux pertinents — le plaçant dans un état de connaissance qui améliore le raisonnement subséquent et réduit les erreurs factuelles.
 
-L'intuition derrière le step-back prompting s'inspire de la façon dont les experts abordent les problèmes difficiles. Un physicien à qui on demande « Que se passe-t-il pour la pression d'un gaz si la température est augmentée à volume constant ? » pourrait d'abord rappeler la loi des gaz parfaits (PV = nRT) comme arrière-plan général avant de l'appliquer au cas spécifique — plutôt que de sauter directement à une réponse qui risque de confondre les variables. Le step-back prompting instruit le modèle de faire de même : générer un principe général ou un concept qui sous-tend la question spécifique, puis raisonner à partir de ce principe vers la réponse. Cela ajoute effectivement une étape d'échafaudage conceptuel qui réduit la chance que la correspondance de pattern superficielle mène à une mauvaise réponse.
+Par exemple, au lieu de demander directement "Quelle est la température d'un corps au repos d'une étoile de neutrons ?", le prompting par recul insère d'abord une étape d'abstraction : "Quels principes physiques régissent la température d'une étoile de neutrons ?" Le modèle génère ensuite une discussion sur les principes de physique des étoiles à neutrons compactes avant de répondre à la question spécifique. La réponse finale est conditionnée à la fois par la question originale et par le contexte abstrait généré, ce qui donne souvent des réponses plus précises et mieux raisonnées.
 
-Dans l'article original, le step-back prompting est démontré avec des exemples few-shot qui apprennent au modèle comment « prendre du recul » de manière appropriée pour un domaine donné. Pour les questions de physique, la question abstraite demande typiquement la loi ou le principe physique pertinent. Pour les questions d'histoire, elle demande le contexte historique plus large. Pour les questions médicales, elle demande la physiologie pertinente. La technique est agnostique au modèle et ne nécessite pas de fine-tuning — c'est purement une intervention au niveau du prompt. Sur les benchmarks MMLU et TimeQA, le step-back prompting surpasse à la fois la chaîne de pensée standard et les baselines augmentés de récupération sur les questions difficiles et intensives en connaissances.
-
-## Fonctionnement
+## Comment ça fonctionne
 
 ```mermaid
-flowchart TD
-  Original[Original specific question] -->|"step-back prompt"| Abstract[Abstract / higher-level question]
-  Abstract -->|"answer abstract question"| Principle[General principle\nor concept]
-  Original -->|"combine with principle"| Grounded[Grounded prompt:\nprinciple + original question]
-  Principle -->|"provides context"| Grounded
-  Grounded -->|"reason to answer"| Final[Final answer]
+flowchart LR
+  Q[Specific question] --> ABSTRACT[Step-back: ask for\nhigh-level concept/principle]
+  ABSTRACT --> CONCEPT[LLM generates\nabstract context]
+  Q --> REASON
+  CONCEPT --> REASON[LLM reasons with\noriginal Q + abstract context]
+  REASON --> ANS[Final answer]
 ```
 
-### Étape 1 — Génération de la question abstraite
+### Étape 1 : Question de recul
 
-La première étape est d'inviter le modèle à identifier une question de niveau supérieur qui subsume l'originale. Cela se fait typiquement avec un prompt few-shot contenant des exemples spécifiques au domaine de paires (question spécifique, question abstraite). Par exemple, si la question originale est « Quel est le point de fusion de l'arséniure de gallium ? », la question abstraite pourrait être « Quelles sont les propriétés thermodynamiques et cristallographiques des semi-conducteurs III-V ? » La question abstraite devrait être suffisamment générale pour activer des connaissances pertinentes larges, mais pas si générale qu'elle soit non informative. Trouver le bon niveau d'abstraction est le principal défi d'ingénierie de prompt, et les exemples few-shot sont essentiels pour orienter le modèle vers le niveau d'abstraction approprié pour un domaine donné.
+Construire ou générer une version plus générale et abstraite de la question. Cela peut être fait manuellement ("Avant de répondre, identifie d'abord les principes ou concepts généraux pertinents") ou généré dynamiquement par le même modèle avec un méta-prompt : "Quelle est la question de niveau supérieur dont cette question est un cas spécifique ?"
 
-### Étape 2 — Réponse à la question abstraite
+### Étape 2 : Récupération du contexte abstrait
 
-Avec la question abstraite générée, le modèle y répond. Cette réponse prend typiquement la forme d'un principe général, d'une définition, d'une loi physique ou d'un résumé de contexte d'arrière-plan pertinent. La propriété clé de cette étape est que la question abstraite est généralement plus facile pour le modèle à répondre de manière fiable que la question spécifique originale — elle active des représentations bien apprises et ancrées factuellement plutôt que des cas limites ou des faits numériques spécifiques plus sujets aux hallucinations. La réponse à la question abstraite devient un bloc de contexte qui contraint et informe l'étape de raisonnement finale.
+Demander au LLM de répondre d'abord à la question abstraite. Cette réponse sert de contexte de raisonnement — elle active des connaissances pertinentes et établit le cadre conceptuel approprié.
 
-### Étape 3 — Réponse à la question originale en utilisant l'abstraction comme contexte
+### Étape 3 : Répondre à la question originale
 
-La dernière étape combine le principe abstrait avec la question spécifique originale dans un seul prompt : « Étant donné ce contexte : [réponse abstraite], répondez à la question spécifique : [question originale]. » Le modèle raisonne maintenant à partir d'une base conceptuelle solide plutôt que de tenter la récupération directe d'un fait spécifique. Cela réduit le risque d'hallucination sur les questions intensives en faits et améliore la cohérence logique du raisonnement multi-étapes. Dans l'article original, cette dernière étape utilise également la chaîne de pensée, rendant le step-back prompting composable avec le CoT : l'étape d'abstraction ancre le raisonnement, et le CoT le rend explicite.
+Fournir le contexte abstrait généré avec la question originale et demander la réponse finale. Le modèle maintenant dispose d'un contexte d'échafaudage riche pour guider son raisonnement.
 
 ## Quand utiliser / Quand NE PAS utiliser
 
-| Utiliser quand | Éviter quand |
-|----------------|--------------|
-| La question nécessite des connaissances factuelles spécifiques où le modèle est sujet aux hallucinations | Questions simples où le prompting direct fonctionne déjà de manière fiable |
-| Le domaine a une hiérarchie claire des principes généraux aux instances spécifiques (physique, chimie, histoire) | La question abstraite est difficile à définir — tâches sans distinction naturelle général/spécifique |
-| Le modèle répond de manière inconsistante aux questions spécifiques mais est fiable sur les principes généraux | La latence est critique — deux appels LLM doublent le temps de réponse |
-| Vous voulez réduire l'hallucination sur les benchmarks intensifs en connaissances sans RAG | La question est purement mathématique ou symbolique — le CoT seul est généralement suffisant |
-| Des exemples few-shot pour le domaine sont disponibles pour apprendre au modèle comment prendre du recul | Le budget de tokens est serré — la réponse abstraite ajoute des tokens au prompt final |
-
-## Comparaisons
-
-| Critère | Step-back prompting | Chaîne de pensée (CoT) | Self-consistency |
-|---------|--------------------|-----------------------|-----------------|
-| Nombre d'appels LLM | 2 (abstrait + final) | 1 | N (typiquement 10–40) |
-| Mécanisme central | Abstraction vers ancrage vers raisonnement | Raisonnement étape par étape explicite | Plusieurs chemins indépendants + vote majoritaire |
-| Bénéfice principal | Réduit l'hallucination sur les questions intensives en connaissances | Améliore le raisonnement logique multi-étapes | Réduit la variance dans les résultats de raisonnement |
-| Coût | 2x référence | 1x référence | Nx référence |
-| Nécessite des exemples few-shot | Oui — pour enseigner le comportement de step-back | Oui — pour les meilleurs résultats | Oui — prompt CoT few-shot comme prompt de base |
-| Meilleur type de tâche | QA intensif en connaissances, science, histoire | Math, logique, code | Math, raisonnement symbolique, QA factuel |
-| Composable avec CoT | Oui — recommandé de combiner les deux | N/A | Oui — le prompt de base utilise le CoT |
-| Note | Complémentaire à la self-consistency ; les deux peuvent être empilés pour des gains supplémentaires | Référence plus simple — essayer avant le step-back | Plus cher ; utiliser quand la haute précision justifie le coût Nx |
+| Scénario | Recommandé | Éviter |
+|----------|------------|--------|
+| Questions scientifiques ou techniques nécessitant une connaissance de premier principe | Oui — l'abstraction récupère des concepts pertinents | Questions simples de recherche de faits — surcoût inutile |
+| Résolution de problèmes mathématiques multi-étapes | Oui — identifie d'abord le type de problème et la stratégie | Tâches créatives — l'abstraction peut étouffer la nouveauté |
+| QR basée sur des documents longs | Oui — le recul aide à identifier des passages de documents pertinents | Quand la latence est critique — deux appels LLM augmentent le temps de réponse |
+| Raisonnement juridique ou médical | Oui — récupère les principes pertinents avant les détails de cas | Quand les questions générales pourraient conduire à un contexte trompeur |
 
 ## Exemples de code
 
-### Step-back prompting avec OpenAI — implémentation en deux appels
+### Prompting par recul à deux étapes
 
 ```python
-# Step-back prompting: abstraction-then-answer, two API calls
+# Step-back prompting: two-step abstraction then answer
 # pip install openai
 
 import os
@@ -73,73 +59,88 @@ from openai import OpenAI
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-STEP_BACK_FEW_SHOT = """Help identify a broader abstract question underpinning a specific one.
+STEP_BACK_META = (
+    "You are an expert at identifying the high-level concept or principle "
+    "behind a specific question. Given a specific question, generate the "
+    "most relevant high-level question that, when answered, would provide "
+    "the conceptual foundation needed to answer the original question."
+)
 
-Original: At what temperature does gallium arsenide melt?
-Step-back: What are the thermodynamic properties of III-V semiconductors?
-
-Original: What was the immediate cause of the US entering World War I?
-Step-back: What geopolitical tensions shaped US foreign policy before WWI?
-
-Original: Patient has peripheral edema, elevated JVP, orthopnea. Diagnosis?
-Step-back: What are the hallmark signs of right-sided and left-sided heart failure?
-
-Original: {question}
-Step-back:"""
-
-GROUNDED = """Using the background context below, answer the specific question step by step.
-
-Background (general principles):
-{background}
-
-Specific question:
-{question}
-
-Let's think step by step:"""
+ANSWER_SYSTEM = (
+    "You are an expert assistant. Use the provided background knowledge "
+    "to give a thorough, accurate answer to the question."
+)
 
 
-def generate_step_back(question: str) -> str:
-    resp = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[{"role": "user", "content": STEP_BACK_FEW_SHOT.format(question=question)}],
-        temperature=0, max_tokens=150,
-    )
-    return resp.choices[0].message.content.strip()
-
-
-def answer_abstract(abstract_q: str) -> str:
+def step_back_question(specific_question: str) -> str:
+    """Generate the abstract/high-level version of the question."""
     resp = client.chat.completions.create(
         model="gpt-4o",
         messages=[
-            {"role": "system", "content": "Answer with accurate background principles (3-5 sentences)."},
-            {"role": "user", "content": abstract_q},
+            {"role": "system", "content": STEP_BACK_META},
+            {"role": "user", "content": specific_question},
         ],
-        temperature=0, max_tokens=300,
+        temperature=0,
+        max_tokens=150,
     )
     return resp.choices[0].message.content.strip()
 
 
-def answer_with_step_back(question: str) -> str:
-    abstract_q = generate_step_back(question)
-    background  = answer_abstract(abstract_q)
+def get_abstract_context(abstract_question: str) -> str:
+    """Answer the abstract question to get background knowledge."""
     resp = client.chat.completions.create(
         model="gpt-4o",
-        messages=[{"role": "user", "content": GROUNDED.format(
-            background=background, question=question)}],
-        temperature=0, max_tokens=500,
+        messages=[
+            {"role": "user", "content": abstract_question},
+        ],
+        temperature=0,
+        max_tokens=400,
     )
     return resp.choices[0].message.content.strip()
+
+
+def answer_with_step_back(specific_question: str) -> dict:
+    """Full step-back pipeline."""
+    abstract_q = step_back_question(specific_question)
+    context = get_abstract_context(abstract_q)
+
+    final_prompt = (
+        f"Background knowledge:\n{context}\n\n"
+        f"Now answer this specific question using the background above:\n{specific_question}"
+    )
+    resp = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": ANSWER_SYSTEM},
+            {"role": "user", "content": final_prompt},
+        ],
+        temperature=0,
+        max_tokens=400,
+    )
+    return {
+        "original_question": specific_question,
+        "step_back_question": abstract_q,
+        "abstract_context": context,
+        "final_answer": resp.choices[0].message.content.strip(),
+    }
 
 
 if __name__ == "__main__":
-    q = "Why did Soviet collectivization in the early 1930s lead to famine in Ukraine?"
-    print(answer_with_step_back(q))
+    question = (
+        "If the temperature inside a gas cloud collapses to form a star "
+        "rises above 10 million Kelvin, what nuclear process begins?"
+    )
+    result = answer_with_step_back(question)
+    print(f"Original:      {result['original_question']}")
+    print(f"\nStep-back Q:   {result['step_back_question']}")
+    print(f"\nContext:\n{result['abstract_context']}")
+    print(f"\nFinal answer:\n{result['final_answer']}")
 ```
 
-### Step-back prompting avec Anthropic — appel unique avec sortie structurée
+### Prompting par recul avec Anthropic
 
 ```python
-# Step-back prompting in one Anthropic call: structured three-part format
+# Step-back prompting with Anthropic
 # pip install anthropic
 
 import os
@@ -147,54 +148,68 @@ import anthropic
 
 client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
-SYSTEM = """You are an expert reasoning assistant. For each question, respond in three parts:
 
-## Abstract question:
-A broader, general question capturing the underlying principle.
-
-## Background context:
-Answer the abstract question with relevant principles and definitions (3-5 sentences).
-
-## Final answer:
-Use the background to reason step-by-step to the specific answer."""
-
-EXAMPLE = [
-    {"role": "user", "content": "Ideal gas: 2 mol, 300 K, 0.05 m^3. What is the pressure?"},
-    {"role": "assistant", "content": """## Abstract question:
-What is the ideal gas law and how does it relate P, V, n, and T?
-
-## Background context:
-PV = nRT, where P is pressure (Pa), V is volume (m^3), n is moles, R = 8.314 J/mol/K, T is Kelvin. Rearranged: P = nRT / V.
-
-## Final answer:
-P = (2 x 8.314 x 300) / 0.05 = 99,768 Pa (about 0.985 atm)."""},
-]
-
-
-def step_back(question: str) -> str:
-    response = client.messages.create(
+def step_back_pipeline(question: str) -> str:
+    # Step 1: Generate abstract question
+    abstract_resp = client.messages.create(
         model="claude-opus-4-5",
-        max_tokens=800,
-        system=SYSTEM,
-        messages=EXAMPLE + [{"role": "user", "content": question}],
+        max_tokens=150,
+        system=(
+            "Given a specific question, write the most relevant general/abstract "
+            "question whose answer would provide helpful background for answering "
+            "the specific question. Output only the abstract question."
+        ),
+        messages=[{"role": "user", "content": question}],
+        temperature=0,
     )
-    return response.content[0].text
+    abstract_q = abstract_resp.content[0].text.strip()
+
+    # Step 2: Answer abstract question
+    context_resp = client.messages.create(
+        model="claude-opus-4-5",
+        max_tokens=400,
+        messages=[{"role": "user", "content": abstract_q}],
+        temperature=0,
+    )
+    context = context_resp.content[0].text.strip()
+
+    # Step 3: Answer original with context
+    final_resp = client.messages.create(
+        model="claude-opus-4-5",
+        max_tokens=400,
+        system="Use the provided background knowledge to answer the question accurately.",
+        messages=[
+            {
+                "role": "user",
+                "content": (
+                    f"Background knowledge:\n{context}\n\n"
+                    f"Question: {question}"
+                ),
+            }
+        ],
+        temperature=0,
+    )
+    print(f"Abstract question: {abstract_q}\n")
+    print(f"Background context:\n{context}\n")
+    return final_resp.content[0].text.strip()
 
 
 if __name__ == "__main__":
-    q = "A patient is given furosemide. How does it cause hypokalemia?"
-    print(step_back(q))
+    q = "What happened to the economy of Weimar Germany in 1923?"
+    answer = step_back_pipeline(q)
+    print(f"Final answer:\n{answer}")
 ```
 
 ## Ressources pratiques
 
-- [Take a Step Back: Evoking Reasoning via Abstraction in Large Language Models (Zheng et al., 2023)](https://arxiv.org/abs/2310.06117) — Article original de Google DeepMind avec benchmarks sur MMLU, TimeQA et MedQA.
-- [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models (Wei et al., 2022)](https://arxiv.org/abs/2201.11903) — L'article CoT sur lequel le step-back prompting se base et est évalué.
-- [Anthropic — Vue d'ensemble du prompt engineering](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Couvre la structuration des system prompts et la conception d'exemples few-shot.
-- [OpenAI — Guide de prompt engineering](https://platform.openai.com/docs/guides/prompt-engineering) — Conseils pratiques sur le prompting few-shot, les stratégies de raisonnement et la structure des sorties.
+- [Zheng et al., 2023 — Take a Step Back (DeepMind)](https://arxiv.org/abs/2310.06117) — Article original présentant le prompting par recul avec une évaluation sur STEM, connaissance du monde et raisonnement — montre des gains significatifs par rapport à la CoT directe et DECOMP
+- [Wei et al., 2022 — Chain-of-Thought Prompting](https://arxiv.org/abs/2201.11903) — Travail fondateur sur les prompts de raisonnement dont le prompting par recul s'inspire et s'améliore
+- [Press et al., 2022 — Measuring and Narrowing the Compositionality Gap](https://arxiv.org/abs/2210.03350) — Prompting par décomposition (Least-to-Most), une technique complémentaire d'abstraction
 
 ## Voir aussi
 
-- [Prompt engineering](/docs/prompt-engineering)
-- [Chaîne de pensée (CoT)](/docs/reasoning-patterns/cot)
-- [Self-consistency](/docs/prompt-engineering/self-consistency)
+- [Ingénierie des prompts](/docs/prompt-engineering)
+- [Chaîne de pensée](/docs/reasoning-patterns/cot)
+- [Autocohérence](/docs/prompt-engineering/self-consistency)
+- [Prompts système, de rôle et contextuels](/docs/prompt-engineering/system-role-contextual-prompting)
+- [LLMs](/docs/llms)

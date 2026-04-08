@@ -1,13 +1,19 @@
 import type {ReactNode} from 'react';
 import Link from '@docusaurus/Link';
-import Translate from '@docusaurus/Translate';
+import Translate, {translate} from '@docusaurus/Translate';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
 import Heading from '@theme/Heading';
 
 export default function NotFound(): ReactNode {
   return (
-    <Layout title="Page not found" description="The page you were looking for could not be found.">
+    <Layout
+      title={translate({id: 'notFound.title', message: 'Page not found'})}
+      description={translate({
+        id: 'notFound.description',
+        message: 'The page you were looking for could not be found.',
+      })}
+    >
       <main
         style={{
           display: 'flex',

@@ -2,6 +2,8 @@
 title: Construire des serveurs MCP
 description: Comment construire des serveurs MCP qui exposent des outils, des ressources et des prompts à n'importe quelle application IA compatible MCP — couvrant la configuration du serveur, l'enregistrement des capacités, la configuration du transport et le cycle de vie complet du serveur.
 keywords: [serveur MCP, Model Context Protocol, construire un serveur MCP, outils, ressources, prompts, TypeScript, SDK MCP, schéma d'outil, transport stdio, HTTP SSE]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Construire des serveurs MCP

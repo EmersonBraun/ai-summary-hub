@@ -1,220 +1,152 @@
 ---
 title: Engenharia Automática de Prompts (APE)
-description: A Engenharia Automática de Prompts (APE) usa LLMs para gerar, pontuar e refinar iterativamente instruções de prompts, substituindo tentativa e erro manual por um loop de otimização orientado por dados que descobre prompts de alto desempenho em escala.
-keywords: [engenharia automática de prompts, APE, otimização de prompts, prompts gerados por LLM, DSPy, Zhou et al, busca de prompts, indução de instruções, ajuste de prompts, meta-prompting]
+description: Como a Engenharia Automática de Prompts usa LLMs para gerar, avaliar e selecionar instruções de prompts otimizadas sem ajuste manual.
+keywords: [automatic prompt engineering, APE, prompt optimization, LLM, instruction generation, DSPy]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Engenharia Automática de Prompts (APE)
 
 ## Definição
 
-A Engenharia Automática de Prompts (APE) é a prática de usar um modelo de linguagem para gerar e otimizar instruções de prompts em vez de escrevê-las manualmente. Introduzida por Zhou et al. (2022) no artigo *Large Language Models Are Human-Level Prompt Engineers*, a APE enquadra o design de prompts como um problema de síntese de programas: dado um conjunto de pares de demonstração entrada-saída, encontrar a instrução em linguagem natural que, quando inserida antes do prompt, maximiza o desempenho da tarefa em um conjunto de avaliação reservado. A busca, pontuação e refinamento de instruções candidatas são todos realizados programaticamente — o papel do ser humano muda de autor de prompts para definidor de tarefas e projetista de métricas.
+A Engenharia Automática de Prompts (APE) é o conjunto de métodos que usam LLMs para gerar, avaliar e selecionar automaticamente instruções de prompts, substituindo a iteração humana manual por otimização sistemática. Em vez de formular prompts manualmente, você define uma função objetivo — geralmente precisão num conjunto de validação — e deixa um algoritmo pesquisar no espaço de prompts possíveis para encontrar o que maximiza essa métrica.
 
-A motivação para automatizar o design de prompts é prática. A engenharia manual de prompts é demorada, frágil e tendenciosa pelas intuições do engenheiro humano sobre como os modelos de linguagem processam texto. Pequenas mudanças no enunciado — "Pense passo a passo" vs "Vamos pensar cuidadosamente passo a passo" — produzem diferenças mensuráveis de precisão que são impossíveis de prever sem testes empíricos. A APE substitui esse processo de tentativa e erro por uma busca sistemática: gere um grande conjunto de instruções candidatas, avalie cada uma em um benchmark e mantenha as melhores. Essa é a mesma filosofia de design por trás da busca de hiperparâmetros no ML clássico — os humanos especificam o objetivo, as máquinas fazem a busca.
+A APE trata prompts como hiperparâmetros e os otimiza por um processo de três etapas: um LLM gera instruções candidatas a partir de exemplos de demonstração entrada-saída; cada candidata é avaliada num conjunto de exemplos rotulados; e as melhores candidatas são selecionadas, opcionalmente refinadas por reamostragem, melhores estratégias de busca ou otimização baseada em gradiente via representações de tokens suaves.
 
-A APE é distinta do ajuste fino de prompts suaves (que otimiza embeddings contínuos de tokens via gradiente descendente) e do fine-tuning (que atualiza os pesos do modelo). A APE opera inteiramente no espaço da linguagem natural usando modelos congelados. Isso a torna agnóstica em relação ao modelo, interpretável — você pode ler e entender a instrução vencedora — e implantável sem qualquer infraestrutura de treinamento. A troca é que o espaço de busca discreto da linguagem natural é vasto e não diferenciável, então a APE depende de amostragem, heurísticas de pontuação e refinamento iterativo em vez de otimização baseada em gradiente.
+Na prática, a APE varia de ferramentas leves como gerar variações de prompts num LLM e selecionar a melhor num conjunto de validação, a frameworks completos como DSPy (que otimiza cadeias de prompts de ponta a ponta), TextGrad (gradiente textual via LLM) e OPRO (otimização por prompting) da Google DeepMind. A APE é especialmente valiosa quando a engenharia manual de prompts atinge um platô, quando você tem dados rotulados disponíveis, ou quando precisa sistematicamente adaptar prompts para um novo modelo ou domínio.
 
 ## Como funciona
 
 ```mermaid
 flowchart TD
-    Demos["Demonstration examples\n(input → output pairs)"] -->|"describe task"| MetaLLM["Meta-LLM\n(instruction proposer)"]
-    MetaLLM -->|"generate N candidate instructions"| Pool["Candidate instruction pool\n[instr_1, instr_2, ..., instr_N]"]
-    Pool -->|"each instruction tested"| Eval["Evaluation on\nheld-out benchmark"]
-    Eval -->|"score each candidate"| Scores["Scored instructions\n[(instr_1, 0.72), (instr_2, 0.85), ...]"]
-    Scores -->|"select top-K"| Select["Top-K instructions"]
-    Select -->|"resample variants"| Refine["Iterative refinement\n(paraphrase / edit)"]
-    Refine -->|"new candidates"| Eval
-    Scores -->|"best instruction"| Output["Optimal instruction\n→ deployed prompt"]
+  DEMO[Input-output demos] --> GEN[LLM: generate N candidate instructions]
+  GEN --> EVAL[Evaluate each candidate on labeled val set]
+  EVAL --> SCORE[Score candidates by accuracy / metric]
+  SCORE --> SELECT[Select top-k candidates]
+  SELECT --> REFINE{Refine?}
+  REFINE -->|yes| RESAMPLE[Resample / mutate / paraphrase top-k]
+  RESAMPLE --> EVAL
+  REFINE -->|no| BEST[Best prompt instruction]
 ```
 
 ### Geração de candidatos
 
-O loop da APE começa com um conjunto de exemplos de demonstração — pares entrada-saída que ilustram a tarefa alvo. Esses exemplos são passados para um meta-LLM (o mesmo ou um modelo diferente) com um meta-prompt que pede para inferir a instrução que produziria as saídas dadas a partir das entradas fornecidas. Meta-prompts típicos parecem com: *"Aqui estão pares entrada-saída. Qual é a instrução que produz essas saídas? Gere 10 instruções candidatas diversas."* Ao amostrar com temperatura > 0, o meta-LLM produz um conjunto diversificado de instruções candidatas que diferem em formulação, enquadramento e especificidade. A qualidade e diversidade desse conjunto inicial determinam diretamente o teto da otimização.
+Dado um conjunto de pares de demonstração entrada-saída, um LLM gerador (que pode ser o mesmo modelo que o alvo ou um modelo diferente) é solicitado a sintetizar instruções que corresponderiam a esses exemplos. Prompts típicos de geração parecem com: *"Aqui estão exemplos de tarefas. Escreva uma instrução que melhor descreve a tarefa."* Você pode gerar dezenas a centenas de candidatas em uma única passagem.
 
-### Pontuação
+### Avaliação e pontuação
 
-Cada instrução candidata é instanciada como um prefixo no prompt (ou como a mensagem de sistema) e avaliada em relação a um benchmark reservado. A função de pontuação é específica da tarefa: precisão para classificação, correção de execução para geração de código, ROUGE ou BERTScore para sumarização, ou um juiz LLM secundário para tarefas abertas. A decisão de design fundamental é se a pontuação é calculada com o próprio meta-LLM (usando estimativas de log-probabilidade de saídas corretas) ou com um avaliador específico da tarefa separado. A pontuação por log-probabilidade é mais rápida, mas pode superajustar à calibração do meta-LLM. A pontuação por avaliador separado é mais confiável, mas requer dados rotulados.
+Cada instrução candidata é inserida em um template de prompt e testada em um conjunto de validação rotulado. A pontuação de desempenho (precisão, F1, BLEU, exatidão de execução de código — qualquer métrica que corresponda ao seu objetivo) determina a classificação da candidata. Esse loop de avaliação é a parte computacionalmente cara: N candidatos × M exemplos de validação = N×M chamadas de LLM.
 
-### Refinamento iterativo
+### Refinamento
 
-Após a pontuação inicial, as melhores K instruções candidatas são selecionadas para refinamento. O meta-LLM é solicitado a parafrasear, estender ou combinar os melhores candidatos — gerando um novo conjunto de variantes semanticamente relacionadas, mas textualmente distintas. Esse loop de refinamento é executado por um número fixo de iterações ou até que um limiar de pontuação alvo seja alcançado. Cada iteração estreita a busca em torno de regiões promissoras do espaço de instruções, análogo à busca evolucionária ou escalada de colina sobre uma paisagem discreta. Na prática, uma ou duas rodadas de refinamento após um grande conjunto inicial (N ≥ 50) tende a recuperar a maior parte do ganho alcançável.
-
-## Comparações
-
-| Critério | APE | Engenharia manual de prompts | Fine-tuning |
-|----------|-----|------------------------------|-------------|
-| Esforço humano | Baixo — definir tarefa e métrica | Alto — autoria e teste iterativos | Alto — coleta de dados e execuções de treinamento |
-| Requer dados rotulados | Sim — para pontuação | Não — pode ser feito empiricamente | Sim — tipicamente milhares de exemplos |
-| Pesos do modelo atualizados | Não | Não | Sim |
-| Saída interpretável | Sim — instrução em linguagem natural | Sim | Não — mudanças de pesos são opacas |
-| Generaliza entre modelos | Sim — re-executar busca por modelo | Parcialmente | Não — vinculado ao modelo base |
-| Latência na inferência | Nenhuma — sem overhead em tempo de execução | Nenhuma | Nenhuma |
-| Custo | Médio — N × M chamadas de avaliação | Baixo | Alto — tempo de GPU |
-| Melhor para | Tarefas com uma métrica clara e ≥ 50 exemplos | Novas tarefas sem uma métrica | Tarefas de alto volume onde ganhos de precisão justificam o treinamento |
+Frameworks APE avançados adicionam loops de refinamento: pegar as melhores instruções, parafraseá-las ou mutá-las e reavaliar. O DSPy compila programas inteiros com módulos interconectados, permitindo a otimização de cadeias complexas e não apenas de instruções únicas. O OPRO mantém um histórico de todos os prompts anteriores e suas pontuações no meta-prompt, encorajando o LLM otimizador a construir iterativamente melhores instruções.
 
 ## Quando usar / Quando NÃO usar
 
-| Use quando | Evite quando |
-|------------|--------------|
-| Você tem um conjunto de avaliação rotulado e pode definir uma métrica de pontuação clara | A tarefa não tem uma métrica automatizada confiável — a APE não pode buscar sem um sinal |
-| A iteração manual de prompts está levando mais de um dia e a precisão ainda está estagnada | Você precisa de um resultado imediatamente — a APE requer múltiplas chamadas de API de LLM para avaliação |
-| Você está implantando o mesmo prompt para muitos usuários e mesmo 1-2% de ganho de precisão importa | Seu conjunto de demonstrações é muito pequeno (< 10 exemplos) — a pontuação será ruidosa |
-| Você quer auditar a melhor instrução encontrada para segurança antes da implantação | A tarefa requer criatividade ou julgamento subjetivo onde uma única métrica é enganosa |
-| Você está usando DSPy ou um framework similar onde a otimização de prompts está integrada | O fine-tuning já está planejado — a APE otimiza prompts, não pesos |
+| Cenário | APE recomendada | Evitar APE |
+|---------|-----------------|------------|
+| Você tem ≥ 50 pares entrada-saída rotulados | Sim — conjunto de validação torna a pontuação confiável | Sem dados de treinamento — você não pode pontuar candidatos |
+| Engenharia manual de prompts atingiu um platô | Sim — APE explora formulações que humanos perdem | Protótipo inicial — iteração manual é mais rápida e instrutiva |
+| Você precisa portar prompts para um novo modelo | Sim — reotimize automaticamente em vez de reformular manualmente | Tarefa de produção de chamada única — overhead da APE não é justificado |
+| Restrições de custo rígidas | Não — N×M chamadas de LLM podem ser caras | — |
+| Cadeias de raciocínio complexas | Sim (DSPy) — otimiza pipelines de ponta a ponta | — |
 
 ## Exemplos de código
 
-### Loop básico de APE com OpenAI
+### APE leve — gerar e pontuar instruções candidatas
 
 ```python
-# Minimal APE implementation: generate instructions, score, return best
+# Lightweight APE: generate candidate prompt instructions and pick the best one
 # pip install openai
 
-import os
-import re
+import os, itertools
 from openai import OpenAI
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-# ----- Task definition --------------------------------------------------------
-# Demonstrations: pairs of (input, expected_output)
 DEMOS = [
-    ("The movie was absolutely fantastic, I loved every minute.", "positive"),
-    ("Terrible film, waste of time and money.", "negative"),
-    ("It was okay, nothing special but not bad either.", "neutral"),
-    ("A masterpiece of modern cinema.", "positive"),
-    ("I walked out after 20 minutes.", "negative"),
+    {"input": "The food was terrible and the service was slow.", "output": "negative"},
+    {"input": "Absolutely loved the ambiance and the pasta!", "output": "positive"},
+    {"input": "It was okay, nothing special.", "output": "neutral"},
 ]
 
-# Held-out evaluation set for scoring
-EVAL_SET = [
-    ("A stunning visual experience with weak writing.", "positive"),  # debatable but positive
-    ("Boring, predictable, and too long.", "negative"),
-    ("I enjoyed it more than I expected.", "positive"),
-    ("Neither good nor bad — forgettable.", "neutral"),
-    ("One of the best films of the decade.", "positive"),
+VAL_SET = [
+    ("Best meal I've had in years!", "positive"),
+    ("Never going back, rude staff.", "negative"),
+    ("Decent place, a bit pricey.", "neutral"),
+    ("Outstanding desserts and friendly service.", "positive"),
+    ("Food was cold and tasteless.", "negative"),
 ]
 
 
-# ----- Step 1: Generate candidate instructions --------------------------------
-def generate_instructions(demos: list[tuple[str, str]], n: int = 10) -> list[str]:
-    """Ask a meta-LLM to infer N candidate instructions from demo pairs."""
-    demo_text = "\n".join(f'Input: "{inp}"\nOutput: "{out}"' for inp, out in demos)
-    meta_prompt = (
-        f"Here are input-output example pairs for a text classification task:\n\n"
-        f"{demo_text}\n\n"
-        f"Generate {n} diverse natural-language instructions that, when prepended to "
-        f"an input text, would cause a language model to produce the correct output. "
-        f"Return one instruction per line, numbered."
+def generate_candidates(demos: list[dict], n: int = 5) -> list[str]:
+    demo_text = "\n".join(
+        f"Input: {d['input']}\nOutput: {d['output']}" for d in demos
+    )
+    prompt = (
+        f"Here are example input-output pairs for a task:\n\n{demo_text}\n\n"
+        f"Write {n} distinct one-sentence instructions that describe this task. "
+        "Output one instruction per line, no numbering."
     )
     resp = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": meta_prompt}],
+        model="gpt-4o",
+        messages=[{"role": "user", "content": prompt}],
         temperature=0.9,
-        max_tokens=800,
+        max_tokens=300,
     )
-    raw = resp.choices[0].message.content
-    lines = [re.sub(r"^\d+[\.\)]\s*", "", l).strip() for l in raw.splitlines()]
-    return [l for l in lines if len(l) > 20]  # filter out empty / too-short lines
+    return [line.strip() for line in resp.choices[0].message.content.splitlines() if line.strip()]
 
 
-# ----- Step 2: Score an instruction on the eval set --------------------------
-def score_instruction(instruction: str, eval_set: list[tuple[str, str]]) -> float:
-    """Return accuracy of the instruction on the eval set."""
+def score_instruction(instruction: str, val_set: list[tuple]) -> float:
     correct = 0
-    for text, expected in eval_set:
-        prompt = f"{instruction}\n\nText: {text}\nLabel:"
+    for text, label in val_set:
         resp = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": instruction},
+                {"role": "user", "content": text},
+            ],
             temperature=0,
-            max_tokens=5,
+            max_tokens=10,
         )
-        prediction = resp.choices[0].message.content.strip().lower()
-        if expected.lower() in prediction:
+        pred = resp.choices[0].message.content.strip().lower()
+        if label in pred:
             correct += 1
-    return correct / len(eval_set)
-
-
-# ----- Step 3: Iterative refinement of top-K instructions --------------------
-def refine_instructions(top_instructions: list[str], n_variants: int = 5) -> list[str]:
-    """Ask the meta-LLM to paraphrase the top instructions to get variants."""
-    instr_text = "\n".join(f"- {i}" for i in top_instructions)
-    refine_prompt = (
-        f"Here are high-performing instructions for a sentiment classification task:\n"
-        f"{instr_text}\n\n"
-        f"Generate {n_variants} new instructions that paraphrase or combine the above "
-        f"to potentially improve performance. Return one per line."
-    )
-    resp = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": refine_prompt}],
-        temperature=0.7,
-        max_tokens=500,
-    )
-    raw = resp.choices[0].message.content
-    lines = [l.strip().lstrip("- ") for l in raw.splitlines()]
-    return [l for l in lines if len(l) > 20]
-
-
-# ----- APE main loop ---------------------------------------------------------
-def run_ape(
-    demos: list[tuple[str, str]],
-    eval_set: list[tuple[str, str]],
-    n_candidates: int = 10,
-    top_k: int = 3,
-    n_refinement_rounds: int = 1,
-) -> dict:
-    print("=== APE: Generating initial candidates ===")
-    candidates = generate_instructions(demos, n=n_candidates)
-    print(f"Generated {len(candidates)} candidates.\n")
-
-    all_scored: list[tuple[str, float]] = []
-
-    for round_num in range(n_refinement_rounds + 1):
-        print(f"--- Round {round_num + 1}: Scoring {len(candidates)} instructions ---")
-        round_scores = []
-        for instr in candidates:
-            score = score_instruction(instr, eval_set)
-            round_scores.append((instr, score))
-            print(f"  [{score:.0%}] {instr[:80]}{'...' if len(instr) > 80 else ''}")
-        all_scored.extend(round_scores)
-
-        if round_num < n_refinement_rounds:
-            top = [i for i, _ in sorted(round_scores, key=lambda x: -x[1])[:top_k]]
-            candidates = refine_instructions(top, n_variants=n_candidates // 2)
-            print()
-
-    best_instr, best_score = max(all_scored, key=lambda x: x[1])
-    return {"instruction": best_instr, "score": best_score, "all_scored": all_scored}
+    return correct / len(val_set)
 
 
 if __name__ == "__main__":
-    result = run_ape(DEMOS, EVAL_SET, n_candidates=8, top_k=3, n_refinement_rounds=1)
-    print(f"\n=== Best instruction (accuracy {result['score']:.0%}) ===")
-    print(result["instruction"])
+    candidates = generate_candidates(DEMOS, n=6)
+    print(f"Generated {len(candidates)} candidates\n")
+
+    results = []
+    for inst in candidates:
+        acc = score_instruction(inst, VAL_SET)
+        results.append((acc, inst))
+        print(f"  {acc:.2f}  {inst}")
+
+    best_acc, best_inst = max(results)
+    print(f"\nBest instruction (acc={best_acc:.2f}):\n{best_inst}")
 ```
 
-### Usando DSPy para APE estruturada
+### DSPy — otimização automática de prompt de ponta a ponta
 
 ```python
-# DSPy provides a higher-level abstraction for automatic prompt optimization.
+# DSPy: compile a prompt program with automatic instruction optimization
 # pip install dspy-ai
 
 import dspy
 
-# Configure DSPy with your LLM backend
-lm = dspy.LM("openai/gpt-4o-mini", api_key=os.environ["OPENAI_API_KEY"])
+# Configure the LM
+lm = dspy.LM("openai/gpt-4o", api_key="YOUR_KEY")
 dspy.configure(lm=lm)
 
-
-# Define the task as a DSPy signature
+# Define a typed signature
 class SentimentClassifier(dspy.Signature):
-    """Classify the sentiment of a movie review as positive, negative, or neutral."""
-    review: str = dspy.InputField(desc="A movie review text")
-    sentiment: str = dspy.OutputField(desc="One of: positive, negative, neutral")
-
+    """Classify the sentiment of a customer review."""
+    review: str = dspy.InputField()
+    sentiment: str = dspy.OutputField(desc="positive, negative, or neutral")
 
 # Wrap in a module
 class SentimentModule(dspy.Module):
@@ -224,42 +156,40 @@ class SentimentModule(dspy.Module):
     def forward(self, review: str) -> dspy.Prediction:
         return self.classify(review=review)
 
-
-# Training examples
+# Training and validation examples
 trainset = [
-    dspy.Example(review=inp, sentiment=out).with_inputs("review")
-    for inp, out in [
-        ("Absolutely loved it!", "positive"),
-        ("Worst movie ever.", "negative"),
-        ("It was fine, nothing memorable.", "neutral"),
-    ]
+    dspy.Example(review="Best meal I've had in years!", sentiment="positive").with_inputs("review"),
+    dspy.Example(review="Never going back, rude staff.", sentiment="negative").with_inputs("review"),
+    dspy.Example(review="Decent place, a bit pricey.", sentiment="neutral").with_inputs("review"),
 ]
 
+# Define metric
+def exact_match(example, prediction, trace=None):
+    return example.sentiment.lower() == prediction.sentiment.lower()
 
-# Use MIPROv2 optimizer to automatically engineer the prompt
-def optimize_with_dspy():
-    module = SentimentModule()
-    optimizer = dspy.MIPROv2(metric=dspy.evaluate.answer_exact_match, auto="light")
-    optimized = optimizer.compile(module, trainset=trainset)
-    print(optimized.classify.extended_signature)  # shows the optimized instruction
-    return optimized
+# Compile with MIPROv2 optimizer (automatic prompt generation + selection)
+optimizer = dspy.MIPROv2(metric=exact_match, num_candidates=8, init_temperature=0.9)
+module = SentimentModule()
+compiled = optimizer.compile(module, trainset=trainset)
 
-
-if __name__ == "__main__":
-    optimized_module = optimize_with_dspy()
-    result = optimized_module(review="A surprisingly moving and well-acted drama.")
-    print(result.sentiment)
+# Use the optimized module
+result = compiled(review="The waiter was incredibly attentive and the food divine.")
+print(result.sentiment)  # positive
 ```
 
 ## Recursos práticos
 
-- [Large Language Models Are Human-Level Prompt Engineers (Zhou et al., 2022)](https://arxiv.org/abs/2211.01910) — O artigo original da APE; introduz a formulação de indução de instruções, a busca iterativa de Monte Carlo e resultados de benchmark em 24 tarefas de NLP.
-- [DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines (Khattab et al., 2023)](https://arxiv.org/abs/2310.03714) — O framework que operacionaliza a otimização no estilo APE como uma abstração de primeira classe; veja também [dspy.ai](https://dspy.ai).
-- [Automatic Prompt Optimization with "Gradient Descent" and Beam Search (Pryzant et al., 2023)](https://arxiv.org/abs/2305.03495) — Estende a APE com uma abordagem de "gradiente textual" que usa feedback gerado por LLM como sinal de gradiente substituto.
-- [PromptBreeder: Self-Referential Self-Improvement Via Prompt Evolution (Fernando et al., 2023)](https://arxiv.org/abs/2309.16797) — Uma abordagem evolucionária de APE que também evolui os meta-prompts usados para geração de instruções.
+- [Zhou et al., 2022 — APE original paper](https://arxiv.org/abs/2211.01910) — Paper fundador introduzindo APE: gerar instruções via LLM e selecionar via desempenho no conjunto de validação
+- [Documentação DSPy](https://dspy-docs.vercel.app/) — Framework para programar em vez de fazer prompting; otimizadores como MIPRO e BootstrapFewShotWithRandomSearch automatizam APE para pipelines inteiros
+- [OPRO — DeepMind, 2023](https://arxiv.org/abs/2309.03409) — "Otimização por prompting": o LLM vê o histórico de prompts anteriores + pontuações e gera instruções melhoradas iterativamente
+- [TextGrad](https://github.com/zou-group/textgrad) — Retropropagação via texto: usa feedback de LLM como "gradientes textuais" para refinar componentes do pipeline
+- [PromptBreeder (Google DeepMind)](https://arxiv.org/abs/2309.16797) — Algoritmo evolutivo autorreferencial que muta e seleciona simultaneamente prompts de tarefa e prompts de mutação
 
 ## Veja também
 
 - [Engenharia de prompts](/docs/prompt-engineering)
+- [Temperatura, Top-K, Top-P](/docs/prompt-engineering/temperature-top-k-top-p)
+- [Autoconsistência](/docs/prompt-engineering/self-consistency)
 - [Autoavaliação e calibração](/docs/prompt-engineering/self-evaluation-calibration)
-- [Fine-tuning](/docs/llms/fine-tuning)
+- [Ensembling de prompts](/docs/prompt-engineering/prompt-ensembling)
+- [LLMs](/docs/llms)

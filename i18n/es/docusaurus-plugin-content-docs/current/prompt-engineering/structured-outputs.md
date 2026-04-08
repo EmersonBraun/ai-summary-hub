@@ -1,18 +1,20 @@
 ---
 title: Salidas estructuradas
-description: Técnicas para que los LLMs produzcan datos estructurados legibles por máquina — modo JSON, esquemas de llamada a funciones y extracción basada en Pydantic — permitiendo una integración fiable en APIs y pipelines automatizados.
-keywords: [salidas estructuradas, modo JSON, llamada a funciones, uso de herramientas, Pydantic, esquema, extracción, formato de respuesta, OpenAI, Anthropic, análisis de salida]
+description: Técnicas para que los LLM produzcan datos estructurados legibles por máquina — modo JSON, esquemas de llamada a funciones y extracción basada en Pydantic — permitiendo una integración fiable en APIs y pipelines automatizados.
+keywords: [structured outputs, JSON mode, function calling, tool use, Pydantic, schema, extraction, response format, OpenAI, Anthropic, output parsing]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Salidas estructuradas
 
 ## Definición
 
-Las salidas estructuradas se refieren a la práctica de restringir o guiar a un LLM para que produzca datos legibles por máquina — más comúnmente JSON — en lugar de prosa de forma libre. En un pipeline de producción, la diferencia entre un LLM que devuelve una respuesta correcta y uno que devuelve una respuesta correcta en un formato analizable es la diferencia entre una demo de juguete y un sistema desplegable. Un servicio posterior que necesita extraer un nombre de producto, una etiqueta de sentimiento o una lista de acciones no puede operar de forma fiable en texto no estructurado; necesita una forma garantizada que pueda deserializar, validar y enrutar.
+Las salidas estructuradas se refieren a la práctica de restringir o guiar a un LLM para que produzca datos legibles por máquina —más comúnmente JSON— en lugar de prosa de forma libre. En un pipeline de producción, la brecha entre un LLM que devuelve una respuesta correcta y uno que devuelve una respuesta correcta en un formato analizable es la brecha entre una demostración de juguete y un sistema desplegable. Un servicio posterior que necesita extraer un nombre de producto, una etiqueta de sentimiento o una lista de elementos de acción no puede operar de forma fiable sobre texto no estructurado; necesita una forma garantizada que pueda deserializar, validar y enrutar.
 
-La evolución de las técnicas de salida estructurada sigue la maduración de las APIs de LLM. Los primeros sistemas se basaban en instrucciones de prompts frágiles ("responde solo con JSON válido") combinadas con análisis con regex y bucles de reintento. Este enfoque fallaba cuando el modelo añadía un preámbulo explicativo, envolvía el JSON en un bloque de código markdown o violaba sutilmente el esquema en casos extremos. La siguiente generación introdujo la llamada a funciones (OpenAI, mediados de 2023) y el uso de herramientas (Anthropic), que mueven la definición del esquema fuera del prompt y hacia un parámetro de API de primer nivel, permitiendo que el modelo sea entrenado y restringido explícitamente sobre el contrato de salida. Más recientemente, los proveedores introdujeron la decodificación restringida por gramática estricta que hace que el cumplimiento del esquema sea una garantía dura a nivel de token, no una instrucción de prompt suave.
+La evolución de las técnicas de salida estructurada sigue la maduración de las APIs de LLM. Los primeros sistemas dependían de instrucciones de prompt frágiles ("responde solo con JSON válido") combinadas con análisis de expresiones regulares y bucles de reintento. Este enfoque fallaba cada vez que el modelo agregaba un preámbulo explicativo, envolvía el JSON en un bloque de código markdown, o violaba sutilmente el esquema en casos extremos. La siguiente generación introdujo la llamada a funciones (OpenAI, mediados de 2023) y el uso de herramientas (Anthropic), que mueven la definición del esquema fuera del prompt y hacia un parámetro de API de primera clase, permitiendo que el modelo sea explícitamente entrenado y restringido en el contrato de salida. Más recientemente, los proveedores introdujeron la decodificación con restricciones de gramática estricta que hace que el cumplimiento del esquema sea una garantía estricta a nivel de token, no una instrucción de prompt suave.
 
-Entender qué técnica aplicar — y por qué — importa para cualquier persona que construya pipelines que dependan de la salida de los LLMs. El modo JSON es el punto de entrada más simple pero no proporciona validación de esquema. La llamada a funciones / uso de herramientas proporciona un esquema tipado y análisis estructurado en la respuesta de la API, pero requiere definir esquemas de herramientas de antemano. Las bibliotecas de extracción basadas en Pydantic (Instructor, analizadores de salida de LangChain) se sitúan por encima de la capa de API y añaden validación a nivel de Python, reintentos automáticos en violaciones del esquema y definición ergonómica del modelo. La elección correcta depende de la complejidad del esquema objetivo, la criticidad de la validación y cuánta lógica de reintento/corrección quieres que maneje la biblioteca por ti.
+Comprender qué técnica aplicar —y por qué— importa para cualquiera que construya pipelines que dependan de la salida del LLM. El modo JSON es el punto de entrada más simple pero no proporciona validación de esquema. La llamada a funciones / uso de herramientas proporciona un esquema tipado y análisis estructurado en la respuesta de la API, pero requiere definir esquemas de herramientas de antemano. Las bibliotecas de extracción basadas en Pydantic (Instructor, analizadores de salida de LangChain) se sitúan por encima de la capa de API y añaden validación a nivel de Python, reintento automático en violaciones de esquema y definición de modelos ergonómica. La elección correcta depende de la complejidad del esquema objetivo, la criticidad de la validación y cuánta lógica de reintento/corrección quieres que maneje la biblioteca.
 
 ## Cómo funciona
 
@@ -27,29 +29,29 @@ flowchart LR
 
 ### Modo JSON
 
-El modo JSON es el mecanismo de salida estructurada más básico. Cuando está habilitado, el modelo está restringido a producir solo JSON válido como su salida de nivel superior. En la API de OpenAI se activa configurando `response_format={"type": "json_object"}` en la solicitud; en la API de Anthropic se puede lograr un efecto similar rellenando previamente el turno del asistente con `{`. El modo JSON garantiza la validez sintáctica (la salida siempre puede analizarse con `json.loads`), pero no valida contra ningún esquema — el modelo podría devolver `{"result": "yes"}` cuando esperabas `{"score": 0.87, "label": "positive", "confidence": 0.92}`. Debes añadir la validación del esquema (por ejemplo, con Pydantic o `jsonschema`) como paso separado e implementar lógica de reintento para desajustes del esquema. El modo JSON es más adecuado para estructuras simples y planas donde el riesgo de desviación del esquema es bajo.
+El modo JSON es el mecanismo de salida estructurada más básico. Cuando está habilitado, el modelo está restringido a producir solo JSON válido como su salida de nivel superior. En la API de OpenAI esto se activa estableciendo `response_format={"type": "json_object"}` en la solicitud; en la API de Anthropic se puede lograr un efecto similar prefijando el turno del asistente con `{`. El modo JSON garantiza la validez sintáctica (la salida siempre puede analizarse con `json.loads`), pero no valida contra ningún esquema —el modelo podría devolver `{"result": "yes"}` cuando esperabas `{"score": 0.87, "label": "positive", "confidence": 0.92}`. Debes añadir validación de esquema (p. ej., con Pydantic o `jsonschema`) como un paso separado, e implementar lógica de reintento para discrepancias de esquema. El modo JSON es más adecuado para estructuras simples y planas donde el riesgo de deriva del esquema es bajo.
 
 ### Llamada a funciones y uso de herramientas
 
-La llamada a funciones (OpenAI) y el uso de herramientas (Anthropic) representan un paso cualitativo adelante. En lugar de incrustar el esquema de salida en el prompt del sistema, lo declaras como una definición de herramienta o función con un objeto JSON Schema. La API devuelve la salida del modelo como un bloque `tool_use` estructurado con un dict `input` analizado, separado de cualquier contenido de texto. Este desacoplamiento es significativo: el texto y los datos estructurados viven en diferentes partes de la respuesta, y la API misma maneja el análisis JSON. Obtienes anotaciones de tipo para cada campo, semántica de campos requeridos vs. opcionales, restricciones de enumeración y soporte de objetos anidados — todo aplicado por el esquema a nivel de API. El modo estricto de OpenAI (2024) va más allá al habilitar la decodificación restringida, haciendo que la adherencia al esquema sea una garantía dura. El uso de herramientas es la elección correcta para extraer datos estructurados de documentos, poblar registros de bases de datos o impulsar llamadas a APIs posteriores con argumentos tipados.
+La llamada a funciones (OpenAI) y el uso de herramientas (Anthropic) representan un paso cualitativo hacia adelante. En lugar de incrustar el esquema de salida en el prompt del sistema, lo declaras como una definición de herramienta o función con un objeto JSON Schema. La API devuelve la salida del modelo como un bloque `tool_use` estructurado con un dict `input` analizado, separado de cualquier contenido de texto. Este desacoplamiento es significativo: el texto y los datos estructurados viven en diferentes partes de la respuesta, y la propia API maneja el análisis JSON. Obtienes anotaciones de tipo para cada campo, semántica de campo requerido vs. opcional, restricciones de enumeración y soporte de objetos anidados —todo aplicado por el esquema a nivel de API. El modo estricto de OpenAI (2024) va más lejos al habilitar la decodificación con restricciones, haciendo que la adherencia al esquema sea una garantía estricta. El uso de herramientas es la elección correcta para extraer datos estructurados de documentos, poblar registros de bases de datos, o impulsar llamadas de API posteriores con argumentos tipados.
 
-### Extracción basada en esquema con Pydantic
+### Extracción basada en esquemas con Pydantic
 
-Bibliotecas como [Instructor](https://github.com/jxnl/instructor) y los analizadores de salida de LangChain envuelven la API de llamada a funciones / uso de herramientas con una interfaz orientada a Pydantic. Defines tu esquema de salida como una subclase de `pydantic.BaseModel` y pasas la clase del modelo a la biblioteca; automáticamente genera el JSON Schema para la definición de la herramienta, llama a la API, valida la respuesta contra tu modelo y reintenta con retroalimentación de error de validación si el esquema es violado. Este enfoque es el más ergonómico para los practicantes de Python porque la salida es un objeto Python completamente tipado — no un dict crudo — con validación de campos, valores por defecto y soporte de modelos anidados. El reintento automático con contexto de error reduce drásticamente la tasa de violaciones silenciosas del esquema. El coste es una dependencia de biblioteca adicional y un uso de tokens ligeramente mayor cuando los errores de validación activan mensajes de reintento.
+Bibliotecas como [Instructor](https://github.com/jxnl/instructor) y los analizadores de salida de LangChain envuelven la API de llamada a funciones / uso de herramientas con una interfaz de Pydantic primero. Defines tu esquema de salida como una subclase de `pydantic.BaseModel` y pasas la clase del modelo a la biblioteca; genera automáticamente el JSON Schema para la definición de la herramienta, llama a la API, valida la respuesta contra tu modelo y reintenta con retroalimentación de error de validación si el esquema es violado. Este enfoque es el más ergonómico para los practicantes de Python porque la salida es un objeto Python completamente tipado —no un dict crudo— con validación de campos, valores predeterminados y soporte de modelos anidados. El reintento automático con contexto de error reduce dramáticamente la tasa de violaciones silenciosas del esquema. El costo es una dependencia de biblioteca adicional y un uso de tokens ligeramente mayor cuando los errores de validación desencadenan mensajes de reintento.
 
 ## Cuándo usar / Cuándo NO usar
 
 | Usar cuando | Evitar cuando |
 |-------------|---------------|
-| La salida del LLM debe consumirse programáticamente (respuesta de API, inserción en BD, activación de flujo de trabajo) | La salida es leída solo por humanos y no se necesita análisis posterior |
-| Necesitas un objeto Python tipado y validado en lugar de una cadena cruda | El esquema es tan simple (cadena o número únicos) que el texto plano es más fácil de analizar |
+| La salida del LLM debe consumirse programáticamente (respuesta de API, inserción en BD, activador de flujo de trabajo) | La salida solo la leen humanos y no se necesita análisis posterior |
+| Necesitas un objeto Python tipado y validado en lugar de una cadena cruda | El esquema es tan simple (cadena o número único) que el texto plano es más fácil de analizar |
 | Construyendo pipelines donde las violaciones del esquema causarían corrupción silenciosa de datos | La latencia es extremadamente ajustada y no puedes permitirte la sobrecarga de los bucles de reintento |
-| La extracción involucra estructuras anidadas, arrays o campos con restricciones de enumeración | Estás en prototipado temprano y el esquema de salida aún no está estable |
-| Necesitas comportamiento de extracción reproducible y testeable entre versiones del modelo | El modelo que estás usando tiene soporte deficiente para uso de herramientas / llamada a funciones |
+| La extracción implica estructuras anidadas, arrays o campos con restricciones de enumeración | Estás en la fase de prototipado temprano y el esquema de salida todavía no es estable |
+| Necesitas un comportamiento de extracción reproducible y testeable entre versiones del modelo | El modelo que estás usando tiene un soporte deficiente para el uso de herramientas / llamada a funciones |
 
 ## Ejemplos de código
 
-### OpenAI — Modo JSON con validación Pydantic
+### OpenAI — modo JSON con validación Pydantic
 
 ```python
 # Structured extraction with OpenAI JSON mode + Pydantic validation
@@ -94,7 +96,7 @@ if __name__ == "__main__":
     print(r.label, r.score, r.key_phrases)
 ```
 
-### OpenAI — Llamada a funciones con esquema estricto
+### OpenAI — llamada a funciones con esquema estricto
 
 ```python
 # Structured extraction with OpenAI function calling (strict mode)
@@ -144,7 +146,7 @@ if __name__ == "__main__":
     print(json.dumps(extract_product(desc), indent=2))
 ```
 
-### Anthropic — Uso de herramientas para extracción estructurada
+### Anthropic — uso de herramientas para extracción estructurada
 
 ```python
 # Structured extraction with Anthropic tool use
@@ -224,18 +226,18 @@ if __name__ == "__main__":
 | Criterio | Modo JSON | Llamada a funciones / Uso de herramientas | Basado en Pydantic (Instructor) |
 |----------|-----------|-------------------------------------------|---------------------------------|
 | Aplicación del esquema | Solo sintáctica (JSON válido, sin esquema) | Estructural (campos, tipos, requeridos) | Estructural + semántica (validadores, restricciones de campo) |
-| Superficie de API | Parámetro `response_format` | Parámetros `tools` + `tool_choice` | Wrapper de biblioteca sobre herramientas |
-| Tipo de salida | Cadena cruda que requiere `json.loads` | Dict analizado en argumentos de la llamada a herramienta | Instancia de modelo Pydantic tipada |
-| Reintento en fallo | Manual — debes implementarlo tú mismo | Manual | Automático — la biblioteca maneja el reintento con contexto de error |
-| Esquemas anidados | Posible pero propenso a errores | Bien soportado mediante JSON Schema | Nativo mediante BaseModel anidado |
-| Mejor para | Estructuras simples y planas; prototipado rápido | Extracción en producción y despacho de API tipado | Esquemas complejos con necesidades de validación a nivel de Python |
+| Superficie de la API | Parámetro `response_format` | Parámetros `tools` + `tool_choice` | Envoltorio de biblioteca sobre herramientas |
+| Tipo de salida | Cadena cruda que requiere `json.loads` | Dict analizado en los argumentos de la llamada de herramienta | Instancia tipada del modelo Pydantic |
+| Reintento en caso de fallo | Manual — debes implementarlo tú mismo | Manual | Automático — la biblioteca maneja el reintento con contexto de error |
+| Esquemas anidados | Posible pero propenso a errores | Bien soportado mediante JSON Schema | De primera clase mediante BaseModel anidado |
+| Mejor para | Estructuras simples y planas; prototipado rápido | Extracción de producción y despacho de API tipado | Esquemas complejos con necesidades de validación a nivel de Python |
 
 ## Recursos prácticos
 
-- [OpenAI — Guía de salidas estructuradas](https://platform.openai.com/docs/guides/structured-outputs) — Guía oficial que cubre modo JSON, llamada a funciones y modo estricto con decodificación restringida.
-- [Anthropic — Documentación de uso de herramientas](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Referencia completa para definir esquemas de herramientas y manejar bloques tool_use en respuestas de Claude.
-- [Biblioteca Instructor (jxnl/instructor)](https://github.com/jxnl/instructor) — La biblioteca más ampliamente usada para extracción estructurada orientada a Pydantic; soporta OpenAI, Anthropic y otros backends.
-- [Documentación de Pydantic](https://docs.pydantic.dev/) — Referencia esencial para definir esquemas, validadores y modelos anidados usados en pipelines de extracción.
+- [OpenAI — Guía de salidas estructuradas](https://platform.openai.com/docs/guides/structured-outputs) — Guía oficial que cubre el modo JSON, la llamada a funciones y el modo estricto con decodificación con restricciones.
+- [Anthropic — Documentación de uso de herramientas](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Referencia completa para definir esquemas de herramientas y manejar bloques tool_use en las respuestas de Claude.
+- [Biblioteca Instructor (jxnl/instructor)](https://github.com/jxnl/instructor) — La biblioteca más utilizada para extracción estructurada de Pydantic primero; soporta OpenAI, Anthropic y otros backends.
+- [Documentación de Pydantic](https://docs.pydantic.dev/) — Referencia esencial para definir esquemas, validadores y modelos anidados utilizados en los pipelines de extracción.
 
 ## Ver también
 

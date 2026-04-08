@@ -1,40 +1,42 @@
 ---
 title: Ansible
 description: Ferramenta de gerenciamento de configuração e automação sem agente que usa playbooks YAML declarativos para configurar servidores, instalar software e gerenciar ambientes de treinamento de ML em escala.
-keywords: [Ansible, gerenciamento de configuração, playbooks, roles, inventory, agentless, CUDA, drivers de GPU, ambiente de ML, IaC]
+keywords: [Ansible, gerenciamento de configuração, playbooks, roles, inventário, sem agente, CUDA, drivers de GPU, ambiente de ML, IaC]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Ansible
 
 ## Definição
 
-Ansible é uma ferramenta de automação open-source criada pela Red Hat que lida com gerenciamento de configuração, implantação de aplicações e automação de tarefas em uma frota de servidores usando arquivos YAML simples e legíveis por humanos chamados **playbooks**. Sua escolha arquitetural definidora é ser **agentless**: o Ansible se conecta a nós gerenciados via SSH (Linux) ou WinRM (Windows) e executa tarefas diretamente, sem daemon ou software agente necessário nas máquinas alvo. Isso o torna significativamente mais fácil de adotar do que ferramentas baseadas em agente — você pode começar a gerenciar servidores existentes sem nenhum software pré-instalado além de Python e um servidor SSH.
+Ansible é uma ferramenta de automação de código aberto criada pela Red Hat que lida com gerenciamento de configuração, implantação de aplicações e automação de tarefas em uma frota de servidores usando arquivos YAML simples e legíveis por humanos chamados **playbooks**. Sua escolha arquitetural definidora é ser **sem agente**: o Ansible se conecta aos nós gerenciados via SSH (Linux) ou WinRM (Windows) e executa tarefas diretamente, sem necessidade de daemon ou software agente nas máquinas alvo. Isso o torna significativamente mais fácil de adotar do que ferramentas baseadas em agentes — você pode começar a gerenciar servidores existentes sem nenhum software pré-instalado além do Python e de um servidor SSH.
 
-O Ansible opera em um **modelo push**: um operador executa um playbook a partir de um nó de controle, o Ansible se conecta ao inventário alvo de hosts e executa tarefas em ordem. As tarefas chamam **módulos** — unidades idempotentes de trabalho que sabem como instalar pacotes, gerenciar arquivos, iniciar serviços, executar comandos e interagir com APIs de nuvem. Módulos da comunidade e oficiais cobrem virtualmente todo gerenciador de pacotes Linux, serviço, provedor de nuvem, dispositivo de rede e aplicação. Os roles agrupam tarefas, arquivos, templates e variáveis relacionadas em unidades reutilizáveis e compartilháveis que podem ser publicadas no Ansible Galaxy ou mantidas em repositórios Git internos.
+O Ansible opera em um **modelo push**: um operador executa um playbook a partir de um nó de controle, o Ansible se conecta ao inventário de hosts alvo e executa as tarefas em ordem. As tarefas chamam **módulos** — unidades de trabalho idempotentes que sabem como instalar pacotes, gerenciar arquivos, iniciar serviços, executar comandos e interagir com APIs de nuvem. Módulos comunitários e oficiais cobrem virtualmente todo gerenciador de pacotes Linux, serviço, provedor de nuvem, dispositivo de rede e aplicação. Os roles agrupam tarefas, arquivos, templates e variáveis relacionados em unidades reutilizáveis e compartilháveis que podem ser publicadas no Ansible Galaxy ou mantidas em repositórios Git internos.
 
-Em contextos de ML e engenharia de dados, o Ansible preenche a lacuna que o [Terraform](/docs/mlops/iac/terraform) deixa. O Terraform provisiona infraestrutura (cria a instância de GPU, a VPC, o bucket S3); o Ansible configura o que roda nessa infraestrutura (instala a versão correta do CUDA, configura o ambiente Python, configura dependências de treinamento distribuído e garante que as ferramentas de monitoramento de GPU estejam rodando). As duas ferramentas são complementares em vez de competitivas: um fluxo de trabalho típico de MLOps usa Terraform para provisionar recursos em nuvem e Ansible para inicializar esses recursos em um estado pronto para treinamento.
+Em contextos de ML e engenharia de dados, o Ansible preenche a lacuna que o [Terraform](/docs/mlops/iac/terraform) deixa. O Terraform provisiona infraestrutura (cria a instância de GPU, a VPC, o bucket S3); o Ansible configura o que roda nessa infraestrutura (instala a versão correta do CUDA, configura o ambiente Python, configura dependências de treinamento distribuído e garante que as ferramentas de monitoramento de GPU estejam em execução). As duas ferramentas são complementares, não concorrentes: um workflow típico de MLOps usa o Terraform para provisionar recursos de nuvem e o Ansible para inicializar esses recursos em um estado pronto para treinar.
 
 ## Como funciona
 
-### Inventory
+### Inventário
 
-O inventory define quais hosts o Ansible gerencia. Um inventory estático é um arquivo INI ou YAML listando hostnames ou endereços IP agrupados por função (por exemplo, `[gpu_training_nodes]`, `[model_serving]`). Inventories dinâmicos consultam APIs de nuvem (AWS EC2, GCP Compute, Azure VMs) em tempo de execução para construir a lista de hosts a partir da infraestrutura ao vivo — essencial para ambientes de auto-scaling. Variáveis de host e grupo definem valores de configuração por host ou por grupo que são referenciados em playbooks.
+O inventário define quais hosts o Ansible gerencia. Um inventário estático é um arquivo INI ou YAML listando nomes de hosts ou endereços IP agrupados por função (por exemplo, `[gpu_training_nodes]`, `[model_serving]`). Inventários dinâmicos consultam APIs de nuvem (AWS EC2, GCP Compute, Azure VMs) em tempo de execução para construir a lista de hosts a partir da infraestrutura em uso — essencial para ambientes de autoescalonamento. Variáveis de host e grupo definem valores de configuração por host ou por grupo que são referenciados nos playbooks.
 
-### Playbooks e tasks
+### Playbooks e tarefas
 
-Um playbook é um arquivo YAML contendo uma ou mais **plays**. Cada play tem como alvo um grupo de hosts e uma lista de **tasks**. Cada task chama um módulo com argumentos e opcionalmente define condições (`when`), loops (`loop`) e handlers acionados por mudança. As tasks são executadas sequencialmente dentro de uma play; as plays podem ser executadas em paralelo em hosts. O resultado de cada task é um de: `ok` (nenhuma mudança necessária), `changed` (mudança foi feita), `failed` ou `skipped`. O Ansible imprime um resumo desses resultados após cada execução de playbook.
+Um playbook é um arquivo YAML contendo uma ou mais **plays**. Cada play tem como alvo um grupo de hosts e uma lista de **tarefas**. Cada tarefa chama um módulo com argumentos e opcionalmente define condições (`when`), loops (`loop`) e handlers acionados em caso de mudança. As tarefas são executadas sequencialmente dentro de uma play; as plays podem ser executadas em paralelo entre os hosts. O resultado de cada tarefa é um dos seguintes: `ok` (nenhuma mudança necessária), `changed` (mudança foi feita), `failed` ou `skipped`. O Ansible imprime um resumo desses resultados após cada execução de playbook.
 
 ### Roles
 
-Os roles fornecem uma estrutura de diretório padronizada para organizar automação relacionada: `tasks/`, `handlers/`, `templates/`, `files/`, `vars/`, `defaults/` e `meta/`. Um role pode ser aplicado a múltiplas plays em múltiplos playbooks, e roles podem depender de outros roles. O Ansible Galaxy hospeda milhares de roles da comunidade (por exemplo, `geerlingguy.docker`, `nvidia.nvidia_driver`) que podem ser instalados com `ansible-galaxy install` e usados diretamente em playbooks.
+Os roles fornecem uma estrutura de diretório padronizada para organizar automação relacionada: `tasks/`, `handlers/`, `templates/`, `files/`, `vars/`, `defaults/` e `meta/`. Um role pode ser aplicado a múltiplas plays em múltiplos playbooks, e roles podem depender de outros roles. O Ansible Galaxy hospeda milhares de roles comunitários (por exemplo, `geerlingguy.docker`, `nvidia.nvidia_driver`) que podem ser instalados com `ansible-galaxy install` e usados diretamente nos playbooks.
 
 ### Variáveis e templating
 
-O Ansible usa o motor de templating Jinja2 em playbooks e arquivos de template. As variáveis podem ser definidas em múltiplos níveis (defaults de role, vars de grupo, vars de host, vars de playbook, vars extras passados com `-e`) com uma ordem de precedência clara. Templates (arquivos `.j2`) geram arquivos de configuração dinamicamente — por exemplo, gerando um arquivo de configuração de treinamento distribuído com o IP correto do nó master, número de GPUs e tamanho de batch para cada ambiente.
+O Ansible usa o motor de templating Jinja2 em todos os playbooks e arquivos de template. As variáveis podem ser definidas em múltiplos níveis (padrões de role, vars de grupo, vars de host, vars de playbook, vars extras passadas com `-e`) com uma ordem de precedência clara. Templates (arquivos `.j2`) geram arquivos de configuração dinamicamente — por exemplo, gerando um arquivo de configuração de treinamento distribuído com o IP correto do nó master, número de GPUs e tamanho de batch para cada ambiente.
 
 ### Idempotência e handlers
 
-Os módulos Ansible são projetados para ser idempotentes: executar um playbook múltiplas vezes produz o mesmo estado final sem causar efeitos colaterais indesejados. Se um pacote já estiver instalado na versão correta, a task reporta `ok` e não faz nada. **Handlers** são tasks especiais que executam no final de uma play apenas se notificados por uma task que resultou em `changed` — usados para reiniciar serviços (como um daemon de treinamento acelerado por CUDA) apenas quando sua configuração realmente muda.
+Os módulos do Ansible são projetados para ser idempotentes: executar um playbook várias vezes produz o mesmo estado final sem causar efeitos colaterais indesejados. Se um pacote já estiver instalado na versão correta, a tarefa reporta `ok` e não faz nada. **Handlers** são tarefas especiais que são executadas no final de uma play somente se notificadas por uma tarefa que resultou em `changed` — usadas para reiniciar serviços (como um daemon de treinamento acelerado por CUDA) apenas quando sua configuração realmente muda.
 
 ```mermaid
 flowchart LR
@@ -50,37 +52,37 @@ flowchart LR
 ## Quando usar / Quando NÃO usar
 
 | Usar quando | Evitar quando |
-|-------------|---------------|
-| Configurar software em servidores existentes: instalar CUDA, Python, pacotes pip, serviços do sistema | Provisionar nova infraestrutura em nuvem do zero (use Terraform para isso) |
-| Inicializar nós de treinamento de GPU após o Terraform criá-los | Você precisa de rastreamento de estado refinado em centenas de recursos (o Ansible não tem arquivo de estado) |
-| Configurar ambientes de ML consistentes em máquinas de desenvolvimento, staging e produção | Você precisa de gráficos de dependência complexos entre recursos de nuvem com ordenação automática |
-| Executar comandos ad-hoc em uma frota de servidores (por exemplo, atualizar um arquivo de configuração em todo lugar) | As máquinas alvo não podem ser alcançadas via SSH ou WinRM a partir do nó de controle |
-| Implantar atualizações de aplicações ou distribuir mudanças de configuração em muitos nós | Você está provisionando recursos nativos de nuvem (VPCs, roles IAM, buckets S3) — use Terraform |
-| Equipes que precisam de ferramentas de IaC com baixa barreira de entrada e curva de aprendizado YAML superficial | Você precisa de execução paralela muito rápida; a sobrecarga SSH do Ansible limita a escalabilidade em milhares de nós |
+|----------|------------|
+| Configurando software em servidores existentes: instalando CUDA, Python, pacotes pip, serviços do sistema | Provisionando nova infraestrutura de nuvem do zero (use o Terraform para isso) |
+| Inicializando nós de treinamento de GPU depois que o Terraform os cria | Você precisa de rastreamento de estado detalhado em centenas de recursos (o Ansible não tem arquivo de estado) |
+| Configurando ambientes de ML consistentes entre máquinas de desenvolvimento, staging e produção | Você precisa de grafos de dependência complexos entre recursos de nuvem com ordenação automática |
+| Executando comandos ad-hoc em uma frota de servidores (por exemplo, atualizar um arquivo de configuração em todos) | As máquinas alvo não podem ser alcançadas via SSH ou WinRM a partir do nó de controle |
+| Implantando atualizações de aplicações ou distribuindo mudanças de configuração em muitos nós | Você está provisionando recursos nativos de nuvem (VPCs, funções IAM, buckets S3) — use o Terraform |
+| Equipes que precisam de ferramentas IaC de baixa barreira com uma curva de aprendizado superficial em YAML | Você precisa de execução paralela muito rápida; a sobrecarga SSH do Ansible limita a escalabilidade em milhares de nós |
 
 ## Comparações
 
 | Critério | Ansible | Terraform |
-|----------|---------|-----------|
-| Paradigma | Procedural com módulos idempotentes — tasks executam em ordem | Declarativo — descreva o estado desejado, Terraform computa o diff |
-| Gerenciamento de estado | Sem estado — sem rastreamento integrado do que foi aplicado anteriormente | Arquivo de estado explícito mapeia configuração para IDs de recursos reais |
-| Caso de uso principal | Gerenciamento de configuração e implantação de software em hosts existentes | Provisionamento de infraestrutura em nuvem (instâncias, redes, armazenamento) |
-| Suporte a provedores de nuvem | Módulos de nuvem existem, mas são menos abrangentes do que os providers do Terraform | 1.000+ providers com cobertura profunda e versionada de API |
-| Idempotência | Em nível de task — cada módulo deve ser escrito idempotentemente | Nativa — plan/apply sempre converge para o estado declarado |
-| Curva de aprendizado | Baixa — tasks YAML são legíveis; nenhum novo idioma necessário | Moderada — sintaxe HCL + modelo mental de state/plan para aprender |
-| Agente necessário | Não — agentless, conecta via SSH | Não — Terraform roda na máquina de controle, chama APIs de nuvem |
-| Quando usar juntos | Ansible configura software na infraestrutura provisionada pelo Terraform | Terraform provisiona recursos; Ansible lida com configuração de SO e app |
+|-----------|---------|-----------|
+| Paradigma | Procedural com módulos idempotentes — tarefas executam em ordem | Declarativo — descreve o estado desejado, o Terraform computa o diff |
+| Gerenciamento de estado | Sem estado — sem rastreamento embutido do que foi aplicado anteriormente | Arquivo de estado explícito mapeia configuração para IDs de recursos reais |
+| Caso de uso principal | Gerenciamento de configuração e implantação de software em hosts existentes | Provisionamento de infraestrutura de nuvem (instâncias, redes, armazenamento) |
+| Suporte a provedores de nuvem | Módulos de nuvem existem, mas são menos abrangentes que os provedores do Terraform | 1.000+ provedores com cobertura profunda e versionada de API |
+| Idempotência | Nível de tarefa — cada módulo deve ser escrito de forma idempotente | Nativo — plan/apply sempre converge para o estado declarado |
+| Curva de aprendizado | Baixa — tarefas YAML são legíveis; nenhuma nova linguagem necessária | Moderada — sintaxe HCL + modelo mental de estado/plano para aprender |
+| Agente necessário | Não — sem agente, conecta via SSH | Não — o Terraform roda na máquina de controle, chama APIs de nuvem |
+| Quando usar juntos | O Ansible configura software na infraestrutura que o Terraform provisionou | O Terraform provisiona recursos; o Ansible lida com configuração de OS e app |
 
-## Prós e contras
+## Vantagens e desvantagens
 
-| Aspecto | Prós | Contras |
-|---------|------|---------|
-| Arquitetura agentless | Sem software para instalar nos nós alvo; funciona com SSH existente | Sobrecarga SSH limita desempenho em escala muito grande (10.000+ nós) |
-| Playbooks YAML | Automação legível por humanos e auto-documentada | Lógica complexa (loops, condicionais) fica verbosa em YAML |
-| Módulos idempotentes | Seguro para re-executar; correção de desvio sem efeitos colaterais | A idempotência depende da qualidade do módulo; módulos shell/command não são inerentemente idempotentes |
-| Ansible Galaxy | Grande ecossistema de roles da comunidade para software comum | A qualidade dos roles da comunidade varia; fixar versões de roles é crítico para reprodutibilidade |
-| Sem arquivo de estado | Simples, sem sobrecarga de gerenciamento de estado | Sem detecção de desvio integrada entre execuções; ferramentas manuais ou de terceiros necessárias |
-| Templating Jinja2 | Geração dinâmica de configuração poderosa | Depurar templates é mais difícil do que código nativo; erros aparecem em tempo de execução |
+| Aspecto | Vantagens | Desvantagens |
+|---------|-----------|--------------|
+| Arquitetura sem agente | Nenhum software para instalar nos nós alvo; funciona com SSH existente | Sobrecarga SSH limita o desempenho em escala muito grande (10.000+ nós) |
+| Playbooks YAML | Automação legível e autodocumentada por humanos | Lógica complexa (loops, condicionais) fica verbosa em YAML |
+| Módulos idempotentes | Seguro para re-executar; correção de drift sem efeitos colaterais | A idempotência depende da qualidade do módulo; módulos shell/command não são inerentemente idempotentes |
+| Ansible Galaxy | Grande ecossistema de roles comunitários para software comum | A qualidade dos roles comunitários varia; fixar versões de roles é crítico para reprodutibilidade |
+| Sem arquivo de estado | Simples, sem sobrecarga de gerenciamento de estado | Sem detecção embutida de drift entre execuções; ferramentas manuais ou de terceiros necessárias |
+| Templating Jinja2 | Geração poderosa de configuração dinâmica | A depuração de templates é mais difícil do que código nativo; erros surgem em tempo de execução |
 
 ## Exemplos de código
 
@@ -314,14 +316,14 @@ flowchart LR
 
 ## Recursos práticos
 
-- [Ansible documentation](https://docs.ansible.com/ansible/latest/index.html) — Documentação oficial cobrindo playbooks, módulos, roles, inventory e melhores práticas.
-- [Ansible Galaxy](https://galaxy.ansible.com/) — Hub da comunidade para roles e coleções Ansible reutilizáveis, incluindo drivers de GPU NVIDIA, Docker e roles Kubernetes.
+- [Documentação do Ansible](https://docs.ansible.com/ansible/latest/index.html) — Documentação oficial cobrindo playbooks, módulos, roles, inventário e melhores práticas.
+- [Ansible Galaxy](https://galaxy.ansible.com/) — Hub comunitário para roles e coleções Ansible reutilizáveis, incluindo drivers de GPU NVIDIA, Docker e roles do Kubernetes.
 - [Jeff Geerling — Ansible for DevOps](https://www.ansiblefordevops.com/) — Livro abrangente e repositório GitHub acompanhante cobrindo o Ansible do básico até padrões de produção.
-- [NVIDIA Ansible collection](https://github.com/nvidia/ansible-collection-nvidia-gpu) — Coleção oficial NVIDIA Ansible para gerenciar drivers de GPU, CUDA e instalações NCCL.
-- [Ansible best practices guide](https://docs.ansible.com/ansible/latest/tips_tricks/ansible_tips_tricks.html) — Dicas e truques oficiais cobrindo estrutura de diretório, gerenciamento de variáveis e otimização de desempenho.
+- [Coleção Ansible da NVIDIA](https://github.com/nvidia/ansible-collection-nvidia-gpu) — Coleção Ansible oficial da NVIDIA para gerenciar drivers de GPU, CUDA e instalações de NCCL.
+- [Guia de melhores práticas do Ansible](https://docs.ansible.com/ansible/latest/tips_tricks/ansible_tips_tricks.html) — Dicas e truques oficiais cobrindo estrutura de diretórios, gerenciamento de variáveis e otimização de desempenho.
 
 ## Veja também
 
 - [Terraform](/docs/mlops/iac/terraform)
-- [ML Kubernetes](/docs/mlops/deployment/ml-kubernetes)
+- [ML no Kubernetes](/docs/mlops/deployment/ml-kubernetes)
 - [MLOps](/docs/mlops)

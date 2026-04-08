@@ -2,6 +2,8 @@
 title: Claude Code
 description: L'assistant de codage IA agentique d'Anthropic disponible en CLI, extension VS Code/JetBrains et application web — capable d'exécuter des tâches multi-étapes autonomes sur l'ensemble de votre base de code.
 keywords: [Claude Code, Anthropic, agent de codage IA, CLI, extension VS Code, JetBrains, codage agentique, génération de code, refactoring, débogage]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Claude Code

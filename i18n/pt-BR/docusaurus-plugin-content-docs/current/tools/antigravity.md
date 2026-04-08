@@ -1,37 +1,64 @@
 ---
 title: Antigravity
 description: IDE orientada a agentes para execução autônoma e vibe coding.
-keywords: [Antigravity, agent-first IDE, autonomous coding]
+keywords: [Antigravity, IDE de agentes, vibe coding, automação]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Antigravity
 
 ## Definição
 
-Antigravity é uma **IDE orientada a agentes** que usa [agentes](/docs/agents) autônomos impulsionados por [LLM](/docs/llms) para lidar com coding, testing, and debugging across the editor, terminal, and browser. An **Agent Manager** coordinates multiple agents in parallel across workspaces; an **Artifacts Timeline** records plans, code diffs, screenshots, and browser recordings for verifiable outputs.
+Antigravity é um ambiente de desenvolvimento integrado orientado a agentes projetado para **vibe coding** — uma abordagem onde você descreve intenções em linguagem natural e o agente de IA escreve, refatora e executa código de forma autônoma para alcançar o objetivo. Em vez de completar linha por linha, o Antigravity opera em loops de tarefa completos: lê sua base de código, planeja alterações, as aplica e verifica os resultados.
 
-Enfatiza autonomia e feedback humano no ciclo: os agentes executam tarefas enquanto os usuários podem comentar e direcionar em tempo real. A IDE suporta assistência de IA inline e é alimentada por grandes modelos (por ex. Gemini and others) with large context windows. Useful for [agent](/docs/agents)-centric workflows and [spec-driven development](/docs/spec-driven-development) where artifacts and auditability matter.
+O editor foi desenvolvido para baixar a fricção entre ideia e código funcionando ao máximo. As instruções de agentes (semelhantes ao `CLAUDE.md` do [Claude Code](/docs/tools/claude-code)) permitem que você defina regras persistentes sobre estilo de código, stack tecnológica e restrições de segurança. O Antigravity pode encadear múltiplas ações de ferramenta — leitura de arquivo, escrita, execução de terminal, pesquisa na web — para completar metas que de outra forma exigiriam múltiplas etapas manuais.
 
-## Como funciona
+## Funcionamento
 
-Você trabalha em uma **interface dupla**: um **editor** completo com IA inline (refatoração, geração) e um **Gerenciador de Agentesador de Agentes** que executa e orquestra agentes. **Agentes** operam em editor, terminal, and browser—por ex. implement a feature, run tests, or debug. **Artifacts** (plans, diffs, screenshots, recordings) are produced and shown in a timeline so outputs are inspectable. **Feedback**: you comment on agent work; the system incorporates feedback for the next steps. The platform runs on desktop (Windows, macOS, Linux) and supports large context and multiple model backends.
+```mermaid
+flowchart LR
+  User["Intenção do usuário\n(prompt de linguagem natural)"] -->|"submeter"| Planner["Planejador de agente"]
+  Planner -->|"decompor em etapas"| Tools["Ferramentas: leitura/escrita\nde arquivo, terminal, busca"]
+  Tools -->|"resultados"| Verifier["Verificador"]
+  Verifier -->|"objetivo atingido?"| Done["Saída / diff"]
+  Verifier -->|"não"| Planner
+```
 
-## Casos de uso
+### Instruções de agente
 
-Antigravity fits teams that want autonomous or semi-autonomous coding with clear artifacts and control.
+Instruções de agente persistentes (arquivo `.agentrc` ou painel de configurações) fornecem ao agente contexto sobre sua base de código: arquitetura preferida, convenções de nomenclatura, quais arquivos nunca modificar e como executar testes. Isso substitui a necessidade de re-especificar contexto a cada sessão.
 
-- Agent-driven implementation and testing with verifiable artifacts
-- Parallel work across multiple agents and workspaces
-- Inline AI assistance plus manager-driven autonomy in one IDE
+### Loops de tarefa
 
-## Documentação externa
+O agente itera — lê saída, ajusta plano, executa novamente — até que a condição de conclusão seja atendida (testes passando, linter limpo, endpoint respondendo). Você pode observar, pausar e redirecionar a qualquer momento.
 
-- [Antigravity – Agent-first IDE](https://www.antigravityai.io/) — Product and overview
-- [Antigravity IDE](https://antigravityaiide.com/) — Platform and capabilities
+## Quando usar / Quando NÃO usar
+
+| Cenário | Usar Antigravity | NÃO usar Antigravity |
+|---------|-----------------|---------------------|
+| Prototipagem rápida de um recurso do zero | Sim — ideal para vibe coding orientado a intenção | |
+| Refatoração de código legado com testes | Sim — o agente pode aplicar e verificar alterações em loop | |
+| Exploração de uma base de código não familiar | Sim — o agente lê e explica antes de agir | |
+| Revisão detalhada de segurança de código crítico | | Prefira revisão manual ou ferramentas de auditoria especializadas |
+| Quando você quer aprender escrevendo código | | A execução autônoma pode contornar o aprendizado |
+
+## Vantagens e desvantagens
+
+| Vantagens | Desvantagens |
+|---------|------------|
+| Entrada em linguagem natural reduz contexto mental | Iteração autônoma pode inserir bugs silenciosamente |
+| Instruções persistentes eliminam repetição de contexto | Menos controle granular do que edição linha por linha |
+| Loop completo de tarefa reduz troca de contexto manual | Requer revisão cuidadosa dos diffs gerados |
+| Bom para explorar e prototipar rapidamente | Modelo mais novo com ecossistema e plugins limitados |
+
+## Recursos práticos
+
+- [Site oficial do Antigravity](https://antigravity.sh/) — Documentação, download e exemplos
 
 ## Veja também
 
-- [Agents](/docs/agents)
-- [Spec-driven development](/docs/spec-driven-development)
+- [Claude Code](/docs/tools/claude-code)
 - [Cursor](/docs/tools/cursor)
-- [LLMs](/docs/llms)
+- [GitHub Copilot](/docs/tools/github-copilot)
+- [Kiro](/docs/tools/kiro)

@@ -2,6 +2,8 @@
 title: TensorFlow Lite
 description: Runtime léger pour l'inférence ML sur appareil sur Android, iOS, systèmes embarqués et microcontrôleurs.
 keywords: [TensorFlow Lite, TFLite, edge AI, inférence sur appareil, conversion de modèle, quantification, délégués, ML mobile]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # TensorFlow Lite

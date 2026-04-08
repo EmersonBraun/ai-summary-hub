@@ -2,39 +2,41 @@
 title: Prometheus
 description: Open-Source-Monitoring- und Alerting-Toolkit, das auf einer Zeitreihendatenbank und einem pull-basierten Scraping-Modell aufgebaut ist, weit verbreitet für ML-Infrastruktur- und Modellmetriken.
 keywords: [Prometheus, PromQL, Zeitreihen, Metriken, Alerting, Alertmanager, Modell-Monitoring, pull-basiert, TSDB]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Prometheus
 
 ## Definition
 
-Prometheus ist ein Open-Source-System-Monitoring- und Alerting-Toolkit, das ursprünglich bei SoundCloud entwickelt wurde und jetzt ein abgeschlossenes CNCF-Projekt ist. Es speichert alle Daten als Zeitreihen: Ströme von zeitgestempelten Gleitkomma-Werten, identifiziert durch einen Metriknamen und einen Satz von Schlüssel-Wert-Labels. Dieses Modell eignet sich natürlich für operative Daten — CPU-Auslastung, Anfragezahlen, Fehlerraten — und für ML-spezifische Signale wie Vorhersagelatenz, Durchsatz und Feature-Wertverteilungen im Zeitverlauf.
+Prometheus ist ein Open-Source-Monitoring- und Alerting-Toolkit, das ursprünglich bei SoundCloud entwickelt wurde und jetzt ein graduiertes CNCF-Projekt ist. Es speichert alle Daten als Zeitreihen: Ströme von mit Zeitstempeln versehenen Gleitkomma-Werten, identifiziert durch einen Metriknamen und eine Menge von Key-Value-Labels. Dieses Modell eignet sich hervorragend für Betriebsdaten — CPU-Auslastung, Anfragezählungen, Fehlerquoten — und für ML-spezifische Signale wie Vorhersagelatenz, Durchsatz und Feature-Wertverteilungen über die Zeit.
 
-Die definierende Architekturrentscheidung in Prometheus ist sein **pull-basiertes Scraping-Modell**. Anstatt instrumentierte Anwendungen zu zwingen, Metriken an einen zentralen Collector zu pushen, scrapt Prometheus periodisch HTTP-Endpunkte (standardmäßig `/metrics`), die von Zielen bereitgestellt werden. Diese Umkehrung der Kontrolle macht Service-Discovery, Zugriffskontrolle und Debugging erheblich einfacher: Man kann den Metriken-Endpunkt jedes Ziels direkt aufrufen, um zu sehen, was Prometheus sammeln wird. Ziele werden über statische Konfiguration oder dynamische Service-Discovery (Kubernetes, Consul, EC2 usw.) entdeckt.
+Die definierende architektonische Entscheidung in Prometheus ist sein **pull-basiertes Scraping-Modell**. Anstatt instrumentierte Anwendungen dazu zu zwingen, Metriken an einen zentralen Collector zu pushen, scrapt Prometheus periodisch HTTP-Endpunkte (standardmäßig `/metrics`), die von Zielen bereitgestellt werden. Diese Inversion of Control macht Service-Discovery, Zugangskontrolle und Debugging erheblich einfacher: Man kann den Metrik-Endpunkt jedes Ziels direkt per curl abfragen, um zu sehen, was Prometheus sammeln wird. Ziele werden über statische Konfiguration oder dynamische Service-Discovery (Kubernetes, Consul, EC2 usw.) entdeckt.
 
-Prometheus ist konzeptionell keine Langzeitspeicherlösung. Seine lokale Zeitreihendatenbank (TSDB) ist für schnelle Aufnahme und Abfrage aktueller Daten optimiert und behält typischerweise 15 Tage bei. Für Langzeitspeicherung kann Prometheus remote-schreiben in Systeme wie Thanos, Cortex oder VictoriaMetrics. In ML-Kontexten ist Prometheus die Erfassungs- und Alerting-Schicht; [Grafana](/docs/mlops/monitoring/grafana) bietet die Visualisierungs- und Dashboarding-Schicht darauf.
+Prometheus ist von Natur aus keine Langzeitspeicherlösung. Seine lokale Zeitreihendatenbank (TSDB) ist für schnelle Aufnahme und Abfrage aktueller Daten optimiert und behält typischerweise 15 Tage bei. Für Langzeitspeicherung kann Prometheus Remote-Write an Systeme wie Thanos, Cortex oder VictoriaMetrics verwenden. In ML-Kontexten ist Prometheus die Sammel- und Alerting-Schicht; [Grafana](/docs/mlops/monitoring/grafana) bietet die Visualisierungs- und Dashboarding-Schicht darüber.
 
 ## Funktionsweise
 
 ### Ziel-Instrumentierung
 
-Anwendungen stellen Metriken über einen HTTP-`/metrics`-Endpunkt im Prometheus-Expositionsformat bereit — ein Klartext-Format von `metric_name{label="value"} numeric_value timestamp`-Zeilen. In Python bietet die `prometheus_client`-Bibliothek Counter-, Gauge-, Histogram- und Summary-Typen, die das Expositionsformat automatisch handhaben. Ein ML-Serving-Prozess stellt typischerweise Counter für gesamte Vorhersageanfragen, Histogramme für Anfrage-Latenz und Gauges für aktuell geladene Modellversionen und Ressourcenauslastung bereit.
+Anwendungen stellen Metriken über einen HTTP-`/metrics`-Endpunkt im Prometheus-Exposition-Format bereit — ein Klartextformat aus `Metrikname{Label="Wert"} numerischer_Wert Zeitstempel`-Zeilen. In Python bietet die `prometheus_client`-Bibliothek Counter-, Gauge-, Histogram- und Summary-Typen, die das Exposition-Format automatisch verarbeiten. Ein ML-Serving-Prozess stellt typischerweise Counter für die Gesamtzahl der Vorhersageanfragen, Histogramme für die Anfrage-Latenz und Gauges für aktuell geladene Modellversionen und Ressourcenauslastung bereit.
 
 ### Scraping und Speicherung
 
-Prometheus wertet seine Konfigurationsdatei aus, um zu bestimmen, welche Ziele gescrapt werden und in welchem Intervall (Standard: 15 Sekunden). Bei jedem Scraping ruft er den `/metrics`-Endpunkt ab, parst das Expositionsformat und schreibt die Samples in seine lokale TSDB in komprimierten Chunks. Die TSDB verwendet ein Write-Ahead-Log (WAL) für Dauerhaftigkeit und komprimiert Daten im Laufe der Zeit in Blöcke. Label-Kardinalität ist der Hauptleistungshebel: Jede eindeutige Kombination von Label-Werten erstellt eine separate Zeitreihe, sodass unbegrenzte Labels (z. B. Nutzer-IDs) vermieden werden müssen.
+Prometheus wertet seine Konfigurationsdatei aus, um zu bestimmen, welche Ziele wie oft gescrapt werden sollen (Standard: 15 Sekunden). Bei jedem Scrape holt er den `/metrics`-Endpunkt ab, parst das Exposition-Format und schreibt die Samples in seine lokale TSDB in komprimierten Chunks. Die TSDB verwendet ein Write-Ahead-Log (WAL) für Dauerhaftigkeit und verdichtet Daten über die Zeit in Blöcke. Label-Kardinalität ist der wichtigste Leistungshebel: Jede einzigartige Kombination von Label-Werten erstellt eine separate Zeitreihe, daher müssen ungebundene Labels (z. B. Benutzer-IDs) vermieden werden.
 
 ### PromQL-Abfragen und Alerting
 
-PromQL (Prometheus Query Language) ist eine funktionale Abfragesprache zur Auswahl und Aggregation von Zeitreihendaten. Instant-Vektoren wählen den aktuellen Wert einer Reihe von Serien aus; Range-Vektoren wählen ein Fenster von Samples aus; Funktionen berechnen Raten, Durchschnitte, Quantile und Vorhersagen über diese Vektoren. Alert-Regeln sind PromQL-Ausdrücke, die in einem konfigurierbaren Intervall ausgewertet werden; wenn ein Ausdruck ein nicht-leeres Ergebnis zurückgibt, feuert der Alert und wird an Alertmanager gesendet.
+PromQL (Prometheus Query Language) ist eine funktionale Abfragesprache zum Auswählen und Aggregieren von Zeitreihendaten. Instant-Vektoren wählen den aktuellen Wert einer Menge von Serien aus; Range-Vektoren wählen ein Fenster von Samples aus; Funktionen berechnen Raten, Durchschnitte, Quantile und Vorhersagen über diese Vektoren. Alerting-Regeln sind PromQL-Ausdrücke, die in einem konfigurierbaren Intervall ausgewertet werden; wenn ein Ausdruck ein nicht-leeres Ergebnis zurückgibt, wird der Alert ausgelöst und an den Alertmanager gesendet.
 
 ### Alertmanager
 
-Alertmanager empfängt Alerts von Prometheus (und anderen Quellen), dedupliziert sie, wendet Gruppierungs- und Routing-Regeln an und sendet Benachrichtigungen an Empfänger (PagerDuty, Slack, E-Mail, Webhooks). Silences und Inhibierungsregeln verhindern Alert-Stürme während bekannter Wartungsfenster oder kaskadierende Fehler. In ML-Systemen routet Alertmanager Modell-Degradations-Alerts an den Slack-Kanal des ML-Teams, während Infrastruktur-Alerts (hohe CPU, OOM-Kills) an das Plattformteam gehen.
+Der Alertmanager empfängt Alerts von Prometheus (und anderen Quellen), dedupliziert sie, wendet Gruppierungs- und Routing-Regeln an und sendet Benachrichtigungen an Empfänger (PagerDuty, Slack, E-Mail, Webhooks). Silences und Inhibition-Regeln verhindern Alert-Stürme während bekannter Wartungsfenster oder kaskadierende Ausfälle. In ML-Systemen leitet der Alertmanager Modell-Degradations-Alerts an den Slack-Kanal des ML-Teams weiter, während Infrastruktur-Alerts (hohe CPU, OOM-Kills) an das Platform-Team gehen.
 
 ### Remote-Speicherung und Federation
 
-Für Multi-Cluster- oder Langzeit-Retention-Szenarien schreibt Prometheus Samples remote an ein dauerhaftes Backend. Federation ermöglicht einem globalen Prometheus, aggregierte Metriken von regionalen Prometheus-Instanzen zu scrapen. Beide Muster sind in großen ML-Plattformen üblich, wo Trainingscluster und Serving-Cluster jeweils ihren eigenen Prometheus betreiben und eine zentrale Instanz Service-Level-Metriken aggregiert.
+Für Multi-Cluster- oder Langzeitaufbewahrungsszenarien schreibt Prometheus Samples remote in ein dauerhaftes Backend. Federation ermöglicht es einem globalen Prometheus, aggregierte Metriken von regionalen Prometheus-Instanzen zu scrapen. Beide Muster sind in großen ML-Plattformen üblich, wo Trainings-Cluster und Serving-Cluster jeweils ihren eigenen Prometheus betreiben und eine zentrale Instanz Service-Level-Metriken aggregiert.
 
 ```mermaid
 flowchart LR
@@ -50,35 +52,35 @@ flowchart LR
 
 | Verwenden wenn | Vermeiden wenn |
 |----------|------------|
-| Operative Metriken für ML-Serving-Infrastruktur benötigt werden (Latenz, Durchsatz, Fehlerrate) | Rohe Vorhersage-Logs oder High-Cardinality-Ereignisdaten gespeichert werden müssen |
-| Ein pull-basierter, self-gehosteter Monitoring-Stack ohne Vendor Lock-in gewünscht wird | Das Team nicht die Infrastrukturerfahrung hat, einen Prometheus-Stack zu betreiben und zu tunen |
-| Auf Kubernetes betrieben wird und native Service-Discovery gewünscht wird | Langzeit-Retention (>15 Tage) ohne zusätzliches Remote-Storage-Setup benötigt wird |
-| Leistungsstarkes Alerting mit Deduplizierung und Routing via Alertmanager benötigt wird | Sub-Sekunden-Scrape-Intervalle benötigt werden; Prometheus ist für 10–60-Sekunden-Intervalle ausgelegt |
-| Ein Standard-Backend für Grafana-Dashboards benötigt wird | Die Anwendung unbegrenzte Label-Kardinalität generiert, die die TSDB-Leistung verschlechtern wird |
+| Betriebsmetriken für ML-Serving-Infrastruktur benötigt werden (Latenz, Durchsatz, Fehlerquote) | Rohe Vorhersage-Logs oder hochkardinalitäts-Ereignisdaten gespeichert werden müssen |
+| Ein pull-basierter, selbst gehosteter Monitoring-Stack ohne Vendor-Lock-in gewünscht wird | Das Team keine Infrastrukturerfahrung für den Betrieb und die Abstimmung eines Prometheus-Stacks hat |
+| Kubernetes verwendet wird und native Service-Discovery gewünscht wird | Langzeitaufbewahrung (\>15 Tage) ohne zusätzliches Remote-Storage-Setup benötigt wird |
+| Leistungsstarkes Alerting mit Deduplizierung und Routing über Alertmanager benötigt wird | Sub-Sekunden-Scrape-Intervalle benötigt werden; Prometheus ist für 10–60 Sekunden ausgelegt |
+| Ein Standard-Backend für Grafana-Dashboards benötigt wird | Die Anwendung unbegrenzte Label-Kardinalität erzeugt, was die TSDB-Leistung beeinträchtigt |
 
 ## Vergleiche
 
-Prometheus und Grafana sind komplementäre, nicht konkurrierende Werkzeuge. Die folgende Tabelle beschreibt, wann sie zusammen vs. Alternativen verwendet werden sollen.
+Prometheus und Grafana sind komplementäre, nicht konkurrierende Werkzeuge. Die folgende Tabelle beschreibt, wann sie gemeinsam oder als Alternativen verwendet werden.
 
 | Kriterium | Prometheus | Grafana |
 |-----------|-----------|---------|
-| Rolle | Metriken erfassen, speichern und darüber alerting | Metriken aus jeder Datenquelle visualisieren und erkunden |
-| Abfragesprache | PromQL (metriken-optimierte funktionale Sprache) | Pro-Datenquelle (PromQL für Prometheus, SQL für andere) |
-| Alerting | Eingebaute Alert-Regeln + Alertmanager | Grafana Alerting (einheitlich, Multi-Datenquelle) |
+| Rolle | Metriken sammeln, speichern und darüber alertieren | Metriken aus beliebiger Datenquelle visualisieren und erkunden |
+| Abfragesprache | PromQL (metriken-optimierte funktionale Sprache) | Pro Datenquelle (PromQL für Prometheus, SQL für andere) |
+| Alerting | Integrierte Alerting-Regeln + Alertmanager | Grafana Alerting (einheitlich, multi-Datenquellen) |
 | Datenquellen | Selbst (TSDB) | Prometheus, InfluxDB, Loki, Elasticsearch, Datenbanken usw. |
-| Speicherung | Lokale TSDB, Remote-Write für Langzeit | Kein Speicher — reine Query- und Visualisierungsschicht |
-| Wann zusammen verwenden | Immer — Prometheus sammelt, Grafana zeigt | Immer — Grafana als UI für Prometheus-Daten verwenden |
+| Speicherung | Lokale TSDB, Remote-Write für Langzeitaufbewahrung | Kein Speicher — reine Query- und Visualisierungsschicht |
+| Gemeinsamer Einsatz | Immer — Prometheus sammelt, Grafana zeigt | Immer — Grafana als UI für Prometheus-Daten verwenden |
 
 ## Vor- und Nachteile
 
 | Aspekt | Vorteile | Nachteile |
 |--------|------|------|
-| Pull-basierte Architektur | Einfaches Debugging, Zugriffskontrolle auf Ziel-Ebene | Erfordert, dass Ziele HTTP-Endpunkte bereitstellen |
-| PromQL | Ausdrucksstark, komposierbar, zweckorientiert für Metriken | Steile Lernkurve im Vergleich zu SQL |
-| Lokale TSDB | Schnelle Aufnahme und Abfrage für aktuelle Daten | Begrenzte Retention; Remote-Storage für Langzeit erforderlich |
-| Label-Modell | Flexible mehrdimensionale Filterung und Aggregation | Hohe Kardinalitätslabels verursachen Speicher- und Abfrageleistungsprobleme |
-| Alertmanager | Umfangreiches Routing, Gruppierung und Stilling | Separate Komponente zu betreiben; Konfiguration kann komplex werden |
-| Ökosystem | Große Bibliothek von Exportern und Client-Bibliotheken | Operativer Overhead für self-hosted Deployments |
+| Pull-basierte Architektur | Einfaches Debugging, Zugangskontrolle auf Zielebene | Ziele müssen HTTP-Endpunkte bereitstellen |
+| PromQL | Ausdrucksstark, komponierbar, zweckgebaut für Metriken | Steile Lernkurve im Vergleich zu SQL |
+| Lokale TSDB | Schnelle Aufnahme und Abfrage für aktuelle Daten | Begrenzte Aufbewahrung; Remote-Speicherung für Langzeitaufbewahrung erforderlich |
+| Label-Modell | Flexibles mehrdimensionales Filtern und Aggregieren | Hochkardinalitäts-Labels verursachen Speicher- und Abfrageleistungsprobleme |
+| Alertmanager | Umfangreiches Routing, Gruppierung und Stummschaltung | Separate Komponente zu betreiben; Konfiguration kann komplex werden |
+| Ökosystem | Große Bibliothek von Exportern und Client-Bibliotheken | Operativer Overhead für selbst gehostete Deployments |
 
 ## Code-Beispiele
 
@@ -217,13 +219,13 @@ if __name__ == "__main__":
 ## Praktische Ressourcen
 
 - [Prometheus-Dokumentation](https://prometheus.io/docs/introduction/overview/) — Offizielle Dokumentation zu Architektur, Konfiguration, PromQL, Alerting und Best Practices.
-- [prometheus_client Python-Bibliothek](https://github.com/prometheus/client_python) — Offizieller Python-Client zur Instrumentierung von Anwendungen; deckt alle Metriktypen und das Expositionsformat ab.
-- [PromQL Cheat Sheet](https://promlabs.com/promql-cheat-sheet/) — Prägnante Referenz für PromQL-Operatoren, Funktionen und gängige Muster.
-- [Robust Perception — Monitoring with Prometheus](https://www.robustperception.io/blog/) — Brian Brazils ausführlicher Blog zu Prometheus-Interna, PromQL-Mustern und operativen Ratschlägen.
+- [prometheus_client Python-Bibliothek](https://github.com/prometheus/client_python) — Offizieller Python-Client zur Instrumentierung von Anwendungen; umfasst alle Metriktypen und das Exposition-Format.
+- [PromQL-Spickzettel](https://promlabs.com/promql-cheat-sheet/) — Prägnante Referenz für PromQL-Operatoren, Funktionen und gängige Muster.
+- [Robust Perception — Monitoring mit Prometheus](https://www.robustperception.io/blog/) — Brian Brazils ausführlicher Blog zu Prometheus-Interna, PromQL-Mustern und Betriebsratschlägen.
 - [Awesome Prometheus](https://github.com/roaldnefs/awesome-prometheus) — Kuratierte Liste von Prometheus-Exportern, Dashboards und Community-Ressourcen.
 
 ## Siehe auch
 
 - [Grafana](/docs/mlops/monitoring/grafana)
 - [ML-Monitoring](/docs/mlops/monitoring)
-- [Model Serving](/docs/mlops/deployment/model-serving)
+- [Model-Serving](/docs/mlops/deployment/model-serving)

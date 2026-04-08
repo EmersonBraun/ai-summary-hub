@@ -2,6 +2,8 @@
 title: PyTorch Mobile
 description: Despliega modelos PyTorch en dispositivos móviles y de borde usando TorchScript y el runtime de nueva generación ExecuTorch.
 keywords: [PyTorch Mobile, TorchScript, ExecuTorch, inferencia móvil, IA en el borde, cuantización, Android, iOS]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # PyTorch Mobile

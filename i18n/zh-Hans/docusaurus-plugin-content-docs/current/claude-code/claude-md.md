@@ -2,6 +2,8 @@
 title: CLAUDE.md 配置
 description: 自定义 Claude Code 行为的项目级和全局指令文件——它们是什么、存放在哪里、如何加载以及如何编写有效的文件。
 keywords: [CLAUDE.md, Claude Code 配置, 项目指令, 系统提示, 编码规范, .claude, 全局配置]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # CLAUDE.md 配置

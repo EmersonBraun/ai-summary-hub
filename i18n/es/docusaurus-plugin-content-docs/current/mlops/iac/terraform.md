@@ -1,36 +1,38 @@
 ---
 title: Terraform
 description: Herramienta declarativa de Infraestructura como Código de HashiCorp para aprovisionar y gestionar recursos en la nube, ampliamente utilizada para crear infraestructura de ML reproducible incluyendo instancias GPU, buckets de almacenamiento y clústeres de Kubernetes.
-keywords: [Terraform, IaC, infraestructura como código, declarativo, HCL, AWS, GCP, Azure, gestión de estado, instancias GPU, infraestructura de ML]
+keywords: [Terraform, IaC, infraestructura como código, declarativo, HCL, AWS, GCP, Azure, gestión de estado, instancias GPU, infraestructura ML]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Terraform
 
 ## Definición
 
-Terraform es una herramienta de Infraestructura como Código (IaC) de código abierto creada por HashiCorp que permite definir, aprovisionar y gestionar infraestructura en la nube y on-premises usando un lenguaje de configuración declarativo llamado HCL (HashiCorp Configuration Language). Describes el estado final deseado de tu infraestructura — qué recursos deben existir, cómo deben estar configurados y cómo se relacionan entre sí — y Terraform determina qué crear, actualizar o destruir para alcanzar ese estado. Este modelo declarativo es fundamentalmente diferente de los enfoques de scripting imperativo donde describes la secuencia de pasos a ejecutar.
+Terraform es una herramienta de Infraestructura como Código (IaC) de código abierto creada por HashiCorp que permite definir, aprovisionar y gestionar infraestructura en la nube y on-premises usando un lenguaje de configuración declarativo llamado HCL (HashiCorp Configuration Language). Se describe el estado final deseado de la infraestructura — qué recursos deben existir, cómo deben configurarse y cómo se relacionan entre sí — y Terraform determina qué crear, actualizar o destruir para alcanzar ese estado. Este modelo declarativo es fundamentalmente diferente de los enfoques de scripting imperativo donde se describe la secuencia de pasos a ejecutar.
 
-La piedra angular de la arquitectura de Terraform es su ecosistema de **providers**. Un provider es un plugin que traduce las definiciones de recursos HCL en llamadas a la API de una plataforma específica: AWS, Google Cloud, Azure, Kubernetes, Datadog, GitHub y cientos más. Cada provider mantiene su propio ciclo de versiones, y Terraform descarga los providers automáticamente basándose en los bloques `required_providers`. Esto significa que una única configuración de Terraform puede simultáneamente aprovisionar un clúster de entrenamiento GPU en AWS, un bucket GCS para datos de entrenamiento, un namespace de Kubernetes para el servicio de modelos y un dashboard de Grafana para el monitoreo — con herramientas coherentes en todas las plataformas.
+La piedra angular de la arquitectura de Terraform es su ecosistema de **proveedores**. Un proveedor es un plugin que traduce las definiciones de recursos HCL en llamadas API contra una plataforma específica: AWS, Google Cloud, Azure, Kubernetes, Datadog, GitHub y cientos más. Cada proveedor mantiene su propio ciclo de lanzamientos versionado, y Terraform descarga los proveedores automáticamente según los bloques `required_providers`. Esto significa que una sola configuración de Terraform puede simultáneamente aprovisionar un clúster de entrenamiento GPU en AWS, un bucket de GCS para datos de entrenamiento, un espacio de nombres de Kubernetes para el servicio de modelos y un panel de Grafana para el monitoreo — con herramientas consistentes en todas las plataformas.
 
-La **gestión de estado** es lo que hace que Terraform sea idempotente y planificable. Terraform mantiene un archivo de estado que mapea cada recurso en la configuración a su contraparte en el mundo real (identificado por los IDs de recursos del proveedor de nube). Cuando ejecutas `terraform plan`, Terraform compara el archivo de estado actual con tu configuración y la infraestructura en vivo, produciendo un diff que muestra exactamente qué cambiará antes de que se realice cualquier cambio. Para los flujos de trabajo en equipo, el estado se almacena en un backend compartido (S3, GCS, Terraform Cloud) con bloqueo para prevenir modificaciones concurrentes. Esta auditabilidad y predictibilidad hacen de Terraform la herramienta IaC dominante para aprovisionar infraestructura de entrenamiento y servicio de ML en entornos regulados y colaborativos.
+La **gestión de estado** es lo que hace que Terraform sea idempotente y planificable. Terraform mantiene un archivo de estado que mapea cada recurso en la configuración a su contraparte en el mundo real (identificada por los IDs de recursos del proveedor de nube). Cuando se ejecuta `terraform plan`, Terraform compara el archivo de estado actual contra la configuración y la infraestructura en vivo, produciendo un diferencial que muestra exactamente qué cambiará antes de realizar ningún cambio. Para flujos de trabajo en equipo, el estado se almacena en un backend compartido (S3, GCS, Terraform Cloud) con bloqueo para evitar modificaciones concurrentes. Esta auditabilidad y previsibilidad hacen de Terraform la herramienta IaC dominante para aprovisionar infraestructura de entrenamiento y servicio de ML en entornos regulados y colaborativos.
 
 ## Cómo funciona
 
 ### Escribir la configuración
 
-Los ingenieros escriben archivos HCL (`.tf`) que declaran recursos, fuentes de datos, variables, salidas y módulos. Los recursos corresponden a objetos de infraestructura (una instancia EC2, un bucket S3, un despliegue de Kubernetes). Las fuentes de datos leen la infraestructura existente sin gestionarla. Las variables parametrizan las configuraciones para su reutilización en entornos. Los módulos encapsulan conjuntos reutilizables de recursos — un módulo de "clúster de entrenamiento GPU" puede instanciarse múltiples veces con diferentes tipos de instancia y regiones.
+Los ingenieros escriben archivos HCL (`.tf`) que declaran recursos, fuentes de datos, variables, salidas y módulos. Los recursos corresponden a objetos de infraestructura (una instancia EC2, un bucket S3, un despliegue de Kubernetes). Las fuentes de datos leen la infraestructura existente sin gestionarla. Las variables parametrizan las configuraciones para su reutilización en diferentes entornos. Los módulos encapsulan conjuntos reutilizables de recursos — un módulo de "clúster de entrenamiento GPU" puede instanciarse múltiples veces con diferentes tipos de instancia y regiones.
 
 ### Inicializar y planificar
 
-Ejecutar `terraform init` descarga los providers y módulos requeridos e inicializa el backend. Ejecutar `terraform plan` produce un plan de ejecución legible por humanos: una lista de recursos a agregar (+), cambiar (~) o destruir (−). La fase de plan es de solo lectura — no realiza cambios en la infraestructura. Los equipos típicamente integran `terraform plan` en los pipelines de CI para revisar los cambios en los pull requests antes de hacer merge.
+Ejecutar `terraform init` descarga los proveedores y módulos requeridos e inicializa el backend. Ejecutar `terraform plan` produce un plan de ejecución legible por humanos: una lista de recursos a añadir (+), cambiar (~) o destruir (−). La fase de planificación es de solo lectura — no realiza cambios en la infraestructura. Los equipos típicamente integran `terraform plan` en los pipelines de CI para revisar los cambios en las solicitudes de extracción antes de fusionarlas.
 
 ### Aplicar y gestión de estado
 
-`terraform apply` ejecuta el plan, llamando a las APIs de los providers para crear, actualizar o eliminar recursos en orden de dependencia. Terraform resuelve el gráfico de dependencias automáticamente basándose en las referencias entre recursos (p. ej., una subnet que referencia un ID de VPC). Después de apply, el archivo de estado se actualiza para reflejar el nuevo estado de la infraestructura. Para la infraestructura de ML, esto significa que las instancias GPU, los buckets de almacenamiento, los roles IAM y los clústeres de Kubernetes se crean todos en el orden correcto con las configuraciones correctas en un solo comando.
+`terraform apply` ejecuta el plan, llamando a las APIs del proveedor para crear, actualizar o eliminar recursos en orden de dependencias. Terraform resuelve el grafo de dependencias automáticamente basándose en las referencias entre recursos (p. ej., una subred que hace referencia a un ID de VPC). Después de aplicar, el archivo de estado se actualiza para reflejar el nuevo estado de la infraestructura. Para la infraestructura de ML, esto significa que las instancias GPU, los buckets de almacenamiento, los roles IAM y los clústeres de Kubernetes se crean todos en el orden correcto con las configuraciones correctas en un solo comando.
 
 ### Destruir y gestión del ciclo de vida
 
-`terraform destroy` elimina todos los recursos gestionados por la configuración — útil para entornos de entrenamiento efímeros que no deben ejecutarse (y costar dinero) entre trabajos de entrenamiento. Los meta-argumentos del ciclo de vida (`create_before_destroy`, `prevent_destroy`, `ignore_changes`) dan control detallado sobre cómo Terraform maneja recursos sensibles como los buckets de almacenamiento de artefactos de modelos que nunca deben borrarse accidentalmente.
+`terraform destroy` elimina todos los recursos gestionados por la configuración — útil para entornos de entrenamiento efímeros que no deberían ejecutarse (y costar dinero) entre trabajos de entrenamiento. Los meta-argumentos de ciclo de vida (`create_before_destroy`, `prevent_destroy`, `ignore_changes`) dan control detallado sobre cómo Terraform gestiona recursos sensibles como los buckets de almacenamiento de artefactos de modelos que nunca deben eliminarse accidentalmente.
 
 ```mermaid
 flowchart LR
@@ -46,35 +48,35 @@ flowchart LR
 
 | Usar cuando | Evitar cuando |
 |----------|------------|
-| Aprovisionando infraestructura en la nube que debe ser reproducible entre entornos | Configurando software dentro de instancias existentes (usa Ansible para eso) |
-| Gestionando infraestructura de ML a escala: clústeres GPU, almacenamiento, redes, Kubernetes | Tu equipo no tiene infraestructura en la nube que gestionar (sin servidores, sin cuentas en la nube) |
-| Múltiples miembros del equipo necesitan colaborar en la misma infraestructura | Necesitas ejecutar comandos de shell arbitrarios o configurar ajustes a nivel de SO en las instancias |
-| Quieres que los cambios de infraestructura se revisen a través de pull requests antes de la aplicación | Tu infraestructura existente no fue creada con Terraform y el costo de migración es prohibitivo |
-| La infraestructura necesita ser versionada, auditada y revertida de forma confiable | Necesitas cambios rápidos e iterativos en la configuración de la aplicación durante el desarrollo |
-| Operas en múltiples proveedores de nube y quieres un flujo de trabajo unificado | Tu organización ya estandariza en una herramienta IaC competidora (Pulumi, CDK) con conocimiento institucional |
+| Se aprovisiona infraestructura en la nube que debe ser reproducible entre entornos | Se configura software dentro de instancias existentes (usar Ansible para eso) |
+| Se gestiona infraestructura de ML a escala: clústeres GPU, almacenamiento, redes, Kubernetes | El equipo no tiene infraestructura en la nube que gestionar (sin servidores, sin cuentas en la nube) |
+| Múltiples miembros del equipo necesitan colaborar en la misma infraestructura | Se necesita ejecutar comandos de shell arbitrarios o configurar ajustes a nivel del SO en instancias |
+| Se quieren los cambios de infraestructura revisados vía solicitudes de extracción antes de su aplicación | La infraestructura existente no fue creada con Terraform y el costo de migración es prohibitivo |
+| La infraestructura necesita versionarse, auditarse y revertirse de forma fiable | Se necesitan cambios rápidos e iterativos en la configuración de la aplicación durante el desarrollo |
+| Se opera en múltiples proveedores de nube y se quiere un flujo de trabajo unificado | La organización ya está estandarizada en una herramienta IaC competidora (Pulumi, CDK) con conocimiento institucional |
 
 ## Comparaciones
 
 | Criterio | Terraform | Ansible |
 |-----------|-----------|---------|
-| Paradigma | Declarativo — describe el estado deseado | Procedimental — describe los pasos para alcanzar el estado |
-| Gestión de estado | Archivo de estado explícito; rastrea los IDs de recursos | Sin estado — sin rastreo de estado integrado |
+| Paradigma | Declarativo — describir el estado deseado | Procedimental — describir los pasos para alcanzar el estado |
+| Gestión de estado | Archivo de estado explícito; rastrea los IDs de recursos | Sin estado — sin seguimiento de estado integrado |
 | Caso de uso principal | Aprovisionamiento de recursos en la nube (instancias, redes, almacenamiento) | Gestión de configuración y despliegue de aplicaciones en instancias existentes |
-| Soporte de proveedores de nube | Más de 1.000 providers vía ecosistema de plugins | Módulos para las principales nubes; menos completo que Terraform |
+| Soporte de proveedores de nube | Más de 1.000 proveedores vía ecosistema de plugins | Módulos para las principales nubes; menos completo que Terraform |
 | Idempotencia | Nativa — plan/apply siempre converge al estado deseado | A nivel de tarea — cada tarea debe escribirse para ser idempotente |
-| Curva de aprendizaje | Sintaxis HCL + modelo mental de estado/plan | Playbooks YAML; barrera inicial más baja |
+| Curva de aprendizaje | Sintaxis HCL + modelo mental de estado/plan | Playbooks YAML; menor barrera inicial |
 | Cuándo usar ambos | Terraform aprovisiona infraestructura; Ansible configura software en ella — se complementan | Ver arriba |
 
 ## Ventajas y desventajas
 
 | Aspecto | Ventajas | Desventajas |
 |--------|------|------|
-| Modelo declarativo | La intención es clara; el plan muestra los cambios exactos antes de apply | No puede expresar fácilmente lógica condicional o bucles complejos (aunque HCL ha mejorado) |
-| Archivo de estado | Permite planificación precisa y detección de drift | El archivo de estado es sensible; la corrupción o pérdida es un incidente grave |
-| Ecosistema de providers | Cubre virtualmente todos los servicios en la nube y herramientas SaaS | La calidad de los providers varía; algunos providers comunitarios están mal mantenidos |
-| Flujo de trabajo plan/apply | Los cambios son revisables antes de la ejecución | Ciclo de iteración más lento que los scripts imperativos para la creación de prototipos rápidos |
-| Reutilización de módulos | Patrones de infraestructura DRY mediante módulos publicados o internos | Los gráficos de módulos grandes pueden ser lentos de inicializar y planificar |
-| Idempotencia | Seguro de ejecutar repetidamente; comportamiento convergente | Los ciclos de destruir/recrear para ciertos cambios de recursos (p. ej., renombrar) causan tiempo de inactividad |
+| Modelo declarativo | La intención es clara; el plan muestra los cambios exactos antes de aplicar | No puede expresar fácilmente lógica condicional o bucles complejos (aunque HCL ha mejorado) |
+| Archivo de estado | Permite una planificación precisa y detección de deriva | El archivo de estado es sensible; la corrupción o pérdida es un incidente grave |
+| Ecosistema de proveedores | Cubre prácticamente todos los servicios en la nube y herramientas SaaS | La calidad del proveedor varía; algunos proveedores de la comunidad están mal mantenidos |
+| Flujo de trabajo plan/apply | Los cambios son revisables antes de la ejecución | Ciclo de iteración más lento que los scripts imperativos para la creación rápida de prototipos |
+| Reutilización de módulos | Patrones de infraestructura DRY mediante módulos publicados o internos | Los grafos de módulos grandes pueden ser lentos de inicializar y planificar |
+| Idempotencia | Seguro de ejecutar repetidamente; comportamiento convergente | Los ciclos de destrucción/recreación para ciertos cambios de recursos (p. ej., renombrado) causan tiempo de inactividad |
 
 ## Ejemplos de código
 
@@ -335,14 +337,14 @@ output "ml_artifacts_bucket_arn" {
 
 ## Recursos prácticos
 
-- [Documentación de Terraform](https://developer.hashicorp.com/terraform/docs) — Documentación oficial de HashiCorp que cubre la sintaxis HCL, providers, estado, workspaces y módulos.
-- [Documentación del provider AWS de Terraform](https://registry.terraform.io/providers/hashicorp/aws/latest/docs) — Referencia completa para todos los recursos y fuentes de datos de AWS disponibles en el provider AWS de Terraform.
+- [Documentación de Terraform](https://developer.hashicorp.com/terraform/docs) — Documentación oficial de HashiCorp que cubre la sintaxis HCL, proveedores, estado, espacios de trabajo y módulos.
+- [Documentación del proveedor AWS de Terraform](https://registry.terraform.io/providers/hashicorp/aws/latest/docs) — Referencia completa de todos los recursos AWS y fuentes de datos disponibles en el proveedor AWS de Terraform.
 - [Mejores prácticas de Terraform](https://developer.hashicorp.com/terraform/language/style) — Guía de estilo oficial que cubre la estructura de módulos, convenciones de nomenclatura y patrones de gestión de estado.
 - [Gruntwork — Terraform: Up and Running](https://www.terraformupandrunning.com/) — Libro ampliamente recomendado sobre patrones de Terraform en producción, módulos y pruebas.
-- [Terraform Registry](https://registry.terraform.io/) — Registro oficial de providers y módulos publicados, incluyendo módulos comunitarios para Kubernetes, EKS y configuraciones de instancias GPU.
+- [Terraform Registry](https://registry.terraform.io/) — Registro oficial de proveedores y módulos publicados, incluyendo módulos de la comunidad para Kubernetes, EKS y configuraciones de instancias GPU.
 
 ## Ver también
 
 - [Ansible](/docs/mlops/iac/ansible)
-- [ML en Kubernetes](/docs/mlops/deployment/ml-kubernetes)
+- [ML Kubernetes](/docs/mlops/deployment/ml-kubernetes)
 - [MLOps](/docs/mlops)

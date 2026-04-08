@@ -1,1 +1,290 @@
-{"theme.common.editThisPage":{"message":"编辑此页","description":"Edit page link"},"theme.docs.paginator.previous":{"message":"上一篇","description":"Previous doc"},"theme.docs.paginator.next":{"message":"下一篇","description":"Next doc"},"theme.docs.paginator.navAriaLabel":{"message":"文档页面","description":"Pagination ARIA"},"home.hero.title":{"message":"AI Summary Hub","description":"Hero title"},"home.hero.tagline":{"message":"AI 概念的单一事实来源，从基础到高级智能体","description":"Hero tagline"},"home.hero.startLearning":{"message":"开始学习","description":"Button"},"home.section.whatTitle":{"message":"这是什么项目？","description":"Section title"},"home.section.whatBody":{"message":"AI Summary Hub 是现代 AI 概念的综合指南。每个主题包含定义、原理、示例和有用链接，助你快速理解 RAG、Transformer、LLM、智能体及 50+ 主题。","description":"Section body"},"home.section.exploreDocs":{"message":"浏览文档","description":"Button aria"},"home.section.exploreDocsButton":{"message":"浏览文档","description":"Button text"},"home.section.helpTitle":{"message":"帮助改进本指南","description":"Section title"},"home.section.helpBody":{"message":"本项目依赖社区贡献。若你从事 AI、LLM 或智能体相关工作，欢迎参与。你可以：","description":"Section body"},"home.section.contributeButton":{"message":"参与项目","description":"Contribute button"},"home.section.helpBullet1":{"message":"根据你的经验添加新主题","description":"Help bullet"},"home.section.helpBullet2":{"message":"用最新概念更新要点","description":"Help bullet"},"home.section.helpBullet3":{"message":"贡献示例与代码片段","description":"Help bullet"},"home.section.helpBullet4":{"message":"修正过时信息","description":"Help bullet"},"home.section.helpBullet5":{"message":"改进说明并翻译内容","description":"Help bullet"},"home.section.helpFooter":{"message":"你的贡献有助于保持本指南及时、有价值。请参阅贡献指南以开始。","description":"Help section closing"},"allTopics.title":{"message":"全部主题","description":"All topics title"},"allTopics.intro":{"message":"按类别浏览本 hub 的所有主题。你也可以使用{sidebarLink}或搜索。","description":"All topics intro"}}
+{
+  "theme.common.editThisPage": {
+    "message": "编辑本页",
+    "description": "The link label to edit the current page"
+  },
+  "theme.docs.paginator.previous": {
+    "message": "上一页",
+    "description": "The label used to navigate to the previous doc"
+  },
+  "theme.docs.paginator.next": {
+    "message": "下一页",
+    "description": "The label used to navigate to the next doc"
+  },
+  "theme.docs.paginator.navAriaLabel": {
+    "message": "文档分页",
+    "description": "The ARIA label for the docs pagination"
+  },
+  "home.hero.title": {
+    "message": "掌握 AI——从基础到生产",
+    "description": "Hero section title"
+  },
+  "home.hero.tagline": {
+    "message": "145+ 篇深度文章，含代码示例、对比表与 Mermaid 图。可跟学学习路径或按分类浏览。",
+    "description": "Hero section tagline"
+  },
+  "home.hero.startLearning": {
+    "message": "开始学习",
+    "description": "Start learning button"
+  },
+  "home.section.whatTitle": {
+    "message": "本项目是什么？",
+    "description": "What is this project section title"
+  },
+  "home.section.whatBody": {
+    "message": "AI Summary Hub 是现代 AI 概念的学习伴侣。每个主题含定义、原理、示例与链接，帮助你快速理解 RAG、Transformer、LLM、智能体等 50+ 主题，从基础到进阶系统。",
+    "description": "What is this project body"
+  },
+  "home.section.exploreDocs": {
+    "message": "浏览文档",
+    "description": "Explore docs button aria label"
+  },
+  "home.section.exploreDocsButton": {
+    "message": "浏览文档",
+    "description": "Explore Docs button text"
+  },
+  "home.section.helpTitle": {
+    "message": "帮助改进本指南",
+    "description": "Help improve this guide title"
+  },
+  "home.section.helpBody": {
+    "message": "本项目依赖社区贡献。若你从事 AI、LLM 或智能体相关工作，欢迎参与。你可以：",
+    "description": "Help improve body intro"
+  },
+  "home.section.contributeButton": {
+    "message": "参与项目",
+    "description": "Contribute button text"
+  },
+  "home.section.helpBullet1": {
+    "message": "根据经验补充新主题",
+    "description": "Help bullet"
+  },
+  "home.section.helpBullet2": {
+    "message": "用最新概念更新要点",
+    "description": "Help bullet"
+  },
+  "home.section.helpBullet3": {
+    "message": "贡献示例与代码片段",
+    "description": "Help bullet"
+  },
+  "home.section.helpBullet4": {
+    "message": "修正过时信息",
+    "description": "Help bullet"
+  },
+  "home.section.helpBullet5": {
+    "message": "改进讲解并翻译内容",
+    "description": "Help bullet"
+  },
+  "home.section.helpFooter": {
+    "message": "你的贡献让本指南保持最新、对所有人有用。请参阅贡献指南开始参与。",
+    "description": "Help section closing"
+  },
+  "allTopics.title": {
+    "message": "所有主题",
+    "description": "All topics page title"
+  },
+  "allTopics.intro": {
+    "message": "按分类浏览知识库中的全部主题。也可使用{sidebarLink}或搜索。",
+    "description": "All topics page intro"
+  },
+  "allTopics.description": {
+    "message": "AI Summary Hub 全部文档主题列表，按分类分组。",
+    "description": "All topics meta description"
+  },
+  "allTopics.sidebarLink": {
+    "message": "侧边栏",
+    "description": "Inline link label in allTopics intro"
+  },
+  "allTopics.level.beginner": {
+    "message": "初级",
+    "description": "Difficulty filter"
+  },
+  "allTopics.level.intermediate": {
+    "message": "中级",
+    "description": "Difficulty filter"
+  },
+  "allTopics.level.advanced": {
+    "message": "高级",
+    "description": "Difficulty filter"
+  },
+  "docLink.intro": {
+    "message": "简介",
+    "description": "Doc title for intro"
+  },
+  "docLink.overview": {
+    "message": "概览",
+    "description": "Doc title for index pages"
+  },
+  "notFound.title": {
+    "message": "页面未找到",
+    "description": "404 page title"
+  },
+  "notFound.description": {
+    "message": "无法找到你要访问的页面。",
+    "description": "404 meta description"
+  },
+  "notFound.message": {
+    "message": "我们找不到该页面。它可能已移动、重命名或不存在。",
+    "description": "404 body"
+  },
+  "notFound.docs": {
+    "message": "浏览文档",
+    "description": "404 link to docs"
+  },
+  "notFound.home": {
+    "message": "返回首页",
+    "description": "404 link home"
+  },
+  "sidebarSwitcher.title": {
+    "message": "学习路径",
+    "description": "Sidebar learning path dropdown title"
+  },
+  "home.hero.browseTopics": {
+    "message": "浏览全部主题",
+    "description": "Home secondary CTA"
+  },
+  "home.meta.description": {
+    "message": "从基础到生产掌握 AI。145+ 篇文章，含代码、对比、学习路径与图示。",
+    "description": "Home meta description"
+  },
+  "home.feat.heading": {
+    "message": "学习 AI 所需的一切——结构化、可实践、有深度",
+    "description": "Features section heading"
+  },
+  "home.banner.agentskit": {
+    "message": "构建 AI 智能体最完整的库之一。生产级框架，含记忆、工具、多智能体编排等。",
+    "description": "AgentsKit banner"
+  },
+  "home.banner.agentskitCta": {
+    "message": "查看文档 →",
+    "description": "AgentsKit banner CTA"
+  },
+  "home.banner.skills": {
+    "message": "为 Claude Code 等 AI 编程助手整理的可复用技能仓库。",
+    "description": "Skills banner"
+  },
+  "home.banner.skillsCta": {
+    "message": "在 GitHub 上查看 →",
+    "description": "Skills banner CTA"
+  },
+  "home.topics.heading": {
+    "message": "覆盖完整 AI 技术栈",
+    "description": "Topic highlights heading"
+  },
+  "home.paths.heading": {
+    "message": "8 条引导式学习路径",
+    "description": "Learning paths heading"
+  },
+  "home.paths.subtitle": {
+    "message": "不知从何开始？选一条路径逐步跟随即可。",
+    "description": "Learning paths subtitle"
+  },
+  "home.contribute.heading": {
+    "message": "开源且由社区共建",
+    "description": "Contribute heading"
+  },
+  "home.contribute.body": {
+    "message": "AI Summary Hub 免费开源。欢迎新增主题、完善文章、提交代码示例，或协助翻译成 6 种语言。",
+    "description": "Contribute body"
+  },
+  "home.contribute.cta": {
+    "message": "在 GitHub 上贡献",
+    "description": "Contribute button"
+  },
+  "learningPath.aiFundamentals.label": {
+    "message": "AI 基础",
+    "description": "Learning path name"
+  },
+  "learningPath.aiFundamentals.description": {
+    "message": "从机器学习到 Transformer 的核心概念",
+    "description": "Learning path description"
+  },
+  "learningPath.aiFundamentals.level": {
+    "message": "初级",
+    "description": "Learning path level"
+  },
+  "learningPath.ragFromZero.label": {
+    "message": "从零掌握 RAG",
+    "description": "Learning path name"
+  },
+  "learningPath.ragFromZero.description": {
+    "message": "构建检索增强生成系统",
+    "description": "Learning path description"
+  },
+  "learningPath.ragFromZero.level": {
+    "message": "初级 → 中级",
+    "description": "Learning path level"
+  },
+  "learningPath.masteringAgents.label": {
+    "message": "精通智能体",
+    "description": "Learning path name"
+  },
+  "learningPath.masteringAgents.description": {
+    "message": "从基础智能体到多智能体系统",
+    "description": "Learning path description"
+  },
+  "learningPath.masteringAgents.level": {
+    "message": "中级 → 高级",
+    "description": "Learning path level"
+  },
+  "learningPath.promptEngineeringMastery.label": {
+    "message": "提示工程精通",
+    "description": "Learning path name"
+  },
+  "learningPath.promptEngineeringMastery.description": {
+    "message": "配置、技术与可靠性",
+    "description": "Learning path description"
+  },
+  "learningPath.promptEngineeringMastery.level": {
+    "message": "初级 → 高级",
+    "description": "Learning path level"
+  },
+  "learningPath.practicalMlops.label": {
+    "message": "实用 MLOps",
+    "description": "Learning path name"
+  },
+  "learningPath.practicalMlops.description": {
+    "message": "端到端机器学习运维流水线",
+    "description": "Learning path description"
+  },
+  "learningPath.practicalMlops.level": {
+    "message": "中级 → 高级",
+    "description": "Learning path level"
+  },
+  "learningPath.aiToolsFrameworks.label": {
+    "message": "AI 工具与框架",
+    "description": "Learning path name"
+  },
+  "learningPath.aiToolsFrameworks.description": {
+    "message": "模型提供商、框架与开发工具",
+    "description": "Learning path description"
+  },
+  "learningPath.aiToolsFrameworks.level": {
+    "message": "初级 → 中级",
+    "description": "Learning path level"
+  },
+  "learningPath.aiSafetyEthics.label": {
+    "message": "AI 安全与伦理",
+    "description": "Learning path name"
+  },
+  "learningPath.aiSafetyEthics.description": {
+    "message": "安全、偏见、可解释性与伦理",
+    "description": "Learning path description"
+  },
+  "learningPath.aiSafetyEthics.level": {
+    "message": "初级 → 中级",
+    "description": "Learning path level"
+  },
+  "learningPath.claudeCodeDeepDive.label": {
+    "message": "Claude Code 深入",
+    "description": "Learning path name"
+  },
+  "learningPath.claudeCodeDeepDive.description": {
+    "message": "掌握 Claude Code 与 MCP",
+    "description": "Learning path description"
+  },
+  "learningPath.claudeCodeDeepDive.level": {
+    "message": "初级 → 高级",
+    "description": "Learning path level"
+  }
+}

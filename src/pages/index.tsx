@@ -191,7 +191,7 @@ function ProjectBanners(): ReactNode {
                 </Translate>
               </p>
               <span className={styles.bannerCta}>
-                View on GitHub &rarr;
+                <Translate id="home.banner.skillsCta">View on GitHub &rarr;</Translate>
               </span>
             </div>
           </Link>

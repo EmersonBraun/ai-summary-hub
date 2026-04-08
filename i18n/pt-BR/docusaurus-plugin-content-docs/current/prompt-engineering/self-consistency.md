@@ -1,173 +1,185 @@
 ---
-title: Auto-consistência
-description: Uma técnica de prompting que gera múltiplos caminhos de raciocínio chain-of-thought independentes e seleciona a resposta final por votação majoritária, melhorando significativamente a confiabilidade em relação ao chain-of-thought de passagem única.
-keywords: [auto-consistência, chain-of-thought, CoT, votação majoritária, amostragem, raciocínio, confiabilidade, engenharia de prompts, Wang et al]
+title: Autoconsistência
+description: Como a autoconsistência melhora o raciocínio de LLMs gerando múltiplas cadeias de pensamento e selecionando a resposta mais consistente.
+keywords: [self-consistency, chain-of-thought, CoT, reasoning, majority voting, LLM, sampling]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
-# Auto-consistência
+# Autoconsistência
 
 ## Definição
 
-A auto-consistência é uma técnica de prompting introduzida por Wang et al. (2022) que aborda uma fraqueza fundamental do prompting chain-of-thought (CoT): um único caminho de raciocínio pode levar a uma resposta confiante, porém errada. O insight é que respostas corretas tendem a ser robustas — múltiplos caminhos de raciocínio independentes que abordam um problema de diferentes ângulos devem convergir para a mesma resposta — enquanto respostas incorretas tendem a ser frágeis e inconsistentes entre caminhos. Ao amostrar muitas cadeias de raciocínio com temperatura > 0 e tomando a votação majoritária sobre suas respostas finais, a auto-consistência age como um método de ensemble fraco, mas prático, que reduz significativamente os erros de raciocínio sem qualquer ajuste fino do modelo.
+A autoconsistência é uma estratégia de decodificação para LLMs que substitui a resposta de caminho único da cadeia de pensamento (CoT) por um ensemble de caminhos de raciocínio diversificados, depois seleciona a resposta final por votação majoritária. Em vez de confiar em uma única cadeia de pensamento (que pode conter um erro de raciocínio fatal), você amostra N caminhos de pensamento independentes em temperatura mais alta e toma a resposta que aparece com mais frequência. Essa ideia simples melhora de forma confiável a precisão em aritmética, raciocínio lógico e tarefas de perguntas e respostas factuais sem exigir treinamento adicional ou feedback externo.
 
-A relação com o CoT é direta: a auto-consistência é CoT com amostragem repetida. Um prompt CoT padrão produz uma cadeia de raciocínio e uma resposta; a auto-consistência produz N cadeias (tipicamente 10–40) e N respostas, depois as agrega. A configuração de temperatura é crítica: você precisa de diversidade nos caminhos de raciocínio, então a decodificação gananciosa (temperatura=0) derrota o propósito. Uma temperatura no intervalo 0,5–0,8 geralmente fornece diversidade suficiente para votação efetiva, mantendo cada cadeia individual coerente. Em benchmarks como GSM8K (problemas de palavras matemáticas), AQuA (raciocínio algébrico) e SVAMP, a auto-consistência melhora a precisão do CoT em 10–20 pontos percentuais ao custo de N vezes mais chamadas de inferência.
-
-O que torna a auto-consistência praticamente útil — e distinta de simplesmente adicionar uma etapa de autoavaliação — é que ela não requer chamadas de modelo adicionais para "verificar" ou "criticar". O mecanismo de votação é puramente estatístico: a resposta que aparece com mais frequência entre N amostras vence. Isso a torna simples de implementar, agnóstica em relação ao modelo e direta de ajustar (simplesmente varie N). A principal limitação é o custo: N completações custam N vezes mais. A auto-consistência é, portanto, melhor aplicada a tarefas onde a precisão vale o orçamento de inferência — matemática, raciocínio em múltiplas etapas e classificação de alto risco — em vez de aplicações sensíveis à latência ou ao custo de tokens.
+A intuição é que processos de raciocínio corretos tendem a convergir para a resposta certa por múltiplas rotas, enquanto os erros são mais aleatórios. Ao agregar N tentativas, o sinal correto se amplifica e o ruído estocástico é reduzido pela média. O método é complementar à CoT básica: você ainda precisa de um prompt CoT eficaz; a autoconsistência simplesmente adiciona robustez executando esse prompt várias vezes.
 
 ## Como funciona
 
 ```mermaid
 flowchart TD
-  Prompt[Question + CoT prompt] -->|"sample, temp > 0"| Path1[Reasoning path 1\n-> Answer A]
-  Prompt -->|"sample, temp > 0"| Path2[Reasoning path 2\n-> Answer A]
-  Prompt -->|"sample, temp > 0"| Path3[Reasoning path 3\n-> Answer B]
-  Prompt -->|"sample, temp > 0"| PathN[Reasoning path N\n-> Answer A]
-  Path1 -->|"extract answer"| Vote{Majority\nvote}
-  Path2 -->|"extract answer"| Vote
-  Path3 -->|"extract answer"| Vote
-  PathN -->|"extract answer"| Vote
-  Vote -->|"most frequent answer"| Final[Final answer: A]
+  Q[Question + CoT prompt] --> S1[Sample path 1\nhigh temperature]
+  Q --> S2[Sample path 2\nhigh temperature]
+  Q --> SN[Sample path N\nhigh temperature]
+  S1 --> A1[Answer 1]
+  S2 --> A2[Answer 2]
+  SN --> AN[Answer N]
+  A1 --> VOTE[Majority vote\nover answers]
+  A2 --> VOTE
+  AN --> VOTE
+  VOTE --> FINAL[Final answer]
 ```
 
-### Gerando caminhos de raciocínio diversos
+### Etapa 1: Prompt CoT
 
-O primeiro passo é solicitar ao modelo um prompt CoT padrão de few-shot — um conjunto de triplas de exemplo (pergunta, raciocínio passo a passo, resposta) seguidas pela nova pergunta. A diferença fundamental em relação ao CoT padrão é que você chama a API N vezes com temperatura > 0 em vez de uma vez com temperatura 0. Cada chamada é estatisticamente independente; o modelo explora uma decomposição diferente do problema, pode usar diferentes variáveis intermediárias ou ordens de cálculo, e pode até cometer erros intermediários diferentes — mas se a resposta subjacente for correta, a maioria dos caminhos ainda chegará a ela. O número de amostras N é um hiperparâmetro: mais amostras reduzem a variância, mas aumentam o custo. No artigo original, N=40 é usado para máxima precisão; na prática, N=10–20 frequentemente recupera a maior parte do benefício com menor custo.
+Construir um prompt CoT básico — seja com exemplos few-shot que mostram raciocínio passo a passo, ou com uma instrução zero-shot como "Vamos raciocinar passo a passo". Esse prompt permanece fixo para todos os caminhos.
 
-### Extraindo e normalizando respostas
+### Etapa 2: Amostragem com temperatura
 
-Após coletar N completações, você deve extrair a resposta final de cada cadeia de raciocínio. Para prompts CoT bem estruturados, a resposta está tipicamente na última frase após uma frase como "The answer is..." ou "Therefore, X." Para respostas numéricas, a normalização importa: "3/4", "0,75" e "75%" são a mesma resposta e devem ser mapeadas para a mesma forma canônica antes da votação. Para tarefas de classificação ou resposta curta, a extração geralmente é uma correspondência de substring ou uma análise simples. A robustez da extração é a parte mais frágil do pipeline — se o modelo produz uma cadeia que não termina com uma resposta claramente analisável, esse caminho deve ser descartado ou atribuído a um bucket "desconhecido".
+Definir temperatura > 0 (tipicamente 0,5–1,0) para encorajar diversidade. Amostrar N completações independentes — cada execução produz um caminho de raciocínio diferente e um rótulo de resposta final. N fica tipicamente no intervalo de 5–40, dependendo do orçamento de custo e da complexidade da tarefa.
 
-### Votação majoritária
+### Etapa 3: Votação majoritária
 
-A etapa de agregação é uma contagem de frequência sobre as respostas extraídas. A resposta mais comum vence. Empates podem ser desfeitos escolhendo a resposta do caminho com maior log-probabilidade, ou simplesmente retornando as respostas empatadas com suas contagens de votos para revisão humana. A intuição estatística é que os erros são diversos (respostas erradas diferentes por razões diferentes) enquanto as respostas corretas são concentradas (a maioria dos caminhos chega à mesma resposta certa). Essa propriedade é mais forte em tarefas com uma resposta correta única, como aritmética, raciocínio simbólico e QA baseado em fatos. Para tarefas de geração aberta — sumarização, escrita criativa, código — a auto-consistência é menos aplicável porque a votação majoritária sobre ensaios não é bem definida.
+Extrair a resposta final de cada caminho (frequentemente a última linha ou um token de resposta claramente delimitado). Agregar por votação majoritária — a resposta que aparece com mais frequência vence. Para respostas de texto livre, você precisará normalizar as respostas (correspondência de string, LLM-as-judge ou expressões regulares) antes de votar.
 
 ## Quando usar / Quando NÃO usar
 
-| Use quando | Evite quando |
-|------------|--------------|
-| A tarefa tem uma única resposta correta e a precisão do CoT é insuficiente | A latência é uma restrição rígida (N vezes as chamadas de inferência são inaceitáveis) |
-| Raciocínio aritmético ou algébrico em múltiplas etapas com taxas de erro conhecidas | O custo de tokens é a principal preocupação e você não pode se dar ao luxo de N completações |
-| Classificação de alto risco onde alguns pontos percentuais de precisão importam | A tarefa é geração aberta onde a votação majoritária não é significativa |
-| Você quer melhoria de precisão sem ajuste fino ou modelos adicionais | O modelo já alcança precisão próxima do máximo em N=1 — retornos decrescentes |
-| Os caminhos de raciocínio precisam ser auditáveis (você pode inspecionar todas as N cadeias) | A extração de respostas é não confiável devido ao formato de saída inconsistente |
-
-## Comparações
-
-| Critério | Auto-consistência | Chain-of-thought (CoT) | Autoavaliação |
-|----------|------------------|------------------------|----------------|
-| Número de chamadas de LLM | N (tipicamente 10–40) | 1 | 2 (gerar + criticar) |
-| Melhoria de precisão | Alta — 10–20pp em benchmarks de raciocínio | Moderada — substancial sobre prompting direto | Moderada — depende da qualidade da autocrítica do modelo |
-| Custo | Alto — linear em N | Baixo | Baixo-moderado |
-| Complexidade de implementação | Baixa — amostrar N vezes e votar | Muito baixa | Moderada — requer projetar um prompt de crítica |
-| Funciona sem feedback externo | Sim | Sim | Sim |
-| Melhor tipo de tarefa | Matemática, raciocínio simbólico, QA factual | A maioria das tarefas de raciocínio | Tarefas onde o modelo pode detectar seus próprios erros |
-| Nota | Mais confiável que CoT, mas proporcionalmente mais caro | Linha de base mais simples — tente antes de usar auto-consistência | Complementar — pode ser combinado para ganhos adicionais |
+| Cenário | Parâmetros recomendados | Evitar |
+|---------|-------------------------|--------|
+| Raciocínio aritmético e matemático | N=10–20, temperatura=0,7 | Temperature=0 — todos os caminhos seriam idênticos |
+| Perguntas e respostas factuais de resposta curta | N=5–10, temperatura=0,5 | Saídas muito longas — custo N× é proibitivo |
+| Raciocínio lógico e simbólico | N=10–20, temperatura=0,8 | Tarefas criativas — consistência não é um objetivo útil aqui |
+| Problemas de álgebra e provas | N=20–40, temperatura=0,7 | Restrições rígidas de latência — N chamadas = N× o atraso |
+| Anotação de dados (auto-rotulagem) | N=5, voto como rótulo de confiança | Tarefas de geração de texto livre — difícil de votar de forma confiável |
 
 ## Exemplos de código
 
-### Auto-consistência com a API OpenAI
+### Autoconsistência com raciocínio matemático
 
 ```python
-# Self-consistency: sample N CoT paths and take majority vote
+# Self-consistency for math reasoning
 # pip install openai
 
-import os, re
-from collections import Counter
+import os, re, collections
 from openai import OpenAI
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-FEW_SHOT = """Q: Roger has 5 tennis balls. He buys 2 cans with 3 each. How many now?
-A: 5 + (2 x 3) = 5 + 6 = 11. The answer is 11.
+COT_SYSTEM = (
+    "You are a math tutor. Solve step by step, then write "
+    "'Answer: <number>' on the last line."
+)
 
-Q: Cafeteria had 23 apples, used 20, bought 6 more. How many now?
-A: 23 - 20 = 3. 3 + 6 = 9. The answer is 9.
-
-Q: {question}
-A:"""
-
-
-def extract_answer(text: str) -> str | None:
-    m = re.search(r"[Tt]he answer is\s+([^.\n]+)", text)
-    return m.group(1).strip().rstrip(".,;") if m else None
+PROBLEM = (
+    "A store sells apples for $0.50 each and oranges for $0.75 each. "
+    "If Alice buys 4 apples and 3 oranges, how much does she spend in total?"
+)
 
 
-def self_consistency(question: str, n: int = 10, temp: float = 0.7) -> dict:
-    """Sample n CoT paths and return majority vote answer with confidence."""
-    answers, completions = [], []
-    for i in range(n):
-        resp = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": FEW_SHOT.format(question=question)}],
-            temperature=temp,
-            max_tokens=300,
-        )
-        text = resp.choices[0].message.content.strip()
-        completions.append(text)
-        ans = extract_answer(text)
-        if ans:
-            answers.append(ans)
-        print(f"  Path {i+1:>2}: {ans!r}")
+def sample_path(problem: str) -> str:
+    resp = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": COT_SYSTEM},
+            {"role": "user", "content": problem},
+        ],
+        temperature=0.7,
+        max_tokens=300,
+    )
+    return resp.choices[0].message.content.strip()
 
-    if not answers:
-        return {"answer": None, "votes": {}}
-    counts = Counter(answers)
-    winner, votes = counts.most_common(1)[0]
-    return {"answer": winner, "confidence": votes / len(answers), "votes": dict(counts)}
+
+def extract_answer(path: str) -> str | None:
+    match = re.search(r"Answer:\s*\$?([\d.]+)", path, re.IGNORECASE)
+    return match.group(1) if match else None
+
+
+def self_consistent_answer(problem: str, n: int = 10) -> str:
+    paths = [sample_path(problem) for _ in range(n)]
+    answers = [extract_answer(p) for p in paths]
+    valid = [a for a in answers if a is not None]
+
+    if not valid:
+        return "Could not extract a consistent answer."
+
+    counter = collections.Counter(valid)
+    winner, count = counter.most_common(1)[0]
+    print(f"Vote distribution: {dict(counter)}")
+    return f"${winner} (voted by {count}/{n} paths)"
 
 
 if __name__ == "__main__":
-    q = ("Janet's ducks lay 16 eggs per day. She eats 3 and bakes with 4. "
-         "She sells the rest at $2/egg. How much does she make daily?")
-    r = self_consistency(q, n=10)
-    print(f"\nAnswer    : {r['answer']}")
-    print(f"Confidence: {r['confidence']:.0%}")
-    print(f"Votes     : {r['votes']}")
+    result = self_consistent_answer(PROBLEM, n=10)
+    print(f"\nSelf-consistent answer: {result}")
+    # Expected: $4.25 (4×0.50 + 3×0.75 = 2.00 + 2.25)
 ```
 
-### Normalização de resposta numérica para votação robusta
+### Autoconsistência com Anthropic
 
 ```python
-# Normalize numeric answers before majority voting
-# Handles fractions, decimals, currency, and percentage strings
+# Self-consistency with Anthropic for logical reasoning
+# pip install anthropic
 
-import re
-from collections import Counter
-from fractions import Fraction
+import os, re, collections
+import anthropic
+
+client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+
+SYSTEM = (
+    "Solve the following logic problem step by step. "
+    "At the very end, write 'Answer: <your answer>' on its own line."
+)
+
+PROBLEM = (
+    "All mammals are warm-blooded. Dolphins are mammals. "
+    "Some warm-blooded animals live in the ocean. "
+    "Is it necessarily true that dolphins are warm-blooded? "
+    "Answer Yes or No."
+)
 
 
-def normalize_numeric(raw: str) -> str:
-    """Canonicalize a raw answer string to a float string for voting."""
-    raw = raw.strip().lower()
-    raw = re.sub(r"[$%,]", "", raw)
-    m = re.match(r"^(\d+)/(\d+)$", raw)
-    if m:
-        return str(float(Fraction(int(m.group(1)), int(m.group(2)))))
-    try:
-        return str(float(raw))
-    except ValueError:
-        return raw
+def sample(problem: str) -> str:
+    resp = client.messages.create(
+        model="claude-opus-4-5",
+        max_tokens=300,
+        system=SYSTEM,
+        messages=[{"role": "user", "content": problem}],
+        temperature=0.6,
+    )
+    return resp.content[0].text.strip()
 
 
-def majority_vote(answers: list[str]) -> str | None:
-    normalized = [normalize_numeric(a) for a in answers]
-    return Counter(normalized).most_common(1)[0][0] if normalized else None
+def extract(text: str) -> str | None:
+    m = re.search(r"Answer:\s*(Yes|No)", text, re.IGNORECASE)
+    return m.group(1).capitalize() if m else None
 
 
 if __name__ == "__main__":
-    raw = ["18", "18.0", "$18", "18", "17", "18", "18", "17", "18", "18"]
-    print("Majority:", majority_vote(raw))  # -> "18.0"
+    n = 8
+    paths = [sample(PROBLEM) for _ in range(n)]
+    answers = [extract(p) for p in paths]
+    valid = [a for a in answers if a]
+
+    counter = collections.Counter(valid)
+    print("Vote distribution:", dict(counter))
+
+    if valid:
+        winner = counter.most_common(1)[0][0]
+        print(f"Self-consistent answer: {winner}")   # Expected: Yes
 ```
 
 ## Recursos práticos
 
-- [Self-Consistency Improves Chain of Thought Reasoning in Language Models (Wang et al., 2022)](https://arxiv.org/abs/2203.11171) — Artigo original com benchmarks em GSM8K, AQuA, SVAMP, StrategyQA e ARC.
-- [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models (Wei et al., 2022)](https://arxiv.org/abs/2201.11903) — O artigo de CoT sobre o qual a auto-consistência se baseia; background essencial.
-- [OpenAI — Referência de API: chat completions](https://platform.openai.com/docs/api-reference/chat/create) — Referência para os parâmetros `temperature`, `n` e `logprobs` usados em implementações de auto-consistência.
-- [Anthropic — Visão geral de engenharia de prompts](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Inclui orientação sobre amostragem e chain-of-thought para modelos Claude.
+- [Wang et al., 2022 — Self-Consistency improves Chain-of-Thought Reasoning in LLMs](https://arxiv.org/abs/2203.11171) — Paper fundador: demonstra melhorias significativas de precisão no GSM8K, MATH e benchmarks de raciocínio substituindo decodificação gulosa por votação majoritária de amostragem
+- [Wei et al., 2022 — Chain-of-Thought Prompting Elicits Reasoning in LLMs](https://arxiv.org/abs/2201.11903) — O paper CoT original do qual a autoconsistência é uma extensão; fornece a base e os benchmarks
+- [Fu et al., 2022 — Complexity-Based Prompting for Multi-Step Reasoning](https://arxiv.org/abs/2210.00720) — Mostra que selecionar respostas CoT por complexidade de raciocínio (comprimento dos passos) melhora ainda mais a autoconsistência
+- [Liang et al., 2023 — Encouraging Divergent Thinking in LLMs](https://arxiv.org/abs/2305.19118) — Prompting por decomposição múltipla (DECOMP) para diversificar caminhos de raciocínio além da variação de temperatura
 
 ## Veja também
 
 - [Engenharia de prompts](/docs/prompt-engineering)
-- [Chain-of-thought (CoT)](/docs/reasoning-patterns/cot)
+- [Cadeia de pensamento](/docs/reasoning-patterns/cot)
 - [Ensembling de prompts](/docs/prompt-engineering/prompt-ensembling)
+- [Temperatura, Top-K, Top-P](/docs/prompt-engineering/temperature-top-k-top-p)
+- [Autoavaliação e calibração](/docs/prompt-engineering/self-evaluation-calibration)
+- [LLMs](/docs/llms)

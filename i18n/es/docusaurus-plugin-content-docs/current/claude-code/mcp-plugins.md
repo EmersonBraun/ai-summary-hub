@@ -1,36 +1,38 @@
 ---
 title: Plugins e integraciones MCP
-description: Model Context Protocol (MCP) en Claude Code — qué son los servidores MCP, cómo extienden las capacidades de Claude, cómo instalarlos y configurarlos, y cómo construir servidores MCP personalizados.
+description: Model Context Protocol (MCP) en Claude Code — qué son los servidores MCP, cómo amplían las capacidades de Claude, cómo instalarlos y configurarlos, y cómo construir servidores MCP personalizados.
 keywords: [MCP, Model Context Protocol, servidor MCP, cliente MCP, plugins de Claude Code, herramientas personalizadas, integraciones externas, configuración MCP, transporte stdio, transporte SSE]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Plugins e integraciones MCP
 
 ## Definición
 
-El Model Context Protocol (MCP) es un estándar abierto desarrollado por Anthropic que define cómo los modelos de IA se comunican con fuentes de datos y herramientas externas. En el contexto de Claude Code, los servidores MCP son plugins que extienden el conjunto de herramientas disponibles para Claude más allá de sus capacidades integradas (acceso al sistema de archivos, comandos de shell, git). Con MCP, Claude puede consultar bases de datos, llamar APIs externas, navegar por la web, leer tickets de Jira, consultar paneles de Grafana, interactuar con GitHub y hacer cualquier otra cosa que implemente un servidor MCP — todo a través de la misma interfaz de lenguaje natural que las herramientas integradas.
+El Model Context Protocol (MCP) es un estándar abierto desarrollado por Anthropic que define cómo los modelos de IA se comunican con fuentes de datos y herramientas externas. En el contexto de Claude Code, los servidores MCP son plugins que amplían el conjunto de herramientas disponibles para Claude más allá de sus capacidades integradas (acceso al sistema de archivos, comandos de shell, git). Con MCP, Claude puede consultar bases de datos, llamar a APIs externas, navegar por la web, leer tickets de Jira, consultar dashboards de Grafana, interactuar con GitHub y hacer cualquier otra cosa que implemente un servidor MCP — todo a través de la misma interfaz de lenguaje natural que las herramientas integradas.
 
-MCP sigue una arquitectura cliente-servidor. Claude Code actúa como un **cliente MCP**: descubre servidores MCP disponibles desde la configuración, se conecta a ellos al inicio de la sesión y los consulta para obtener la lista de herramientas que exponen. Cada servidor MCP expone un conjunto de **herramientas** (funciones con definiciones de entrada JSON Schema, idénticas en estructura a las herramientas integradas), **recursos** opcionales (fuentes de datos de solo lectura como documentación o esquemas de bases de datos) y **prompts** opcionales (plantillas de prompts reutilizables). Cuando Claude decide llamar a una herramienta MCP, Claude Code enruta la llamada al servidor apropiado, ejecuta la operación y devuelve el resultado al modelo como resultado de herramienta.
+MCP sigue una arquitectura cliente-servidor. Claude Code actúa como **cliente MCP**: descubre los servidores MCP disponibles desde la configuración, se conecta a ellos al inicio de la sesión y los consulta para obtener la lista de herramientas que exponen. Cada servidor MCP expone un conjunto de **herramientas** (funciones con definiciones de entrada JSON Schema, idénticas en estructura a las herramientas integradas), **recursos** opcionales (fuentes de datos de solo lectura como documentación o esquemas de bases de datos) y **prompts** opcionales (plantillas de prompts reutilizables). Cuando Claude decide llamar a una herramienta MCP, Claude Code enruta la llamada al servidor apropiado, ejecuta la operación y devuelve el resultado al modelo como resultado de herramienta.
 
-El beneficio clave de MCP sobre las integraciones de herramientas ad hoc es la estandarización. Antes de MCP, cada asistente de IA tenía su propio formato de plugin propietario. MCP define un protocolo universal para que un servidor MCP escrito una vez pueda funcionar con cualquier cliente compatible con MCP — Claude Code, Claude Desktop o cualquier otro cliente MCP. Esto significa que el ecosistema de integraciones disponibles está creciendo rápidamente, y construir una nueva integración no requiere entender los aspectos internos específicos de Claude.
+El beneficio clave de MCP sobre las integraciones de herramientas ad-hoc es la estandarización. Antes de MCP, cada asistente de IA tenía su propio formato de plugin propietario. MCP define un protocolo universal para que un servidor MCP escrito una vez pueda funcionar con cualquier cliente compatible con MCP — Claude Code, Claude Desktop, o cualquier otro cliente MCP. Esto significa que el ecosistema de integraciones disponibles está creciendo rápidamente, y construir una nueva integración no requiere entender los internos específicos de Claude.
 
 ## Cómo funciona
 
 ### Tipos de servidores MCP y transportes
 
-Los servidores MCP vienen en dos variedades de transporte. Los **servidores stdio** se ejecutan como subprocesos locales: Claude Code genera el proceso del servidor al inicio de la sesión y se comunica a través de stdin/stdout usando JSON-RPC. Los servidores stdio son el tipo más común para herramientas locales (clientes de bases de datos, procesadores de archivos, análisis de código especializado). Los **servidores SSE (Server-Sent Events)** se ejecutan como servidores HTTP persistentes y se comunican a través de una conexión de red. Los servidores SSE son mejores para servicios remotos, infraestructura de equipo compartida o servidores que necesitan mantener estado a través de múltiples conexiones de clientes.
+Los servidores MCP vienen en dos variedades de transporte. Los **servidores stdio** se ejecutan como subprocesos locales: Claude Code genera el proceso del servidor al inicio de la sesión y se comunica a través de stdin/stdout usando JSON-RPC. Los servidores stdio son el tipo más común para herramientas locales (clientes de bases de datos, procesadores de archivos, análisis de código especializado). Los **servidores SSE (Server-Sent Events)** se ejecutan como servidores HTTP persistentes y se comunican a través de una conexión de red. Los servidores SSE son mejores para servicios remotos, infraestructura de equipos compartidos, o servidores que necesitan mantener estado entre múltiples conexiones de clientes.
 
 ### Configuración y descubrimiento
 
-Los servidores MCP se configuran en el archivo de configuración de Claude Code, típicamente en `~/.claude/settings.json` para configuración global o `.claude/settings.json` para servidores específicos del proyecto. Cada entrada de servidor especifica un nombre, tipo de transporte y el comando (para stdio) o URL (para SSE) necesario para iniciar o conectarse al servidor. Claude Code lee esta configuración al inicio de la sesión, inicializa conexiones a todos los servidores configurados y obtiene sus manifiestos de herramientas. Las herramientas de todos los servidores MCP conectados aparecen en la lista de herramientas del modelo junto a las herramientas integradas — desde la perspectiva del modelo, no hay diferencia.
+Los servidores MCP se configuran en el archivo de configuración de Claude Code, normalmente en `~/.claude/settings.json` para configuración global o `.claude/settings.json` para servidores específicos del proyecto. Cada entrada de servidor especifica un nombre, tipo de transporte y el comando (para stdio) o URL (para SSE) necesarios para iniciarse o conectarse. Claude Code lee esta configuración al inicio de la sesión, inicializa conexiones a todos los servidores configurados y obtiene sus manifiestos de herramientas. Las herramientas de todos los servidores MCP conectados aparecen en la lista de herramientas del modelo junto a las herramientas integradas — desde la perspectiva del modelo, no hay diferencia.
 
 ### Flujo de invocación de herramientas
 
-Cuando Claude decide llamar a una herramienta MCP, Claude Code actúa como intermediario: serializa los argumentos de la llamada a herramienta a JSON, envía una solicitud `tools/call` al servidor MCP a través del transporte configurado, espera la respuesta, deserializa el resultado y lo devuelve al modelo como un bloque `tool_result`. Toda la ida y vuelta es transparente para el modelo — simplemente ve un resultado de herramienta, igual que una llamada a herramienta integrada. Los servidores MCP pueden devolver texto, imágenes o datos estructurados, todo lo cual Claude Code reenvía al modelo apropiadamente.
+Cuando Claude decide llamar a una herramienta MCP, Claude Code actúa como intermediario: serializa los argumentos de la llamada a herramienta en JSON, envía una solicitud `tools/call` al servidor MCP sobre el transporte configurado, espera la respuesta, deserializa el resultado y lo devuelve al modelo como un bloque `tool_result`. Todo el proceso de ida y vuelta es transparente para el modelo — simplemente ve un resultado de herramienta, igual que una llamada a herramienta integrada. Los servidores MCP pueden devolver texto, imágenes o datos estructurados, todos los cuales Claude Code reenvía al modelo apropiadamente.
 
 ### Autenticación y seguridad
 
-Los servidores MCP manejan su propia autenticación. Un servidor MCP de GitHub, por ejemplo, lee un token de acceso personal de GitHub de una variable de entorno configurada en el campo `env` de la entrada del servidor. Claude Code pasa el entorno configurado al subproceso pero no gestiona secretos por sí mismo — es responsabilidad del servidor MCP autenticarse con los servicios externos. Debido a que los servidores MCP ejecutan código con los permisos del usuario local, se debe tener cuidado al usar servidores MCP de terceros: revisa el código del servidor o confía en el publicador antes de agregarlo a tu configuración.
+Los servidores MCP manejan su propia autenticación. Un servidor MCP de GitHub, por ejemplo, lee un token de acceso personal de GitHub de una variable de entorno configurada en el campo `env` de la entrada del servidor. Claude Code pasa el entorno configurado al subproceso pero no gestiona secretos por sí mismo — es responsabilidad del servidor MCP autenticarse con servicios externos. Dado que los servidores MCP ejecutan código con los permisos del usuario local, se debe tener cuidado al usar servidores MCP de terceros: revisa el código del servidor o confía en el publicador antes de agregarlo a tu configuración.
 
 ```mermaid
 flowchart LR
@@ -49,11 +51,11 @@ flowchart LR
 
 | Usar cuando | Evitar cuando |
 |---|---|
-| Necesitas que Claude interactúe con un servicio externo (GitHub, Jira, Slack, bases de datos) | La tarea puede realizarse con herramientas integradas (sistema de archivos, shell) — no hay necesidad de agregar complejidad |
-| Tu equipo comparte un conjunto común de herramientas y quieres una capa de integración estandarizada | Estás en un entorno sensible a la seguridad donde el acceso a herramientas externas debe estar estrictamente controlado |
+| Necesitas que Claude interactúe con un servicio externo (GitHub, Jira, Slack, bases de datos) | La tarea puede realizarse con herramientas integradas (sistema de archivos, shell) — no es necesario agregar complejidad |
+| Tu equipo comparte un conjunto común de herramientas y quieres una capa de integración estandarizada | Estás en un entorno sensible a la seguridad donde el acceso a herramientas externas debe controlarse estrictamente |
 | Quieres dar a Claude acceso a fuentes de datos privadas (APIs internas, bases de datos propietarias) | Necesitas una integración puntual rápida — un script de shell llamado a través de la herramienta Bash es más simple |
-| Estás construyendo una herramienta reutilizable que debería funcionar con múltiples clientes de IA | El servidor MCP que quieres usar proviene de una fuente no confiable — revisa su código primero |
-| Quieres que Claude tenga acceso en vivo al estado del sistema (métricas, registros, seguimiento de errores) | El servicio externo tiene límites de tasa que podrían superarse por las llamadas autónomas de herramientas de Claude |
+| Estás construyendo una herramienta reutilizable que debería funcionar con múltiples clientes de IA | El servidor MCP que quieres usar es de una fuente no confiable — revisa su código primero |
+| Quieres que Claude tenga acceso en vivo al estado del sistema (métricas, logs, seguimiento de errores) | El servicio externo tiene límites de velocidad que podrían superarse por las llamadas autónomas de herramientas de Claude |
 
 ## Ejemplos de código
 
@@ -219,7 +221,7 @@ claude
 ## Recursos prácticos
 
 - [Documentación MCP — Anthropic](https://docs.anthropic.com/en/docs/mcp) — Especificación oficial de MCP, descripción general del protocolo y arquitectura cliente/servidor.
-- [SDK de TypeScript de MCP](https://github.com/modelcontextprotocol/typescript-sdk) — SDK oficial para construir servidores y clientes MCP en TypeScript/JavaScript.
+- [SDK TypeScript de MCP](https://github.com/modelcontextprotocol/typescript-sdk) — SDK oficial para construir servidores y clientes MCP en TypeScript/JavaScript.
 - [Repositorio de servidores MCP](https://github.com/modelcontextprotocol/servers) — Colección oficial de servidores MCP de referencia: sistema de archivos, GitHub, PostgreSQL, Google Drive, Slack y más.
 - [Guía de integración MCP de Claude Code](https://docs.anthropic.com/en/docs/claude-code/mcp) — Guía específica de Claude Code para configurar y usar servidores MCP en sesiones.
 - [Especificación MCP](https://spec.modelcontextprotocol.io) — Especificación completa del protocolo para implementar clientes o servidores personalizados.

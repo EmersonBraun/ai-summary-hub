@@ -1,37 +1,64 @@
 ---
 title: Antigravity
 description: 以代理为先的 IDE，用于自主执行和氛围编程。
-keywords: [Antigravity, agent-first IDE, autonomous coding]
+keywords: [Antigravity, 代理 IDE, 氛围编程, 自动化]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Antigravity
 
 ## 定义
 
-Antigravity is an **agent-first IDE** that uses autonomous [LLM](/docs/llms)-powered [agents](/docs/agents) to handle coding, testing, and debugging across the editor, terminal, and browser. An **Agent Manager** coordinates multiple agents in parallel across workspaces; an **Artifacts Timeline** records plans, code diffs, screenshots, and browser recordings for verifiable outputs.
+Antigravity 是一款以代理为先的集成开发环境，专为**氛围编程**而设计——这是一种你用自然语言描述意图，AI 代理就能自主编写、重构和执行代码以实现目标的方式。与逐行补全不同，Antigravity 以完整任务循环的方式运作：读取你的代码库、规划变更、应用变更并验证结果。
 
-它强调自主性和人在回路中的反馈: agents execute tasks while users can comment and steer in real time. The IDE supports inline AI assistance and is powered by large models (例如 Gemini and others) with large context windows. Useful for [agent](/docs/agents)-centric workflows and [spec-driven development](/docs/spec-driven-development) where artifacts and auditability matter.
+该编辑器旨在最大程度降低从想法到可运行代码之间的摩擦。代理指令（类似于 [Claude Code](/docs/tools/claude-code) 的 `CLAUDE.md`）让你可以为代码风格、技术栈和安全约束定义持久规则。Antigravity 可以链式调用多个工具动作——读取文件、写入、执行终端命令、网页搜索——以完成原本需要多个手动步骤才能完成的目标。
 
 ## 工作原理
 
-你在**双重界面**中工作：一个功能齐全的**编辑器**带有内联 AI（重构、生成）和一个**代理管理器ager** that runs and orchestrates agents. **Agents** operate across editor, terminal, and browser—例如 implement a feature, run tests, or debug. **Artifacts** (plans, diffs, screenshots, recordings) are produced and shown in a timeline so outputs are inspectable. **Feedback**: you comment on agent work; the system incorporates feedback for the next steps. The platform runs on desktop (Windows, macOS, Linux) and supports large context and multiple model backends.
+```mermaid
+flowchart LR
+  User["用户意图\n（自然语言提示）"] -->|"提交"| Planner["代理规划器"]
+  Planner -->|"分解为步骤"| Tools["工具：文件读写\n终端、搜索"]
+  Tools -->|"结果"| Verifier["验证器"]
+  Verifier -->|"目标达成？"| Done["输出 / 差异"]
+  Verifier -->|"否"| Planner
+```
 
-## 应用场景
+### 代理指令
 
-Antigravity fits teams that want autonomous or semi-autonomous coding with clear artifacts and control.
+持久代理指令（`.agentrc` 文件或设置面板）为代理提供你的代码库背景：首选架构、命名约定、哪些文件绝不能修改以及如何运行测试。这样就无需在每次会话中重新说明上下文。
 
-- Agent-driven implementation and testing with verifiable artifacts
-- Parallel work across multiple agents and workspaces
-- Inline AI assistance plus manager-driven autonomy in one IDE
+### 任务循环
 
-## 外部文档
+代理持续迭代——读取输出、调整计划、重新执行——直到完成条件满足（测试通过、代码检查干净、端点响应）。你可以随时观察、暂停和重定向。
 
-- [Antigravity – Agent-first IDE](https://www.antigravityai.io/) — Product and overview
-- [Antigravity IDE](https://antigravityaiide.com/) — Platform and capabilities
+## 何时使用 / 何时不使用
+
+| 场景 | 使用 Antigravity | 不使用 Antigravity |
+|------|----------------|------------------|
+| 从零开始快速原型开发一个功能 | 是——非常适合意图驱动的氛围编程 | |
+| 带测试的遗留代码重构 | 是——代理可以循环应用和验证变更 | |
+| 探索陌生代码库 | 是——代理在操作前先读取和解释 | |
+| 关键代码的详细安全审查 | | 首选手动审查或专业审计工具 |
+| 当你想通过写代码来学习时 | | 自主执行可能绕过学习过程 |
+
+## 优缺点
+
+| 优点 | 缺点 |
+|------|------|
+| 自然语言输入减少认知负担 | 自主迭代可能悄悄引入 bug |
+| 持久指令消除重复上下文说明 | 比逐行编辑粒度控制更少 |
+| 完整任务循环减少手动上下文切换 | 需要仔细审查生成的差异 |
+| 非常适合快速探索和原型开发 | 较新的产品，生态系统和插件有限 |
+
+## 实用资源
+
+- [Antigravity 官方网站](https://antigravity.sh/) — 文档、下载和示例
 
 ## 另请参阅
 
-- [Agents](/docs/agents)
-- [Spec-driven development](/docs/spec-driven-development)
+- [Claude Code](/docs/tools/claude-code)
 - [Cursor](/docs/tools/cursor)
-- [LLMs](/docs/llms)
+- [GitHub Copilot](/docs/tools/github-copilot)
+- [Kiro](/docs/tools/kiro)

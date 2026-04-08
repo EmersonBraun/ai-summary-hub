@@ -1,18 +1,20 @@
 ---
-title: Auto-evaluación y calibración
-description: Técnicas que hacen un prompt a un LLM para evaluar la calidad y confianza de sus propias salidas — permitiendo auto-corrección iterativa, cuantificación de incertidumbre y respuestas más confiables sin supervisión externa.
-keywords: [auto-evaluación, autocrítica, calibración, puntuación de confianza, chain-of-verification, auto-corrección, fiabilidad de LLM, ingeniería de prompts, IA constitucional]
+title: Autoevaluación y calibración
+description: Técnicas que hacen un prompt a un LLM para evaluar la calidad y confianza de sus propios resultados — permitiendo la autocorrección iterativa, la cuantificación de incertidumbre y respuestas más confiables sin supervisión externa.
+keywords: [self-evaluation, self-critique, calibration, confidence scoring, chain-of-verification, self-correction, LLM reliability, prompt engineering, constitutional AI]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
-# Auto-evaluación y calibración
+# Autoevaluación y calibración
 
 ## Definición
 
-La auto-evaluación se refiere a hacer un prompt a un modelo de lenguaje para que critique, verifique o puntúe su propia salida generada previamente. En lugar de tratar la primera respuesta del modelo como definitiva, un paso de auto-evaluación le pide al modelo que actúe como su propio revisor — verificando errores factuales, inconsistencias lógicas, razonamiento incompleto o fallo en seguir instrucciones — y luego ya sea para señalar problemas o para generar una respuesta mejorada. El modelo utiliza los mismos pesos y ventana de contexto para ambos roles, lo cual es tanto una fortaleza (no se necesita ningún modelo adicional) como una limitación fundamental (el modelo puede tener puntos ciegos sistemáticos que no puede auto-detectar).
+La autoevaluación se refiere a hacer un prompt a un modelo de lenguaje para que critique, verifique o puntúe su propia salida generada previamente. En lugar de tratar la primera respuesta del modelo como definitiva, un paso de autoevaluación pide al modelo que actúe como su propio revisor —verificando errores factuales, inconsistencias lógicas, razonamiento incompleto o falta de seguimiento de instrucciones— y luego ya sea para señalar problemas o para generar una respuesta mejorada. El modelo usa los mismos pesos y ventana de contexto para ambos roles, lo que es tanto una fortaleza (no se necesita ningún modelo adicional) como una limitación fundamental (el modelo puede tener puntos ciegos sistemáticos que no puede autodetectar).
 
-La calibración es la dimensión más estrecha y cuantitativa de la auto-evaluación. Un modelo está *bien calibrado* si su confianza expresada coincide con su precisión empírica: cuando dice que está 80% seguro, debería ser correcto aproximadamente el 80% de las veces. La mayoría de los LLMs están mal calibrados por defecto — expresan alta confianza incluso en preguntas que responden incorrectamente, un fenómeno conocido como *sobreconfianza* o *exceso epistémico*. Las técnicas de calibración hacen un prompt al modelo para que produzca una puntuación de confianza numérica explícita junto con cada respuesta, y luego el sistema puede usar esa puntuación para enrutar respuestas inciertas a revisión humana, para activar pasos de verificación adicionales, o para abstenerse de responder por completo.
+La calibración es la dimensión cuantitativa más estrecha de la autoevaluación. Un modelo está *bien calibrado* si su confianza expresada coincide con su precisión empírica: cuando dice tener un 80% de confianza, debería ser correcto aproximadamente el 80% del tiempo. La mayoría de los LLM están mal calibrados de fábrica —expresan alta confianza incluso en preguntas que responden incorrectamente, un fenómeno conocido como *sobreconfianza* o *exceso epistémico*. Las técnicas de calibración hacen un prompt al modelo para producir una puntuación de confianza numérica explícita junto con cada respuesta, y luego el sistema puede usar esa puntuación para enrutar respuestas inciertas a revisión humana, para desencadenar pasos de verificación adicionales, o para abstenerse de responder completamente.
 
-Juntas, la auto-evaluación y la calibración abordan dos modos de fallo distintos pero relacionados. La auto-evaluación aborda la *corrección*: el modelo produjo una respuesta, ¿pero es correcta? La calibración aborda la *conciencia de incertidumbre*: ¿sabe el modelo cuándo no sabe? Ambas son necesarias para desplegar LLMs en entornos de alto riesgo. Un modelo que detecta sus propios errores es más fiable; un modelo que sabe lo que no sabe es más confiable. Las técnicas aquí cubiertas — autocrítica, puntuación de confianza y chain-of-verification — son cada vez más componentes estándar de los pipelines de LLM en producción.
+En conjunto, la autoevaluación y la calibración abordan dos modos de falla distintos pero relacionados. La autoevaluación aborda la *corrección*: el modelo produjo una respuesta, ¿pero es correcta? La calibración aborda la *conciencia de la incertidumbre*: ¿sabe el modelo cuándo no sabe? Ambas son necesarias para desplegar LLM en entornos de alto riesgo. Un modelo que detecta sus propios errores es más fiable; un modelo que sabe lo que no sabe es más confiable. Las técnicas aquí cubiertas —autocrítica, puntuación de confianza y cadena de verificación— son componentes cada vez más estándar de los pipelines de producción de LLM.
 
 ## Cómo funciona
 
@@ -31,52 +33,52 @@ flowchart TD
 
 ### Autocrítica
 
-La autocrítica es el método de auto-evaluación más simple. Después de generar una respuesta inicial, añades un segundo prompt que le pide al modelo que revise su propia salida según criterios explícitos. Los buenos prompts de autocrítica son *específicos* sobre qué verificar: precisión factual, consistencia lógica, completitud, adherencia a instrucciones, tono o seguridad. Los prompts vagos como "¿Es buena esta respuesta?" producen críticas superficiales. Los prompts específicos como "Lista cualquier afirmación factual en la respuesta sobre la que tengas menos del 90% de confianza, y explica por qué" producen retroalimentación accionable.
+La autocrítica es el método de autoevaluación más simple. Después de generar una respuesta inicial, añades un segundo prompt que pide al modelo que revise su propia salida con criterios explícitos. Los buenos prompts de autocrítica son *específicos* sobre qué verificar: precisión factual, consistencia lógica, completitud, adherencia a instrucciones, tono o seguridad. Los prompts vagos como "¿Es buena esta respuesta?" producen críticas superficiales y poco profundas. Los prompts específicos como "Enumera cualquier afirmación factual en la respuesta de la que tengas menos del 90% de confianza, y explica por qué" producen retroalimentación accionable.
 
-La calidad de la autocrítica mejora sustancialmente cuando le instruyes al modelo para que adopte una postura adversarial — buscar activamente problemas en lugar de confirmar que la respuesta está bien. Frases como "Cuestiona cada afirmación clave", "Encuentra al menos un defecto" y "¿A qué se opondría un escéptico?" sesgan al modelo hacia críticas útiles en lugar de validación. La IA Constitucional (Anthropic, 2022) sistematiza esto definiendo un conjunto de "principios" que el modelo debe verificar en la respuesta antes de revisarla — creando efectivamente una rúbrica de crítica estructurada que puede auditarse.
+La calidad de la autocrítica mejora sustancialmente cuando instruyes al modelo a adoptar una postura adversarial —buscar activamente problemas en lugar de confirmar que la respuesta está bien. Frases como "Desafía cada afirmación clave", "Encuentra al menos un defecto" y "¿A qué se opondría un escéptico?" sesgan al modelo hacia una crítica útil en lugar de la validación. La IA constitucional (Anthropic, 2022) sistematiza esto definiendo un conjunto de "principios" que el modelo debe verificar la respuesta antes de revisar —creando efectivamente una rúbrica de crítica estructurada que puede auditarse.
 
-Un modo de fallo crítico de la autocrítica es la *validación sycophantic*: el modelo elogia su propia respuesta y no encuentra problemas, especialmente cuando la respuesta original ya sonaba plausible pero era incorrecta. Esto es más pronunciado en modelos más pequeños y menos pronunciado en modelos que han sido ajustados con datos de crítica. Las mitigaciones incluyen: usar una instancia de modelo separada para la crítica, inyectar errores deliberados en el borrador para probar si el paso de crítica los detecta, y requerir que la crítica sea una lista estructurada en lugar de prosa libre (haciendo "sin problemas" una afirmación más difícil de defender).
+Un modo de falla crítico de la autocrítica es la *validación servil*: el modelo elogia su propia respuesta y no encuentra problemas, especialmente cuando la respuesta original ya sonaba plausible pero era incorrecta. Esto es más pronunciado en modelos más pequeños y menos pronunciado en modelos que han sido ajustados finamente con datos de crítica. Las mitigaciones incluyen: usar una instancia de modelo separada para la crítica, inyectar errores deliberados en el borrador para probar si el paso de crítica los detecta, y requerir que la crítica sea una lista estructurada en lugar de prosa libre (haciendo que "sin problemas" sea una afirmación más difícil de defender).
 
 ### Calibración y puntuación de confianza
 
-Los prompts de puntuación de confianza le piden al modelo que produzca una probabilidad explícita o una calificación ordinal junto con cada respuesta. Una versión mínima es una simple solicitud añadida al prompt de respuesta: "Después de tu respuesta, indica tu confianza como un porcentaje del 0 al 100, donde 100 significa que estás seguro y 0 significa que estás adivinando." Las versiones más sofisticadas piden un desglose por afirmación: "Para cada declaración factual en tu respuesta, califica tu confianza (alta / media / baja) e identifica la fuente de incertidumbre."
+Los prompts de puntuación de confianza piden al modelo producir una probabilidad explícita o calificación ordinal junto con cada respuesta. Una versión mínima es una simple solicitud añadida al prompt de respuesta: "Después de tu respuesta, indica tu confianza como un porcentaje de 0 a 100, donde 100 significa que estás seguro y 0 significa que estás adivinando." Las versiones más sofisticadas piden un desglose por afirmación: "Para cada declaración factual en tu respuesta, califica tu confianza (alta / media / baja) e identifica la fuente de incertidumbre."
 
-Las puntuaciones de confianza numéricas de los LLMs deben tratarse con escepticismo. Las probabilidades verbalizadas crudas no están bien calibradas en el sentido estadístico — un modelo que dice "70% de confianza" no acierta sistemáticamente el 70% de las veces en esas preguntas. Sin embargo, son *monotónicamente útiles*: las preguntas donde el modelo reporta baja confianza tienden a ser más difíciles y propensas a errores que las preguntas donde reporta alta confianza. Esto significa que las puntuaciones de confianza verbalizadas son útiles para *clasificar* y *enrutar* (enviar respuestas de baja confianza a revisión) aunque no sean útiles para la estimación de probabilidad exacta.
+Las puntuaciones de confianza numéricas de los LLM deben tratarse con escepticismo. Las probabilidades verbalizadas brutas no están bien calibradas en el sentido estadístico —un modelo que dice "70% de confianza" no es sistemáticamente correcto el 70% del tiempo en esas preguntas. Sin embargo, son *monótonamente útiles*: las preguntas donde el modelo informa baja confianza tienden a ser más difíciles y más propensas a errores que las preguntas donde informa alta confianza. Esto significa que las puntuaciones de confianza verbalizadas son útiles para *clasificar* y *enrutar* (enviar respuestas de baja confianza a revisión) incluso si no son útiles para la estimación exacta de probabilidades.
 
-La calibración puede mejorarse post-hoc mediante escalado de temperature o escalado de Platt aplicado a las log-probabilidades del modelo, pero estos requieren un conjunto de datos etiquetado. A nivel de prompt, puedes mejorar la calibración relativa pidiendo al modelo que compare su confianza con preguntas de referencia de dificultad conocida ("Tengo tanta confianza como tendría sobre la capital de Francia frente a una fecha histórica oscura").
+La calibración puede mejorarse post-hoc mediante el escalado de temperatura o el escalado de Platt aplicado a las log-probabilidades del modelo, pero estos requieren un conjunto de datos etiquetado. A nivel de prompt, puede mejorar la calibración relativa pidiendo al modelo que compare su confianza contra preguntas de referencia de dificultad conocida ("Tengo la misma confianza que tendría sobre la capital de Francia vs. una fecha histórica oscura").
 
-### Chain-of-verification
+### Cadena de verificación
 
-El chain-of-verification (CoVe, Dhuliawala et al., 2023) estructura la auto-evaluación como un pipeline de verificación de múltiples pasos: genera una respuesta de línea base, luego planifica explícitamente un conjunto de preguntas de verificación que confirmarían o refutarían las afirmaciones clave en esa respuesta, responde esas preguntas de verificación de forma independiente (sin mirar la respuesta original para reducir el sesgo de confirmación) y finalmente produce una respuesta revisada informada por los resultados de la verificación. Esta descomposición es importante porque obliga al modelo a separar la *generación de afirmaciones* de la *verificación de afirmaciones*, reduciendo la probabilidad de que el mismo error de razonamiento se propague a través de ambos pasos.
+La cadena de verificación (CoVe, Dhuliawala et al., 2023) estructura la autoevaluación como un pipeline de verificación de múltiples pasos: generar una respuesta de referencia, luego planificar explícitamente un conjunto de preguntas de verificación que confirmarían o refutarían las afirmaciones clave en esa respuesta, responder esas preguntas de verificación de forma independiente (sin mirar la respuesta original para reducir el sesgo de confirmación), y finalmente producir una respuesta revisada informada por los resultados de la verificación. Esta descomposición es importante porque obliga al modelo a separar la *generación de afirmaciones* de la *verificación de afirmaciones*, reduciendo la posibilidad de que el mismo error de razonamiento se propague a través de ambos pasos.
 
-Las preguntas de verificación deben ser atómicas — cada una debe probar una única subafirmación específica. Por ejemplo, si la respuesta de línea base afirma "Python 3.10 introdujo la coincidencia de patrones estructural y el operador walrus", las preguntas de verificación deben ser: "¿En qué versión de Python se introdujo la coincidencia de patrones estructural?" y "¿En qué versión de Python se introdujo el operador walrus?" Responder estas de forma independiente a menudo revela errores factuales que la respuesta original afirmó con confianza.
+Las preguntas de verificación deben ser atómicas —cada una debe probar una sola subafirmación específica. Por ejemplo, si la respuesta de referencia afirma "Python 3.10 introdujo la coincidencia de patrones estructurales y el operador morsa", las preguntas de verificación deben ser: "¿En qué versión de Python se introdujo la coincidencia de patrones estructurales?" y "¿En qué versión de Python se introdujo el operador morsa?" Responder estas de forma independiente a menudo revela errores factuales que la respuesta original afirmaba con confianza.
 
 ## Cuándo usar / Cuándo NO usar
 
 | Usar cuando | Evitar cuando |
 |-------------|---------------|
-| La tarea es de alto riesgo y la corrección factual es crítica (médica, legal, financiera) | La latencia es una restricción dura — la auto-evaluación añade al menos un round-trip completo de inferencia |
-| Quieres una señal de incertidumbre incorporada sin un modelo evaluador separado | El dominio del modelo es uno donde la auto-evaluación es sistemáticamente poco fiable (por ejemplo, eventos muy recientes más allá del corte de entrenamiento) |
-| La calidad de la salida es muy variable entre ejecuciones y necesitas un mecanismo de filtrado | La tarea es simple y bien restringida — la sobrecarga de auto-evaluación supera el beneficio de precisión |
-| Necesitas enrutar respuestas inciertas a revisión humana automáticamente | El modelo es demasiado pequeño para producir autocríticas fiables (< 7B parámetros típicamente produce auto-evaluación pobre) |
-| Las respuestas contienen múltiples afirmaciones factuales independientes que pueden verificarse atómicamente | Necesitas calibración de probabilidad exacta — las puntuaciones de confianza verbalizadas no están estadísticamente calibradas |
-| Construyendo un pipeline donde el modelo debe detectar sus propias alucinaciones | La generación original ya está en precisión de techo — la autocrítica añade coste sin ganancia de precisión |
+| La tarea es de alto riesgo y la corrección factual es crítica (médico, legal, financiero) | La latencia es una restricción estricta — la autoevaluación añade al menos un viaje de ida y vuelta de inferencia completo |
+| Quieres una señal de incertidumbre incorporada sin un modelo evaluador separado | El dominio del modelo es uno donde la autoevaluación es sistemáticamente poco fiable (p. ej., eventos muy recientes más allá del corte de entrenamiento) |
+| La calidad de la salida es muy variable entre ejecuciones y necesitas un mecanismo de filtrado | La tarea es simple y bien restringida — la sobrecarga de autoevaluación supera el beneficio de precisión |
+| Necesitas enrutar respuestas inciertas a revisión humana automáticamente | El modelo es demasiado pequeño para producir autocríticas fiables (\< 7B parámetros típicamente produce autoevaluaciones pobres) |
+| Las respuestas contienen múltiples afirmaciones factuales independientes que pueden verificarse atómicamente | Necesitas calibración de probabilidad exacta — las puntuaciones de confianza verbalizadas no están calibradas estadísticamente |
+| Construyendo un pipeline donde el modelo debe detectar sus propias alucinaciones | La generación original ya está en precisión máxima — la autocrítica añade costo sin ganancia de precisión |
 
 ## Comparaciones
 
-| Criterio | Auto-evaluación | Self-consistency | Evaluación externa |
-|----------|----------------|-----------------|---------------------|
-| Llamadas adicionales al modelo | 1–3 (crítica, puntuación, verificación) | N (típicamente 10–40) | 1 (evaluador separado) |
+| Criterio | Autoevaluación | Autoconsistencia | Evaluación externa |
+|----------|---------------|-----------------|-------------------|
+| Llamadas adicionales al modelo | 1–3 (criticar, puntuar, verificar) | N (típicamente 10–40) | 1 (evaluador separado) |
 | Requiere modelo separado | No — el mismo modelo se revisa a sí mismo | No | Sí — típicamente un modelo más fuerte o especializado |
-| Detecta errores factuales | Sí, si la autocrítica está bien prompta | Parcialmente — los hechos inconsistentes pueden sobrevivir el voto mayoritario | Sí, más fiablemente |
-| Proporciona puntuación de incertidumbre | Sí — calificación de confianza explícita | Implícita — la distribución de votos es un proxy de confianza | Sí — el evaluador puede producir una puntuación |
-| Reduce la alucinación | Sí, especialmente con CoVe | Parcialmente — la votación reduce pero no elimina la alucinación | Más fiablemente, pero añade coste y latencia |
-| Esfuerzo de implementación | Moderado — requiere diseño cuidadoso del prompt de crítica | Bajo — muestrea N veces y vota | Alto — requiere prompt del evaluador, llamada separada a la API, posiblemente un modelo separado |
-| Mejor caso de uso | QA de alto riesgo de un solo turno, generación factual | Matemáticas y razonamiento en múltiples pasos | Pipelines empresariales con fuertes requisitos de corrección |
+| Detecta errores factuales | Sí, si la autocrítica está bien formulada | Parcialmente — los hechos inconsistentes pueden sobrevivir el voto mayoritario | Sí, de forma más fiable |
+| Proporciona puntuación de incertidumbre | Sí — calificación de confianza explícita | Implícita — la distribución de votos es un proxy para la confianza | Sí — el evaluador puede generar una puntuación |
+| Reduce la alucinación | Sí, especialmente con CoVe | Parcialmente — la votación reduce pero no elimina la alucinación | De forma más fiable, pero añade costo y latencia |
+| Esfuerzo de implementación | Moderado — requiere un diseño cuidadoso del prompt de crítica | Bajo — muestrear N veces y votar | Alto — requiere prompt de evaluador, llamada API separada, posiblemente un modelo separado |
+| Mejor caso de uso | QA de alto riesgo de un solo turno, generación factual | Matemáticas y razonamiento de múltiples pasos | Pipelines empresariales con requisitos estrictos de corrección |
 
 ## Ejemplos de código
 
-### Auto-evaluación con paso de crítica usando el SDK de Anthropic
+### Autoevaluación con paso de crítica usando el SDK de Anthropic
 
 ```python
 # Self-evaluation pipeline: generate → critique → score → revise
@@ -228,7 +230,7 @@ if __name__ == "__main__":
     print(f"Confidence: {result['confidence_score']['confidence']}")
 ```
 
-### Chain-of-verification para afirmaciones factuales
+### Cadena de verificación para afirmaciones factuales
 
 ```python
 # Chain-of-Verification (CoVe): decompose claims, verify independently, revise
@@ -355,15 +357,15 @@ if __name__ == "__main__":
 
 ## Recursos prácticos
 
-- [Self-Refine: Iterative Refinement with Self-Feedback (Madaan et al., 2023)](https://arxiv.org/abs/2303.17651) — Introduce y evalúa la autocrítica iterativa y la revisión en siete tareas diversas de generación de texto; la referencia fundacional para los pipelines de auto-evaluación.
-- [Chain-of-Verification Reduces Hallucination in Large Language Models (Dhuliawala et al., 2023)](https://arxiv.org/abs/2309.11495) — Propone CoVe, el enfoque de planificación de verificación estructurada descrito en este artículo, con experimentos en QA basado en listas y generación de formato largo.
-- [Constitutional AI: Harmlessness from AI Feedback (Bai et al., 2022)](https://arxiv.org/abs/2212.08073) — Demuestra la autocrítica sistemática contra un conjunto definido de principios a escala; el precedente de producción para rúbricas de auto-evaluación estructuradas.
-- [Language Models (Mostly) Know What They Know (Kadavath et al., 2022)](https://arxiv.org/abs/2207.05221) — Estudia si los LLMs pueden informar con precisión su propia incertidumbre; muestra que la calibración es posible pero imperfecta, proporcionando la base empírica para las técnicas de puntuación de confianza.
-- [Calibration of Large Language Models Using Their Generations (Kapoor et al., 2024)](https://arxiv.org/abs/2403.07221) — Revisa los métodos de calibración post-hoc incluyendo la confianza verbalizada y los compara con las líneas base de log-probabilidad en las familias GPT-4 y Claude.
+- [Self-Refine: Iterative Refinement with Self-Feedback (Madaan et al., 2023)](https://arxiv.org/abs/2303.17651) — Introduce y evalúa la autocrítica iterativa y la revisión en siete tareas diversas de generación de texto; la referencia fundamental para los pipelines de autoevaluación.
+- [Chain-of-Verification Reduces Hallucination in Large Language Models (Dhuliawala et al., 2023)](https://arxiv.org/abs/2309.11495) — Propone CoVe, el enfoque de planificación de verificación estructurada descrito en este artículo, con experimentos en QA basada en listas y generación de formato largo.
+- [Constitutional AI: Harmlessness from AI Feedback (Bai et al., 2022)](https://arxiv.org/abs/2212.08073) — Demuestra la autocrítica sistemática contra un conjunto definido de principios a escala; el precedente de producción para rúbricas de autoevaluación estructuradas.
+- [Language Models (Mostly) Know What They Know (Kadavath et al., 2022)](https://arxiv.org/abs/2207.05221) — Estudia si los LLM pueden informar con precisión su propia incertidumbre; muestra que la calibración es posible pero imperfecta, proporcionando la base empírica para las técnicas de puntuación de confianza.
+- [Calibration of Large Language Models Using Their Generations (Kapoor et al., 2024)](https://arxiv.org/abs/2403.07221) — Encuesta métodos de calibración post-hoc incluyendo confianza verbalizada y los compara con líneas base de log-probabilidad en las familias GPT-4 y Claude.
 
 ## Ver también
 
 - [Ingeniería de prompts](/docs/prompt-engineering)
-- [Self-consistency](/docs/prompt-engineering/self-consistency)
-- [Técnicas de debiasing](/docs/prompt-engineering/debiasing-techniques)
+- [Autoconsistencia](/docs/prompt-engineering/self-consistency)
+- [Técnicas de eliminación de sesgos](/docs/prompt-engineering/debiasing-techniques)
 - [Métricas de evaluación](/docs/evaluation-metrics)
