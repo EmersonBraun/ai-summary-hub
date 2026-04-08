@@ -1,36 +1,38 @@
 ---
-title: "Agents basés sur les DAG"
-description: Flux de travail de graphe acyclique dirigé pour les agents — exécution parallèle, dépendances de tâches et construction de graphe dynamique.
-keywords: [agents DAG, graphe acyclique dirigé, agents parallèles, LangGraph, orchestration de flux de travail, dépendances de tâches, tri topologique]
+title: "DAG-based agents"
+description: Directed acyclic graph workflows for agents — parallel execution, task dependencies, and dynamic graph construction.
+keywords: [DAG agents, directed acyclic graph, parallel agents, LangGraph, workflow orchestration, task dependencies, topological sort]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Agents basés sur les DAG
 
 ## Définition
 
-Un agent basé sur les DAG organise son travail comme un **graphe acyclique dirigé (DAG)** : un ensemble de nœuds (tâches ou étapes d'agent) connectés par des arêtes dirigées qui encodent les dépendances entre eux. « Acyclique » signifie qu'il n'y a pas de dépendances circulaires — l'exécution s'écoule strictement vers l'avant des entrées vers les sorties. L'avantage clé par rapport aux pipelines séquentiels est que **les nœuds indépendants peuvent s'exécuter en parallèle**, réduisant considérablement le temps d'horloge murale pour les flux de travail complexes multi-étapes.
+Ein DAG-basierter Agent organisiert seine Arbeit als **gerichteten azyklischen Graphen (DAG)**: eine Menge von Knoten (Aufgaben oder Agentenschritte), die durch gerichtete Kanten verbunden sind, die Abhängigkeiten zwischen ihnen kodieren. „Azyklisch" bedeutet, dass es keine zirkulären Abhängigkeiten gibt – die Ausführung fließt strikt vorwärts von Eingaben zu Ausgaben. Der wesentliche Vorteil gegenüber sequentiellen Pipelines besteht darin, dass **unabhängige Knoten parallel ausgeführt werden können**, was die Wanduhrzeit für komplexe mehrstufige Workflows drastisch reduziert.
 
-En pratique, chaque nœud dans le DAG peut être un appel LLM, une invocation d'outil, une transformation de données ou même un sous-agent. Un nœud se déclenche dès que tous ses prédécesseurs ont terminé avec succès, transmettant leurs sorties comme entrées. Ce modèle s'applique naturellement à des tâches comme l'analyse concurrentielle (rechercher trois entreprises en parallèle, puis synthétiser), la révision de code (vérifier la sécurité, le style et les tests simultanément, puis rapporter), ou les pipelines de données (récupérer plusieurs sources de données en parallèle, les joindre, puis agréger).
+In der Praxis kann jeder Knoten im DAG ein LLM-Aufruf, ein Werkzeugaufruf, eine Datentransformation oder sogar ein Subagent sein. Ein Knoten feuert, sobald alle seine Vorgänger erfolgreich abgeschlossen wurden, und übergibt deren Ausgaben als Eingaben. Dieses Modell passt natürlich zu Aufgaben wie der Wettbewerbsanalyse (drei Unternehmen parallel recherchieren, dann synthetisieren), dem Code-Review (Sicherheit, Stil und Tests gleichzeitig prüfen, dann berichten) oder Datenpipelines (mehrere Datenquellen parallel abrufen, zusammenführen und aggregieren).
 
-La construction dynamique de DAG va encore plus loin : au lieu d'un graphe fixe défini au moment de la conception, l'agent construit ou modifie le graphe au moment de l'exécution en fonction des résultats intermédiaires. Un agent de planification pourrait produire une liste de tâches dont les dépendances ne sont pas connues jusqu'à ce qu'il voit les données, puis construire et exécuter le DAG approprié à la volée. Cela combine le parallélisme structuré des DAG avec l'adaptabilité des agents de planification, au coût d'une complexité d'implémentation supplémentaire.
+Die dynamische DAG-Konstruktion geht noch weiter: Anstatt eines zur Entwurfszeit definierten festen Graphen erstellt oder modifiziert der Agent den Graphen zur Laufzeit auf der Grundlage von Zwischenergebnissen. Ein Planungsagent könnte eine Aufgabenliste erzeugen, deren Abhängigkeiten erst bekannt sind, wenn er die Daten sieht, und dann den entsprechenden DAG spontan aufbauen und ausführen. Dies kombiniert den strukturierten Parallelismus von DAGs mit der Anpassungsfähigkeit von Planungsagenten – auf Kosten zusätzlicher Implementierungskomplexität.
 
 ## Comment ça fonctionne
 
-### Définition du graphe et types de nœuds
+### Graphdefinition und Knotentypen
 
-Un DAG est défini par un ensemble de nœuds et un ensemble d'arêtes dirigées. Chaque nœud porte une fonction (le travail à faire), une spécification d'entrée (quelles sorties de nœuds en amont accepter) et une spécification de sortie (ce qu'il produit). Les arêtes sont définies comme des paires `(nœud_amont, nœud_aval)`. Les nœuds sans arêtes entrantes sont des points d'entrée ; les nœuds sans arêtes sortantes sont des points de sortie. Les fonctions de nœuds peuvent être synchrones ou asynchrones — les nœuds asynchrones sont essentiels pour obtenir un vrai parallélisme dans les flux de travail liés aux E/S.
+Ein DAG wird durch eine Menge von Knoten und eine Menge gerichteter Kanten definiert. Jeder Knoten trägt eine Funktion (die zu erledigende Arbeit), eine Eingabespezifikation (welche Ausgaben der vorgelagerten Knoten akzeptiert werden) und eine Ausgabespezifikation (was er produziert). Kanten sind als `(upstream_node, downstream_node)`-Paare definiert. Knoten ohne eingehende Kanten sind Einstiegspunkte; Knoten ohne ausgehende Kanten sind Ausstiegspunkte. Knotenfunktionen können synchron oder asynchron sein – asynchrone Knoten sind für echte Parallelität in I/O-gebundenen Workflows unerlässlich.
 
-### Tri topologique et ordonnancement
+### Topologische Sortierung und Scheduling
 
-Avant l'exécution, l'ordonnanceur calcule un **ordre topologique** du graphe : une séquence linéaire de nœuds telle que chaque nœud apparaît après tous ses prédécesseurs. Si plusieurs nœuds sont à la même profondeur (sans dépendance mutuelle), ils peuvent être distribués simultanément. L'algorithme standard est l'algorithme de Kahn, qui traite les nœuds couche par couche. Au moment de l'exécution, une file d'attente contient les nœuds dont toutes les dépendances ont été satisfaites ; les workers tirent de la file et exécutent les nœuds, puis mettent en file les nœuds en aval nouvellement débloqués.
+Vor der Ausführung berechnet der Scheduler eine **topologische Ordnung** des Graphen: eine lineare Sequenz von Knoten, sodass jeder Knoten nach allen seinen Vorgängern erscheint. Wenn mehrere Knoten auf derselben Tiefe liegen (keine Abhängigkeit voneinander), können sie gleichzeitig ausgeführt werden. Der Standardalgorithmus ist der Kahn-Algorithmus, der Knoten schichtweise verarbeitet. Zur Laufzeit hält eine Warteschlange Knoten, deren Abhängigkeiten alle erfüllt sind; Worker entnehmen der Warteschlange Knoten, führen sie aus und fügen neu freigeschaltete nachgelagerte Knoten in die Warteschlange ein.
 
-### Exécution parallèle
+### Parallele Ausführung
 
-Les nœuds indépendants — ceux sans dépendances partagées — s'exécutent en parallèle en utilisant des threads, des coroutines asynchrones ou un pool de processus. Le degré de parallélisme est borné par la structure du DAG : une chaîne entièrement séquentielle n'offre aucun parallélisme, tandis qu'un fan-out large suivi d'une agrégation fan-in peut exécuter des dizaines de tâches simultanément. Dans les flux de travail d'agents, c'est particulièrement précieux pour des tâches comme les recherches web en masse, les récupérations de données multi-sources ou les appels de sous-agents indépendants.
+Unabhängige Knoten – solche ohne gemeinsame Abhängigkeiten – werden parallel mit Threads, asynchronen Coroutinen oder einem Prozesspool ausgeführt. Der Grad der Parallelität ist durch die Struktur des DAG begrenzt: Eine vollständig sequentielle Kette bietet keine Parallelität, während ein breites Fan-out gefolgt von einer Fan-in-Aggregation Dutzende von Aufgaben gleichzeitig ausführen kann. In Agenten-Workflows ist dies besonders wertvoll für Aufgaben wie Massen-Websuchen, Datenabrufe aus mehreren Quellen oder unabhängige Subagenten-Aufrufe.
 
-### Construction dynamique de DAG
+### Dynamische DAG-Konstruktion
 
-En mode dynamique, une étape de planification s'exécute d'abord et produit une spécification de graphe (par exemple, une liste JSON de nœuds et d'arêtes). L'ordonnanceur instancie le DAG, le valide pour les cycles, et commence l'exécution. Les DAG dynamiques doivent inclure la détection de cycles — généralement via DFS — avant que l'ordonnancement commence. Ce modèle est plus fragile que les DAG statiques parce qu'un plan malformé peut produire un graphe invalide, mais il permet une adaptabilité beaucoup plus riche.
+Im dynamischen Modus läuft zunächst ein Planungsschritt und gibt eine Graphspezifikation aus (z. B. eine JSON-Liste von Knoten und Kanten). Der Scheduler instanziiert den DAG, validiert ihn auf Zyklen und beginnt die Ausführung. Dynamische DAGs müssen eine Zykluserkennung – typischerweise per DFS – enthalten, bevor das Scheduling beginnt. Dieses Muster ist anfälliger als statische DAGs, weil ein fehlerhafter Plan einen ungültigen Graphen erzeugen kann, aber es ermöglicht eine viel reichhaltigere Anpassungsfähigkeit.
 
 ```mermaid
 flowchart LR
@@ -46,22 +48,22 @@ flowchart LR
 
 | Utiliser quand | Éviter quand |
 |---|---|
-| Le flux de travail a plusieurs sous-tâches indépendantes pouvant s'exécuter en parallèle | Toutes les tâches sont strictement séquentielles sans opportunité de parallélisme |
-| Le temps d'exécution est une priorité et les tâches sont liées aux E/S | Le graphe de dépendances est suffisamment simple pour qu'un pipeline linéaire suffise |
-| Les dépendances de tâches sont bien définies et peuvent être spécifiées à l'avance | La replanification dynamique est plus importante que l'exécution parallèle |
-| Vous avez besoin d'une observabilité fine sur quelles tâches ont réussi ou échoué | L'équipe manque de familiarité avec les concepts d'ordonnancement de graphes |
-| Le flux de travail ressemble à un pipeline de données avec des étapes fan-out et fan-in | Les tâches sont si rapides que la surcharge d'ordonnancement dépasse le bénéfice du parallélisme |
+| Der Workflow mehrere unabhängige Teilaufgaben hat, die parallel ausgeführt werden können | Alle Aufgaben streng sequentiell sind und keine Parallelisierungsmöglichkeit besteht |
+| Ausführungszeit Priorität hat und Aufgaben I/O-gebunden sind | Der Abhängigkeitsgraph einfach genug ist, dass eine lineare Pipeline ausreicht |
+| Aufgabenabhängigkeiten klar definiert und im Voraus spezifizierbar sind | Dynamisches Replanning wichtiger ist als parallele Ausführung |
+| Feingranulare Beobachtbarkeit darüber benötigt wird, welche Aufgaben bestanden oder fehlgeschlagen sind | Das Team mit Graphen-Scheduling-Konzepten nicht vertraut ist |
+| Der Workflow einer Datenpipeline mit Fan-out- und Fan-in-Phasen ähnelt | Aufgaben so schnell sind, dass der Scheduling-Overhead den Parallelisierungsnutzen übersteigt |
 
 ## Comparaisons
 
-| Critère | Agents DAG | Pipeline séquentiel | Planner-Executor |
+| Kriterium | DAG-basierte Agenten | Sequentielle Pipeline | Planner-Executor |
 |---|---|---|---|
-| Parallélisme | Natif — les branches indépendantes s'exécutent simultanément | Aucun | Aucun par défaut |
-| Flexibilité / adaptation dynamique | Faible à moyenne (graphe fixe) | Faible | Élevée (boucle de replanification) |
-| Complexité d'implémentation | Élevée (ordonnanceur, détection de cycles, async) | Très faible | Moyenne |
-| Auditabilité | Élevée — la structure du graphe est explicite | Moyenne | Élevée — l'artefact de plan est explicite |
-| Gestion des échecs | Nouvelle tentative par nœud, re-exécutions partielles possibles | Redémarrage depuis le début | Replanification en cas d'échec |
-| Idéal pour | Flux de travail larges et parallélisables | Tâches séquentielles simples | Tâches adaptatives multi-étapes |
+| Parallelismus | Nativ — unabhängige Zweige laufen gleichzeitig | Keiner | Standardmäßig keiner |
+| Flexibilität / dynamische Anpassung | Niedrig-mittel (fester Graph) | Niedrig | Hoch (Replanning-Schleife) |
+| Implementierungskomplexität | Hoch (Scheduler, Zykluserkennung, async) | Sehr niedrig | Mittel |
+| Nachvollziehbarkeit | Hoch — Graphstruktur ist explizit | Mittel | Hoch — Plan-Artefakt ist explizit |
+| Fehlerbehandlung | Wiederholung pro Knoten, teilweise Neuausführungen möglich | Neustart von Anfang an | Replanning bei Fehler |
+| Meilleur pour | Breite, parallelisierbare Workflows | Einfache sequentielle Aufgaben | Mehrstufige adaptive Aufgaben |
 
 ## Exemples de code
 
@@ -237,13 +239,13 @@ if __name__ == "__main__":
 
 ## Ressources pratiques
 
-- [Documentation LangGraph](https://langchain-ai.github.io/langgraph/) — Framework d'exécution de graphe de qualité production pour les agents LLM, avec prise en charge de première classe pour le branchement, l'exécution parallèle et les cycles.
-- [LLM Compiler: Parallel Function Calling (Kim et al., 2023)](https://arxiv.org/abs/2312.04511) — Article introduisant les appels d'outils parallèles basés sur DAG pour les agents LLM, avec des améliorations de latence significatives.
-- [Concepts DAG Apache Airflow](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/dags.html) — Modèle d'orchestration DAG éprouvé dans le monde de l'ingénierie des données ; de nombreux moteurs DAG d'agents empruntent ces concepts.
-- [Prefect — Orchestration de flux de travail](https://docs.prefect.io/latest/concepts/flows/) — Orchestration de flux de travail moderne avec exécution de tâches parallèles intégrée, applicable aux flux de travail d'agents.
+- [LangGraph Documentation](https://langchain-ai.github.io/langgraph/) — Produktionsreifes Graph-Ausführungs-Framework für LLM-Agenten, mit erstklassiger Unterstützung für Verzweigungen, parallele Ausführung und Zyklen.
+- [LLM Compiler: Parallel Function Calling (Kim et al., 2023)](https://arxiv.org/abs/2312.04511) — Paper, das DAG-basierte parallele Werkzeugaufrufe für LLM-Agenten einführt, mit signifikanten Latenzverbesserungen.
+- [Apache Airflow DAG Concepts](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/dags.html) — Bewährtes DAG-Orchestrierungsmodell aus der Datentechnik; viele Agenten-DAG-Engines übernehmen diese Konzepte.
+- [Prefect — Workflow Orchestration](https://docs.prefect.io/latest/concepts/flows/) — Moderne Workflow-Orchestrierung mit integrierter paralleler Aufgabenausführung, anwendbar auf Agenten-Workflows.
 
 ## Voir aussi
 
-- [Architecture Planner-Executor](/docs/agents/planner-executor)
-- [Agents IA](/docs/agents)
+- [Planner-Executor architecture](/docs/agents/planner-executor)
+- [AI agents](/docs/agents)
 - [Airflow](/docs/mlops/data-engineering/airflow)

@@ -1,36 +1,38 @@
 ---
 title: Case study — Qwen
-description: Alibaba's LLM family; multilingual, Programmierung, and long-context support.
-keywords: [Qwen, Alibaba, multilingual, Programmierung, long context]
+description: Alibabas LLM-Familie; mehrsprachig, Programmierung und Langkontext-Unterstützung.
+keywords: [Qwen, Alibaba, multilingual, coding, long context]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Case study: Qwen
 
 ## Definition
 
-Qwen is Alibaba’s Familie von [LLMs](/docs/llms). Die Modelle sind gebaut für **multilingual** use (einschließlich Chinesisch und Englisch), **Programmierung** (Qwen-Coder), and **long context**, and are available as open weights and via API.
+Qwen ist Alibabas Familie von [LLMs](/docs/llms). Die Modelle sind für **mehrsprachigen** Einsatz (einschließlich Chinesisch und Englisch), **Programmierung** (Qwen-Coder) und **langen Kontext** konzipiert und als offene Gewichte sowie über API verfügbar.
 
-Like [DeepSeek](/docs/case-studies/deepseek) and [Claude](/docs/case-studies/claude), Qwen uses pretraining, Instruktions-Tuning, and alignment; differentiation includes strong multilingual and Programmierung variants and long-context support. Use case: chat, code assistance, [RAG](/docs/rag) over long documents, and [Feinabstimmung](/docs/llms/fine-tuning) for domain-specific applications.
+Wie [DeepSeek](/docs/case-studies/deepseek) und [Claude](/docs/case-studies/claude) nutzt Qwen Vortraining, Instruktions-Tuning und Ausrichtung; Differenzierungsmerkmale umfassen starke mehrsprachige und Programmiervarianten sowie Langkontext-Unterstützung. Anwendungsfall: Chat, Code-Unterstützung, [RAG](/docs/rag) über lange Dokumente und [Feinabstimmung](/docs/llms/fine-tuning) für domänenspezifische Anwendungen.
 
 ## Funktionsweise
 
-**Base models** are vortrainiert auf großen mehrsprachigen und Code-Korpora. **Instruction tuning** and **alignment** (z. B. DPO, RLHF-style) produce chat and tool-use variants. **Specialized versions**: Qwen-Coder for code, Qwen-VL for vision-language. **Long context** is supported via extended context windows and optional [RAG](/docs/rag). Weights are published for [local inference](/docs/local-inference) and [Feinabstimmung](/docs/llms/fine-tuning); API access is also offered. [Prompt engineering](/docs/prompt-engineering) and [agents](/docs/agents) extend the system for applications.
+**Basismodelle** werden auf großen mehrsprachigen und Code-Korpora vortrainiert. **Instruktions-Tuning** und **Ausrichtung** (z. B. DPO, RLHF-artig) erzeugen Chat- und Werkzeugnutzungsvarianten. **Spezialisierte Versionen**: Qwen-Coder für Code, Qwen-VL für Vision-Sprache. **Langer Kontext** wird über erweiterte Kontextfenster und optionales [RAG](/docs/rag) unterstützt. Gewichte werden für [lokale Inferenz](/docs/local-inference) und [Feinabstimmung](/docs/llms/fine-tuning) veröffentlicht; API-Zugang wird ebenfalls angeboten. [Prompt Engineering](/docs/prompt-engineering) und [Agenten](/docs/agents) erweitern das System für Anwendungen.
 
 ## Anwendungsfälle
 
-Qwen fits multilingual and Programmierung applications and long-context workflows with open or API access.
+Qwen eignet sich für mehrsprachige und Programmieranwendungen sowie Langkontext-Workflows mit offenem oder API-Zugang.
 
-- Multilingual chat, translation, and content generation
-- Code generation and code-focused [agents](/docs/agents)
-- Long-document Q&A and [RAG](/docs/rag) with large context windows
+- Mehrsprachiger Chat, Übersetzung und Inhaltsgenerierung
+- Codegenerierung und codeorientierte [Agenten](/docs/agents)
+- Langdokument-Q&A und [RAG](/docs/rag) mit großen Kontextfenstern
 
 ## Externe Dokumentation
 
-- [Qwen – Official site](https://qwenlm.github.io/) — Models and docs
-- [Qwen – Hugging Face](https://huggingface.co/Qwen2) — Weights and model cards
+- [Qwen – Official site](https://qwenlm.github.io/) — Modelle und Dokumentation
+- [Qwen – Hugging Face](https://huggingface.co/Qwen2) — Gewichte und Modellkarten
 
 ## Siehe auch
 
 - [LLMs](/docs/llms)
-- [Fine-tuning](/docs/llms/fine-tuning)
-- [Local inference](/docs/local-inference)
+- [Feinabstimmung](/docs/llms/fine-tuning)
+- [Lokale Inferenz](/docs/local-inference)

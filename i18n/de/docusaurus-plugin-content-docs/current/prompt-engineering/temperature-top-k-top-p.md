@@ -2,17 +2,19 @@
 title: Temperature, Top-K, Top-P
 description: Wie die Sampling-Parameter Temperature, Top-K und Top-P Zufälligkeit und Kreativität in LLM-Ausgaben steuern.
 keywords: [Temperature, Top-K, Top-P, Nucleus Sampling, Sampling-Parameter, LLM-Konfiguration, Zufälligkeit, Kreativität]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Temperature, Top-K, Top-P
 
 ## Definition
 
-Temperature, Top-K und Top-P sind Sampling-Parameter, die steuern, wie ein LLM das nächste Token während der Textgenerierung auswählt. Nachdem das Modell eine Wahrscheinlichkeitsverteilung über sein gesamtes Vokabular berechnet hat (via Softmax über Logits), formen diese Parameter, welche Tokens als Kandidaten für die Auswahl in Frage kommen und wie wahrscheinlich jeder Kandidat ausgewählt wird. Zusammen steuern sie den Kompromiss zwischen Determinismus und Vielfalt: Niedrige Werte machen das Modell vorhersehbar und fokussiert, hohe Werte machen es kreativ und abwechslungsreich.
+Temperature, Top-K und Top-P sind Sampling-Parameter, die steuern, wie ein LLM das nächste Token während der Textgenerierung auswählt. Nachdem das Modell eine Wahrscheinlichkeitsverteilung über sein gesamtes Vokabular berechnet hat (via Softmax über Logits), bestimmen diese Parameter, welche Token als Kandidaten für die Auswahl in Frage kommen und wie wahrscheinlich jeder Kandidat ausgewählt wird. Zusammen regeln sie den Kompromiss zwischen Determinismus und Diversität: Niedrige Werte machen das Modell vorhersagbar und fokussiert, hohe Werte machen es kreativ und abwechslungsreich.
 
-**Temperature** skaliert die rohen Logits vor dem Softmax-Schritt neu und verflacht oder schärft damit die Wahrscheinlichkeitsverteilung effektiv. Eine Temperature von 1,0 lässt die Verteilung unverändert. Werte unter 1,0 machen die Verteilung spitzer — das Modell wählt fast immer das Token mit der höchsten Wahrscheinlichkeit. Werte über 1,0 verflachen die Verteilung — mehr Tokens werden zu plausiblen Kandidaten, was überraschendere und vielfältigere Ausgaben erzeugt. Bei Temperature 0 wird die Generierung deterministisch (Argmax-Dekodierung).
+**Temperature** skaliert die rohen Logits vor dem Softmax-Schritt um und flacht die Wahrscheinlichkeitsverteilung effektiv ab oder schärft sie. Eine Temperature von 1,0 lässt die Verteilung unverändert. Werte unter 1,0 machen die Verteilung spitzer — das Modell wählt fast immer das Token mit der höchsten Wahrscheinlichkeit. Werte über 1,0 flachen die Verteilung ab — mehr Token werden zu plausiblen Kandidaten und erzeugen überraschendere und abwechslungsreichere Ausgaben. Bei Temperature 0 wird die Generierung deterministisch (Argmax-Dekodierung).
 
-**Top-K** und **Top-P** sind Trunkierungsstrategien, die nach der Temperature-Skalierung angewendet werden. Top-K behält nur die K wahrscheinlichsten Tokens und verteilt die Wahrscheinlichkeitsmasse unter ihnen, wobei alle anderen verworfen werden. Top-P (auch Nucleus Sampling genannt) wählt dynamisch den kleinsten Satz von Tokens aus, deren kumulative Wahrscheinlichkeitsmasse einen Schwellenwert P erreicht, und sampelt dann aus diesem Satz. Top-P wird generell Top-K vorgezogen, weil die Größe des Kandidatensatzes sich an die Form der Verteilung anpasst: Wenn das Modell zuversichtlich ist, ist der Nucleus klein; wenn das Modell unsicher ist, expandiert der Nucleus, um mehr Alternativen einzuschließen.
+**Top-K** und **Top-P** sind Abschneidungsstrategien, die nach der Temperaturskalierung angewendet werden. Top-K behält nur die K wahrscheinlichsten Token und verteilt die Wahrscheinlichkeitsmasse unter ihnen neu, wobei alle anderen verworfen werden. Top-P (auch Nucleus Sampling genannt) wählt dynamisch den kleinsten Satz von Token aus, deren kumulierte Wahrscheinlichkeitsmasse einen Schwellenwert P erreicht, und sampelt dann aus diesem Satz. Top-P wird im Allgemeinen gegenüber Top-K bevorzugt, weil die Größe des Kandidatensets sich an die Form der Verteilung anpasst: Wenn das Modell sicher ist, ist der Nucleus klein; wenn das Modell unsicher ist, erweitert sich der Nucleus, um mehr Alternativen einzuschließen.
 
 ## Funktionsweise
 
@@ -25,30 +27,30 @@ flowchart LR
   TP -->|"sample one token"| TOK[Next token]
 ```
 
-Die Parameter werden sequenziell angewendet: zuerst Temperature-Skalierung, dann Top-K-Trunkierung, dann Top-P-Nucleus-Auswahl, dann Sampling. In der Praxis wenden die meisten APIs nur temperature + Top-P (OpenAI-Standard) oder temperature + Top-K (Anthropic-Standard) an; das gleichzeitige Anwenden von sowohl Top-K als auch Top-P ist möglich, aber unüblich.
+Die Parameter werden sequentiell angewendet: zuerst Temperaturskalierung, dann Top-K-Abschneidung, dann Top-P-Nucleus-Auswahl, dann Sampling. In der Praxis wenden die meisten APIs nur Temperature + Top-P (OpenAI-Standard) oder Temperature + Top-K (Anthropic-Standard) an; die gleichzeitige Anwendung von Top-K und Top-P ist möglich, aber ungewöhnlich.
 
 ### Temperature
 
-Temperature `T` teilt jeden rohen Logit `z_i` vor dem Softmax: `p_i = softmax(z / T)`. Wenn `T < 1`, werden die Logit-Unterschiede verstärkt — das Token mit der höchsten Wahrscheinlichkeit erhält einen noch größeren Anteil der Wahrscheinlichkeitsmasse. Wenn `T > 1`, schrumpfen die Logit-Unterschiede — die Wahrscheinlichkeitsmasse verteilt sich gleichmäßiger. Gängige Voreinstellungen: `T = 0` für deterministische Extraktionsaufgaben, `T = 0,2–0,4` für sachliche Fragen und Antworten, `T = 0,7–1,0` für kreatives Schreiben, `T > 1,0` für maximale Vielfalt (obwohl die Qualität bei extremen Werten abnimmt).
+Temperature `T` teilt jeden rohen Logit `z_i` vor dem Softmax: `p_i = softmax(z / T)`. Wenn `T < 1`, werden die Logit-Unterschiede verstärkt — das Token mit der höchsten Wahrscheinlichkeit erhält einen noch größeren Anteil der Wahrscheinlichkeitsmasse. Wenn `T > 1`, schrumpfen Logit-Unterschiede — Wahrscheinlichkeitsmasse verteilt sich gleichmäßiger. Übliche Voreinstellungen: `T = 0` für deterministische Extraktionsaufgaben, `T = 0,2–0,4` für sachliche Fragen und Antworten, `T = 0,7–1,0` für kreatives Schreiben, `T > 1,0` für maximale Diversität (obwohl die Qualität bei extremen Werten abnimmt).
 
 ### Top-K
 
-Top-K Sampling schränkt den Kandidatenpool auf die K Tokens mit der höchsten Wahrscheinlichkeit nach der Temperature-Skalierung ein. Alle Tokens außerhalb der Top-K werden vor der Renormalisierung auf Wahrscheinlichkeit null gesetzt. Die entscheidende Einschränkung ist, dass K unabhängig davon fest ist, wie die Verteilung aussieht: Wenn das Modell sehr zuversichtlich ist, kann selbst K=50 viele Tokens mit nahezu null Wahrscheinlichkeit einschließen, die Rauschen einführen; wenn das Modell unsicher ist, kann ein kleines K vernünftige Alternativen abschneiden. Die API von Anthropic stellt `top_k` als direkten Parameter bereit; die API von OpenAI unterstützt es nativ nicht.
+Top-K-Sampling beschränkt den Kandidatenpool auf die K Token mit der höchsten Wahrscheinlichkeit nach der Temperaturskalierung. Alle Token außerhalb der Top-K erhalten vor der Renormalisierung eine Wahrscheinlichkeit von null. Die wesentliche Einschränkung ist, dass K unabhängig davon fest ist, wie die Verteilung aussieht: Wenn das Modell sehr sicher ist, kann sogar K=50 viele Token mit nahezu null Wahrscheinlichkeit einschließen, die Rauschen einführen; wenn das Modell unsicher ist, kann ein kleines K vernünftige Alternativen abschneiden. Anthropics API stellt `top_k` als direkten Parameter bereit; OpenAIs API unterstützt es nativ nicht.
 
 ### Top-P (Nucleus Sampling)
 
-Top-P Sampling baut den Kandidatensatz dynamisch auf. Beginnend mit dem wahrscheinlichsten Token und nach unten arbeitend werden Tokens zum Nucleus hinzugefügt, bis ihre kumulative Wahrscheinlichkeit den Schwellenwert P erreicht. Nur Tokens im Nucleus werden für das Sampling in Betracht gezogen. Mit `P = 0,9` sampelt das Modell aus den Tokens, die zusammen 90% der Wahrscheinlichkeitsmasse ausmachen. Weil sich der Nucleus zusammenzieht, wenn das Modell zuversichtlich ist (einige Tokens dominieren), und expandiert, wenn es unsicher ist (Wahrscheinlichkeitsmasse ist dünn verteilt), passt sich Top-P natürlich an den internen Zustand des Modells an. Top-P wird sowohl von OpenAI (`top_p`) als auch von Anthropic (`top_p`) APIs unterstützt.
+Top-P-Sampling erstellt den Kandidatenset dynamisch. Beginnend mit dem wahrscheinlichsten Token und abwärts arbeitend, werden Token zum Nucleus hinzugefügt, bis ihre kumulierte Wahrscheinlichkeit den Schwellenwert P erreicht. Nur Token im Nucleus werden für das Sampling berücksichtigt. Mit `P = 0,9` sampelt das Modell aus denjenigen Token, die zusammen 90% der Wahrscheinlichkeitsmasse ausmachen. Da sich der Nucleus zusammenzieht, wenn das Modell sicher ist (wenige Token dominieren), und sich erweitert, wenn es unsicher ist (Wahrscheinlichkeitsmasse ist dünn verteilt), passt Top-P sich natürlich an den internen Zustand des Modells an. Top-P wird von beiden APIs unterstützt: OpenAI (`top_p`) und Anthropic (`top_p`).
 
 ## Wann verwenden / Wann NICHT verwenden
 
 | Szenario | Empfohlene Einstellungen | Vermeiden |
-|----------|--------------------------|-----------|
-| Sachliche Fragen, Datenextraktion, Klassifikation | `temperature=0–0,2`, `top_p=1,0` für nahezu deterministische Ausgabe | Hohe Temperature; führt Halluzinationen und Format-Fehler ein |
-| Kreatives Schreiben, Brainstorming, Ideenfindung | `temperature=0,8–1,0`, `top_p=0,95` für diverse, neuartige Ausgaben | Temperature=0; erzeugt repetitiven, vorhersehbaren Text |
+|----------|----------------------|-------|
+| Sachliche F&A, Datenextraktion, Klassifikation | `temperature=0–0,2`, `top_p=1,0` für nahezu deterministische Ausgabe | Hohe Temperature; führt zu Halluzinationen und Formatfehlern |
+| Kreatives Schreiben, Brainstorming, Ideenfindung | `temperature=0,8–1,0`, `top_p=0,95` für diverse, neuartige Ausgaben | Temperature=0; erzeugt repetitiven, vorhersagbaren Text |
 | Code-Generierung | `temperature=0,2–0,4`, `top_p=0,95`; etwas Variation hilft, lokale Optima zu vermeiden | Temperature > 0,8; Syntaxfehler und Logikdrift nehmen zu |
-| Self-Consistency (mehrere Denkpfade) | `temperature=0,6–1,0`; Vielfalt ist beabsichtigt | Temperature=0; alle Pfade wären identisch und würden den Zweck zunichte machen |
-| Strukturierte Ausgabeextraktion (JSON, Tabellen) | `temperature=0`, `top_p=1,0` für strikte Schema-Adhärenz | Top-P < 0,9 kombiniert mit hoher Temperature; Schema-Verletzungen steigen |
-| Dialog / Chatbots | `temperature=0,5–0,7`, `top_p=0,9`; balanciert Kohärenz mit Natürlichkeit | Extreme Temperature in beiden Richtungen; zu roboterhaft oder zu inkohärent |
+| Self-Consistency (mehrere Denkketten) | `temperature=0,6–1,0`; Diversität ist beabsichtigt | Temperature=0; alle Pfade wären identisch und würden den Zweck verfehlen |
+| Strukturierte Ausgabeextraktion (JSON, Tabellen) | `temperature=0`, `top_p=1,0` für strikte Schema-Einhaltung | Top-P \< 0,9 kombiniert mit hoher Temperature; Schema-Verletzungen steigen stark an |
+| Dialog / Chatbots | `temperature=0,5–0,7`, `top_p=0,9`; balanciert Kohärenz mit Natürlichkeit | Extreme Temperature in beide Richtungen; zu roboterhaft oder zu inkohärent |
 
 ## Code-Beispiele
 
@@ -138,11 +140,11 @@ if __name__ == "__main__":
 
 ## Praktische Ressourcen
 
-- [OpenAI — API-Referenz: Temperature und Top-P](https://platform.openai.com/docs/api-reference/chat/create) — Offizielle Parameterdokumentation mit gültigen Bereichen und Standards
-- [Anthropic — API-Referenz: Temperature, Top-K, Top-P](https://docs.anthropic.com/en/api/messages) — Anthropics Parameterreferenz einschließlich Top-K (nicht in OpenAI verfügbar)
-- [Das Nucleus Sampling Paper (Holtzman et al., 2020)](https://arxiv.org/abs/1904.09751) — Originalpaper, das Top-P / Nucleus Sampling mit Motivation und empirischen Ergebnissen einführt
-- [Hugging Face — Textgenerierungsstrategien](https://huggingface.co/docs/transformers/generation_strategies) — Umfassender Leitfaden zu Sampling-Strategien einschließlich greedy, Beam Search, Temperature, Top-K und Top-P
-- [Lilian Weng — Steuerbare Textgenerierung](https://lilianweng.github.io/posts/2021-01-02-controllable-text-generation/) — Tiefgreifender Blogbeitrag zu Sampling-Methoden im Kontext steuerbarer Generierung
+- [OpenAI — API-Referenz: temperature und top_p](https://platform.openai.com/docs/api-reference/chat/create) — Offizielle Parameter-Dokumentation mit gültigen Bereichen und Standardwerten
+- [Anthropic — API-Referenz: temperature, top_k, top_p](https://docs.anthropic.com/en/api/messages) — Anthropics Parameter-Referenz einschließlich top_k (nicht in OpenAI verfügbar)
+- [Das Nucleus-Sampling-Papier (Holtzman et al., 2020)](https://arxiv.org/abs/1904.09751) — Originalpapier, das Top-P / Nucleus Sampling mit Motivation und empirischen Ergebnissen einführt
+- [Hugging Face — Textgenerierungsstrategien](https://huggingface.co/docs/transformers/generation_strategies) — Umfassender Leitfaden zu Sampling-Strategien einschließlich Greedy, Beam Search, Temperature, Top-K und Top-P
+- [Lilian Weng — Kontrollierbare Textgenerierung](https://lilianweng.github.io/posts/2021-01-02-controllable-text-generation/) — Tiefgehender Blogbeitrag über Sampling-Methoden im Kontext kontrollierbarer Generierung
 
 ## Siehe auch
 

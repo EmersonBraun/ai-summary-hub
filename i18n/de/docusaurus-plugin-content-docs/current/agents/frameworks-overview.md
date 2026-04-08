@@ -1,36 +1,38 @@
 ---
-title: Überblick über Agent-Frameworks
-description: Ein umfassender Überblick über die KI-Agent-Framework-Landschaft, der Single-Agent-, Multi-Agenten-, graphbasierte und native Ansätze abdeckt, mit einem Leitfaden zur Wahl des richtigen Frameworks.
-keywords: [Agent-Frameworks, CrewAI, AutoGen, LangGraph, LangChain, Anthropic Tool Use, Multi-Agenten, Single-Agent]
+title: Agent frameworks overview
+description: A comprehensive overview of the AI agent framework landscape, covering single-agent, multi-agent, graph-based, and native approaches, with a guide on how to choose the right framework.
+keywords: [agent frameworks, CrewAI, AutoGen, LangGraph, LangChain, Anthropic tool use, multi-agent, single-agent]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
-# Überblick über Agent-Frameworks
+# Überblick über Agenten-Frameworks
 
 ## Definition
 
-Ein **Agent-Framework** ist eine Bibliothek oder ein SDK, das die Infrastrukturprobleme beim Aufbau von KI-Agenten übernimmt: Tool-Registrierung, Nachrichtenübermittlung, Zustandsverwaltung, Orchestrierung und Integration mit LLM-Anbietern. Ohne ein Framework schreibt man diese Infrastrukturschichten selbst; mit einem Framework beschreibt man, *was* der Agent tun soll, und es übernimmt, *wie* die Schleife läuft.
+Ein **Agenten-Framework** ist eine Bibliothek oder ein SDK, das sich um die Infrastrukturaspekte beim Aufbau von KI-Agenten kümmert: Werkzeugregistrierung, Nachrichtenübermittlung, Zustandsverwaltung, Orchestrierung und Integration mit LLM-Anbietern. Ohne ein Framework schreiben Sie diese Infrastrukturschichten selbst; mit einem Framework beschreiben Sie *was* Ihr Agent tun soll, und es kümmert sich um *wie* die Schleife läuft.
 
-Die Agent-Framework-Landschaft ist schnell gewachsen und umfasst jetzt mehrere unterschiedliche Kategorien. Einige Frameworks konzentrieren sich auf einen einzelnen Agenten mit Tools (LangChain-Agenten), andere priorisieren rollenbasierte Zusammenarbeit zwischen vielen Agenten (CrewAI, AutoGen), andere modellieren Agentenverhalten als explizite zustandsbehaftete Graphen (LangGraph), und einige überspringen das Framework völlig und verlassen sich auf die nativen Fähigkeiten des Modellanbieters (Anthropic Tool Use, OpenAI Function Calling). Jede Kategorie spiegelt eine andere Philosophie darüber wider, wo Kontrolle und Komplexität angesiedelt sein sollten.
+Die Agenten-Framework-Landschaft ist schnell gewachsen und umfasst nun mehrere unterschiedliche Kategorien. Einige Frameworks konzentrieren sich auf einen einzigen Agenten mit Werkzeugen (LangChain-Agenten), andere priorisieren die rollenbasierte Zusammenarbeit zwischen vielen Agenten (CrewAI, AutoGen), andere modellieren das Agentenverhalten als explizite zustandsbehaftete Graphen (LangGraph), und einige überspringen das Framework vollständig und verlassen sich auf die nativen Fähigkeiten des Modellanbieters (Anthropic Tool Use, OpenAI Function Calling). Jede Kategorie spiegelt eine andere Philosophie darüber wider, wo Kontrolle und Komplexität liegen sollten.
 
-Die Wahl des richtigen Frameworks ist nicht nur eine technische Entscheidung – sie prägt, wie man über das System nachdenkt, Fehler debuggt und in die Produktion skaliert. Ein Anfänger, der einen einfachen Recherche-Assistenten aufbaut, hat sehr andere Bedürfnisse als ein Plattform-Team, das ein Dutzend spezialisierter Agenten in einer Produktionspipeline verbindet.
+Die Wahl des richtigen Frameworks ist nicht nur eine technische Entscheidung – sie beeinflusst, wie Sie über Ihr System nachdenken, Fehler debuggen und in die Produktion skalieren. Ein Anfänger, der einen einfachen Forschungsassistenten entwickelt, hat ganz andere Bedürfnisse als ein Plattform-Team, das ein Dutzend spezialisierter Agenten in einer Produktionspipeline verbindet.
 
 ## Funktionsweise
 
 ### Single-Agent-Frameworks (LangChain-Agenten)
 
-Single-Agent-Frameworks geben einem LLM Zugang zu einer Reihe von Tools und führen eine Schleife aus: Das Modell entscheidet, welches Tool aufgerufen werden soll, das Framework führt es aus, die Beobachtung wird an die Konversation angehängt, und die Schleife setzt sich fort, bis das Modell eine endgültige Antwort ausgibt. LangChain ist das kanonische Beispiel und stellt `create_react_agent` und `AgentExecutor` für unkomplizierte ReAct-artige Agenten bereit. Der Entwickler registriert Tools (Python-Funktionen mit Docstrings oder Pydantic-Schemas) und das Framework übernimmt die Prompt-Konstruktion und Ergebnis-Analyse. Single-Agent ist der richtige Ausgangspunkt: geringere Latenz, einfacher zu debuggen und einfacher zu testen. Komplexität entsteht, wenn mehrere spezialisierte Rollen parallel arbeiten müssen oder wenn der Zustand für ein Kontextfenster zu groß wird.
+Single-Agent-Frameworks geben einem LLM Zugang zu einer Menge von Werkzeugen und führen eine Schleife aus: Das Modell entscheidet, welches Werkzeug aufgerufen werden soll, das Framework führt es aus, die Beobachtung wird dem Gespräch hinzugefügt, und die Schleife setzt fort, bis das Modell eine Endantwort ausgibt. LangChain ist das kanonische Beispiel und stellt `create_react_agent` und `AgentExecutor` für unkomplizierte ReAct-Style-Agenten bereit. Der Entwickler registriert Werkzeuge (Python-Funktionen mit Docstrings oder Pydantic-Schemas) und das Framework übernimmt die Prompt-Konstruktion und Ergebnisverarbeitung. Single-Agent ist der richtige Ausgangspunkt: geringere Latenz, einfacher zu debuggen und einfacher zu testen. Die Komplexität wächst, wenn Sie mehrere spezialisierte Rollen benötigen, die parallel arbeiten, oder wenn der Zustand zu groß für ein Kontextfenster wird.
 
-### Multi-Agenten-Frameworks (CrewAI, AutoGen)
+### Multi-Agent-Frameworks (CrewAI, AutoGen)
 
-Multi-Agenten-Frameworks koordinieren mehrere LLM-gestützte Agenten, jeder mit seiner eigenen Rolle, Anweisungen und Tools, auf ein gemeinsames Ziel hin. CrewAI verwendet eine Crew-Metapher mit Rollen, Zielen und Hintergrundgeschichten; AutoGen verwendet eine Konversationsmetapher, bei der Agenten Nachrichten austauschen. Beide unterstützen sequenzielle und parallele Ausführungsmuster. Das Framework verwaltet Nachrichten-Routing, Ausgabeübergabe zwischen Agenten und optional Human-in-the-Loop-Checkpoints. Multi-Agenten-Ansätze glänzen, wenn das Problem natürlicherweise in distinkte Spezialisierungen zerfällt (Forscher, Schreiber, Kritiker) oder wenn Redundanz und Debatte zur Verbesserung der Ausgabequalität benötigt werden.
+Multi-Agent-Frameworks koordinieren mehrere LLM-gestützte Agenten, jeweils mit ihrer eigenen Rolle, Anweisungen und Werkzeugen, auf ein gemeinsames Ziel hin. CrewAI verwendet eine Crew-Metapher mit Rollen, Zielen und Hintergrundgeschichten; AutoGen verwendet eine Konversationsmetapher, bei der Agenten Nachrichten austauschen. Beide unterstützen sequentielle und parallele Ausführungsmuster. Das Framework verwaltet das Nachrichtenrouting, die Ausgabe-Übergabe zwischen Agenten und optional Human-in-the-Loop-Checkpoints. Multi-Agent-Ansätze glänzen, wenn das Problem sich natürlich in distinkte Spezialisierungen zerlegt (Forscher, Autor, Kritiker) oder wenn Sie Redundanz und Debatte benötigen, um die Ausgabequalität zu verbessern.
 
 ### Graphbasierte Frameworks (LangGraph)
 
-Graphbasierte Frameworks repräsentieren Agentenverhalten als expliziten gerichteten Graphen: Knoten sind Python-Funktionen (jede kann ein LLM oder ein Tool aufrufen), Kanten sind Übergänge zwischen Knoten, und der gemeinsame Zustand ist ein typisiertes Dictionary. LangGraph, aufgebaut auf LangChain, hat diesen Ansatz populär gemacht. Zyklen im Graphen ermöglichen es dem Agenten, zu schleifen, bis eine Abbruchbedingung erfüllt ist; bedingte Kanten erlauben dynamisches Routing basierend auf Zwischenergebnissen. Die Explizitheit eines Graphen macht komplexe Flows einfacher zu verstehen, isoliert zu testen und über Unterbrechungen hinweg zu persistieren. Dies ist das bevorzugte Muster, wenn feinkörnige Kontrolle über den Ausführungsfluss, Checkpointing oder Human-in-the-Loop-Genehmigungen an bestimmten Schritten benötigt werden.
+Graphbasierte Frameworks stellen das Agentenverhalten als expliziten gerichteten Graphen dar: Knoten sind Python-Funktionen (jede kann ein LLM oder ein Werkzeug aufrufen), Kanten sind Übergänge zwischen Knoten, und der gemeinsame Zustand ist ein typisiertes Dictionary. LangGraph, das auf LangChain aufbaut, hat diesen Ansatz populär gemacht. Zyklen im Graphen ermöglichen dem Agenten, zu loopen, bis eine Abbruchbedingung erfüllt ist; bedingte Kanten ermöglichen dynamisches Routing basierend auf Zwischenergebnissen. Die Explizitheit eines Graphen macht komplexe Flows einfacher zu verstehen, isoliert zu testen und über Unterbrechungen hinweg fortzusetzen. Dies ist das bevorzugte Muster, wenn Sie feinkörnige Kontrolle über den Ausführungsfluss, Checkpointing oder Human-in-the-Loop-Genehmigungen bei bestimmten Schritten benötigen.
 
-### Natives Tool Use (Anthropic Tool Use, OpenAI Function Calling)
+### Natives Werkzeug-Nutzung (Anthropic Tool Use, OpenAI Function Calling)
 
-Natives Tool Use überspringt die Framework-Schicht vollständig und verwendet den eingebauten Mechanismus des Modellanbieters für strukturiertes Function Calling. Anthropics API akzeptiert einen `tools`-Parameter mit JSON-Schema-Definitionen; das Modell gibt `tool_use`-Blöcke zurück, die der eigene Code ausführt, dann werden `tool_result`-Blöcke zurückgegeben. OpenAIs Äquivalent sind `functions` / `tools` mit `function_call`-Antworten. Dieser Ansatz hat minimalen Abstraktions-Overhead, volle Kontrolle über die Schleife und die engste Integration mit modellspezifischen Funktionen wie Streaming und parallelen Tool-Aufrufen. Der Kompromiss ist, dass man die Orchestrierungslogik selbst schreibt, was für einfache Anwendungsfälle in Ordnung ist, aber im großen Maßstab komplex wird.
+Natives Werkzeug-Nutzung überspringt die Framework-Schicht vollständig und verwendet den eingebauten Mechanismus des Modellanbieters für strukturiertes Function Calling. Anthropics API akzeptiert einen `tools`-Parameter mit JSON-Schema-Definitionen; das Modell gibt `tool_use`-Blöcke zurück, die Ihr Code ausführt, dann fügen Sie `tool_result`-Blöcke zurück ein. OpenAIs Äquivalent sind `functions` / `tools` mit `function_call`-Antworten. Dieser Ansatz hat minimalen Abstraktions-Overhead, vollständige Kontrolle über die Schleife und die engste Integration mit modellspezifischen Funktionen wie Streaming und parallelen Werkzeugaufrufen. Der Tradeoff ist, dass Sie die Orchestrierungslogik selbst schreiben, was für einfache Anwendungsfälle in Ordnung ist, aber bei skalierenden Szenarien komplex wird.
 
 ```mermaid
 flowchart LR
@@ -57,22 +59,22 @@ flowchart LR
 
 | Verwenden wenn | Vermeiden wenn |
 |---|---|
-| Tool-augmentiertes LLM-Verhalten über einen einzelnen Prompt hinaus benötigt wird | Die Aufgabe ein Einmal-Prompt ohne externe Datenbedürfnisse ist |
-| Das Problem sich in mehrere spezialisierte Rollen zerlegen lässt (Multi-Agenten) | Ultra-niedrige Latenz benötigt wird und keine mehrstufigen Schleifen leistbar sind |
-| Reproduzierbare, inspizierbare Agenten-Flows gewünscht werden (graphbasiert) | Das Team das Fachwissen fehlt, um nicht-deterministische Agentenschleifen zu debuggen |
-| Nahe an der Anbieter-API mit minimaler Abstraktion gearbeitet werden soll (nativ) | Schnelles Prototyping benötigt wird und kein Orchestrierungs-Boilerplate geschrieben werden soll |
-| Ein Produktionssystem aufgebaut wird, das Checkpointing und Persistenz benötigt | Die Aufgabe mit einer einfachen RAG-Pipeline oder einer einzelnen Prompt-Kette lösbar ist |
+| Werkzeuggestütztes LLM-Verhalten über einen einzigen Prompt hinaus benötigt wird | Die Aufgabe ein einmaliger Prompt ohne externe Datenbedarfe ist |
+| Das Problem sich in mehrere spezialisierte Rollen zerlegt (Multi-Agent) | Ultra-niedrige Latenz benötigt wird und mehrstufige Schleifen nicht leistbar sind |
+| Reproduzierbare, inspizierbare Agenten-Flows gewünscht werden (graphbasiert) | Das Team nicht über die Expertise verfügt, nicht-deterministische Agenten-Schleifen zu debuggen |
+| Nahe an der Anbieter-API mit minimaler Abstraktion bleiben wollen (nativ) | Schnelles Prototyping gewünscht wird und kein Orchestrierungs-Boilerplate geschrieben werden soll |
+| Ein Produktionssystem gebaut wird, das Checkpointing und Persistenz benötigt | Die Aufgabe mit einer einfachen RAG-Pipeline oder einer einzigen Prompt-Kette lösbar ist |
 
 ## Vergleiche
 
 | Kriterium | CrewAI | AutoGen | LangGraph | Anthropic Tool Use |
 |---|---|---|---|---|
-| **Architektur** | Rollenbasierte Crew mit Aufgaben und Prozessen | Konversationsgesteuerte Agentenpaare und Gruppen-Chats | Expliziter Zustandsgraph mit Knoten und Kanten | Rohe API mit JSON-Schema-Tool-Definitionen |
-| **Multi-Agenten-Unterstützung** | Erstklassig: Agenten sind Crew-Mitglieder mit Rollen und Zielen | Erstklassig: Agenten kommunizieren über einen Nachrichtenbus | Möglich über Subgraphen, aber primär Single-Agent-Graphen | Manuell: Multi-Agenten-Koordination selbst implementieren |
-| **Zustandsverwaltung** | Implizit: zwischen Aufgaben über Crew-Kontext weitergegeben | Implizit: Nachrichtenhistorie in der Konversation | Explizit: TypedDict-Zustand geteilt über alle Knoten | Manuell: eigenes State-Dict pflegen |
-| **Lernkurve** | Niedrig: deklarative YAML-artige API | Mittel: erfordert Verständnis von Agentenrollen und Gruppen-Chat | Mittel-Hoch: erfordert Graphentheorie-Intuition | Niedrig: nur Python + JSON Schema, aber mehr Boilerplate |
-| **Community & Ökosystem** | Wächst schnell, starke Tutorials | Groß (Microsoft-gestützt), starke Forschungs-Community | Wächst schnell, enge LangChain-Integration | Offizielles Anthropic SDK, gut dokumentiert |
-| **Beste Verwendung für** | Strukturierte rollenbasierte Pipelines, Content-Workflows | Forschung, Code-Generierung, Human-in-the-Loop-Experimente | Komplexe Branching-Flows, Produktionspipelines | Einfache bis mittlere Tools, enge Modellintegration |
+| **Architektur** | Rollenbasierte Crew mit Aufgaben und Prozessen | Konversationsgesteuerte Agenten-Paare und Gruppenchats | Expliziter Zustandsgraph mit Knoten und Kanten | Rohe API mit JSON-Schema-Werkzeugdefinitionen |
+| **Multi-Agent-Unterstützung** | Erstklassig: Agenten sind Crew-Mitglieder mit Rollen und Zielen | Erstklassig: Agenten kommunizieren über einen Message Bus | Möglich über Subgraphen, aber primär Single-Agent-Graphen | Manuell: Sie implementieren Multi-Agent-Koordination selbst |
+| **Zustandsverwaltung** | Implizit: wird zwischen Aufgaben über den Crew-Kontext übergeben | Implizit: Nachrichtenverlauf im Gespräch | Explizit: TypedDict geteilter Zustand über alle Knoten | Manuell: Sie pflegen Ihr eigenes Zustandsdictionary |
+| **Lernkurve** | Niedrig: deklarative YAML-ähnliche API | Mittel: erfordert Verständnis von Agenten-Rollen und Gruppenchat | Mittel-Hoch: erfordert Graph-Theorie-Intuition | Niedrig: nur Python + JSON-Schema, aber mehr Boilerplate |
+| **Community & Ökosystem** | Wächst schnell, starke Tutorials | Groß (Microsoft-gestützt), starke Forschungsgemeinschaft | Wächst rasch, enge LangChain-Integration | Offizielles Anthropic SDK, gut dokumentiert |
+| **Am besten für** | Strukturierte rollenbasierte Pipelines, Content-Workflows | Forschung, Code-Gen, Human-in-the-Loop-Experimente | Komplexe Verzweigungsflows, Produktionspipelines | Einfache bis mittlere Werkzeuge, enge Modellintegration |
 | **Streaming-Unterstützung** | Begrenzt | Begrenzt | Unterstützt über LangChain-Streaming | Vollständiges Streaming über Anthropic SDK |
 
 ## Code-Beispiele
@@ -144,12 +146,12 @@ response = client.messages.create(
 
 ## Praktische Ressourcen
 
-- [LangChain Agenten-Dokumentation](https://python.langchain.com/docs/concepts/agents/) — Umfassender Leitfaden zum Aufbau von Agenten mit LangChain, einschließlich ReAct, Tool Use und Gedächtnis.
-- [CrewAI offizielle Dokumentation](https://docs.crewai.com/) — Vollständige Referenz für Rollen, Aufgaben, Crews und Prozesse in CrewAI.
-- [AutoGen Dokumentation (Microsoft)](https://microsoft.github.io/autogen/) — Deckt ConversableAgent, Gruppen-Chats, Code-Ausführung und Human-in-the-Loop-Muster ab.
-- [LangGraph Dokumentation](https://langchain-ai.github.io/langgraph/) — Graphbasierte Agenten-Zustandsmaschinen, Persistenz und Human-in-the-Loop-Checkpoints.
-- [Anthropic Tool Use Leitfaden](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Offizieller Leitfaden zur Definition von Tools mit JSON Schema und zur Handhabung von tool_use / tool_result Nachrichtentypen.
-- [AgentsKit](https://emersonbraun.github.io/agentskit/) — Produktionsreifes Framework zum Aufbau von KI-Agenten mit Gedächtnis, Tools und Multi-Agenten-Orchestrierung
+- [LangChain Agents documentation](https://python.langchain.com/docs/concepts/agents/) — Umfassender Leitfaden zum Aufbau von Agenten mit LangChain, einschließlich ReAct, Werkzeug-Nutzung und Speicher.
+- [CrewAI official documentation](https://docs.crewai.com/) — Vollständige Referenz für Rollen, Aufgaben, Crews und Prozesse in CrewAI.
+- [AutoGen documentation (Microsoft)](https://microsoft.github.io/autogen/) — Behandelt ConversableAgent, Gruppenchats, Code-Ausführung und Human-in-the-Loop-Muster.
+- [LangGraph documentation](https://langchain-ai.github.io/langgraph/) — Graphbasierte Agenten-Zustandsmaschinen, Persistenz und Human-in-the-Loop-Checkpoints.
+- [Anthropic Tool Use guide](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Offizieller Leitfaden zum Definieren von Werkzeugen mit JSON-Schema und Behandeln von tool_use / tool_result Nachrichtentypen.
+- [AgentsKit](https://emersonbraun.github.io/agentskit/) — Produktionsreifes Framework zum Aufbau von KI-Agenten mit Speicher, Werkzeugen und Multi-Agent-Orchestrierung
 
 ## Siehe auch
 
@@ -157,5 +159,5 @@ response = client.messages.create(
 - [AutoGen](/docs/agents/autogen)
 - [LangGraph](/docs/agents/langgraph)
 - [Anthropic Tool Use](/docs/agents/anthropic-tool-use)
-- [Multi-Agenten-Systeme](/docs/agents/multi-agent-systems)
-- [KI-Agenten](/docs/agents)
+- [Multi-agent systems](/docs/agents/multi-agent-systems)
+- [AI agents](/docs/agents)

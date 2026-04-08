@@ -1,36 +1,38 @@
 ---
 title: Case study — Grok
 description: xAIs LLM mit Echtzeit-Wissen und Reasoning.
-keywords: [Grok, xAI, real-time, Schlussfolgern]
+keywords: [Grok, xAI, real-time, reasoning]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Case study: Grok
 
 ## Definition
 
-Grok ist eine Familie von [LLMs](/docs/llms) from xAI. Es ist positioned around real-time or up-to-date knowledge (z. B. access to X/Twitter data) and strong Schlussfolgern, offered via API and in X’s product experience.
+Grok ist eine Familie von [LLMs](/docs/llms) von xAI. Es ist auf Echtzeit- oder aktuelles Wissen ausgerichtet (z. B. Zugang zu X/Twitter-Daten) und starkes Reasoning, angeboten über API und in X's Produkterfahrung.
 
-Like [ChatGPT](/docs/case-studies/chatgpt) and [Claude](/docs/case-studies/claude), Grok uses ein vortrainiertes base, Instruktions-Tuning, and alignment; differentiation includes real-time [RAG](/docs/rag)-style grounding and integration with X’s platform. Use case: chat, research, and applications that benefit from current information and Schlussfolgern.
+Wie [ChatGPT](/docs/case-studies/chatgpt) und [Claude](/docs/case-studies/claude) verwendet Grok ein vortrainiertes Basismodell, Instruktions-Tuning und Ausrichtung; Differenzierungsmerkmale umfassen Echtzeit-[RAG](/docs/rag)-artiges Grounding und Integration in X's Plattform. Anwendungsfall: Chat, Recherche und Anwendungen, die von aktuellen Informationen und Reasoning profitieren.
 
 ## Funktionsweise
 
-A **base model** (Decoder-only [transformer](/docs/transformers)) is vortrainiert auf großem Textkorpus (und optional other data). **Instruction tuning** and **alignment** (z. B. Präferenzoptimierung) shape helpfulness and safety. **Real-time or live knowledge** is provided by retrieving and conditioning on fresh content (z. B. from X) so answers can reflect recent events. The product exposes Grok via chat and API; [prompt engineering](/docs/prompt-engineering) and tool use extend it for [agents](/docs/agents) and custom workflows.
+Ein **Basismodell** (nur-Decoder [Transformer](/docs/transformers)) wird auf großskaligem Text (und optional anderen Daten) vortrainiert. **Instruktions-Tuning** und **Ausrichtung** (z. B. Präferenzoptimierung) formen Hilfsbereitschaft und Sicherheit. **Echtzeit- oder Live-Wissen** wird durch Abrufen und Konditionieren auf frischen Inhalten bereitgestellt (z. B. von X), sodass Antworten aktuelle Ereignisse widerspiegeln können. Das Produkt stellt Grok über Chat und API zur Verfügung; [Prompt Engineering](/docs/prompt-engineering) und Werkzeugnutzung erweitern es für [Agenten](/docs/agents) und benutzerdefinierte Workflows.
 
 ## Anwendungsfälle
 
-Grok fits use cases where up-to-date information and Schlussfolgern matter more than a static training cutoff.
+Grok eignet sich für Anwendungsfälle, bei denen aktuelle Informationen und Reasoning wichtiger sind als ein statischer Trainingsabschneidepunkt.
 
-- Chat and research with awareness of recent news and events
-- Applications that need real-time or search-augmented answers
-- Integration in X and third-party products via API
+- Chat und Recherche mit Bewusstsein für aktuelle Nachrichten und Ereignisse
+- Anwendungen, die Echtzeit- oder sucherweiterte Antworten benötigen
+- Integration in X und Drittanbieterprodukte über API
 
 ## Externe Dokumentation
 
-- [xAI – Grok](https://x.ai/) — Product and API
-- [xAI – Blog](https://x.ai/blog) — Model and capability updates
+- [xAI – Grok](https://x.ai/) — Produkt und API
+- [xAI – Blog](https://x.ai/blog) — Modell- und Fähigkeitsupdates
 
 ## Siehe auch
 
 - [LLMs](/docs/llms)
 - [RAG](/docs/rag)
-- [Prompt engineering](/docs/prompt-engineering)
+- [Prompt Engineering](/docs/prompt-engineering)

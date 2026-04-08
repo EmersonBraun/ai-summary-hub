@@ -1,76 +1,125 @@
 ---
-title: Agentes de IA
-description: Sistemas que percebem, raciocinam e agem em direção a objetivos.
-keywords: [agentes de IA, autônomo, ferramentas, ReAct]
+title: AI agents
+description: Systems that perceive, reason, and act toward goals.
+keywords: [AI agents, autonomous, tools, ReAct]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Agentes de IA
 
 ## Definição
 
-An **AI agent** é um sistema que percebe seu ambiente (por ex. user input, tool outputs), reasons (possibly with an LLM), and takes actions (por ex. calling APIs, writing code) to achieve goals. Agents often use tools and loops of thought–action–observation.
+Ein **KI-Agent** ist ein System, das seine Umgebung wahrnimmt (z. B. Benutzereingaben, Werkzeugausgaben), schlussfolgert (möglicherweise mit einem LLM) und Aktionen ausführt (z. B. APIs aufrufen, Code schreiben), um Ziele zu erreichen. Agenten verwenden oft Werkzeuge und Schleifen aus Gedanke–Aktion–Beobachtung, um Aufgaben zu lösen, die mehr als einen einzigen LLM-Aufruf erfordern.
 
-Mais formalmente: **um agente é um programa autônomo que se comunica com um modelo de IA para realizar operações baseadas em objetivos usando as ferramentas e o contexto que possui, e is capable of autonomous decisão-making grounded in truth.** Agents bridge the gap between a one-off prototype (por ex. in AI Studio) and a scalable application: you define tools, give the agent access to them, and it decides when to call which tool and how to combine results to satisfy the user's goal.
+Formal gesagt: **Ein Agent ist ein autonomes Programm, das mit einem KI-Modell kommuniziert, um zielbasierte Operationen mithilfe der Werkzeuge und des Kontexts durchzuführen, die es hat, und das in der Lage ist, auf Wahrheit gegründete autonome Entscheidungen zu treffen.** Agenten überbrücken die Lücke zwischen einem einmaligen Prototyp (z. B. in AI Studio) und einer skalierbaren Anwendung: Sie definieren Werkzeuge, geben dem Agenten Zugang dazu, und er entscheidet, wann welches Werkzeug aufgerufen werden soll und wie Ergebnisse kombiniert werden, um das Ziel des Benutzers zu erfüllen.
+
+Das Hauptmerkmal eines Agenten – im Gegensatz zu einer einfachen Kette oder Pipeline – ist **Autonomie bei der Entscheidung über die nächste Aktion**. Der Agent folgt keinem festen Skript; er verwendet das LLM, um über den aktuellen Zustand nachzudenken und die am besten geeignete Aktion auszuwählen. Dies macht Agenten mächtig für offene Aufgaben, aber auch schwieriger vorherzusagen und zu debuggen als deterministische Pipelines. [Multi-Agent](/docs/agents/multi-agent-systems) und [Subagenten](/docs/subagents)-Setups erweitern einzelne Agenten mit Koordinationsmustern und hierarchischer Delegation.
 
 ## Como funciona
 
-Loop típico: receber tarefa → planejar ou raciocinar → escolher ação (por ex. chamada de ferramenta) → observar resultado → repetir até concluir ou atingir o limite. The **user** sends a request; the **agent** (backed by an LLM) produces a **thought** (raciocínio) and a **decisão**: either call a **tool** (por ex. search, API, code runner) and get an **observation**, or return a **final answer**. The observation is fed back into the agent for the next step. LLMs provide raciocínio and tool selection; frameworks (LangChain, LlamaIndex, Google ADK) handle orchestration, tool registration, and message passing. [Multi-agent](/docs/agents/multi-agent-systems) and [subagent](/docs/subagents) setups extend this with multiple agents or a parent delegating to children.
+### Agenten-Reasoning-Schleife
 
 ```mermaid
 flowchart LR
-  User[User request] --> Agent["Agent / LLM"]
-  Agent --> Thought[Thought]
-  Thought --> Decision{Action?}
-  Decision -->|Tool call| Tool[Execute tool]
-  Tool --> Obs[Observation]
-  Obs --> Agent
-  Decision -->|Done| Answer[Final answer]
-  Answer --> User
+  UserReq[User request] -->|initialize state| Agent["Agent / LLM"]
+  Agent -->|reason| Thought[Thought]
+  Thought -->|decide| Decision{Tool call or done?}
+  Decision -->|tool call| Tool[Execute tool]
+  Tool -->|result| Obs[Observation]
+  Obs -->|append to context| Agent
+  Decision -->|done| Answer[Final answer]
+  Answer -->|return| UserReq
 ```
 
-```python
-# Conceptual agent loop (pseudocode)
-def agent_loop(task):
-    state = {"messages": [user_message(task)]}
-    while not done(state):
-        response = llm.invoke(state["messages"])
-        if response.tool_calls:
-            for call in response.tool_calls:
-                result = tools.execute(call)
-                state["messages"].append(tool_result(result))
-        else:
-            return response.content
-    return state
+### Werkzeugregistrierung und -dispatch
+
+```mermaid
+flowchart LR
+  LLM[LLM] -->|selects tool by name| Dispatcher[Tool dispatcher]
+  Dispatcher -->|routes call| Search[Search tool]
+  Dispatcher -->|routes call| Code[Code runner]
+  Dispatcher -->|routes call| API[API tool]
+  Search -->|returns text| LLM
+  Code -->|returns output| LLM
+  API -->|returns JSON| LLM
 ```
 
-## Casos de uso
+Typische Schleife: Aufgabe empfangen → planen oder schlussfolgern → Aktion wählen (z. B. Werkzeugaufruf) → Ergebnis beobachten → wiederholen bis fertig oder Limit erreicht. Der **Benutzer** sendet eine Anfrage; der **Agent** (gestützt durch ein LLM) produziert einen **Gedanken** (Überlegung) und eine **Entscheidung**: entweder ein **Werkzeug** aufrufen (z. B. Suche, API, Code-Runner) und eine **Beobachtung** erhalten, oder eine **Endantwort** zurückgeben. Die Beobachtung wird für den nächsten Schritt zurück in den Agenten eingespeist. LLMs liefern Überlegung und Werkzeugauswahl; Frameworks (LangChain, LlamaIndex, Google ADK) übernehmen Orchestrierung, Werkzeugregistrierung und Nachrichtenübermittlung.
 
-Agentes são adequados quando a tarefa requer múltiplos passos, uso de ferramentas ou decisões que vão além de uma única chamada ao LLM.
+## Quando usar / Quando NÃO usar
 
-- Automação de tarefas (agendamento, pipelines de dados, preenchimento de formulários)
-- Geração e edição de código com acesso a arquivos e APIs
-- Assistentes de pesquisa que buscam, resumem e citam
-- Multi-step workflows that combine tools and human-in-the-loop
+| Cenário | Usar agentes | Não usar agentes |
+|---|---|---|
+| Mehrstufige Aufgaben, die mehrere Werkzeuge erfordern | Ja — Agenten bewältigen komplexe Werkzeugketten auf natürliche Weise | Nein — eine einfache Kette oder Pipeline ist günstiger und vorhersehbarer |
+| Aufgaben mit unbekannter Anzahl von Schritten im Voraus | Ja — Agenten entscheiden dynamisch, wie viele Schritte benötigt werden | Nein — wenn Schritte fest sind, verwenden Sie eine hardcodierte Pipeline |
+| Recherche und Synthese über viele Quellen | Ja — Agenten können iterativ suchen, lesen und integrieren | Nein — wenn die Daten bereits strukturiert sind, reicht eine Batch-Abfrage |
+| Sicherheitskritische Aufgaben ohne menschliche Aufsicht | Nein — Agenten können unerwartete Entscheidungen treffen | Ja — Menschen in der Schleife für hochriskante Aktionen behalten |
+| Niedrige Latenz, einfache, einstufige Antworten | Nein — Agenten-Overhead fügt Latenz hinzu | Ja — ein direkter LLM-Aufruf ist schneller |
+
+## Comparações
+
+| Ansatz | Autonomie | Werkzeug-Nutzung | Schritte | Vorhersehbarkeit | Kosten |
+|---|---|---|---|---|---|
+| Direkter LLM-Aufruf | Keine | Nein | 1 | Hoch | Niedrig |
+| Kette / Pipeline | Niedrig (fester Fluss) | Möglich | Fest | Hoch | Niedrig–mittel |
+| Agent (einzeln) | Hoch (dynamisch) | Ja | Dynamisch | Mittel | Mittel–hoch |
+| Multi-Agent | Sehr hoch | Ja | Dynamisch pro Agent | Niedrig–mittel | Hoch |
 
 ## Vantagens e desvantagens
 
-| Pros | Cons |
-|------|------|
-| Flexible, can use many tools | Unpredictable, can loop or fail |
-| Handles multi-step tasks | Latency and cost from many LLM calls |
-| Enables automation | Needs good tool projeto and safety |
-| Scale from prototype to production | Requires monitoring and guardrails |
+| Vantagens | Desvantagens |
+|---|---|
+| Flexibel — kann viele Werkzeuge verwenden und offene Aufgaben bewältigen | Unvorhersehbar — kann loopen, steckenbleiben oder unerwartete Pfade nehmen |
+| Bewältigt mehrstufige Aufgaben mit dynamischem Branching | Latenz und Kosten durch mehrere LLM-Aufrufe |
+| Ermöglicht die Automatisierung komplexer Workflows | Erfordert gut gestaltete Werkzeuge, Schemas und Sicherheitsleitplanken |
+| Skaliert vom Prototyp zur Produktion mit dem richtigen Framework | Debugging erfordert das Inspizieren langer Gedanke–Aktion-Traces |
 
-## Documentação externa
+## Exemplos de código
 
-- [From Prototypes to Agents with ADK – Google Codelabs](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — Build your first agent with Google's Agent Development Kit (ADK)
-- [LangChain – Agents](https://python.langchain.com/docs/concepts/agents/) — Agent concepts and tool use
-- [LlamaIndex – Agents](https://docs.llamaindex.ai/en/stable/module_guides/deploying/agents/) — Agent and query engine guides
-- [OpenAI Assistants API](https://platform.openai.com/docs/assistants/overview) — Managed agents with tools
+```python
+# Conceptual agent loop (pseudocode)
+def agent_loop(task: str, tools: dict, llm) -> str:
+    messages = [{"role": "user", "content": task}]
+    for _ in range(10):  # max iterations
+        response = llm.invoke(messages, tools=list(tools.values()))
+        if response.tool_calls:
+            for call in response.tool_calls:
+                tool_fn = tools[call["name"]]
+                result = tool_fn(**call["arguments"])
+                messages.append({"role": "tool", "content": str(result)})
+        else:
+            return response.content  # final answer
+    return "Max iterations reached."
+
+# LangChain example with a real tool
+from langchain_openai import ChatOpenAI
+from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain_community.tools import DuckDuckGoSearchRun
+from langchain import hub
+
+llm = ChatOpenAI(model="gpt-4o-mini")
+tools = [DuckDuckGoSearchRun()]
+prompt = hub.pull("hwchase17/openai-tools-agent")
+agent = create_tool_calling_agent(llm, tools, prompt)
+executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+result = executor.invoke({"input": "What are the latest developments in RAG?"})
+print(result["output"])
+```
+
+## Recursos práticos
+
+- [From Prototypes to Agents with ADK – Google Codelabs](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — Erstellen Sie Ihren ersten Agenten mit Googles Agent Development Kit (ADK)
+- [LangChain – Agents](https://python.langchain.com/docs/concepts/agents/) — Agenten-Konzepte, Werkzeug-Nutzung und ReAct-Style-Orchestrierung
+- [LlamaIndex – Agents](https://docs.llamaindex.ai/en/stable/module_guides/deploying/agents/) — Agenten- und Query-Engine-Leitfäden
+- [OpenAI Assistants API](https://platform.openai.com/docs/assistants/overview) — Verwaltete Agenten mit eingebauten Werkzeugen (Code-Interpreter, Dateisuche)
+- [Anthropic – Build with Claude: Agents](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Claude Werkzeug-Nutzung und agentische Muster
+- [AgentsKit](https://emersonbraun.github.io/agentskit/) — Produktionsreifes Framework zum Aufbau von KI-Agenten mit Speicher, Werkzeugen und Multi-Agent-Orchestrierung
 
 ## Veja também
 
 - [Multi-agent systems](/docs/agents/multi-agent-systems)
 - [Subagents](/docs/subagents)
+- [Autonomous agents](/docs/autonomous-agents)
 - [ReAct](/docs/reasoning-patterns/react)
 - [RDD](/docs/reasoning-patterns/rdd)

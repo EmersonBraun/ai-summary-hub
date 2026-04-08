@@ -1,18 +1,20 @@
 ---
-title: Prompt engineering para agentes
-description: Mejores prácticas para escribir prompts de sistema que producen un comportamiento de agente de IA confiable y bien delimitado.
-keywords: [prompt engineering para agentes, prompt de sistema, descripciones de herramientas, chain-of-thought, few-shot, guardrails, definición de rol, formato de salida]
+title: Agent prompt engineering
+description: Best practices for writing system prompts that produce reliable, well-scoped AI agent behavior.
+keywords: [agent prompt engineering, system prompt, tool descriptions, chain-of-thought, few-shot, guardrails, role definition, output format]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
-# Prompt engineering para agentes
+# Ingeniería de prompts para agentes
 
 ## Definición
 
-El prompt engineering para agentes es el arte de escribir prompts de sistema y definiciones de herramientas que produzcan de forma confiable el comportamiento que quieres de un agente de IA. A diferencia del prompt engineering para un chatbot de un solo turno — donde principalmente te preocupas por el formato y el tono — los prompts de agentes deben gobernar el razonamiento de múltiples pasos, la disciplina de selección de herramientas, el cumplimiento de restricciones, la recuperación de errores y las condiciones de terminación a lo largo de una secuencia ilimitada de pasos. Un prompt de agente mal escrito produce agentes que hacen bucles sin fin, llaman a herramientas con argumentos incorrectos, ignoran las restricciones del usuario o confabulan resultados cuando las herramientas fallan.
+La ingeniería de prompts para agentes es el arte de escribir system prompts y definiciones de herramientas que produzcan de manera confiable el comportamiento deseado de un agente de IA. A diferencia de la ingeniería de prompts para un chatbot de un solo turno — donde se trata principalmente de formato y tono —, los prompts de agentes deben gobernar el razonamiento de múltiples pasos, la disciplina de selección de herramientas, el cumplimiento de restricciones, la recuperación de errores y las condiciones de detención a través de una secuencia ilimitada de pasos. Un prompt de agente mal escrito produce agentes que se repiten indefinidamente, llaman herramientas con argumentos incorrectos, ignoran las restricciones del usuario o confabulan resultados cuando las herramientas fallan.
 
-El prompt de sistema es la constitución del agente. Define qué es el agente, qué puede hacer, qué nunca debe hacer, cómo debe razonar y cómo debe ser su salida. Dado que los LLMs son muy sensibles a la redacción, la estructura y el orden, los pequeños cambios en el prompt de sistema pueden tener grandes efectos en el comportamiento. El prompt engineering para agentes es, por tanto, una disciplina iterativa y empírica: escribes un prompt, lo evalúas contra un conjunto de datos de tareas, identificas los modos de fallo y refinas. Herramientas como LangSmith y DeepEval (ver [evaluación](/docs/agents/evaluation)) hacen que este ciclo de retroalimentación sea más rápido.
+El system prompt es la constitución del agente. Define quién es el agente, qué puede hacer, qué nunca debe hacer, cómo debe pensar y cómo debe verse su salida. Dado que los LLMs son muy sensibles a la formulación, estructura y orden, pequeños cambios en el system prompt pueden tener grandes efectos en el comportamiento. La ingeniería de prompts para agentes es por tanto una disciplina iterativa y empírica: se escribe un prompt, se evalúa contra un conjunto de datos de tareas, se identifican los modos de fallo y se refina. Herramientas como LangSmith y DeepEval (ver [Evaluación](/docs/agents/evaluation)) aceleran este bucle de retroalimentación.
 
-Los buenos prompts de agentes son modulares y explícitos. Separan la definición del rol, la declaración de capacidades, la especificación de restricciones, las reglas de formato de salida y los ejemplos few-shot en secciones claramente delimitadas. Esta estructura hace que los prompts sean más fáciles de mantener, auditar y extender a medida que evolucionan las capacidades del agente. También ayuda al LLM a activar el "modo" correcto para cada sección en lugar de mezclar preocupaciones.
+Los buenos prompts de agentes son modulares y explícitos. Separan la definición de rol, declaración de capacidades, especificación de restricciones, reglas de formato de salida y ejemplos few-shot en secciones claramente delimitadas. Esta estructura facilita el mantenimiento, la auditoría y la ampliación de los prompts a medida que evolucionan las capacidades del agente. También ayuda al LLM a activar el "modo" correcto para cada sección en lugar de mezclar preocupaciones.
 
 ## Cómo funciona
 
@@ -28,55 +30,55 @@ flowchart LR
   Examples -->|shapes| Behavior
 ```
 
-### Definición del rol
+### Definición de rol
 
-La definición del rol le dice al agente quién es, cuál es su propósito principal y qué persona adoptar. Una buena definición del rol es específica: "Eres un ingeniero de software senior especializado en Python y PostgreSQL, que ayuda a los desarrolladores a depurar problemas de producción" es más útil que "Eres un asistente útil." La especificidad activa el conocimiento relevante y establece el tono de respuesta apropiado. El rol también debe establecer la relación del agente con el usuario (par, asistente, experto), lo que influye en cómo el agente maneja la incertidumbre y el desacuerdo. Mantén la definición del rol concisa (3-5 oraciones) y colócala primero en el prompt de sistema para que enmarque todas las instrucciones posteriores.
+La definición de rol le dice al agente quién es, cuál es su propósito principal y qué persona debe adoptar. Una buena definición de rol es específica: "Eres un Ingeniero de Software Senior especializado en Python y PostgreSQL que ayuda a los desarrolladores a solucionar problemas de producción" es más útil que "Eres un asistente útil." La especificidad activa el conocimiento relevante y establece un tono de respuesta apropiado. El rol también debe establecer la relación del agente con el usuario (colega, asistente, experto), lo que influye en cómo el agente maneja la incertidumbre y el desacuerdo. Mantén la definición de rol concisa (3-5 oraciones) y colócala en primer lugar en el system prompt para que enmarque todas las instrucciones posteriores.
 
 ### Descripciones de herramientas y selección de herramientas
 
-Cada herramienta a la que tiene acceso el agente debe describirse con precisión. El nombre de la herramienta, la descripción, los nombres de los parámetros, los tipos de los parámetros y el formato de retorno deben especificarse claramente. Las descripciones de herramientas ambiguas son una de las causas más comunes de selección incorrecta de herramientas y argumentos malformados. Incluye: qué hace la herramienta, cuándo usarla (y críticamente, cuándo no), qué entradas espera y qué formato de salida esperar. Para herramientas con propósitos similares, añade desambiguación explícita: "Usa `search_web` para noticias y eventos actuales; usa `search_documents` para consultas a la base de conocimiento interna de la empresa." Los ejemplos few-shot de invocaciones correctas de herramientas (dentro del prompt de sistema o como historial de conversación) reducen significativamente los errores de selección de herramientas.
+Cada herramienta a la que el agente tiene acceso debe describirse con precisión. El nombre de la herramienta, descripción, nombres de parámetros, tipos de parámetros y formato de retorno deben especificarse todos. Las descripciones de herramientas ambiguas son una de las causas más comunes de selección incorrecta de herramientas y argumentos erróneos. Incluir: qué hace la herramienta, cuándo usarla (y de manera crítica, cuándo no), qué entradas espera y qué formato de salida esperar. Para herramientas con propósitos similares, añadir desambiguación explícita: "Usa `search_web` para eventos actuales y noticias; usa `search_documents` para consultas de la base de conocimientos interna de la empresa." Los ejemplos few-shot de llamadas correctas a herramientas (dentro del system prompt o como historial de conversación) reducen significativamente los errores de selección de herramientas.
 
-### Chain-of-thought para agentes
+### Chain-of-Thought para agentes
 
-El prompting de chain-of-thought (CoT) pide al agente que razone explícitamente antes de actuar. Para los agentes, esto significa pensar en: qué está pidiendo el usuario, qué información tengo, qué información necesito, qué herramienta debo llamar a continuación y qué espero que sea el resultado. Instruir al agente para que razone antes de actuar ("Antes de llamar a cualquier herramienta, expón brevemente tu plan") mejora la precisión en tareas complejas de múltiples pasos y hace que las trazas sean más interpretables. Algunos frameworks (ReAct, ver [ReAct](/docs/reasoning-patterns/react)) formalizan esto como ciclos de Pensamiento / Acción / Observación. Sé explícito en el prompt sobre si el razonamiento debe estar en la salida o solo en el scratchpad.
+El prompting de Chain-of-Thought (CoT) pide al agente que piense explícitamente antes de actuar. Para los agentes, esto significa razonar sobre: qué está pidiendo el usuario, qué información tengo, qué información necesito, qué herramienta debería llamar a continuación y cómo espero que se vea el resultado. Instruir al agente para que piense antes de actuar ("Antes de llamar a cualquier herramienta, esboza brevemente tu plan") mejora la precisión en tareas complejas de múltiples pasos y hace que las trazas sean más interpretables. Algunos frameworks (ReAct, ver [ReAct](/docs/reasoning-patterns/react)) formalizan esto como ciclos pensamiento/acción/observación. Sé explícito en el prompt sobre si el razonamiento debe estar en la salida o solo en el bloque de borrador.
 
-### Restricciones y guardrails en los prompts
+### Restricciones y guardrails en prompts
 
-Las restricciones definen lo que el agente no debe hacer. Deben formularse positivamente donde sea posible ("siempre pide confirmación antes de eliminar datos") en lugar de solo negativamente ("nunca elimines datos sin preguntar"). Incluye: restricciones de alcance (solo responde preguntas sobre X), restricciones de salida (siempre responde en español, siempre usa JSON válido), restricciones de comportamiento (nunca inventes URLs o rutas de archivo) y restricciones de seguridad (nunca generes contenido dañino). Los guardrails en los prompts son una primera línea de defensa, no un reemplazo de los controles técnicos (ver [seguridad](/docs/agents/security)); son más efectivos cuando especifican el comportamiento exacto esperado en casos límite.
+Las restricciones definen lo que el agente no debe hacer. Deben formularse de manera positiva siempre que sea posible ("siempre solicitar confirmación antes de eliminar datos") en lugar de solo negativa ("nunca eliminar datos sin preguntar"). Incluir: restricciones de alcance (solo responder preguntas sobre X), restricciones de salida (siempre responder en inglés, siempre usar JSON válido), restricciones de comportamiento (nunca inventar URLs o rutas de archivo) y restricciones de seguridad (nunca generar contenido dañino). Los guardrails en prompts son una primera línea de defensa, no un reemplazo de los controles técnicos (ver [Seguridad](/docs/agents/security)); son más efectivos cuando especifican el comportamiento esperado exacto en casos límite.
 
 ### Especificación del formato de salida
 
-Los agentes que producen salida estructurada (JSON, markdown, llamadas a funciones) necesitan instrucciones explícitas de formato. Especifica el esquema exacto, los nombres de campos, los tipos y los campos requeridos vs. opcionales. Incluye un ejemplo válido en el prompt. Para los agentes que llaman a herramientas, aclara cuándo devolver una respuesta final versus continuar llamando a herramientas, y cómo se ve la condición de terminación. Si el agente interactúa con sistemas posteriores, el formato de salida es un contrato; la ambigüedad aquí se propaga hacia integraciones rotas.
+Los agentes que producen salidas estructuradas (JSON, Markdown, llamadas a funciones) necesitan instrucciones de formato explícitas. Especificar el esquema exacto, nombres de campos, tipos y campos requeridos vs. opcionales. Incluir un ejemplo válido en el prompt. Para agentes de llamada a herramientas, aclarar cuándo devolver una respuesta final versus seguir llamando herramientas, y cómo se ve la condición de parada. Cuando el agente interactúa con sistemas downstream, el formato de salida es un contrato; la ambigüedad aquí se traduce en integraciones defectuosas.
 
 ## Cuándo usar / Cuándo NO usar
 
 | Usar cuando | Evitar cuando |
 |---|---|
-| El agente llama a múltiples herramientas y la selección de herramientas es inconsistente | Tratar el prompt de sistema como una configuración única que nunca se revisa |
-| El agente hace bucles o termina prematuramente sin completar la tarea | Escribir un muro de texto enorme sin estructura ni secciones |
-| El agente ignora las restricciones del usuario o viola las políticas de seguridad | Confiar únicamente en los valores predeterminados del modelo sin ninguna especificación de rol o restricción |
-| Incorporar un nuevo LLM y necesitar transferir el comportamiento del modelo anterior | Añadir nuevas instrucciones de forma ad hoc sin evaluar las regresiones |
-| Construir un flujo de trabajo de múltiples pasos con requisitos de formato de salida deterministas | Esperar que el prompt solo maneje las amenazas de seguridad (también usa controles técnicos) |
+| El agente llama múltiples herramientas y la selección de herramientas es inconsistente | Tratar el system prompt como una configuración de una sola vez que nunca se revisa |
+| El agente se repite o se detiene prematuramente sin completar la tarea | Escribir un prompt de texto continuo sin estructura ni secciones |
+| El agente ignora las restricciones del usuario o viola las políticas de seguridad | Depender únicamente de los valores predeterminados del modelo sin especificación de rol o restricciones |
+| Se integra un nuevo LLM y se desea transferir el comportamiento del modelo anterior | Añadir nuevas instrucciones ad hoc sin evaluación de regresión |
+| Se construye un flujo de trabajo de múltiples pasos con requisitos de formato de salida deterministas | Esperar que el prompt solo maneje amenazas de seguridad (usar controles técnicos) |
 
 ## Comparaciones
 
 | Elemento del prompt | Propósito | Errores comunes |
 |---|---|---|
-| Definición del rol | Establece persona, experiencia y tono | Demasiado vaga ("asistente útil") o demasiado larga; colocada después de otras secciones |
-| Descripciones de herramientas | Guía la selección correcta de herramientas y la formación de argumentos | Falta orientación de cuándo/cuándo no usar; sin ejemplos de invocaciones |
-| Restricciones | Impone límites de alcance, seguridad y formato | Solo restricciones negativas ("nunca hagas X") sin especificar la alternativa correcta |
-| Instrucción chain-of-thought | Mejora la precisión del razonamiento en tareas complejas | Mezclar el razonamiento en la salida de la llamada a herramienta cuando debería estar en el scratchpad |
-| Ejemplos few-shot | Demuestra el comportamiento esperado para el uso de herramientas y el formato de salida | Ejemplos demasiado simples para representar casos extremos reales |
+| Definición de rol | Establece persona, experiencia y tono | Demasiado vago ("asistente útil") o demasiado largo; colocado después de otras secciones |
+| Descripciones de herramientas | Guía la selección correcta de herramientas y la formación de argumentos | Falta orientación de cuándo/cuándo no; sin llamadas de ejemplo |
+| Restricciones | Impone límites de alcance, seguridad y formato | Solo restricciones negativas ("nunca hacer X") sin especificar la alternativa correcta |
+| Instrucción de Chain-of-Thought | Mejora la precisión del razonamiento en tareas complejas | Mezclar el razonamiento en la salida de llamada a herramienta cuando debe estar en el bloque de borrador |
+| Ejemplos few-shot | Demuestra el comportamiento esperado para el uso de herramientas y el formato de salida | Ejemplos demasiado simples para representar casos límite reales |
 
-## Pros y contras
+## Ventajas y desventajas
 
-| Pros | Contras |
+| Ventajas | Desventajas |
 |---|---|
-| Efecto inmediato: no se requiere fine-tuning ni reentrenamiento | La sensibilidad del prompt significa que pequeños cambios de redacción pueden romper el comportamiento |
-| La estructura modular facilita el mantenimiento y la auditoría | Los prompts largos consumen tokens en cada llamada, aumentando el costo |
-| Los ejemplos few-shot reducen significativamente los errores de selección de herramientas | Las instrucciones pueden entrar en conflicto; los LLMs pueden priorizar instrucciones posteriores |
-| Las restricciones proporcionan una primera línea de defensa contra el mal uso | Los prompts son visibles para el modelo pero no están protegidos criptográficamente |
-| El chain-of-thought mejora la precisión y la interpretabilidad de las trazas | La sobreedspecificación del comportamiento puede hacer que el agente sea frágil en casos extremos |
+| Efecto inmediato: no se requiere fine-tuning ni reentrenamiento | La sensibilidad al prompt significa que pequeños cambios de formulación pueden romper el comportamiento |
+| La estructura modular hace que el mantenimiento y la auditoría sean sencillos | Los prompts largos consumen tokens en cada llamada y aumentan los costos |
+| Los ejemplos few-shot reducen significativamente los errores de selección de herramientas | Las instrucciones pueden conflictuar; los LLMs pueden priorizar instrucciones posteriores |
+| Las restricciones proporcionan una primera línea de defensa contra el abuso | Los prompts son visibles para el modelo pero no están criptográficamente protegidos |
+| Chain-of-Thought mejora la precisión y la interpretabilidad de la traza | Especificar demasiado el comportamiento puede hacer al agente frágil en casos límite |
 
 ## Ejemplos de código
 
@@ -311,14 +313,14 @@ if __name__ == "__main__":
 
 ## Recursos prácticos
 
-- [Anthropic - Resumen de prompt engineering](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Orientación oficial de Anthropic sobre la estructura del prompt de sistema, definición del rol y chain-of-thought para modelos Claude.
-- [Anthropic - Documentación de uso de herramientas](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Referencia completa para escribir definiciones de herramientas, manejar llamadas a herramientas y estructurar conversaciones de uso de herramientas con Claude.
-- [OpenAI - Guía de prompt engineering](https://platform.openai.com/docs/guides/prompt-engineering) — Técnicas fundamentales para el prompting estructurado, incluyendo ejemplos few-shot, instrucciones de formato explícitas y especificación de restricciones.
-- [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629) — Artículo original que describe el patrón de prompting Pensamiento/Acción/Observación fundamental para la mayoría de los frameworks de agentes.
+- [Anthropic - Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Guías oficiales de Anthropic sobre estructura de system prompts, definición de roles y Chain-of-Thought para modelos Claude.
+- [Anthropic - Tool use documentation](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Referencia completa para escribir definiciones de herramientas, manejar llamadas a herramientas y estructurar conversaciones de uso de herramientas con Claude.
+- [OpenAI - Prompt engineering guide](https://platform.openai.com/docs/guides/prompt-engineering) — Técnicas fundamentales para el prompting estructurado, incluyendo ejemplos few-shot, instrucciones de formato explícitas y especificación de restricciones.
+- [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629) — Artículo original que describe el patrón de prompting pensamiento/acción/observación que subyace a la mayoría de los frameworks de agentes.
 
 ## Ver también
 
-- [Agentes](/docs/agents)
+- [Agents](/docs/agents)
 - [Prompt engineering](/docs/prompt-engineering)
-- [Herramientas y acciones de agentes](/docs/agents/tools-actions)
+- [Agent tools and actions](/docs/agents/tools-actions)
 - [Anthropic tool use](/docs/agents/anthropic-tool-use)

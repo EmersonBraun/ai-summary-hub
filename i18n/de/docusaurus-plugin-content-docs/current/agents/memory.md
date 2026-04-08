@@ -1,40 +1,42 @@
 ---
-title: "Agentengedächtnis"
-description: Wie KI-Agenten Informationen über Gesprächsrunden und Sitzungen hinweg speichern, abrufen und darüber nachdenken.
-keywords: [Agentengedächtnis, Kurzzeitgedächtnis, Langzeitgedächtnis, episodisches Gedächtnis, semantisches Gedächtnis, Arbeitsgedächtnis, Kontextfenster]
+title: "Agent memory"
+description: How AI agents store, retrieve, and reason over information across turns and sessions.
+keywords: [agent memory, short-term memory, long-term memory, episodic memory, semantic memory, working memory, context window]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Agentengedächtnis
 
 ## Definition
 
-Agentengedächtnis bezeichnet die Mechanismen, durch die ein KI-Agent Informationen im Laufe seines Betriebs speichert, indiziert und abruft. Ohne Gedächtnis beginnt jede Interaktion mit einem leeren Blatt – der Agent kann nicht aus vergangenen Gesprächen lernen, Fakten ansammeln oder den Zustand einer lang laufenden Aufgabe verfolgen. Gedächtnis verwandelt einen zustandslosen LLM-Aufruf in ein persistentes, zielgerichtetes System.
+Agentengedächtnis bezieht sich auf die Mechanismen, durch die ein KI-Agent Informationen im Verlauf seines Betriebs speichert, indiziert und abruft. Ohne Gedächtnis beginnt jede Interaktion bei einem leeren Blatt – der Agent kann nicht aus vergangenen Gesprächen lernen, Fakten akkumulieren oder den Zustand einer lang laufenden Aufgabe verfolgen. Gedächtnis verwandelt einen zustandslosen LLM-Aufruf in ein persistentes, zielorientiertes System.
 
-In der Kognitionswissenschaft wird das Gedächtnis in mehrere Typen unterteilt: Arbeitsgedächtnis (aktive Informationen, die gerade im Kopf gehalten werden), Kurzzeitgedächtnis (jüngste Ereignisse, die für einen begrenzten Zeitraum behalten werden) und Langzeitgedächtnis (dauerhaftes Wissen, das unbegrenzt persistiert). KI-Agenten spiegeln diese Taxonomie eng wider. Das Kontextfenster des LLM fungiert als Arbeitsgedächtnis; ein gleitender Puffer jüngster Nachrichten dient als Kurzzeitgedächtnis; und ein externer Speicher – oft eine Vektordatenbank – dient als Langzeitgedächtnis.
+In der Kognitionswissenschaft wird Gedächtnis in mehrere Typen unterteilt: Arbeitsgedächtnis (aktive Informationen, die gerade im Kopf gehalten werden), Kurzzeitgedächtnis (kürzliche Ereignisse, die für einen begrenzten Zeitraum behalten werden) und Langzeitgedächtnis (dauerhaftes Wissen, das unbegrenzt persistiert). KI-Agenten spiegeln diese Taxonomie eng wider. Das Kontextfenster des LLM fungiert als Arbeitsgedächtnis; ein gleitender Puffer kürzlicher Nachrichten dient als Kurzzeitgedächtnis; und ein externer Speicher – oft eine Vektordatenbank – dient als Langzeitgedächtnis.
 
-Gedächtnis ermöglicht mehrstufiges Reasoning. Wenn ein Agent eine Folgefrage beantworten, einen Plan über mehrere Schritte ausführen oder die Präferenzen eines Benutzers aus einer früheren Sitzung erinnern muss, greift er auf eine oder mehrere dieser Gedächtnisschichten zurück. Die richtige Gestaltung des Gedächtnisses bestimmt, ob sich ein Agent wie ein sachkundiger Assistent oder ein amnesischer Chatbot anfühlt.
+Gedächtnis ermöglicht mehrstufiges Reasoning. Wenn ein Agent eine Folgefrage beantworten, einen Plan über mehrere Schritte ausführen oder sich an die Präferenzen eines Benutzers aus einer früheren Sitzung erinnern muss, greift er auf eine oder mehrere dieser Gedächtnisschichten zurück. Die richtige Gestaltung des Gedächtnisses bestimmt, ob ein Agent sich wie ein kenntnisreicher Assistent oder ein amnestischer Chatbot anfühlt.
 
 ## Funktionsweise
 
 ### Arbeitsgedächtnis und das Kontextfenster
 
-Das Kontextfenster ist die unmittelbarste Form des Gedächtnisses, die jedem LLM-gestützten Agenten zur Verfügung steht. Alle Nachrichten, Tool-Ergebnisse und Zwischengedanken innerhalb eines einzelnen Inferenzaufrufs befinden sich im Arbeitsgedächtnis. Typische Kontextfenster reichen von 8K bis 200K Tokens, was eine harte Obergrenze für das aktive Reasoning des Agenten setzt. Wenn dieses Limit sich nähert, müssen ältere Informationen entweder zusammengefasst, komprimiert oder entfernt werden, um Platz zu schaffen. Das Arbeitsgedächtnis ist schnell und null-latent, aber vollständig flüchtig – es verschwindet, wenn der Aufruf endet.
+Das Kontextfenster ist die unmittelbarste Form des Gedächtnisses, die für jeden LLM-gestützten Agenten verfügbar ist. Alle Nachrichten, Werkzeug-Ergebnisse und Zwischengedanken innerhalb eines einzigen Inferenzaufrufs befinden sich im Arbeitsgedächtnis. Typische Kontextfenster reichen von 8K bis 200K Token und setzen eine harte Obergrenze dafür, worüber der Agent aktiv nachdenken kann. Wenn diese Grenze erreicht wird, müssen ältere Informationen entweder zusammengefasst, komprimiert oder entfernt werden, um Platz zu schaffen. Arbeitsgedächtnis ist schnell und nulllatentig, aber vollständig flüchtig – es verschwindet, wenn der Aufruf endet.
 
-### Kurzzeit-Puffergedächtnis
+### Kurzzeit-Pufferspeicher
 
-Kurzzeitgedächtnis wird als rollierender Puffer implementiert, der die letzten N Konversationsrunden hält. Wenn eine neue Runde ankommt, wird die älteste Runde verworfen, wenn der Puffer voll ist. Dieser Ansatz ist einfach, kostengünstig und ausreichend für konversationale Kontinuität innerhalb einer einzelnen Sitzung. Der Puffer wird üblicherweise serialisiert und zu Beginn jedes neuen Inferenzaufrufs in das Kontextfenster eingefügt. Seine Haupteinschränkung ist, dass er nicht für lange Sitzungen oder sitzungsübergreifende Erinnerung skaliert.
+Kurzzeitgedächtnis wird als rollierender Puffer implementiert, der die letzten N Gesprächsrunden hält. Wenn eine neue Runde eintrifft, wird die älteste Runde verworfen, wenn der Puffer voll ist. Dieser Ansatz ist einfach, günstig und ausreichend für Gesprächskontinuität innerhalb einer einzigen Sitzung. Der Puffer wird üblicherweise serialisiert und zu Beginn jedes neuen Inferenzaufrufs zurück in das Kontextfenster übergeben. Seine Hauptbeschränkung ist, dass er nicht für lange Sitzungen oder sitzungsübergreifenden Abruf skaliert.
 
-### Semantisches Langzeitgedächtnis
+### Langzeit-Semantikspeicher
 
-Langzeitgedächtnis verwendet einen externen persistenten Speicher – typischerweise eine Vektordatenbank – um Embeddings vergangener Ereignisse, Fakten und Zusammenfassungen zu halten. Wenn der Agent sich an etwas erinnern muss, bettet er die aktuelle Anfrage ein und führt eine Näherungs-Nearest-Neighbor-Suche durch, um die semantisch relevantesten Erinnerungen abzurufen. Abgerufene Chunks werden vor der Inferenz in das Kontextfenster eingefügt. Dieses Muster skaliert auf Millionen gespeicherter Fakten und unterstützt sitzungsübergreifende Erinnerung, fügt aber Abruf-Latenz hinzu und erfordert ein Embedding-Modell.
+Langzeitgedächtnis verwendet einen externen persistenten Speicher – typischerweise eine Vektordatenbank – um Einbettungen vergangener Ereignisse, Fakten und Zusammenfassungen zu halten. Wenn der Agent sich an etwas erinnern muss, bettet er die aktuelle Anfrage ein und führt eine Approximate-Nearest-Neighbor-Suche durch, um die semantisch relevantesten Erinnerungen abzurufen. Abgerufene Chunks werden vor der Inferenz in das Kontextfenster eingefügt. Dieses Muster skaliert auf Millionen gespeicherter Fakten und unterstützt sitzungsübergreifenden Abruf, fügt aber Abruf-Latenz hinzu und erfordert ein Einbettungsmodell.
 
 ### Episodisches vs. semantisches Gedächtnis
 
-Episodisches Gedächtnis speichert spezifische vergangene Ereignisse mit ihrem Kontext: "In Sitzung 23 fragte der Benutzer nach der Rückerstattungsrichtlinie und war frustriert." Semantisches Gedächtnis speichert allgemeines Weltwissen oder angesammelte Fakten: "Das Rückgabefenster beträgt 30 Tage." Beide Typen können im selben Vektorspeicher koexistieren, unterschieden durch Metadaten. Episodisches Gedächtnis ist wertvoll für Personalisierung; semantisches Gedächtnis ist wertvoll, um den Agenten in Domänenwissen zu verankern.
+Episodisches Gedächtnis speichert spezifische vergangene Ereignisse mit ihrem Kontext: „In Sitzung 23 fragte der Benutzer nach der Rückgaberichtlinie und war frustriert." Semantisches Gedächtnis speichert allgemeines Weltwissen oder akkumulierte Fakten: „Das Rückgabefenster beträgt 30 Tage." Beide Typen können im selben Vektorspeicher koexistieren, unterschieden durch Metadaten. Episodisches Gedächtnis ist wertvoll für Personalisierung; semantisches Gedächtnis ist wertvoll, um den Agenten in Domänenwissen zu verankern.
 
 ### Abrufschleife
 
-Die Abrufschleife verbindet alle Schichten. Bei jeder Runde fragt der Agent das Langzeitgedächtnis nach relevantem Kontext, fügt ihn mit dem Kurzzeit-Puffer zusammen und speist den kombinierten Kontext in das Arbeitsgedächtnis des LLM. Nach der Generierung können wichtige Fakten aus der neuen Runde zurück in den Langzeitspeicher geschrieben werden, was die Schleife schließt.
+Die Abrufschleife verbindet alle Schichten. Bei jeder Runde fragt der Agent das Langzeitgedächtnis nach relevantem Kontext, fügt diesen mit dem Kurzzeit-Puffer zusammen und speist den kombinierten Kontext in das Arbeitsgedächtnis des LLM ein. Nach der Generierung können wichtige Fakten aus der neuen Runde zurück in den Langzeitspeicher geschrieben werden, was die Schleife schließt.
 
 ```mermaid
 flowchart LR
@@ -53,21 +55,21 @@ flowchart LR
 
 | Verwenden wenn | Vermeiden wenn |
 |---|---|
-| Der Agent Informationen aus früheren Sitzungen oder Runden erinnern muss | Die Aufgabe in einem einzelnen Prompt vollständig abgeschlossen ist ohne Folgefragen |
-| Benutzer Personalisierung basierend auf vergangenen Interaktionen erwarten | Gedächtnisspeicherungskosten oder Latenz für den Anwendungsfall inakzeptabel sind |
+| Der Agent Informationen aus früheren Sitzungen oder Runden abrufen muss | Die Aufgabe vollständig in einem einzigen Prompt selbstenthalten ist und keine Folgefragen hat |
+| Benutzer Personalisierung basierend auf vergangenen Interaktionen erwarten | Speicherkosten oder Latenz für den Anwendungsfall inakzeptabel sind |
 | Der Agent lang laufende Aufgaben mit vielen Zwischenergebnissen verfolgt | Das Kontextfenster groß genug ist, um alle relevanten Informationen zu halten |
-| Domänenwissen das in ein einzelnes Kontextfenster passt übersteigt | Datenschutzanforderungen das Speichern von Benutzerkonversationsdaten verbieten |
-| Konsistentes Verhalten über mehrere Agentenaufrufungen hinweg benötigt wird | Die zusätzliche Komplexität den marginalen Nutzen der Persistenz überwiegt |
+| Domänenwissen das hineinpasst, was in ein einzelnes Kontextfenster passt, übersteigt | Datenschutzanforderungen das Speichern von Benutzergesprächen verbieten |
+| Konsistentes Verhalten über mehrere Agenten-Aufrufe hinweg benötigt wird | Die hinzugefügte Komplexität den marginalen Nutzen der Persistenz überwiegt |
 
 ## Vor- und Nachteile
 
 | Vorteile | Nachteile |
 |---|---|
-| Ermöglicht Multi-Turn- und sitzungsübergreifende Kontinuität | Langzeitspeicher fügen Abruf-Latenz hinzu |
-| Unterstützt Personalisierung und benutzerspezifischen Kontext | Vektordatenbanken führen Infrastruktur-Komplexität ein |
-| Skaliert über Kontextfenster-Limits hinaus | Abrufqualität hängt von der Genauigkeit des Embedding-Modells ab |
-| Episodisches Gedächtnis verbessert die Benutzererfahrung erheblich | Gedächtnis-Veralterung erfordert Eviction- oder Update-Strategien |
-| Semantisches Gedächtnis verankert den Agenten in Domänenwissen | Datenschutz- und Datenaufbewahrungsrichtlinien müssen explizit verwaltet werden |
+| Ermöglicht mehrstufige und sitzungsübergreifende Kontinuität | Langzeitspeicher fügen Abruf-Latenz hinzu |
+| Unterstützt Personalisierung und benutzerspezifischen Kontext | Vektordatenbanken führen Infrastrukturkomplexität ein |
+| Skaliert jenseits von Kontextfenstergrenzen | Abrufqualität hängt von der Genauigkeit des Einbettungsmodells ab |
+| Episodisches Gedächtnis verbessert die Benutzererfahrung erheblich | Gedächtnisveralterung erfordert Eviktions- oder Update-Strategien |
+| Semantisches Gedächtnis verankert den Agenten in Domänenwissen | Datenschutz- und Datenhaltungsrichtlinien müssen explizit verwaltet werden |
 
 ## Code-Beispiele
 
@@ -221,13 +223,13 @@ if __name__ == "__main__":
 
 ## Praktische Ressourcen
 
-- [LangChain Gedächtniskonzepte](https://python.langchain.com/docs/concepts/memory/) — Offizielle LangChain-Dokumentation zu allen eingebauten Gedächtnistypen und wann jeder anzuwenden ist.
-- [MemGPT: Towards LLMs as Operating Systems](https://arxiv.org/abs/2310.08560) — Forschungspapier zur Einführung virtuellen Kontextmanagements für unbegrenztes Agentengedächtnis, vergleichbar mit virtuellem OS-Speicher.
-- [Chroma – Open-Source-Embedding-Datenbank](https://docs.trychroma.com/) — Beliebter leichtgewichtiger Vektorspeicher, der in vielen Agentengedächtnis-Implementierungen verwendet wird.
-- [OpenAI Assistants Threads](https://platform.openai.com/docs/assistants/how-it-works/managing-threads) — Wie OpenAIs verwaltete Agenten-API Konversations-Threads und persistentes Gedächtnis handhabt.
+- [LangChain Memory Concepts](https://python.langchain.com/docs/concepts/memory/) — Offizielle LangChain-Dokumentation zu allen eingebauten Gedächtnistypen und wann jeder angewendet werden sollte.
+- [MemGPT: Towards LLMs as Operating Systems](https://arxiv.org/abs/2310.08560) — Forschungspaper, das virtuelles Kontextverwaltung für unbegrenzte Agenten-Gedächtniskapazität einführt, vergleichbar mit virtuellem OS-Speicher.
+- [Chroma – Open-source embedding database](https://docs.trychroma.com/) — Beliebter leichtgewichtiger Vektorspeicher, der in vielen Agenten-Gedächtnisimplementierungen verwendet wird.
+- [OpenAI Assistants Threads](https://platform.openai.com/docs/assistants/how-it-works/managing-threads) — Wie OpenAIs verwaltete Agenten-API Gesprächs-Threads und persistenten Speicher behandelt.
 
 ## Siehe auch
 
-- [KI-Agenten](/docs/agents)
-- [Konversationsgedächtnis](/docs/agents/conversational-memory)
+- [AI agents](/docs/agents)
+- [Conversational memory](/docs/agents/conversational-memory)
 - [RAG](/docs/rag)

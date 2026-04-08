@@ -2,35 +2,37 @@
 title: Case study — Claude
 description: LLM de Anthropic que sigue instrucciones con contexto largo y seguridad.
 keywords: [Claude, Anthropic, constitutional AI, long context]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Case study: Claude
 
 ## Definición
 
-Claude is Anthropic’s familia de modelos conversacionales [LLMs](/docs/llms). Los modelos están construidos para seguimiento de instrucciones, contexto largo y seguridad, using techniques such as constitutional AI and RLHF-style alignment.
+Claude es la familia de [LLMs](/docs/llms) conversacionales de Anthropic. Los modelos están diseñados para el seguimiento de instrucciones, contexto largo y seguridad, utilizando técnicas como la IA constitucional y el alineamiento al estilo RLHF.
 
-They share the same broad stack as [ChatGPT](/docs/case-studies/chatgpt): pretrained base, ajuste de instrucciones, and preference-alineamiento basado en. Claude emphasizes long-context windows, [prompt engineering](/docs/prompt-engineering)-friendly behavior, and safety constraints. Use case: chat, long-document analysis, codificación, and [agent](/docs/agents)-style workflows via API and products like [Claude Code](/docs/tools/claude-code).
+Comparten el mismo stack amplio que [ChatGPT](/docs/case-studies/chatgpt): base preentrenada, ajuste de instrucciones y alineamiento basado en preferencias. Claude hace hincapié en ventanas de contexto largo, comportamiento amigable con la [ingeniería de prompts](/docs/prompt-engineering) y restricciones de seguridad. Caso de uso: chat, análisis de documentos largos, programación y flujos de trabajo de estilo [agente](/docs/agents) a través de la API y productos como [Claude Code](/docs/tools/claude-code).
 
 ## Cómo funciona
 
-Un **modelo base** ([transformer](/docs/transformers) solo decodificador) se preentrena en grandes corpus de texto. **Ajuste de instrucciones**ing** trains the model on (instruction, response) pairs. **Constitutional AI** and **RLHF** (reward model + policy optimization) shape helpfulness, honesty, and refusals. El resultado es un model with long context support (por ej. 100K+ tokens), suitable for documents and extended conversations. **Safety and guardrails** (content policy, refusals) are applied in the product. [RAG](/docs/rag) and tools extend Claude for specific applications.
+Un **modelo base** ([transformer](/docs/transformers) solo decodificador) se preentrena en grandes corpus de texto. El **ajuste de instrucciones** entrena el modelo con pares (instrucción, respuesta). La **IA constitucional** y el **RLHF** (modelo de recompensa + optimización de política) dan forma a la utilidad, honestidad y rechazos. El resultado es un modelo con soporte de contexto largo (p. ej., más de 100 000 tokens), adecuado para documentos y conversaciones extendidas. La **seguridad y las salvaguardas** (política de contenido, rechazos) se aplican en el producto. [RAG](/docs/rag) y herramientas amplían Claude para aplicaciones específicas.
 
 ## Casos de uso
 
-Claude fits applications that need long context, careful instruction-following, and strong safety defaults.
+Claude es adecuado para aplicaciones que necesitan contexto largo, seguimiento cuidadoso de instrucciones y valores predeterminados de seguridad sólidos.
 
-- Long-document Q&A, summarization, and analysis
-- Coding assistance and code generation with large codebase context
-- Chat and task automation with explicit safety and refusal behavior
+- Preguntas y respuestas, resumen y análisis de documentos largos
+- Asistencia de programación y generación de código con contexto de base de código grande
+- Chat y automatización de tareas con comportamiento explícito de seguridad y rechazo
 
 ## Documentación externa
 
-- [Anthropic – Claude](https://www.anthropic.com/product) — Models and product
-- [Anthropic – Model documentation](https://docs.anthropic.com/) — API and guides
+- [Anthropic – Claude](https://www.anthropic.com/product) — Modelos y producto
+- [Anthropic – Model documentation](https://docs.anthropic.com/) — API y guías
 
 ## Ver también
 
 - [LLMs](/docs/llms)
-- [Prompt engineering](/docs/prompt-engineering)
+- [Ingeniería de prompts](/docs/prompt-engineering)
 - [Claude Code](/docs/tools/claude-code)

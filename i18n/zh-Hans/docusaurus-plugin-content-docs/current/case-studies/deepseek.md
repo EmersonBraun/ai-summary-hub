@@ -2,35 +2,37 @@
 title: Case study — DeepSeek
 description: DeepSeek AI 的开放权重大语言模型，具有强大的推理和代码能力；MoE 和高效扩展。
 keywords: [DeepSeek, open weights, 推理, code, MoE]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Case study: DeepSeek
 
 ## 定义
 
-DeepSeek is a 家族 [LLMs](/docs/llms) from DeepSeek AI. The models are 以强大的推理和代码性能著称, released as **open weights** so they can be run [locally](/docs/local-inference) or fine-tuned. Variants include dense and mixture-of-experts (MoE) architectures for different scale and cost trade-offs.
+DeepSeek 是 DeepSeek AI 的一系列 [LLMs](/docs/llms)。这些模型以强大的推理和代码性能著称，以**开放权重**发布，可以[本地](/docs/local-inference)运行或进行微调。变体包括密集和专家混合（MoE）架构，适用于不同的规模和成本权衡。
 
-They illustrate the same core stack (pretraining, 指令调优, alignment) as [ChatGPT](/docs/case-studies/chatgpt) and [Claude](/docs/case-studies/claude), with an emphasis on open release and efficiency. Use case: chat, code generation, 推理 tasks, and [RAG](/docs/rag) or [agents](/docs/agents) when self-hosted or cost control matters.
+它们展示了与 [ChatGPT](/docs/case-studies/chatgpt) 和 [Claude](/docs/case-studies/claude) 相同的核心技术栈（预训练、指令调优、对齐），重点强调开放发布和效率。使用场景：当自托管或成本控制很重要时，用于聊天、代码生成、推理任务以及 [RAG](/docs/rag) 或[智能体](/docs/agents)。
 
 ## 工作原理
 
-**Base models** 在...上预训练 large text and code corpora; **指令调优** and **preference optimization** (例如 DPO) align them for chat and tool use. **MoE** variants activate a subset of parameters per token to scale capacity without proportionally increasing compute. Weights are published in standard formats (例如 SafeTensors); teams run them with [quantization](/docs/quantization) on consumer GPUs or deploy via [local inference](/docs/local-inference) runtimes (vLLM, Ollama, etc.). [Prompt engineering](/docs/prompt-engineering) and [fine-tuning](/docs/llms/fine-tuning) extend use for specific domains.
+**基础模型**在大型文本和代码语料库上预训练；**指令调优**和**偏好优化**（例如 DPO）使其对齐以进行聊天和工具使用。**MoE** 变体每个 token 只激活参数的子集，以在不按比例增加计算量的情况下扩展容量。权重以标准格式发布（例如 SafeTensors）；团队使用[量化](/docs/quantization)在消费级 GPU 上运行，或通过[本地推理](/docs/local-inference)运行时（vLLM、Ollama 等）部署。[提示词工程](/docs/prompt-engineering)和[微调](/docs/llms/fine-tuning)扩展了特定领域的使用。
 
 ## 应用场景
 
-DeepSeek fits when you want strong 推理 and code capability with open weights and local or cost-effective deployment.
+DeepSeek 适合希望以开放权重和本地或经济高效的部署来获得强大推理和代码能力的情况。
 
-- Code generation and code-assisted workflows (IDE, agents)
-- Reasoning and math with open, self-hostable models
-- Fine-tuning and [local inference](/docs/local-inference) for privacy or cost
+- 代码生成和代码辅助工作流（IDE、智能体）
+- 使用开放、可自托管模型的推理和数学
+- 针对隐私或成本的微调和[本地推理](/docs/local-inference)
 
 ## 外部文档
 
 - [DeepSeek – Official site](https://www.deepseek.com/)
-- [DeepSeek – Models on Hugging Face](https://huggingface.co/deepseek-ai) — Weights and cards
+- [DeepSeek – Models on Hugging Face](https://huggingface.co/deepseek-ai) — 权重和模型卡
 
 ## 另请参阅
 
 - [LLMs](/docs/llms)
-- [Local inference](/docs/local-inference)
-- [Fine-tuning](/docs/llms/fine-tuning)
+- [本地推理](/docs/local-inference)
+- [微调](/docs/llms/fine-tuning)

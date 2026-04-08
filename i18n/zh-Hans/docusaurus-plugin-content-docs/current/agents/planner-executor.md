@@ -1,36 +1,38 @@
 ---
-title: 规划器-执行器架构
-description: 一个 LLM 创建逐步计划，另一个独立执行每个步骤的架构。
-keywords: [规划器执行器, LLM 规划, 代理架构, 多代理, 任务分解, 重新规划]
+title: "Planner-Executor architecture"
+description: Architecture where one LLM creates a step-by-step plan and another executes each step independently.
+keywords: [planner executor, LLM planning, agent architecture, multi-agent, task decomposition, replanning]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # 规划器-执行器架构
 
 ## 定义
 
-规划器-执行器架构将*决定做什么*的关注点与*执行它*的关注点分离。**规划器** LLM 接收高级目标并生成结构化的逐步计划——共同完成目标的子任务序列。**执行器** LLM（或确定性程序）然后逐步执行计划，调用工具并产生结果。两个组件通过共享的计划工件而不是单个整体提示进行通信。
+Die Planner-Executor-Architektur trennt die Entscheidung darüber, *was zu tun ist*, von der *Ausführung*. Ein **Planner**-LLM empfängt ein übergeordnetes Ziel und erzeugt einen strukturierten, schrittweisen Plan – eine Sequenz von Teilaufgaben, die zusammen das Ziel erreichen. Ein **Executor**-LLM (oder ein deterministisches Programm) arbeitet dann den Plan Schritt für Schritt ab, ruft Werkzeuge auf und erzeugt Ergebnisse. Die beiden Komponenten kommunizieren über ein gemeinsames Plan-Artefakt statt über einen einzigen monolithischen Prompt.
 
-这种关注点分离解决了单代理 ReAct 循环的基本限制：当任务复杂时，要求一个 LLM 同时推理策略、选择下一个行动并处理低级工具细节会导致错误和幻觉。通过将高级分解委托给规划器和低级执行委托给执行器，每个组件都可以独立优化、提示和监控。规划器可以使用更有能力的模型；执行器可以是更快、更便宜的模型，甚至是非 LLM 程序。
+Diese Trennung der Zuständigkeiten behebt eine fundamentale Einschränkung von Single-Agent-ReAct-Schleifen: Wenn eine Aufgabe komplex ist, führt das gleichzeitige Nachdenken über Strategie, Auswahl der nächsten Aktion und Umgang mit Low-Level-Werkzeugdetails zu Fehlern und Halluzinationen. Durch die Delegation der übergeordneten Zerlegung an den Planner und der Low-Level-Ausführung an den Executor kann jede Komponente unabhängig optimiert, mit Prompts versehen und überwacht werden. Der Planner kann ein fähigeres Modell verwenden; der Executor kann ein schnelleres, günstigeres Modell oder sogar ein Nicht-LLM-Programm sein.
 
-计划细化和重新规划是基本架构的关键扩展。现实世界的任务很少按预期展开：工具调用可能失败、网页可能返回意外数据，或者中间结果可能揭示原始计划是错误的。健壮的规划器-执行器系统监控执行结果，并在需要重新规划时重新调用规划器。这个反馈循环将脆弱的流水线变成了自适应代理。
+Plan-Verfeinerung und Replanning sind kritische Erweiterungen der grundlegenden Architektur. Aufgaben aus der realen Welt verlaufen selten wie erwartet: Ein Werkzeugaufruf kann fehlschlagen, eine Webseite kann unerwartete Daten zurückgeben, oder ein Zwischenergebnis kann zeigen, dass der ursprüngliche Plan falsch war. Ein robustes Planner-Executor-System überwacht Ausführungsergebnisse und ruft den Planner erneut auf, wenn Replanning benötigt wird. Diese Feedback-Schleife verwandelt eine brüchige Pipeline in einen adaptiven Agenten.
 
 ## 工作原理
 
-### 规划器
+### Planner
 
-规划器接收用户的目标以及可用工具和任何相关上下文。它输出结构化计划——通常是步骤对象的 JSON 列表，每个步骤描述子任务、预期输入/输出，以及可选的使用哪个工具。良好的规划提示包含工具 schema，以便规划器可以准确地引用它们。规划器自身不调用任何工具；它只推理所需的操作序列。温度通常应较低，以产生确定性、结构良好的计划。
+Der Planner empfängt das Ziel des Benutzers zusammen mit verfügbaren Werkzeugen und relevantem Kontext. Er gibt einen strukturierten Plan aus – typischerweise eine JSON-Liste von Schrittobjekten, jedes beschreibt eine Teilaufgabe, die erwartete Ein-/Ausgabe und optional welches Werkzeug verwendet werden soll. Ein guter Planungs-Prompt enthält die Werkzeug-Schemas, damit der Planner diese genau referenzieren kann. Der Planner ruft selbst keine Werkzeuge auf; er denkt nur über die Sequenz der benötigten Operationen nach. Die Temperatur sollte im Allgemeinen niedrig sein, um deterministische, gut strukturierte Pläne zu erzeugen.
 
-### 计划工件
+### Plan-Artefakt
 
-计划是规划器和执行器之间的契约。它是一个机器可读的文档（JSON 或结构化文本），编码步骤序列、它们的依赖关系和预期结果。将计划存储为显式工件——而不是隐式保留在模型的思维链中——使系统可审计、可暂停和可恢复。可以在此处插入人机协作审批步骤，允许用户在执行开始前审查和编辑计划。
+Der Plan ist der Vertrag zwischen Planner und Executor. Es ist ein maschinenlesbares Dokument (JSON oder strukturierter Text), das die Sequenz der Schritte, ihre Abhängigkeiten und ihre erwarteten Ergebnisse kodiert. Das Speichern des Plans als explizites Artefakt – anstatt ihn implizit in der Chain-of-Thought des Modells zu halten – macht das System auditierbar, pausierbar und fortsetzbar. Ein Human-in-the-Loop-Genehmigungsschritt kann hier eingefügt werden, damit Benutzer den Plan vor Beginn der Ausführung überprüfen und bearbeiten können.
 
-### 执行器
+### Executor
 
-执行器逐步读取计划，解析对先前步骤输出的任何输入引用，调用适当的工具，并记录结果。执行器可以是第二个 LLM（当步骤需要自然语言推理时有用）、确定性脚本（对于像 API 调用这样的结构化步骤有用）或两者的混合。每个步骤后，结果写回计划工件，以便后续步骤可以引用它。如果步骤失败，执行器标记它并可选地触发重新规划。
+Der Executor liest den Plan Schritt für Schritt, löst alle Eingabereferenzen zu früheren Schrittausgaben auf, ruft die entsprechenden Werkzeuge auf und zeichnet das Ergebnis auf. Der Executor kann ein zweites LLM sein (nützlich wenn Schritte natürlichsprachliches Reasoning erfordern), ein deterministisches Skript (nützlich für strukturierte Schritte wie API-Aufrufe) oder ein Hybrid. Nach jedem Schritt wird das Ergebnis zurück in das Plan-Artefakt geschrieben, sodass nachfolgende Schritte darauf referenzieren können. Wenn ein Schritt fehlschlägt, markiert der Executor ihn und löst optional Replanning aus.
 
-### 重新规划循环
+### Replanning-Schleife
 
-当执行与计划偏离时——由于工具失败、意外输出或条件变化——控制权返回给规划器，并带有部分执行记录。规划器根据新信息修改剩余步骤。重新规划可以自动触发（例如，在任何步骤失败时）或在每个步骤后触发以实现最大适应性。限制重新规划迭代可防止无限循环。
+Wenn die Ausführung vom Plan abweicht – aufgrund von Werkzeugfehlern, unerwarteten Ausgaben oder geänderten Bedingungen – kehrt die Kontrolle zum Planner mit dem partiellen Ausführungsprotokoll zurück. Der Planner überarbeitet die verbleibenden Schritte angesichts der neuen Informationen. Replanning kann automatisch ausgelöst werden (z. B. bei jedem Schrittfehler) oder nach jedem Schritt für maximale Anpassungsfähigkeit. Das Begrenzen von Replanning-Iterationen verhindert Endlosschleifen.
 
 ```mermaid
 flowchart LR
@@ -44,26 +46,26 @@ flowchart LR
   Executor -->|"step failed or replanning needed"| Planner
 ```
 
-## 适用场景 / 不适用场景
+## 何时使用 / 何时不使用
 
-| 适用场景 | 不适用场景 |
+| 使用场景 | 避免场景 |
 |---|---|
-| 任务需要难以提前枚举的多个顺序步骤 | 任务对于单次 LLM 调用或 ReAct 循环足够简单 |
-| 您希望在执行开始前进行人工审查或批准 | 延迟至关重要，额外的规划器调用不可接受 |
-| 执行步骤具有明确的依赖关系，可以独立验证 | 计划结构是微不足道的，增加了不必要的复杂性 |
-| 您需要审计代理做了什么以及每个步骤为什么被采取 | 任务是探索性的，根本无法提前规划 |
-| 失败时的重新规划对可靠性很重要 | 工具 API 非常不可靠，以至于任何计划都无法在第一次接触时存活 |
+| Die Aufgabe mehrere sequentielle Schritte erfordert, die schwer im Voraus aufzuzählen sind | Die Aufgabe einfach genug für einen einzigen LLM-Aufruf oder eine ReAct-Schleife ist |
+| Menschliche Überprüfung oder Genehmigung vor der Ausführung gewünscht wird | Latenz kritisch ist und der zusätzliche Planner-Aufruf nicht akzeptabel ist |
+| Ausführungsschritte klare Abhängigkeiten haben und einzeln validiert werden können | Die Plan-Struktur trivial wäre und unnötige Komplexität hinzufügt |
+| Auditiert werden muss, was der Agent getan hat und warum jeder Schritt unternommen wurde | Die Aufgabe explorativ ist und überhaupt nicht im Voraus geplant werden kann |
+| Replanning bei Fehler für Zuverlässigkeit wichtig ist | Werkzeug-APIs so unzuverlässig sind, dass kein Plan den ersten Kontakt überlebt |
 
 ## 比较
 
-| 标准 | 规划器-执行器 | 单一 ReAct 代理 | 基于 DAG 的代理 |
+| Kriterium | Planner-Executor | Single ReAct agent | DAG-basierte Agenten |
 |---|---|---|---|
-| 关注点分离 | 高——规划和执行是不同的 | 无——一个代理同时完成两者 | 高——每个节点是独立的单元 |
-| 适应性/重新规划 | 中等——重新规划增加一次往返 | 高——代理在每个步骤调整 | 低——DAG 结构通常是固定的 |
-| 可审计性 | 高——计划工件是显式的 | 低——推理只在上下文中 | 高——图结构是显式的 |
-| 并行性 | 默认无 | 无 | 原生——独立分支并行运行 |
-| 实现复杂度 | 中等 | 低 | 高 |
-| 最适合 | 具有顺序依赖的多步骤任务 | 探索性、动态任务 | 具有已知可并行化子任务的任务 |
+| Trennung der Zuständigkeiten | Hoch — Planung und Ausführung sind getrennt | Keine — ein Agent macht beides | Hoch — jeder Knoten ist eine separate Einheit |
+| Anpassungsfähigkeit / Replanning | Mittel — Replanning fügt einen Roundtrip hinzu | Hoch — Agent passt sich bei jedem Schritt an | Niedrig — DAG-Struktur ist typischerweise fest |
+| Nachvollziehbarkeit | Hoch — Plan-Artefakt ist explizit | Niedrig — Reasoning ist nur im Kontext | Hoch — Graphstruktur ist explizit |
+| Parallelismus | Standardmäßig keiner | Keiner | Nativ — unabhängige Zweige laufen parallel |
+| Implementierungskomplexität | Mittel | Niedrig | Hoch |
+| 最适合 | Mehrstufige Aufgaben mit sequentiellen Abhängigkeiten | Explorative, dynamische Aufgaben | Aufgaben mit bekannten parallelisierbaren Teilaufgaben |
 
 ## 代码示例
 
@@ -228,13 +230,13 @@ if __name__ == "__main__":
 
 ## 实用资源
 
-- [Plan-and-Solve Prompting（Wang 等人，2023）](https://arxiv.org/abs/2305.04091) — 展示将规划与解决分离比标准思维链提高推理准确性的论文。
-- [LangGraph——计划并执行代理](https://langchain-ai.github.io/langgraph/tutorials/plan-and-execute/plan-and-execute/) — 实现带重新规划的规划器-执行器循环的官方 LangGraph 教程。
-- [LLM Compiler（Kim 等人，2023）](https://arxiv.org/abs/2312.04511) — 通过并行执行独立计划步骤扩展规划器-执行器。
-- [Anthropic——构建有效代理](https://www.anthropic.com/research/building-effective-agents) — 关于代理架构的实用指导，包括编排器-子代理模式。
+- [Plan-and-Solve Prompting (Wang et al., 2023)](https://arxiv.org/abs/2305.04091) — Paper, das zeigt, dass die Trennung von Planung und Lösung die Reasoning-Genauigkeit gegenüber Standard-Chain-of-Thought verbessert.
+- [LangGraph — Plan-and-Execute Agent](https://langchain-ai.github.io/langgraph/tutorials/plan-and-execute/plan-and-execute/) — Offizielles LangGraph-Tutorial, das eine Planner-Executor-Schleife mit Replanning implementiert.
+- [LLM Compiler (Kim et al., 2023)](https://arxiv.org/abs/2312.04511) — Erweitert Planner-Executor um parallele Ausführung unabhängiger Planschritte.
+- [Anthropic — Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) — Praktische Anleitungen zu Agenten-Architekturen einschließlich Orchestrator-Subagenten-Muster.
 
-## 另请参阅
+## 另见
 
-- [AI 代理](/docs/agents)
-- [基于 DAG 的代理](/docs/agents/dag-agents)
-- [思维链推理](/docs/reasoning-patterns/cot)
+- [AI agents](/docs/agents)
+- [DAG-based agents](/docs/agents/dag-agents)
+- [Chain-of-thought reasoning](/docs/reasoning-patterns/cot)

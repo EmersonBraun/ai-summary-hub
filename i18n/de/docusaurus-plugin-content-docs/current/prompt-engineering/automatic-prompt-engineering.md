@@ -2,17 +2,19 @@
 title: Automatic Prompt Engineering (APE)
 description: Automatic Prompt Engineering (APE) nutzt LLMs, um Prompt-Anweisungen zu generieren, zu bewerten und iterativ zu verfeinern — es ersetzt manuelles Trial-and-Error durch eine datengetriebene Optimierungsschleife, die leistungsstarke Prompts in großem Maßstab entdeckt.
 keywords: [Automatic Prompt Engineering, APE, Prompt-Optimierung, LLM-generierte Prompts, DSPy, Zhou et al, Prompt-Suche, Instruction Induction, Prompt Tuning, Meta-Prompting]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Automatic Prompt Engineering (APE)
 
 ## Definition
 
-Automatic Prompt Engineering (APE) ist die Praxis, ein Sprachmodell zu verwenden, um Prompt-Anweisungen zu generieren und zu optimieren, anstatt diese manuell zu schreiben. Von Zhou et al. (2022) im Paper *Large Language Models Are Human-Level Prompt Engineers* eingeführt, fasst APE Prompt-Design als Programmsyntheseproblem auf: Gegeben eine Menge von Eingabe-Ausgabe-Demonstrations-Paaren, finde die natürlichsprachliche Anweisung, die, wenn sie einem Prompt vorangestellt wird, die Aufgabenleistung auf einem gehaltenen Evaluierungsset maximiert. Das Suchen, Bewerten und Verfeinern von Kandidatenanweisungen erfolgt programmatisch — die Rolle des Menschen verlagert sich vom Prompt-Autor zum Aufgabendefinierer und Metrik-Designer.
+Automatic Prompt Engineering (APE) ist die Praxis, ein Sprachmodell zu nutzen, um Prompt-Anweisungen zu generieren und zu optimieren, anstatt sie von Hand zu schreiben. Eingeführt von Zhou et al. (2022) im Papier *Large Language Models Are Human-Level Prompt Engineers*, formuliert APE Prompt-Design als ein Programmsynthese-Problem: Gegeben eine Reihe von Eingabe-Ausgabe-Demonstrationspaaren, finde die natürlichsprachliche Anweisung, die, wenn sie einem Prompt vorangestellt wird, die Aufgabenleistung auf einem zurückgehaltenen Evaluierungsset maximiert. Das Suchen, Bewerten und Verfeinern von Kandidatenanweisungen wird alles programmatisch durchgeführt — die Rolle des Menschen verlagert sich vom Prompt-Autor zum Aufgaben-Definierer und Metrik-Designer.
 
-Die Motivation für die Automatisierung des Prompt-Designs ist praktisch. Manuelles Prompt Engineering ist zeitaufwendig, fragil und von den Intuitionen des menschlichen Ingenieurs darüber beeinflusst, wie Sprachmodelle Text verarbeiten. Kleine Änderungen in der Formulierung — "Think step by step" vs. "Let's think carefully step by step" — erzeugen messbare Genauigkeitsunterschiede, die ohne empirische Tests nicht vorhersehbar sind. APE ersetzt dieses Rätselraten durch systematische Suche: Generiere einen großen Pool von Kandidatenanweisungen, bewerte jede auf einem Benchmark und behalte die besten. Dies ist dieselbe Designphilosophie wie Hyperparameter-Suche im klassischen ML — Menschen spezifizieren das Ziel, Maschinen führen die Suche durch.
+Die Motivation für die Automatisierung von Prompt-Design ist praktisch. Manuelles Prompt-Engineering ist zeitaufwändig, spröde und von den Intuitionen des menschlichen Ingenieurs darüber beeinflusst, wie Sprachmodelle Text verarbeiten. Kleine Änderungen in der Formulierung — „Think step by step" vs. „Let's think carefully step by step" — erzeugen messbare Genauigkeitsunterschiede, die ohne empirische Tests nicht vorhersagbar sind. APE ersetzt dieses Rätselraten durch systematische Suche: Generiere einen großen Pool von Kandidatenanweisungen, bewerte jede auf einem Benchmark und behalte die besten Performer. Dies ist dieselbe Designphilosophie hinter der Hyperparameter-Suche im klassischen ML — Menschen spezifizieren das Ziel, Maschinen führen die Suche durch.
 
-APE unterscheidet sich von Soft Prompt Tuning (das kontinuierliche Token-Einbettungen via Gradientenabstieg optimiert) und von Fine-Tuning (das Modellgewichte aktualisiert). APE operiert vollständig im natürlichsprachigen Raum mit eingefrorenen Modellen. Dies macht es modell-agnostisch, interpretierbar — Sie können die gewinnende Anweisung lesen und verstehen — und ohne Trainingsinfrastruktur einsetzbar. Der Kompromiss besteht darin, dass der diskrete Suchraum natürlicher Sprache riesig und nicht-differenzierbar ist, sodass APE auf Sampling, Scoring-Heuristiken und iterative Verfeinerung statt auf gradientenbasierte Optimierung angewiesen ist.
+APE unterscheidet sich vom Soft Prompt Tuning (das kontinuierliche Token-Embeddings durch Gradientenabstieg optimiert) und vom Fine-Tuning (das Modellgewichte aktualisiert). APE arbeitet vollständig im natürlichsprachlichen Raum unter Verwendung eingefrorener Modelle. Dies macht es modell-agnostisch, interpretierbar — man kann die gewinnende Anweisung lesen und verstehen — und deploybar ohne jegliche Trainingsinfrastruktur. Der Kompromiss besteht darin, dass der diskrete Suchraum der natürlichen Sprache riesig und nicht-differenzierbar ist, sodass APE auf Sampling, Bewertungsheuristiken und iterative Verfeinerung statt auf gradientenbasierte Optimierung setzt.
 
 ## Funktionsweise
 
@@ -30,38 +32,38 @@ flowchart TD
 
 ### Kandidatengenerierung
 
-Die APE-Schleife beginnt mit einer Reihe von Demonstrations-Beispielen — Eingabe-Ausgabe-Paare, die die Zielaufgabe veranschaulichen. Diese Beispiele werden einem Meta-LLM (demselben oder einem anderen Modell) mit einem Meta-Prompt übergeben, der es auffordert, die Anweisung abzuleiten, die die gegebenen Ausgaben aus den gegebenen Eingaben erzeugen würde. Typische Meta-Prompts sehen so aus: *"Here are input-output pairs. What is the instruction that produces these outputs? Generate 10 diverse candidate instructions."* Durch Sampling bei temperature > 0 erzeugt das Meta-LLM einen vielfältigen Pool von Kandidatenanweisungen, die sich in Formulierung, Rahmung und Spezifität unterscheiden. Die Qualität und Vielfalt dieses anfänglichen Pools bestimmt direkt die Obergrenze der Optimierung.
+Die APE-Schleife beginnt mit einer Reihe von Demonstrationsbeispielen — Eingabe-Ausgabe-Paare, die die Zielaufgabe illustrieren. Diese Beispiele werden einem Meta-LLM (demselben oder einem anderen Modell) mit einem Meta-Prompt übergeben, der es auffordert, die Anweisung abzuleiten, die die gegebenen Ausgaben aus den gegebenen Eingaben erzeugen würde. Typische Meta-Prompts sehen so aus: *„Hier sind Eingabe-Ausgabe-Paare. Was ist die Anweisung, die diese Ausgaben erzeugt? Generiere 10 diverse Kandidatenanweisungen."* Durch Sampling bei Temperatur > 0 erzeugt das Meta-LLM einen diversen Pool von Kandidatenanweisungen, die sich in Formulierung, Rahmen und Spezifität unterscheiden. Die Qualität und Diversität dieses anfänglichen Pools bestimmt direkt die Obergrenze der Optimierung.
 
 ### Bewertung
 
-Jede Kandidatenanweisung wird als Präfix im Prompt (oder als Systemnachricht) instanziiert und gegen ein gehaltenes Benchmark evaluiert. Die Bewertungsfunktion ist aufgabenspezifisch: Genauigkeit für Klassifikation, Ausführungskorrektheit für Code-Generierung, ROUGE oder BERTScore für Zusammenfassung oder ein sekundärer LLM-Richter für offene Aufgaben. Die entscheidende Designentscheidung ist, ob der Score mit dem Meta-LLM selbst (unter Verwendung von Log-Wahrscheinlichkeitsschätzungen korrekter Ausgaben) oder mit einem separaten aufgabenspezifischen Evaluator berechnet wird. Log-Wahrscheinlichkeits-Scoring ist schneller, kann aber auf die Kalibrierung des Meta-LLM überangepasst sein. Separates Evaluator-Scoring ist zuverlässiger, erfordert aber gelabelte Daten.
+Jede Kandidatenanweisung wird als Präfix im Prompt (oder als Systemnachricht) instantiiert und gegen ein zurückgehaltenes Benchmark bewertet. Die Bewertungsfunktion ist aufgabenspezifisch: Genauigkeit für Klassifikation, Ausführungskorrektheit für Code-Generierung, ROUGE oder BERTScore für Zusammenfassung oder ein sekundärer LLM-Richter für offene Aufgaben. Die wichtigste Designentscheidung ist, ob der Score mit dem Meta-LLM selbst berechnet wird (unter Verwendung von Log-Wahrscheinlichkeitsschätzungen korrekter Ausgaben) oder mit einem separaten aufgabenspezifischen Evaluator. Log-Wahrscheinlichkeits-Scoring ist schneller, kann aber zur Kalibrierung des Meta-LLM überanpassen. Separate Evaluator-Bewertung ist zuverlässiger, benötigt aber beschriftete Daten.
 
 ### Iterative Verfeinerung
 
-Nach der anfänglichen Bewertung werden die Top-K Kandidatenanweisungen zur Verfeinerung ausgewählt. Das Meta-LLM wird aufgefordert, die besten Kandidaten zu paraphrasieren, zu erweitern oder zu kombinieren — wodurch ein neuer Pool von Varianten entsteht, die semantisch verwandt, aber textlich unterschiedlich sind. Diese Verfeinerungsschleife läuft für eine feste Anzahl von Iterationen oder bis ein Ziel-Score-Schwellenwert erreicht ist. Jede Iteration verengt die Suche auf vielversprechende Bereiche des Anweisungsraums, analog zur evolutionären Suche oder zum Hill Climbing über eine diskrete Landschaft. In der Praxis erzielt eine oder zwei Runden der Verfeinerung nach einem großen anfänglichen Pool (N ≥ 50) typischerweise den größten Teil des erreichbaren Gewinns.
+Nach der anfänglichen Bewertung werden die Top-K-Kandidatenanweisungen zur Verfeinerung ausgewählt. Das Meta-LLM wird aufgefordert, die besten Kandidaten zu paraphrasieren, zu erweitern oder zu kombinieren — wodurch ein neuer Pool von Varianten entsteht, die semantisch verwandt, aber textuell verschieden sind. Diese Verfeinerungsschleife läuft für eine feste Anzahl von Iterationen oder bis ein Ziel-Score-Schwellenwert erreicht ist. Jede Iteration verengt die Suche um vielversprechende Regionen des Anweisungsraums, analog zur evolutionären Suche oder zum Hill-Climbing über einer diskreten Landschaft. In der Praxis erholt sich nach einem großen anfänglichen Pool (N ≥ 50) nach einer oder zwei Verfeinerungsrunden meist der größte Teil des erreichbaren Gewinns.
 
 ## Vergleiche
 
 | Kriterium | APE | Manuelles Prompt Engineering | Fine-Tuning |
-|-----------|-----|------------------------------|-------------|
-| Menschlicher Aufwand | Gering — Aufgabe und Metrik definieren | Hoch — iteratives Verfassen und Testen | Hoch — Datenerhebung und Trainingsläufe |
-| Benötigt gelabelte Daten | Ja — zum Bewerten | Nein — kann empirisch durchgeführt werden | Ja — typischerweise Tausende von Beispielen |
+|-----------|-----|--------------------------|-------------|
+| Menschlicher Aufwand | Gering — Aufgabe und Metrik definieren | Hoch — iteratives Erstellen und Testen | Hoch — Datensammlung und Trainingsläufe |
+| Benötigt beschriftete Daten | Ja — für Bewertung | Nein — kann empirisch durchgeführt werden | Ja — typischerweise Tausende von Beispielen |
 | Modellgewichte aktualisiert | Nein | Nein | Ja |
-| Ausgabe interpretierbar | Ja — natürlichsprachige Anweisung | Ja | Nein — Gewichtsänderungen sind undurchsichtig |
-| Generalisiert über Modelle | Ja — Suche pro Modell neu ausführen | Teilweise | Nein — an Basismodell gebunden |
+| Ausgabe interpretierbar | Ja — natürlichsprachliche Anweisung | Ja | Nein — Gewichtsänderungen sind undurchsichtig |
+| Verallgemeinert modellübergreifend | Ja — Suche pro Modell erneut ausführen | Teilweise | Nein — an Basismodell gebunden |
 | Latenz bei Inferenz | Keine — kein Laufzeit-Overhead | Keine | Keine |
-| Kosten | Mittel — N × M Evaluierungsaufrufe | Niedrig | Hoch — GPU-Zeit |
-| Am besten geeignet für | Aufgaben mit klarer Metrik und ≥ 50 Beispielen | Neuartige Aufgaben ohne Metrik | Hochvolumige Aufgaben, bei denen Genauigkeitsgewinne das Training rechtfertigen |
+| Kosten | Mittel — N × M Evaluierungsaufrufe | Gering | Hoch — GPU-Zeit |
+| Am besten für | Aufgaben mit klarer Metrik und ≥ 50 Beispielen | Neuartige Aufgaben ohne Metrik | Hochvolumige Aufgaben, bei denen Genauigkeitsgewinne das Training rechtfertigen |
 
 ## Wann verwenden / Wann NICHT verwenden
 
 | Verwenden wenn | Vermeiden wenn |
-|----------------|----------------|
-| Sie ein gelabeltes Evaluierungsset haben und eine klare Scoring-Metrik definieren können | Die Aufgabe hat keine zuverlässige automatisierte Metrik — APE kann ohne Signal nicht suchen |
-| Manuelle Prompt-Iteration mehr als einen Tag dauert und die Genauigkeit weiterhin stagniert | Sie sofort ein Ergebnis benötigen — APE erfordert mehrere LLM-API-Aufrufe zur Evaluierung |
-| Sie denselben Prompt für viele Benutzer einsetzen und selbst 1-2% Genauigkeitsgewinne wichtig sind | Ihr Demonstrations-Pool zu klein ist (< 10 Beispiele) — Scoring wird laut sein |
-| Sie die beste gefundene Anweisung vor dem Einsatz auf Sicherheit prüfen möchten | Die Aufgabe Kreativität oder subjektives Urteil erfordert, bei dem eine einzelne Metrik irreführend ist |
-| Sie DSPy oder ein ähnliches Framework verwenden, bei dem Prompt-Optimierung eingebaut ist | Fine-Tuning bereits geplant ist — APE optimiert Prompts, keine Gewichte |
+|----------|------------|
+| Ein beschriftetes Evaluierungsset vorhanden ist und eine klare Bewertungsmetrik definiert werden kann | Die Aufgabe keine zuverlässige automatisierte Metrik hat — APE kann ohne Signal nicht suchen |
+| Manuelle Prompt-Iteration mehr als einen Tag dauert und die Genauigkeit immer noch stagniert | Ein sofortiges Ergebnis benötigt wird — APE erfordert mehrere LLM-API-Aufrufe für die Evaluierung |
+| Derselbe Prompt an viele Benutzer deployed wird und selbst 1–2% Genauigkeitsgewinne wichtig sind | Der Demonstrationspool zu klein ist (\< 10 Beispiele) — die Bewertung wird verrauscht |
+| Die beste gefundene Anweisung vor dem Deployment auf Sicherheit geprüft werden soll | Die Aufgabe Kreativität oder subjektives Urteil erfordert, wo eine einzige Metrik irreführend ist |
+| DSPy oder ein ähnliches Framework verwendet wird, bei dem Prompt-Optimierung eingebaut ist | Fine-Tuning bereits geplant ist — APE optimiert Prompts, keine Gewichte |
 
 ## Code-Beispiele
 
@@ -196,7 +198,7 @@ if __name__ == "__main__":
     print(result["instruction"])
 ```
 
-### DSPy für strukturiertes APE
+### DSPy für strukturiertes APE verwenden
 
 ```python
 # DSPy provides a higher-level abstraction for automatic prompt optimization.
@@ -253,10 +255,10 @@ if __name__ == "__main__":
 
 ## Praktische Ressourcen
 
-- [Large Language Models Are Human-Level Prompt Engineers (Zhou et al., 2022)](https://arxiv.org/abs/2211.01910) — Das originale APE-Paper; führt die Instruction-Induction-Formulierung, die iterative Monte-Carlo-Suche und Benchmark-Ergebnisse über 24 NLP-Aufgaben ein.
-- [DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines (Khattab et al., 2023)](https://arxiv.org/abs/2310.03714) — Das Framework, das APE-artige Optimierung als erstklassige Abstraktion operationalisiert; siehe auch [dspy.ai](https://dspy.ai).
-- [Automatic Prompt Optimization with "Gradient Descent" and Beam Search (Pryzant et al., 2023)](https://arxiv.org/abs/2305.03495) — Erweitert APE mit einem "textuellen Gradienten"-Ansatz, der LLM-generiertes Feedback als Proxy-Gradientensignal nutzt.
-- [PromptBreeder: Self-Referential Self-Improvement Via Prompt Evolution (Fernando et al., 2023)](https://arxiv.org/abs/2309.16797) — Ein evolutionärer APE-Ansatz, der auch die für die Anweisungsgenerierung verwendeten Meta-Prompts weiterentwickelt.
+- [Large Language Models Are Human-Level Prompt Engineers (Zhou et al., 2022)](https://arxiv.org/abs/2211.01910) — Das originale APE-Papier; führt die Instruction-Induction-Formulierung, die iterative Monte-Carlo-Suche und Benchmark-Ergebnisse über 24 NLP-Aufgaben ein.
+- [DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines (Khattab et al., 2023)](https://arxiv.org/abs/2310.03714) — Das Framework, das APE-ähnliche Optimierung als erstklassige Abstraktion operationalisiert; siehe auch [dspy.ai](https://dspy.ai).
+- [Automatic Prompt Optimization with "Gradient Descent" and Beam Search (Pryzant et al., 2023)](https://arxiv.org/abs/2305.03495) — Erweitert APE mit einem „textuellen Gradienten"-Ansatz, der LLM-generiertes Feedback als Proxy-Gradientsignal nutzt.
+- [PromptBreeder: Self-Referential Self-Improvement Via Prompt Evolution (Fernando et al., 2023)](https://arxiv.org/abs/2309.16797) — Ein evolutionärer APE-Ansatz, der auch die Meta-Prompts für die Anweisungsgenerierung weiterentwickelt.
 
 ## Siehe auch
 

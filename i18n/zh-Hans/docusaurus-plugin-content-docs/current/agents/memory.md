@@ -1,40 +1,42 @@
 ---
-title: 代理记忆
-description: AI 代理如何在轮次和会话中存储、检索和推理信息。
-keywords: [代理记忆, 短期记忆, 长期记忆, 情节记忆, 语义记忆, 工作记忆, 上下文窗口]
+title: "Agent memory"
+description: How AI agents store, retrieve, and reason over information across turns and sessions.
+keywords: [agent memory, short-term memory, long-term memory, episodic memory, semantic memory, working memory, context window]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # 代理记忆
 
 ## 定义
 
-代理记忆是指 AI 代理在其操作过程中存储、索引和检索信息的机制。没有记忆，每次交互都从空白状态开始——代理无法从过去的对话中学习、积累事实或追踪长期运行任务的状态。记忆将无状态的 LLM 调用转化为持久的、目标导向的系统。
+Agentengedächtnis bezieht sich auf die Mechanismen, durch die ein KI-Agent Informationen im Verlauf seines Betriebs speichert, indiziert und abruft. Ohne Gedächtnis beginnt jede Interaktion bei einem leeren Blatt – der Agent kann nicht aus vergangenen Gesprächen lernen, Fakten akkumulieren oder den Zustand einer lang laufenden Aufgabe verfolgen. Gedächtnis verwandelt einen zustandslosen LLM-Aufruf in ein persistentes, zielorientiertes System.
 
-在认知科学中，记忆分为几种类型：工作记忆（当前活跃在脑中的信息）、短期记忆（在有限时间内保留的近期事件）和长期记忆（无限期持续的持久知识）。AI 代理与这种分类紧密对应。LLM 的上下文窗口充当工作记忆；最近消息的滑动缓冲区充当短期记忆；外部存储——通常是向量数据库——充当长期记忆。
+In der Kognitionswissenschaft wird Gedächtnis in mehrere Typen unterteilt: Arbeitsgedächtnis (aktive Informationen, die gerade im Kopf gehalten werden), Kurzzeitgedächtnis (kürzliche Ereignisse, die für einen begrenzten Zeitraum behalten werden) und Langzeitgedächtnis (dauerhaftes Wissen, das unbegrenzt persistiert). KI-Agenten spiegeln diese Taxonomie eng wider. Das Kontextfenster des LLM fungiert als Arbeitsgedächtnis; ein gleitender Puffer kürzlicher Nachrichten dient als Kurzzeitgedächtnis; und ein externer Speicher – oft eine Vektordatenbank – dient als Langzeitgedächtnis.
 
-记忆是实现多轮推理的关键。当代理需要回答后续问题、在多个步骤中执行计划，或记住上一次会话中用户的偏好时，它就在使用这些记忆层中的一个或多个。正确设计记忆决定了代理是感觉像知识渊博的助手还是健忘的聊天机器人。
+Gedächtnis ermöglicht mehrstufiges Reasoning. Wenn ein Agent eine Folgefrage beantworten, einen Plan über mehrere Schritte ausführen oder sich an die Präferenzen eines Benutzers aus einer früheren Sitzung erinnern muss, greift er auf eine oder mehrere dieser Gedächtnisschichten zurück. Die richtige Gestaltung des Gedächtnisses bestimmt, ob ein Agent sich wie ein kenntnisreicher Assistent oder ein amnestischer Chatbot anfühlt.
 
 ## 工作原理
 
-### 工作记忆和上下文窗口
+### Arbeitsgedächtnis und das Kontextfenster
 
-上下文窗口是任何 LLM 支持的代理可用的最直接的记忆形式。单次推理调用中的所有消息、工具结果和中间思维都驻留在工作记忆中。典型的上下文窗口从 8K 到 200K 令牌不等，为代理可以主动推理的内容设置了硬性上限。当接近这个限制时，旧信息必须被摘要、压缩或驱逐以腾出空间。工作记忆快速且零延迟，但完全是挥发性的——调用结束时就消失了。
+Das Kontextfenster ist die unmittelbarste Form des Gedächtnisses, die für jeden LLM-gestützten Agenten verfügbar ist. Alle Nachrichten, Werkzeug-Ergebnisse und Zwischengedanken innerhalb eines einzigen Inferenzaufrufs befinden sich im Arbeitsgedächtnis. Typische Kontextfenster reichen von 8K bis 200K Token und setzen eine harte Obergrenze dafür, worüber der Agent aktiv nachdenken kann. Wenn diese Grenze erreicht wird, müssen ältere Informationen entweder zusammengefasst, komprimiert oder entfernt werden, um Platz zu schaffen. Arbeitsgedächtnis ist schnell und nulllatentig, aber vollständig flüchtig – es verschwindet, wenn der Aufruf endet.
 
-### 短期缓冲区记忆
+### Kurzzeit-Pufferspeicher
 
-短期记忆实现为持有最后 N 次对话轮次的滚动缓冲区。当新轮次到来时，如果缓冲区已满，最旧的轮次被丢弃。这种方法简单、廉价，足以在单次会话内保持对话连贯性。缓冲区通常在每次新推理调用开始时被序列化并传回上下文窗口。其主要限制是不能扩展到长会话或跨会话回忆。
+Kurzzeitgedächtnis wird als rollierender Puffer implementiert, der die letzten N Gesprächsrunden hält. Wenn eine neue Runde eintrifft, wird die älteste Runde verworfen, wenn der Puffer voll ist. Dieser Ansatz ist einfach, günstig und ausreichend für Gesprächskontinuität innerhalb einer einzigen Sitzung. Der Puffer wird üblicherweise serialisiert und zu Beginn jedes neuen Inferenzaufrufs zurück in das Kontextfenster übergeben. Seine Hauptbeschränkung ist, dass er nicht für lange Sitzungen oder sitzungsübergreifenden Abruf skaliert.
 
-### 长期语义记忆
+### Langzeit-Semantikspeicher
 
-长期记忆使用外部持久存储——通常是向量数据库——来保存过去事件、事实和摘要的嵌入。当代理需要回忆某些内容时，它嵌入当前查询并执行近似最近邻搜索以检索最语义相关的记忆。检索到的块在推理之前注入到上下文窗口中。这种模式可以扩展到数百万个存储的事实并支持跨会话回忆，但增加了检索延迟并需要嵌入模型。
+Langzeitgedächtnis verwendet einen externen persistenten Speicher – typischerweise eine Vektordatenbank – um Einbettungen vergangener Ereignisse, Fakten und Zusammenfassungen zu halten. Wenn der Agent sich an etwas erinnern muss, bettet er die aktuelle Anfrage ein und führt eine Approximate-Nearest-Neighbor-Suche durch, um die semantisch relevantesten Erinnerungen abzurufen. Abgerufene Chunks werden vor der Inferenz in das Kontextfenster eingefügt. Dieses Muster skaliert auf Millionen gespeicherter Fakten und unterstützt sitzungsübergreifenden Abruf, fügt aber Abruf-Latenz hinzu und erfordert ein Einbettungsmodell.
 
-### 情节记忆与语义记忆
+### Episodisches vs. semantisches Gedächtnis
 
-情节记忆（Episodic memory）存储带有上下文的特定过去事件："在第 23 次会话中，用户询问了退款政策并感到沮丧。"语义记忆（Semantic memory）存储一般世界知识或积累的事实："退款窗口为 30 天。"两种类型可以共存于同一向量存储中，通过元数据区分。情节记忆对个性化有价值；语义记忆对将代理植根于领域知识有价值。
+Episodisches Gedächtnis speichert spezifische vergangene Ereignisse mit ihrem Kontext: „In Sitzung 23 fragte der Benutzer nach der Rückgaberichtlinie und war frustriert." Semantisches Gedächtnis speichert allgemeines Weltwissen oder akkumulierte Fakten: „Das Rückgabefenster beträgt 30 Tage." Beide Typen können im selben Vektorspeicher koexistieren, unterschieden durch Metadaten. Episodisches Gedächtnis ist wertvoll für Personalisierung; semantisches Gedächtnis ist wertvoll, um den Agenten in Domänenwissen zu verankern.
 
-### 检索循环
+### Abrufschleife
 
-检索循环连接所有层。在每轮，代理查询长期记忆以获取相关上下文，将其与短期缓冲区合并，并将组合上下文输入 LLM 的工作记忆。生成后，新轮次的重要事实可以写回长期存储，完成循环。
+Die Abrufschleife verbindet alle Schichten. Bei jeder Runde fragt der Agent das Langzeitgedächtnis nach relevantem Kontext, fügt diesen mit dem Kurzzeit-Puffer zusammen und speist den kombinierten Kontext in das Arbeitsgedächtnis des LLM ein. Nach der Generierung können wichtige Fakten aus der neuen Runde zurück in den Langzeitspeicher geschrieben werden, was die Schleife schließt.
 
 ```mermaid
 flowchart LR
@@ -49,25 +51,25 @@ flowchart LR
   LLM -->|"write new facts"| LTS
 ```
 
-## 适用场景 / 不适用场景
+## 何时使用 / 何时不使用
 
-| 适用场景 | 不适用场景 |
+| 使用场景 | 避免场景 |
 |---|---|
-| 代理必须回忆来自以前会话或轮次的信息 | 任务在单一提示中完全自包含，无需后续跟进 |
-| 用户期望基于过去交互的个性化 | 记忆存储成本或延迟对用例不可接受 |
-| 代理追踪带有许多中间结果的长期运行任务 | 上下文窗口足够大以容纳所有相关信息 |
-| 领域知识超出单一上下文窗口的容量 | 隐私要求禁止存储用户对话数据 |
-| 您需要跨多次代理调用的一致行为 | 增加的复杂性超过了持久性的边际收益 |
+| Der Agent Informationen aus früheren Sitzungen oder Runden abrufen muss | Die Aufgabe vollständig in einem einzigen Prompt selbstenthalten ist und keine Folgefragen hat |
+| Benutzer Personalisierung basierend auf vergangenen Interaktionen erwarten | Speicherkosten oder Latenz für den Anwendungsfall inakzeptabel sind |
+| Der Agent lang laufende Aufgaben mit vielen Zwischenergebnissen verfolgt | Das Kontextfenster groß genug ist, um alle relevanten Informationen zu halten |
+| Domänenwissen das hineinpasst, was in ein einzelnes Kontextfenster passt, übersteigt | Datenschutzanforderungen das Speichern von Benutzergesprächen verbieten |
+| Konsistentes Verhalten über mehrere Agenten-Aufrufe hinweg benötigt wird | Die hinzugefügte Komplexität den marginalen Nutzen der Persistenz überwiegt |
 
 ## 优缺点
 
 | 优点 | 缺点 |
 |---|---|
-| 支持多轮和跨会话连续性 | 长期存储增加检索延迟 |
-| 支持个性化和用户特定上下文 | 向量数据库引入基础设施复杂性 |
-| 可扩展超出上下文窗口限制 | 检索质量取决于嵌入模型准确性 |
-| 情节记忆显著改善用户体验 | 记忆过时需要驱逐或更新策略 |
-| 语义记忆将代理植根于领域知识 | 必须明确管理隐私和数据保留政策 |
+| Ermöglicht mehrstufige und sitzungsübergreifende Kontinuität | Langzeitspeicher fügen Abruf-Latenz hinzu |
+| Unterstützt Personalisierung und benutzerspezifischen Kontext | Vektordatenbanken führen Infrastrukturkomplexität ein |
+| Skaliert jenseits von Kontextfenstergrenzen | Abrufqualität hängt von der Genauigkeit des Einbettungsmodells ab |
+| Episodisches Gedächtnis verbessert die Benutzererfahrung erheblich | Gedächtnisveralterung erfordert Eviktions- oder Update-Strategien |
+| Semantisches Gedächtnis verankert den Agenten in Domänenwissen | Datenschutz- und Datenhaltungsrichtlinien müssen explizit verwaltet werden |
 
 ## 代码示例
 
@@ -221,13 +223,13 @@ if __name__ == "__main__":
 
 ## 实用资源
 
-- [LangChain 记忆概念](https://python.langchain.com/docs/concepts/memory/) — 官方 LangChain 文档，涵盖所有内置记忆类型及何时应用每种类型。
-- [MemGPT：面向 LLM 的操作系统](https://arxiv.org/abs/2310.08560) — 介绍无限代理记忆的虚拟上下文管理的研究论文，类比操作系统虚拟内存。
-- [Chroma——开源嵌入数据库](https://docs.trychroma.com/) — 许多代理记忆实现中使用的流行轻量级向量存储。
-- [OpenAI Assistants Threads](https://platform.openai.com/docs/assistants/how-it-works/managing-threads) — OpenAI 托管代理 API 如何处理对话线程和持久记忆。
+- [LangChain Memory Concepts](https://python.langchain.com/docs/concepts/memory/) — Offizielle LangChain-Dokumentation zu allen eingebauten Gedächtnistypen und wann jeder angewendet werden sollte.
+- [MemGPT: Towards LLMs as Operating Systems](https://arxiv.org/abs/2310.08560) — Forschungspaper, das virtuelles Kontextverwaltung für unbegrenzte Agenten-Gedächtniskapazität einführt, vergleichbar mit virtuellem OS-Speicher.
+- [Chroma – Open-source embedding database](https://docs.trychroma.com/) — Beliebter leichtgewichtiger Vektorspeicher, der in vielen Agenten-Gedächtnisimplementierungen verwendet wird.
+- [OpenAI Assistants Threads](https://platform.openai.com/docs/assistants/how-it-works/managing-threads) — Wie OpenAIs verwaltete Agenten-API Gesprächs-Threads und persistenten Speicher behandelt.
 
-## 另请参阅
+## 另见
 
-- [AI 代理](/docs/agents)
-- [对话记忆](/docs/agents/conversational-memory)
+- [AI agents](/docs/agents)
+- [Conversational memory](/docs/agents/conversational-memory)
 - [RAG](/docs/rag)

@@ -1,43 +1,45 @@
 ---
 title: Aprendizaje con pocos ejemplos
-description: Learning from very few examples.
-keywords: [few-shot, meta-learning, MAML]
+description: Aprendizaje a partir de muy pocos ejemplos.
+keywords: [few-shot, meta-aprendizaje, MAML]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Aprendizaje con pocos ejemplos
 
 ## Definición
 
-El aprendizaje few-shot busca adaptarse rápidamente a partir de un número pequeño de ejemplos etiquetados (por ej. 1–5 por clase). Meta-learning (por ej. MAML) trains models to be good at few-shot adaptation.
+El aprendizaje few-shot busca adaptarse rápidamente a partir de un número pequeño de ejemplos etiquetados (como 1–5 por clase). El meta-aprendizaje (como MAML) entrena modelos para ser buenos en la adaptación con pocos ejemplos.
 
-Se sitúa entre [transfer learning](/docs/transfer-learning) (más datos objetivo) and [zero-shot](/docs/zero-shot-learning) (sin ejemplos objetivo). [LLMs](/docs/llms) do few-shot implicitly via in-context examples in the prompt; classical few-shot uses episodic meta-training (por ej. MAML) so the model learns to adapt from a support set.
+Se sitúa entre el [aprendizaje por transferencia](/docs/transfer-learning) (más datos objetivo) y el [aprendizaje zero-shot](/docs/zero-shot-learning) (sin ejemplos objetivo). Los [LLMs](/docs/llms) hacen few-shot implícitamente mediante ejemplos en el contexto en la indicación; el few-shot clásico usa meta-entrenamiento episódico (como MAML) para que el modelo aprenda a adaptarse a partir de un conjunto de soporte.
 
 ## Cómo funciona
 
 ```mermaid
 flowchart LR
-  Support[Support set] --> Adapt[Adapt]
-  Adapt --> Query[Query set]
-  Query --> Predict[Predict]
+  Support[Conjunto de soporte] --> Adapt[Adaptar]
+  Adapt --> Query[Conjunto de consulta]
+  Query --> Predict[Predecir]
 ```
 
-Each task has a **support set** (pocos ejemplos etiquetados, por ej. 1–5 por clase) and a **query set** (examples to predict). **Adapt**: the model uses the support set to adapt (por ej. compute prototypes, or take a few gradient steps in MAML). **Predict**: the adapted model predicts labels for the query set. **Episodic training**: sample many few-shot tasks from a meta-train set; for each, adapt on the task support set and optimize so that predictions on the query set improve. At test time, the model gets a new task’s support set and predicts on its query set. For LLMs, "adapt" is just conditioning on the support examples in the prompt (in-context few-shot).
+Cada tarea tiene un **conjunto de soporte** (pocos ejemplos etiquetados, como 1–5 por clase) y un **conjunto de consulta** (ejemplos para predecir). **Adaptar**: el modelo usa el conjunto de soporte para adaptarse (como calcular prototipos, o tomar algunos pasos de gradiente en MAML). **Predecir**: el modelo adaptado predice etiquetas para el conjunto de consulta. **Entrenamiento episódico**: muestrear muchas tareas few-shot de un conjunto meta-entrenamiento; para cada una, adaptar en el conjunto de soporte de la tarea y optimizar para que las predicciones en el conjunto de consulta mejoren. En el momento de la prueba, el modelo obtiene el conjunto de soporte de una nueva tarea y predice en su conjunto de consulta. Para los LLMs, "adaptar" es simplemente condicionar en los ejemplos de soporte en la indicación (few-shot en contexto).
 
 ## Casos de uso
 
-Few-shot learning applies when you have only a handful of examples por clase or task (including in-context LLM prompts).
+El aprendizaje few-shot aplica cuando solo tiene un puñado de ejemplos por clase o tarea (incluyendo indicaciones LLM en contexto).
 
-- Classifying rare classes with only a pocos ejemplos etiquetados
-- LLM in-context learning (por ej. 1–5 examples in the prompt)
-- Rapid adaptation in robotics or personalization with minimal data
+- Clasificar clases raras con solo unos pocos ejemplos etiquetados
+- Aprendizaje en contexto de LLMs (como 1–5 ejemplos en la indicación)
+- Adaptación rápida en robótica o personalización con datos mínimos
 
-## Documentación externa
+## Recursos prácticos
 
 - [Model-Agnostic Meta-Learning (MAML) (Finn et al.)](https://arxiv.org/abs/1703.03400)
-- [Hugging Face – Few-shot learning](https://huggingface.co/docs/transformers/tasks/summarization#few-shot-summarization)
+- [Hugging Face – Aprendizaje few-shot](https://huggingface.co/docs/transformers/tasks/summarization#few-shot-summarization)
 
 ## Ver también
 
-- [Zero-shot learning](/docs/zero-shot-learning)
+- [Aprendizaje zero-shot](/docs/zero-shot-learning)
 - [LLMs](/docs/llms)
-- [Transfer learning](/docs/transfer-learning)
+- [Aprendizaje por transferencia](/docs/transfer-learning)

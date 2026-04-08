@@ -1,36 +1,38 @@
 ---
 title: LangGraph
-description: 基于 LangChain 构建的有状态代理图，节点是 Python 函数，边定义路由，共享的 TypedDict 状态支持循环、条件分支、持久化和人机协作检查点。
-keywords: [LangGraph, 有状态代理, 状态图, 节点, 边, 条件路由, 循环, 持久化, 人机协作, LangChain]
+description: Stateful agent graphs built on LangChain, where nodes are Python functions, edges define routing, and a shared TypedDict state enables cycles, conditional branching, persistence, and human-in-the-loop checkpoints.
+keywords: [LangGraph, stateful agents, state graph, nodes, edges, conditional routing, cycles, persistence, human-in-the-loop, LangChain]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # LangGraph
 
 ## 定义
 
-LangGraph 是一个基于 LangChain 构建的开源 Python 库，用于将**有状态代理工作流构建为显式有向图**。大多数代理框架将执行循环隐藏在不透明的 `run()` 调用后面，而 LangGraph 将其作为您可以检查、测试和修改的一等图对象公开。节点是普通的 Python 函数（每个可能调用 LLM、工具或任意逻辑）；边是节点间的转换；整个工作流共享一个**状态**对象——每个节点都可以读取和写入的类型化字典。
+LangGraph ist eine Open-Source-Python-Bibliothek, die auf LangChain aufbaut, zur Konstruktion **zustandsbehafteter Agenten-Workflows als explizite gerichtete Graphen**. Wo die meisten Agenten-Frameworks die Ausführungsschleife hinter einem undurchsichtigen `run()`-Aufruf verbergen, legt LangGraph sie als erstklassiges Graph-Objekt frei, das Sie inspizieren, testen und modifizieren können. Knoten sind normale Python-Funktionen (jede kann ein LLM, ein Werkzeug oder beliebige Logik aufrufen); Kanten sind Übergänge zwischen Knoten; und der gesamte Workflow teilt ein einziges **Zustands**-Objekt – ein typisiertes Dictionary, aus dem jeder Knoten lesen und in das schreiben kann.
 
-LangGraph 的关键洞察是，许多看似复杂的代理行为——循环直到满足条件、基于 LLM 响应内容进行分支、暂停等待人工批准、从保存的检查点恢复——都清晰地映射到图原语：循环、条件边、中断和持久化状态。这种显式性有成本（比 CrewAI 或 AutoGen 更多的样板代码），但在生产中有所回报：您可以隔离地对每个节点进行单元测试，精确追踪执行所走的路径，并从任何检查点重放工作流。
+Die Schlüsselerkenntnis in LangGraph ist, dass viele Agenten-Verhaltensweisen, die komplex erscheinen – Loopen bis eine Bedingung erfüllt ist, Branching auf dem Inhalt einer LLM-Antwort, Pausieren für menschliche Genehmigung, Wiederaufnehmen von einem gespeicherten Checkpoint – sauber auf Graph-Primitive abbilden: Zyklen, bedingte Kanten, Interrupts und persistenter Zustand. Diese Explizitheit hat einen Preis (mehr Boilerplate als CrewAI oder AutoGen), zahlt sich aber in der Produktion aus: Sie können jeden Knoten isoliert unit-testen, genau verfolgen, welchen Pfad eine Ausführung genommen hat, und einen Workflow von jedem Checkpoint aus wiedergeben.
 
-LangGraph 同时支持**单代理**模式（带几个节点在循环中调用工具的图）和**多代理**模式（组合在一起的多个子图，具有跨图状态共享）。它与 LangChain 的工具生态系统、聊天模型和 LangSmith 可观测性原生集成。该框架是 LangChain 自 2024-2025 年起推荐的生产代理架构的基础。
+LangGraph unterstützt sowohl **Single-Agent**-Muster (ein Graph mit wenigen Knoten, der Werkzeuge in einer Schleife aufruft) als auch **Multi-Agent**-Muster (mehrere Subgraphen zusammengesetzt, mit Graph-übergreifender Zustandsteilung). Es integriert sich nativ in LangChains Werkzeug-Ökosystem, Chat-Modelle und LangSmith für Beobachtbarkeit. Das Framework ist die Grundlage der empfohlenen Produktions-Agenten-Architektur von LangChain ab 2024-2025.
 
 ## 工作原理
 
-### 节点：作为执行单元的 Python 函数
+### Knoten: Python-Funktionen als Ausführungseinheiten
 
-LangGraph 中的节点是任何接受当前状态并返回（部分）更新状态的 Python 可调用对象。节点通过 `graph.add_node("name", function)` 添加到图中。函数签名始终是 `(state: State) -> dict`——它从状态读取所需内容，执行工作（LLM 调用、工具执行、数据转换），并只返回它想要更新的键。这使节点易于独立测试：传入模拟状态，断言返回的字典。LangChain 的 `ToolNode` 是一个预构建节点，执行来自 LLM 响应的工具调用，涵盖了最常见的代理模式。
+Ein Knoten in LangGraph ist jedes Python-Callable, das den aktuellen Zustand akzeptiert und einen (teilweisen) aktualisierten Zustand zurückgibt. Knoten werden dem Graphen mit `graph.add_node("name", function)` hinzugefügt. Die Funktionssignatur ist immer `(state: State) -> dict` – sie liest, was sie braucht, aus dem Zustand, erledigt ihre Arbeit (LLM-Aufruf, Werkzeugausführung, Datentransformation) und gibt nur die Schlüssel zurück, die sie aktualisieren möchte. Das macht Knoten einfach unabhängig zu testen: Übergeben Sie einen Mock-Zustand, bestätigen Sie das zurückgegebene Dict. LangChains `ToolNode` ist ein vorgefertigter Knoten, der Werkzeugaufrufe aus einer LLM-Antwort ausführt und deckt das gängigste Agenten-Muster direkt ab.
 
-### 边：路由和条件分支
+### Kanten: Routing und bedingtes Branching
 
-边连接节点并确定执行顺序。简单边（`graph.add_edge("a", "b")`）总是从节点 `a` 转换到节点 `b`。条件边（`graph.add_conditional_edges`）使用当前状态调用路由函数，并使用返回的字符串决定下一个节点。这是动态控制流的机制：LLM 生成响应后，路由器检查它是否包含工具调用（路由到 `tools`）或最终答案（路由到 `END`）。条件边使 LangGraph 比顺序流水线强大得多——您可以将复杂的决策树、重试逻辑和升级路径表示为可读的图结构。
+Kanten verbinden Knoten und bestimmen die Ausführungsreihenfolge. Eine einfache Kante (`graph.add_edge("a", "b")`) übergeht immer von Knoten `a` zu Knoten `b`. Eine bedingte Kante (`graph.add_conditional_edges`) ruft eine Routing-Funktion mit dem aktuellen Zustand auf und verwendet die zurückgegebene Zeichenfolge, um den nächsten Knoten zu bestimmen. Dies ist der Mechanismus für dynamischen Kontrollfluss: Nachdem ein LLM eine Antwort generiert hat, prüft ein Router, ob sie Werkzeugaufrufe enthält (Route zu `tools`) oder eine Endantwort (Route zu `END`). Bedingte Kanten machen LangGraph deutlich mächtiger als eine sequentielle Pipeline – Sie können komplexe Entscheidungsbäume, Wiederholungslogik und Eskalationspfade als lesbare Graphstruktur ausdrücken.
 
-### 状态：跨所有节点共享的 TypedDict
+### Zustand: geteiltes TypedDict über alle Knoten
 
-状态是 LangGraph 应用程序的支柱。您定义一个 `TypedDict`（或 Pydantic 模型），包含您的工作流需要的所有字段：消息、中间结果、标志、计数器。每个节点接收完整状态并只返回它修改的字段。LangGraph 使用**归约器**将部分更新与当前状态合并——默认情况下，赋值覆盖；使用 `add_messages` 归约器，消息列表是追加而不是替换。显式的状态类型意味着类型检查器可以在运行时之前捕获错误，任何检查点的状态快照是发生事情的完整、可检查记录。
+Zustand ist das Rückgrat einer LangGraph-Anwendung. Sie definieren ein `TypedDict` (oder ein Pydantic-Modell) mit allen Feldern, die Ihr Workflow benötigt: Nachrichten, Zwischenergebnisse, Flags, Zähler. Jeder Knoten erhält den vollständigen Zustand und gibt nur die Felder zurück, die er ändert. LangGraph fügt partielle Updates mit dem aktuellen Zustand mithilfe von **Reducern** zusammen – standardmäßig überschreiben Zuweisungen; mit dem `add_messages`-Reducer wird die Nachrichtenliste angefügt statt ersetzt. Explizite Zustandstypisierung bedeutet, dass Typprüfer Fehler vor der Laufzeit erkennen können, und der Zustands-Snapshot bei jedem Checkpoint ist ein vollständiges, inspizierbares Protokoll dessen, was passiert ist.
 
-### 循环、持久化和人机协作
+### Zyklen, Persistenz und Human-in-the-Loop
 
-LangGraph 原生处理循环：节点可以基于条件边回到前一个节点（或自身），支持代理重试循环、自我纠正模式和多轮工具使用，无需任何特殊处理。持久化由**检查点器**提供（SQLite、Postgres、Redis 或内存）：图在每次节点执行后保存完整状态，因此您可以在崩溃或中断后从任意点恢复。人机协作通过 `interrupt_before` 和 `interrupt_after` 实现——图在指定节点暂停，将当前状态呈现给调用者，接受人工输入，然后继续。这使 LangGraph 成为需要可审计、可中断、生产级代理流水线时的最佳选择。
+LangGraph verarbeitet Zyklen nativ: Ein Knoten kann basierend auf einer Bedingung zu einem vorherigen Knoten (oder sich selbst) zurückkanten und ermöglicht so Agenten-Wiederholungsschleifen, Selbstkorrekturmuster und mehrstufige Werkzeug-Nutzung ohne spezielle Behandlung. Persistenz wird von **Checkpointern** (SQLite, Postgres, Redis oder In-Memory) bereitgestellt: Der Graph speichert den vollständigen Zustand nach jeder Knotenausführung, sodass Sie von jedem Punkt aus nach einem Absturz oder einer Unterbrechung fortsetzen können. Human-in-the-Loop wird über `interrupt_before` und `interrupt_after` implementiert – der Graph pausiert beim angegebenen Knoten, zeigt dem Aufrufer den aktuellen Zustand, akzeptiert menschliche Eingaben und setzt fort. Dies macht LangGraph zur stärksten Wahl, wenn Sie auditierbare, unterbrechbare, produktionsreife Agenten-Pipelines benötigen.
 
 ```mermaid
 flowchart TD
@@ -44,25 +46,25 @@ flowchart TD
   ErrorHandler -->|max retries exceeded| End
 ```
 
-## 适用场景 / 不适用场景
+## 何时使用 / 何时不使用
 
-| 适用场景 | 不适用场景 |
+| 使用场景 | 避免场景 |
 |---|---|
-| 您需要对代理执行的每个步骤进行细粒度控制 | 您想要声明式的高级 API，不需要步骤级控制 |
-| 您需要持久化和在执行中途恢复工作流的能力 | 您的工作流简单而线性——链或单代理循环就足够了 |
-| 需要在特定步骤进行人机协作审批 | 团队不熟悉图论，更喜欢更简单的思维模型 |
-| 您正在构建需要完整可观测性和重放的生产系统 | 您的代理是不需要生产级可靠性的研究原型 |
-| 您的工作流有难以线性表达的复杂条件分支或循环 | 多代理角色协调是您的主要需求——CrewAI 或 AutoGen 更简单 |
+| Feingranulare Kontrolle über jeden Schritt der Agenten-Ausführung benötigt wird | Eine deklarative, hochrangige API gewünscht wird und keine Schritt-Level-Kontrolle benötigt wird |
+| Persistenz und die Möglichkeit, Workflows mitten in der Ausführung fortzusetzen, erforderlich sind | Der Workflow einfach und linear ist — eine Kette oder Single-Agent-Schleife ausreicht |
+| Human-in-the-Loop-Genehmigungen bei bestimmten Schritten erforderlich sind | Das Team nicht mit Graph-Theorie vertraut ist und ein einfacheres Denkmodell bevorzugt |
+| Produktionssysteme gebaut werden, die vollständige Beobachtbarkeit und Replay benötigen | Agenten Forschungsprototypen sind, die keine produktionsreife Zuverlässigkeit benötigen |
+| Der Workflow komplexes bedingtes Branching oder Zyklen hat, die sich linear schwer ausdrücken lassen | Multi-Agent-Rollenkoordination der primäre Bedarf ist — CrewAI oder AutoGen sind einfacher |
 
 ## 比较
 
-| 标准 | LangGraph | CrewAI | AutoGen |
+| Kriterium | LangGraph | CrewAI | AutoGen |
 |---|---|---|---|
-| **抽象级别** | 低：显式图、节点、边和状态 | 高：声明式角色、目标、任务 | 中等：带消息历史的对话代理 |
-| **控制流** | 显式的条件边和循环 | 顺序或层级流程（不透明） | 消息驱动、轮次制（不透明） |
-| **持久化** | 一等功能：SQLite、Postgres、Redis 的检查点器 | 未内置 | 未内置 |
-| **人机协作** | 一等功能：`interrupt_before` / `interrupt_after` | 仅手动 | 一等功能：每个代理的 `human_input_mode` |
-| **可测试性** | 高：节点是纯函数，易于单元测试 | 中等：任务可以测试，但团队执行是不透明的 | 低：对话流程难以确定性地进行单元测试 |
+| **Abstraktionsebene** | Niedrig: expliziter Graph, Knoten, Kanten und Zustand | Hoch: deklarative Rollen, Ziele, Aufgaben | Mittel: konversationale Agenten mit Nachrichtenverlauf |
+| **Kontrollfluss** | Explizite bedingte Kanten und Zyklen | Sequentieller oder hierarchischer Prozess (undurchsichtig) | Nachrichtengesteuert, rundenbasiert (undurchsichtig) |
+| **Persistenz** | Erstklassig: Checkpointer für SQLite, Postgres, Redis | Nicht eingebaut | Nicht eingebaut |
+| **Human-in-the-Loop** | Erstklassig: `interrupt_before` / `interrupt_after` | Nur manuell | Erstklassig: `human_input_mode` pro Agent |
+| **Testbarkeit** | Hoch: Knoten sind reine Funktionen, einfach unit-zu-testen | Mittel: Aufgaben können getestet werden, aber Crew-Ausführung ist undurchsichtig | Niedrig: Konversationsflows sind schwer deterministisch unit-zu-testen |
 
 ## 代码示例
 
@@ -187,16 +189,16 @@ print("Total steps:", result["step_count"])
 
 ## 实用资源
 
-- [LangGraph 官方文档](https://langchain-ai.github.io/langgraph/) — 图构建、状态管理、检查点器和人机协作模式的完整参考。
-- [LangGraph GitHub 仓库](https://github.com/langchain-ai/langgraph) — 源代码、问题跟踪器和涵盖常见模式的示例笔记本。
-- [LangGraph "How-to" 指南](https://langchain-ai.github.io/langgraph/how-tos/) — 持久化、流式传输、子图、多代理协调等实用配方。
-- [LangGraph 的 LangSmith 追踪](https://docs.smith.langchain.com/) — 用于追踪 LangGraph 执行、检查每个节点状态和调试失败的可观测性平台。
+- [LangGraph official documentation](https://langchain-ai.github.io/langgraph/) — Vollständige Referenz für Graph-Konstruktion, Zustandsverwaltung, Checkpointer und Human-in-the-Loop-Muster.
+- [LangGraph GitHub repository](https://github.com/langchain-ai/langgraph) — Quellcode, Issue-Tracker und Beispiel-Notebooks, die gängige Muster abdecken.
+- [LangGraph "How-to" guides](https://langchain-ai.github.io/langgraph/how-tos/) — Praktische Rezepte für Persistenz, Streaming, Subgraphen, Multi-Agent-Koordination und mehr.
+- [LangSmith tracing for LangGraph](https://docs.smith.langchain.com/) — Beobachtbarkeitsplattform zum Tracing von LangGraph-Ausführungen, Inspektion des Zustands bei jedem Knoten und Debugging von Fehlern.
 
-## 另请参阅
+## 另见
 
-- [代理框架概述](/docs/agents/frameworks-overview)
+- [Agent frameworks overview](/docs/agents/frameworks-overview)
 - [CrewAI](/docs/agents/crewai)
 - [AutoGen](/docs/agents/autogen)
 - [LangChain](/docs/tools/langchain)
-- [多代理系统](/docs/agents/multi-agent-systems)
+- [Multi-agent systems](/docs/agents/multi-agent-systems)
 - [ReAct](/docs/reasoning-patterns/react)

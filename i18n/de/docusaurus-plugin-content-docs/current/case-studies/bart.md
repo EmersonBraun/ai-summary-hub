@@ -1,28 +1,30 @@
 ---
 title: Case study — BART
 description: Encoder-Decoder-Vorgänger von Gemini; Denoising-Vortraining für Zusammenfassung und Generierung.
-keywords: [BART, encoder-decoder, Entrauschen, summarization]
+keywords: [BART, encoder-decoder, denoising, summarization]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Case study: BART
 
 ## Definition
 
-BART (Bidirectional and Auto-Regressive Transformers) ist ein [transformer](/docs/transformers) **encoder-decoder** model from Meta (Facebook AI). Es ist pretrained with Entrauschen objectives (z. B. token deletion, masking, sentence permutation) and feinabgestimmt for summarization, translation, and conditional generation.
+BART (Bidirectional and Auto-Regressive Transformers) ist ein [Transformer](/docs/transformers) **Encoder-Decoder**-Modell von Meta (Facebook AI). Es wird mit Denoising-Zielen vortrainiert (z. B. Token-Löschung, Maskierung, Satz-Permutation) und für Zusammenfassung, Übersetzung und bedingte Generierung feinabgestimmt.
 
-BART represents an earlier generation of large sequence-to-sequence models; Google’s [Gemini](/docs/case-studies/gemini) and other modern [LLMs](/docs/llms) build on different architectures (Decoder-only, multimodal) but share the goal of strong text understanding and generation. Use case: summarization, question answering, and conditional text generation where encoder-decoder structure is beneficial.
+BART repräsentiert eine frühere Generation großer Sequenz-zu-Sequenz-Modelle; Googles [Gemini](/docs/case-studies/gemini) und andere moderne [LLMs](/docs/llms) bauen auf anderen Architekturen auf (nur Decoder, multimodal), verfolgen aber dasselbe Ziel eines starken Textverstehens und der Textgenerierung. Anwendungsfall: Zusammenfassung, Frage-Antwort-Systeme und bedingte Textgenerierung, bei denen die Encoder-Decoder-Struktur vorteilhaft ist.
 
 ## Funktionsweise
 
-**Encoder**: Ein bidirektionaler Encoder ähnlich [BERT](/docs/transformers/bert) verarbeitet die Quellsequenz. **Decoder**: Ein kausaler (autoregressiver) Dekoder attends to the encoder output and previous decoder positions to generate the target. **Pretraining**: corrupt the input (mask, delete, permute) and train the model to reconstruct the original—this Entrauschen objective learns robust representations. **Fine-tuning**: add a task-specific head or use the sequence output for summarization (z. B. CNN/DailyMail), translation, or QA. Inference: encode source, then decode token by token.
+**Encoder**: Ein [BERT](/docs/transformers/bert)-ähnlicher bidirektionaler Encoder verarbeitet die Quellsequenz. **Decoder**: Ein kausaler (autoregressiver) Decoder berücksichtigt die Encoder-Ausgabe und vorherige Decoder-Positionen, um das Ziel zu generieren. **Vortraining**: Die Eingabe wird korrumpiert (maskiert, gelöscht, permutiert) und das Modell wird trainiert, das Original zu rekonstruieren — dieses Denoising-Ziel erlernt robuste Repräsentationen. **Feinabstimmung**: Ein aufgabenspezifischer Kopf wird hinzugefügt oder die Sequenzausgabe wird für die Zusammenfassung (z. B. CNN/DailyMail), Übersetzung oder Frage-Antwort verwendet. Inferenz: Quelle kodieren, dann Token für Token dekodieren.
 
 ## Anwendungsfälle
 
-BART-style encoder-decoder models fit conditional generation and understanding tasks with a clear source and target.
+BART-artige Encoder-Decoder-Modelle eignen sich für bedingte Generierungs- und Verständnisaufgaben mit einer klaren Quelle und einem klaren Ziel.
 
-- Document and dialogue summarization
-- Conditional generation (z. B. sentence completion, data-to-text)
-- Fine-tuning for domain-specific NLU and generation
+- Dokument- und Dialogzusammenfassung
+- Bedingte Generierung (z. B. Satzvervollständigung, Daten-zu-Text)
+- Feinabstimmung für domänenspezifisches NLU und Generierung
 
 ## Externe Dokumentation
 

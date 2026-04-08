@@ -1,44 +1,46 @@
 ---
 title: Agentes autónomos
-description: Agentes que operan con mínima intervención humana.
+description: Agentes que operan con mínima intervención humana persiguiendo objetivos a largo plazo.
 keywords: [agentes autónomos, largo horizonte, autodirigido]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Agentes autónomos
 
 ## Definición
 
-Los agentes autónomos persiguen objetivos a largo plazo con intervención humana limitada. They plan, use tools, and adapt when the environment or task changes (por ej. codificación agents, research assistants).
+Los agentes autónomos persiguen objetivos a largo plazo con intervención humana limitada. Planifican, usan herramientas y se adaptan cuando el entorno o la tarea cambian (por ejemplo, agentes de codificación, asistentes de investigación).
 
-They se sitúan en el “alta autonomía” extremo del [agents](/docs/agents) espectro: en lugar de un turno de usuario y una respuesta, ejecutan bucles largos (plan → act → observe → replan) until the goal is met or a limit is hit. [Subagents](/docs/subagents) and [razonamiento patterns](/docs/reasoning-patterns) (por ej. ReAct, ToT) are often used inside autonomous agents to structure planning and action.
+Se sitúan en el extremo de "alta autonomía" del espectro de [agentes](/docs/agents): en lugar de un turno de usuario y una respuesta, ejecutan bucles largos (planificar → actuar → observar → replanificar) hasta que se cumple el objetivo o se alcanza un límite. Los [subagentes](/docs/subagents) y los [patrones de razonamiento](/docs/reasoning-patterns) (como ReAct, ToT) se usan a menudo dentro de agentes autónomos para estructurar la planificación y la acción.
 
 ## Cómo funciona
 
 ```mermaid
 flowchart LR
-  Goal[Goal] --> Plan[Plan]
-  Plan --> Act[Act]
-  Act --> Observe[Observe]
+  Goal[Objetivo] --> Plan[Planificar]
+  Plan --> Act[Actuar]
+  Act --> Observe[Observar]
   Observe --> Plan
 ```
 
-The agent starts from a **goal** (por ej. “implement feature X”). It **plans** (possibly breaking into steps or sub-tasks), then **acts** (llamadas a herramientas, code edits, search). The **observe** step captures results (tool outputs, errors, state) and feeds back into **plan** for the next iteration. The loop combines planning, memory (what was tried, what worked), tool use, and often reflection (por ej. self-critique). It runs until a stopping condition: task done, step/budget limit, or human-in-the-loop check. Safety and oversight (por ej. approval gates, rollback) are important when autonomy is high.
+El agente comienza a partir de un **objetivo** (por ejemplo, "implementar la función X"). **Planifica** (posiblemente dividiendo en pasos o subtareas), luego **actúa** (llamadas a herramientas, ediciones de código, búsqueda). El paso de **observación** captura los resultados (salidas de herramientas, errores, estado) y retroalimenta la **planificación** para la siguiente iteración. El bucle combina planificación, memoria (qué se intentó, qué funcionó), uso de herramientas y, a menudo, reflexión (como autocrítica). Se ejecuta hasta que se cumple una condición de parada: tarea completada, límite de pasos o presupuesto, o verificación en el bucle humano. La seguridad y supervisión (como puertas de aprobación, reversión) son importantes cuando la autonomía es alta.
 
 ## Casos de uso
 
-Los agentes autónomos son adecuados para trabajo de largo horizonte y múltiples pasos donde el sistema debe planificar, actuar y adaptarse sin input humano paso a paso.
+Los agentes autónomos son adecuados para trabajo de largo horizonte y múltiples pasos donde el sistema debe planificar, actuar y adaptarse sin intervención humana paso a paso.
 
-- Long-horizon codificación agents that plan, edit, and test
-- Research assistants that gather sources, summarize, and iterate
-- Data pipelines that adapt when inputs or schemas change
+- Agentes de codificación de largo horizonte que planifican, editan y prueban
+- Asistentes de investigación que recopilan fuentes, resumen e iteran
+- Canales de datos que se adaptan cuando cambian las entradas o los esquemas
 
-## Documentación externa
+## Recursos prácticos
 
 - [From Prototypes to Agents with ADK – Google Codelabs](https://codelabs.developers.google.com/your-first-agent-with-adk#0)
-- [LangChain – Autonomous agents](https://python.langchain.com/docs/concepts/agents/)
+- [LangChain – Agentes autónomos](https://python.langchain.com/docs/concepts/agents/)
 
 ## Ver también
 
-- [Agents](/docs/agents)
-- [Subagents](/docs/subagents)
-- [Reasoning patterns](/docs/reasoning-patterns)
+- [Agentes](/docs/agents)
+- [Subagentes](/docs/subagents)
+- [Patrones de razonamiento](/docs/reasoning-patterns)

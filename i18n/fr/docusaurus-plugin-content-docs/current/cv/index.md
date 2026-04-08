@@ -1,44 +1,46 @@
 ---
-title: Computer vision (CV)
+title: Vision par ordinateur (CV)
 description: Classification d'images, détection d'objets et segmentation.
-keywords: [computer vision, image, video, CNN]
+keywords: [vision par ordinateur, image, vidéo, CNN]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
-# Computer vision (CV)
+# Vision par ordinateur (CV)
 
 ## Définition
 
-La vision par ordinateur permet aux machines d'interpréter les images et la vidéo: classification, detection, segmentation, tracking, and generative tasks. [CNNs](/docs/neural-networks/cnn) and vision [transformers](/docs/transformers) are core building blocks.
+La vision par ordinateur permet aux machines d'interpréter des images et des vidéos : classification, détection, segmentation, suivi et tâches génératives. Les [CNNs](/docs/neural-networks/cnn) et les [transformers](/docs/transformers) de vision sont les blocs de construction centraux.
 
-Il chevauche [multimodal](/docs/multimodal-ai) when combining vision and language (par ex. VLMs). Generative CV uses [diffusion](/docs/diffusion-models) or [GANs](/docs/gans). Most pipelines follow a backbone (feature extraction) plus task head; [transfer learning](/docs/transfer-learning) from ImageNet or similar is standard.
+Elle chevauche le [multimodal](/docs/multimodal-ai) lors de la combinaison de vision et de langage (comme les VLMs). La CV générative utilise la [diffusion](/docs/diffusion-models) ou les [GANs](/docs/gans). La plupart des pipelines suivent un backbone (extraction de caractéristiques) plus une tête de tâche ; l'[apprentissage par transfert](/docs/transfer-learning) depuis ImageNet ou similaire est la norme.
 
 ## Comment ça fonctionne
 
 ```mermaid
 flowchart LR
   Image[Image] --> Backbone[Backbone]
-  Backbone --> Features[Features]
-  Features --> Head[Head]
-  Head --> Output["Detection/Seg/Class"]
+  Backbone --> Features[Caractéristiques]
+  Features --> Head[Tête]
+  Head --> Output["Détection/Seg/Classe"]
 ```
 
-The **image** (or video frame) est alimenté dans un **backbone** (par ex. ResNet, ViT) qui produit **features** (spatial feature maps or patch tokens). A **head** (one or more layers) maps features to the **output**: classification (logits par classe), detection (boxes + classes), segmentation (mask per pixel), or generation (par ex. [diffusion](/docs/diffusion-models)). Backbones are usually pré-entraîné sur large datasets (par ex. ImageNet) then fine-tuned with the head on the target task. Data augmentation, normalization, and loss conception (par ex. focal loss, mask head) are task-specific.
+L'**image** (ou la trame vidéo) est introduite dans un **backbone** (comme ResNet, ViT) qui produit des **caractéristiques** (cartes de caractéristiques spatiales ou tokens de patches). Une **tête** (une ou plusieurs couches) mappe les caractéristiques vers la **sortie** : classification (logits par classe), détection (boîtes + classes), segmentation (masque par pixel) ou génération (comme la [diffusion](/docs/diffusion-models)). Les backbones sont généralement pré-entraînés sur de grands ensembles de données (comme ImageNet) puis ajustés avec la tête sur la tâche cible. L'augmentation des données, la normalisation et la conception de la perte (comme la perte focale, la tête de masque) sont spécifiques à la tâche.
 
 ## Cas d'utilisation
 
-Computer vision is used wherever you need to interpret or generate images and video (detection, segmentation, recognition).
+La vision par ordinateur est utilisée partout où il faut interpréter ou générer des images et des vidéos (détection, segmentation, reconnaissance).
 
-- Object detection, instance segmentation, and tracking
-- Image classification and recognition (par ex. medical, satellite)
-- Video understanding and action recognition
+- Détection d'objets, segmentation d'instances et suivi
+- Classification et reconnaissance d'images (comme médical, satellitaire)
+- Compréhension vidéo et reconnaissance d'actions
 
-## Documentation externe
+## Ressources pratiques
 
-- [CS231n – CNNs for Visual Recognition](https://cs231n.github.io/)
-- [PyTorch – Vision tutorials](https://pytorch.org/vision/stable/index.html)
+- [CS231n – CNNs pour la reconnaissance visuelle](https://cs231n.github.io/)
+- [PyTorch – Tutoriels de vision](https://pytorch.org/vision/stable/index.html)
 
 ## Voir aussi
 
 - [CNN](/docs/neural-networks/cnn)
-- [Multimodal AI](/docs/multimodal-ai)
-- [Diffusion models](/docs/diffusion-models)
+- [IA multimodale](/docs/multimodal-ai)
+- [Modèles de diffusion](/docs/diffusion-models)

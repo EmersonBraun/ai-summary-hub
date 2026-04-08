@@ -2,17 +2,19 @@
 title: Max Tokens und Stop-Sequenzen
 description: Wie Max Tokens, Stop-Sequenzen und Wiederholungsstrafen die Länge, Grenzen und Qualität von LLM-generiertem Text steuern.
 keywords: [Max Tokens, Stop-Sequenzen, Wiederholungsstrafe, Frequency Penalty, Presence Penalty, Generierungslänge, LLM-Konfiguration]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Max Tokens und Stop-Sequenzen
 
 ## Definition
 
-Max Tokens, Stop-Sequenzen und Wiederholungsstrafen sind Generierungssteuerungsparameter, die bestimmen, wann das Modell aufhört zu generieren und wie es wiederholte Inhalte behandelt. Während Sampling-Parameter wie Temperature *was* das Modell sagt beeinflussen, formen Generierungssteuerungsparameter *wie viel* es sagt, *wo* es stoppt und *wie vielfältig* es über den Verlauf einer langen Antwort bleibt. Jede LLM-API stellt einige Versionen dieser Steuerungen zur Verfügung, und ihr Verständnis ist für die Entwicklung zuverlässiger, kosteneffizienter Pipelines unerlässlich.
+Max Tokens, Stop-Sequenzen und Wiederholungsstrafen sind Generierungssteuerungsparameter, die bestimmen, wann das Modell aufhört zu generieren und wie es mit wiederholten Inhalten umgeht. Während Sampling-Parameter wie Temperature bestimmen, *was* das Modell sagt, bestimmen Generierungssteuerungsparameter, *wie viel* es sagt, *wo* es aufhört und *wie abwechslungsreich* es über den Verlauf einer langen Antwort bleibt. Jede LLM-API bietet irgendeine Version dieser Steuerungen, und ihr Verständnis ist wesentlich für den Aufbau zuverlässiger, kosteneffizienter Pipelines.
 
-**Max Tokens** setzt eine harte Obergrenze für die Anzahl der Tokens, die das Modell in einer einzelnen Antwort generieren kann. Es fungiert als Sicherheitsdecke: Das Modell stoppt in dem Moment, in dem es ein Token ausgeben würde, das dieses Budget überschreitet. Es ist kein Ziellänge — das Modell kann früher stoppen, wenn es natürlich ein End-of-Sequence-Token generiert. Die Wahl eines angemessenen Max-Tokens-Wertes ist sowohl für die Kosten (Sie werden typischerweise pro Ausgabe-Token abgerechnet) als auch für die Korrektheit wichtig (eine abgeschnittene Antwort kann JSON-Objekte offen lassen, eine Gedankenkette mittendrin unterbrechen oder unvollständige Ergebnisse an nachgelagerte Systeme liefern).
+**Max Tokens** legt eine harte Obergrenze für die Anzahl der Token fest, die das Modell in einer einzelnen Antwort generieren kann. Es fungiert als Sicherheitsdecke: Das Modell stoppt in dem Moment, in dem es ein Token ausgeben würde, das dieses Budget überschreitet. Es ist kein Zielwert für die Länge — das Modell kann früher aufhören, wenn es ein End-of-Sequence-Token auf natürliche Weise generiert. Die Wahl eines angemessenen Max-Tokens-Werts ist sowohl für die Kosten (typischerweise werden Output-Token in Rechnung gestellt) als auch für die Korrektheit wichtig (eine abgeschnittene Antwort kann JSON-Objekte offen lassen, eine Denkkette mittendrin abschneiden oder teilweise Ergebnisse an nachgelagerte Systeme liefern).
 
-**Stop-Sequenzen** bieten semantische Stoppbedingungen: eine oder mehrere Zeichenketten, die, wenn generiert, das Modell sofort anhalten lassen (die Stop-Zeichenkette selbst ist von der Ausgabe ausgeschlossen). Sie sind unentbehrlich für die strukturierte Generierung — das Einwickeln der LLM-Ausgabe in ein bekanntes Trennzeichen und die Verwendung des schließenden Trennzeichens als Stop-Sequenz macht die Extraktion trivial und robust. **Wiederholungsstrafen** (Frequency Penalty und Presence Penalty bei OpenAI; in der Messages-API von Anthropic nicht nativ verfügbar) reduzieren die Wahrscheinlichkeit, bereits erschienene Tokens erneut zu generieren, und entmutigen das Schleifen und Fülltext, der bei langen Generierungen entstehen kann.
+**Stop-Sequenzen** bieten semantische Stoppbedingungen: eine oder mehrere Zeichenketten, die, wenn sie generiert werden, das Modell sofort zum Anhalten veranlassen (die Stop-Zeichenkette selbst wird aus der Ausgabe ausgeschlossen). Sie sind unverzichtbar für die strukturierte Generierung — das Einwickeln von LLM-Ausgaben in einen bekannten Begrenzer und die Verwendung des schließenden Begrenzers als Stop-Sequenz macht die Extraktion trivial und robust. **Wiederholungsstrafen** (Frequency Penalty und Presence Penalty bei OpenAI; nicht nativ in Anthropics Messages API verfügbar) reduzieren die Wahrscheinlichkeit, Token erneut zu generieren, die bereits erschienen sind, und entmutigen die Schleifenbildung und den Fülltext, der bei langen Generierungen auftreten kann.
 
 ## Funktionsweise
 
@@ -29,30 +31,30 @@ flowchart TD
   REP --> LOOP
 ```
 
-Jedes generierte Token durchläuft drei Checkpoints in Folge: End-of-Sequence-Erkennung, Max-Token-Budget-Durchsetzung und Stop-Sequenz-Abgleich. Wenn keine der Stoppbedingungen ausgelöst wird, wird die Wiederholungsstrafe auf die Logits für das nächste Token angewendet, bevor das Sampling fortgesetzt wird.
+Jedes generierte Token durchläuft der Reihe nach drei Kontrollpunkte: End-of-Sequence-Erkennung, Max-Token-Budget-Durchsetzung und Stop-Sequenz-Abgleich. Wenn keine der Stoppbedingungen ausgelöst wird, wird die Wiederholungsstrafe auf die Logits für das nächste Token angewendet, bevor das Sampling fortgesetzt wird.
 
 ### Max Tokens
 
-Der Parameter `max_tokens` (in älteren Anthropic-SDKs `max_tokens_to_sample` genannt, jetzt `max_tokens`) ist ein erforderliches oder stark empfohlenes Feld in den meisten LLM-APIs. Zu niedrig eingestellt riskiert abgeschnittene Ausgaben; unnötig hoch eingestellt verschwendet Rechenleistung und erhöht die Latenz bei Streaming-Endpunkten. Eine praktische Heuristik: Schätzen Sie die erwartete Ausgabelänge und setzen Sie `max_tokens` auf das 1,5- bis 2-fache dieser Schätzung als sichere Obergrenze. Für strukturierte Ausgaben wie JSON erstellen Sie ein Profil der Worst-Case-Token-Anzahl Ihres Schemas und fügen Sie einen 20%-Puffer hinzu.
+Der Parameter `max_tokens` (in älteren Anthropic SDKs als `max_tokens_to_sample` bezeichnet, jetzt `max_tokens`) ist ein erforderliches oder dringend empfohlenes Feld in den meisten LLM-APIs. Zu niedrig eingestellt riskiert man abgeschnittene Ausgaben; unnötig hoch eingestellt verschwendet man Rechenzeit und erhöht die Latenz bei Streaming-Endpunkten. Eine praktische Heuristik: Die erwartete Ausgabelänge schätzen, dann `max_tokens` auf das 1,5- bis 2-fache dieser Schätzung als sichere Obergrenze setzen. Für strukturierte Ausgaben wie JSON das Worst-Case-Token-Count des Schemas ermitteln und einen 20%igen Puffer hinzufügen.
 
 ### Stop-Sequenzen
 
-Stop-Sequenzen werden als Liste von Zeichenketten definiert. Das Modell scannt seine Ausgabe nach jedem Token und hält an, sobald der generierte Text mit einem Eintrag in der Liste endet. Häufige Muster sind `["###", "\n\n", "</answer>", "```"]` für strukturierte Prompt-Vorlagen, `["\nHuman:", "\nUser:"]` für Chat-Simulatoren, die nicht die nächste Benutzerrunde generieren sollen, und schließende Trennzeichen wie `["</json>"]` für die Tag-Extraktion. Stop-Sequenzen werden mit dem rohen generierten Text abgeglichen, nicht mit tokenisierten Grenzen, sodass Multi-Token-Zeichenketten korrekt funktionieren. Ein wichtiger Fallstrick: Die Stop-Sequenz ist *nicht* im zurückgegebenen Text enthalten, also muss Ihre Parsing-Logik deren Fehlen berücksichtigen.
+Stop-Sequenzen werden als Liste von Zeichenketten definiert. Das Modell scannt seine Ausgabe nach jedem Token und hält an, sobald der generierte Text mit einem Eintrag in der Liste endet. Übliche Muster sind `["###", "\n\n", "</answer>", "```"]` für strukturierte Prompt-Templates, `["\nHuman:", "\nUser:"]` für Chat-Simulatoren, die nicht den nächsten Benutzer-Turn generieren sollen, und schließende Begrenzer wie `["</json>"]` für markierte Extraktion. Stop-Sequenzen werden gegen rohen generierten Text abgeglichen, nicht gegen tokenisierte Grenzen, sodass Multi-Token-Zeichenketten korrekt funktionieren. Ein wichtiger Fallstrick: Die Stop-Sequenz ist *nicht* im zurückgegebenen Text enthalten, sodass Ihre Parsing-Logik ihre Abwesenheit berücksichtigen muss.
 
 ### Wiederholungsstrafen
 
-Die API von OpenAI stellt zwei verschiedene Strafparameter zur Verfügung. **Frequency Penalty** (`frequency_penalty`, Bereich −2,0 bis 2,0) reduziert den Logit eines Tokens proportional dazu, wie oft es bereits im generierten Text aufgetaucht ist — entmutigt die Wiederholung häufig verwendeter Wörter. **Presence Penalty** (`presence_penalty`, Bereich −2,0 bis 2,0) wendet eine flache Logit-Reduktion auf jedes Token an, das mindestens einmal aufgetaucht ist, unabhängig von der Häufigkeit — entmutigt die Wiederverwendung bereits gesehener Tokens. Positive Werte reduzieren Wiederholungen; negative Werte fördern sie. Werte im Bereich 0,1–0,5 sind typischerweise ausreichend, um Schleifen zu unterdrücken, ohne die Ausgabequalität erheblich zu beeinträchtigen. Werte über 1,0 können dazu führen, dass das Modell nützliche Verbindungswörter vermeidet und die Kohärenz beeinträchtigt.
+OpenAIs API bietet zwei unterschiedliche Strafparameter. **Frequency Penalty** (`frequency_penalty`, Bereich −2,0 bis 2,0) reduziert den Logit eines Tokens proportional dazu, wie oft es bereits im generierten Text erschienen ist — es entmutigt die Wiederholung häufig verwendeter Wörter. **Presence Penalty** (`presence_penalty`, Bereich −2,0 bis 2,0) wendet eine flache Logit-Reduktion auf jedes Token an, das mindestens einmal erschienen ist, unabhängig von der Häufigkeit — es entmutigt die Wiederverwendung jedes bereits gesehenen Tokens. Positive Werte reduzieren Wiederholungen; negative Werte fördern sie. Werte im Bereich 0,1–0,5 sind typischerweise ausreichend, um Schleifen zu unterdrücken, ohne die Ausgabequalität wesentlich zu beeinträchtigen. Werte über 1,0 können dazu führen, dass das Modell nützliche Verbindungswörter vermeidet und die Kohärenz beeinträchtigt wird.
 
 ## Wann verwenden / Wann NICHT verwenden
 
 | Szenario | Empfohlene Einstellungen | Vermeiden |
-|----------|--------------------------|-----------|
-| Kurze sachliche Antworten oder Klassifikationen | `max_tokens=50–150`; keine Stop-Sequenzen nötig | Sehr hohes `max_tokens`; verschwendet Budget und kann Auffüllung einladen |
-| Strukturierte JSON- oder Tag-Extraktion | Stop auf schließendem Trennzeichen (z.B. `["</json>"]`); `max_tokens` auf Worst-Case-Schema ausgelegt | Auslassen von Stop-Sequenzen; Modell kann nach der schließenden Klammer Prosa anhängen |
-| Multi-Turn Chat-Simulation | Stop-Sequenzen `["\nHuman:", "\nUser:"]` um zu verhindern, dass das Modell die nächste Benutzerrunde generiert | Keine Stop-Sequenzen; Modell halluziniert die nächste Gesprächsrunde |
-| Langform-Generierung (Essays, Berichte) | Hohes `max_tokens` (2048–4096+); milder `frequency_penalty=0,2` zur Vermeidung repetitiver Formulierungen | `frequency_penalty > 1,0`; unterbricht stilistische Kohärenz und vermeidet legitime wiederholte Begriffe |
-| Code-Generierung | Stop auf sprachgerechten Trennzeichen (z.B. dreifachem Backtick); `max_tokens` auf Funktionslänge ausgelegt | `presence_penalty > 0,5`; Variablennamen und Schlüsselwörter müssen sich wiederholen — Strafen beeinträchtigen die Korrektheit |
-| Kostenempfindliche Batch-Inferenz | `max_tokens` eng auf das 95. Perzentil der erwarteten Ausgabelänge setzen | `max_tokens` auf API-Maximum belassen (z.B. 4096), wenn die typische Ausgabe 100 Tokens beträgt |
+|----------|----------------------|-------|
+| Kurze sachliche Antworten oder Klassifikationen | `max_tokens=50–150`; keine Stop-Sequenzen erforderlich | Sehr hohes `max_tokens`; verschwendet Budget und kann zu Auffüllen einladen |
+| Strukturiertes JSON oder markierte Extraktion | Stopp beim schließenden Begrenzer (z. B. `["</json>"]`); `max_tokens` auf Worst-Case-Schema dimensioniert | Stop-Sequenzen weglassen; das Modell kann nach der schließenden Klammer Prosa anhängen |
+| Multi-Turn-Chat-Simulation | Stop-Sequenzen `["\nHuman:", "\nUser:"]`, um zu verhindern, dass das Modell den nächsten Benutzer-Turn generiert | Keine Stop-Sequenzen; das Modell halluziniert den nächsten Konversations-Turn |
+| Langform-Generierung (Essays, Berichte) | Hohes `max_tokens` (2048–4096+); mildes `frequency_penalty=0,2` zur Vermeidung repetitiver Formulierungen | `frequency_penalty > 1,0`; bricht stilistische Kohärenz und vermeidet legitime wiederholte Begriffe |
+| Code-Generierung | Stopp bei sprachgerechten Begrenzern (z. B. dreifachem Backtick); `max_tokens` auf Funktionslänge dimensioniert | `presence_penalty > 0,5`; Variablennamen und Schlüsselwörter müssen sich wiederholen — Strafen beeinträchtigen die Korrektheit |
+| Kostensensitive Batch-Inferenz | `max_tokens` eng auf die 95. Perzentile der erwarteten Ausgabelänge setzen | `max_tokens` beim API-Maximum belassen (z. B. 4096), wenn die typische Ausgabe 100 Token beträgt |
 
 ## Code-Beispiele
 
@@ -187,11 +189,11 @@ if __name__ == "__main__":
 
 ## Praktische Ressourcen
 
-- [OpenAI — API-Referenz: Chat Completions](https://platform.openai.com/docs/api-reference/chat/create) — Vollständige Parameterreferenz für `max_tokens`, `stop`, `frequency_penalty` und `presence_penalty`
-- [Anthropic — API-Referenz: Messages](https://docs.anthropic.com/en/api/messages) — Referenz für `max_tokens` und `stop_sequences` in der Messages-API
-- [OpenAI — Token-Verwaltung](https://platform.openai.com/docs/guides/text-generation/managing-tokens) — Leitfaden zum Zählen von Tokens, Verstehen von Kontextfenstern und angemessenen `max_tokens`-Größen
-- [Hugging Face — Textgenerierung steuern](https://huggingface.co/docs/transformers/main_classes/text_generation) — Low-Level-Dokumentation zu `max_new_tokens`, `eos_token_id`, `repetition_penalty` und verwandten Parametern in der Transformers-Bibliothek
-- [tiktoken (OpenAI-Tokenizer)](https://github.com/openai/tiktoken) — Token-Zählbibliothek zur Schätzung von Ausgabe-Token-Budgets vor API-Aufrufen
+- [OpenAI — API-Referenz: Chat Completions](https://platform.openai.com/docs/api-reference/chat/create) — Vollständige Parameter-Referenz für `max_tokens`, `stop`, `frequency_penalty` und `presence_penalty`
+- [Anthropic — API-Referenz: Messages](https://docs.anthropic.com/en/api/messages) — Referenz für `max_tokens` und `stop_sequences` in der Messages API
+- [OpenAI — Token-Verwaltung](https://platform.openai.com/docs/guides/text-generation/managing-tokens) — Leitfaden zum Token-Zählen, Kontextfenster-Verständnis und angemessener `max_tokens`-Dimensionierung
+- [Hugging Face — Textgenerierungssteuerung](https://huggingface.co/docs/transformers/main_classes/text_generation) — Low-Level-Dokumentation über `max_new_tokens`, `eos_token_id`, `repetition_penalty` und verwandte Parameter in der Transformers-Bibliothek
+- [tiktoken (OpenAI Tokenizer)](https://github.com/openai/tiktoken) — Token-Zählbibliothek zur Schätzung von Output-Token-Budgets vor API-Aufrufen
 
 ## Siehe auch
 

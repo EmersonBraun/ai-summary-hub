@@ -2,27 +2,29 @@
 title: Case study — DALL·E
 description: Geração de imagens a partir de texto com difusão e linguagem.
 keywords: [DALL-E, text-to-image, diffusion]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Case study: DALL·E
 
 ## Definição
 
-DALL·E (and DALL·E 2) are modelos de texto para imagem da OpenAI. They generate images from text prompts using [diffusion models](/docs/diffusion-models) and language–image alignment.
+DALL·E (e DALL·E 2) são modelos de texto para imagem da OpenAI. Eles geram imagens a partir de prompts de texto usando [modelos de difusão](/docs/diffusion-models) e alinhamento linguagem-imagem.
 
-Eles são a leading example of [multimodal](/docs/multimodal-ai) generation: text in, image out. The same [diffusion](/docs/diffusion-models) and conditioning ideas appear in Stable Diffusion and other open models. Use case: creative and product imagery from natural language; safety and content policies apply.
+São um exemplo de destaque de geração [multimodal](/docs/multimodal-ai): texto de entrada, imagem de saída. As mesmas ideias de [difusão](/docs/diffusion-models) e condicionamento aparecem no Stable Diffusion e em outros modelos abertos. Caso de uso: imagens criativas e de produto a partir da linguagem natural; políticas de segurança e conteúdo se aplicam.
 
 ## Como funciona
 
-**Texto** é codificado com um codificador de linguagem ou [multimodal](/docs/multimodal-ai) (por ex. codificador de texto CLIP, T5) em um **embedding de texto**. Um **difusion** model (por ex. UNet) is **conditioned** on this embedding: the denoising process is guided so the generated image matches the text. Training uses large datasets of captioned images; the model learns to associate text and image content. **Sampling**: start from noise, run the reverse diffusion process with the text embedding as condition, and decode to an image. **Safety filters** (por ex. classifier, policy) limit harmful or restricted outputs before delivery. Variants (inpainting, editing) condition on both text and an existing image or mask.
+O **texto** é codificado com um codificador de linguagem ou [multimodal](/docs/multimodal-ai) (p. ex., codificador de texto CLIP, T5) em um **embedding de texto**. Um modelo de **difusão** (p. ex., UNet) é **condicionado** sobre esse embedding: o processo de remoção de ruído é guiado para que a imagem gerada corresponda ao texto. O treinamento usa grandes conjuntos de dados de imagens com legendas; o modelo aprende a associar conteúdo de texto e imagem. **Amostragem**: partir do ruído, executar o processo de difusão inversa com o embedding de texto como condição e decodificar para uma imagem. **Filtros de segurança** (p. ex., classificador, política) limitam saídas prejudiciais ou restritas antes da entrega. As variantes (inpainting, edição) condicionam tanto sobre texto quanto sobre uma imagem ou máscara existente.
 
 ## Casos de uso
 
-Text-to-image models like DALL·E are used wherever you need images generated or edited from natural language (creative, product, UI).
+Os modelos de texto para imagem como DALL·E são usados onde quer que seja necessário gerar ou editar imagens a partir da linguagem natural (criativo, produto, UI).
 
-- Creative and marketing asset generation from text prompts
-- Concept art, illustration, and projeto exploration
-- Product and UI mockups from natural language descriptions
+- Geração de ativos criativos e de marketing a partir de prompts de texto
+- Arte conceitual, ilustração e exploração de design
+- Maquetes de produtos e interfaces a partir de descrições em linguagem natural
 
 ## Documentação externa
 
@@ -31,5 +33,5 @@ Text-to-image models like DALL·E are used wherever you need images generated or
 
 ## Veja também
 
-- [Diffusion models](/docs/diffusion-models)
-- [Multimodal AI](/docs/multimodal-ai)
+- [Modelos de difusão](/docs/diffusion-models)
+- [IA multimodal](/docs/multimodal-ai)

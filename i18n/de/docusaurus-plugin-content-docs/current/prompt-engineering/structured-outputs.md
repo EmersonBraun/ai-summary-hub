@@ -2,17 +2,19 @@
 title: Strukturierte Ausgaben
 description: Techniken, um LLMs maschinenlesbare strukturierte Daten erzeugen zu lassen — JSON-Modus, Function Calling Schemas und Pydantic-basierte Extraktion — für zuverlässige Integration in APIs und automatisierte Pipelines.
 keywords: [Strukturierte Ausgaben, JSON-Modus, Function Calling, Tool Use, Pydantic, Schema, Extraktion, Response Format, OpenAI, Anthropic, Output Parsing]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Strukturierte Ausgaben
 
 ## Definition
 
-Strukturierte Ausgaben bezeichnet die Praxis, ein LLM zu zwingen oder zu leiten, maschinenlesbare Daten zu erzeugen — meistens JSON — anstatt freien Fließtext. In einer Produktionspipeline ist die Lücke zwischen einem LLM, das eine korrekte Antwort zurückgibt, und einem, das eine korrekte Antwort in einem parsbaren Format zurückgibt, die Lücke zwischen einer Toy-Demo und einem einsetzbaren System. Ein nachgelagerter Dienst, der einen Produktnamen, ein Sentiment-Label oder eine Liste von Aktionspunkten extrahieren muss, kann nicht zuverlässig auf unstrukturiertem Text operieren; er benötigt eine garantierte Form, die er deserialisieren, validieren und weiterleiten kann.
+Strukturierte Ausgaben bezeichnet die Praxis, ein LLM dazu zu bringen, maschinenlesbare Daten — meistens JSON — anstatt Freitext zu produzieren. In einer Produktionspipeline ist die Lücke zwischen einem LLM, das eine korrekte Antwort liefert, und einem, das eine korrekte Antwort in einem parsbaren Format liefert, die Lücke zwischen einer Spielzeug-Demo und einem deploysfähigen System. Ein nachgelagerter Dienst, der einen Produktnamen, ein Sentiment-Label oder eine Liste von Aktionspunkten extrahieren muss, kann nicht zuverlässig auf unstrukturiertem Text operieren; er benötigt eine garantierte Form, die deserialisiert, validiert und weitergeleitet werden kann.
 
-Die Evolution der strukturierten Ausgabetechniken verfolgt die Reifung von LLM-APIs. Frühe Systeme stützten sich auf fragile Prompt-Anweisungen ("antworte nur mit validem JSON") kombiniert mit Regex-Parsing und Retry-Schleifen. Dieser Ansatz scheiterte, wenn das Modell eine erklärende Einleitung hinzufügte, das JSON in einem Markdown-Code-Block einwickelte oder unter Randfällen das Schema subtil verletzte. Die nächste Generation führte Function Calling (OpenAI, Mitte 2023) und Tool Use (Anthropic) ein, die die Schemadefinition aus dem Prompt herausverschieben und in einen erstklassigen API-Parameter einbringen, sodass das Modell explizit trainiert und am Ausgabevertrag eingeschränkt werden kann. Zuletzt führten Anbieter striktes grammatikbeschränktes Decoding ein, das die Schema-Compliance zu einer harten Garantie auf Token-Ebene macht, nicht zu einer weichen Prompt-Anweisung.
+Die Evolution der strukturierten Ausgabe-Techniken verfolgt die Reifung von LLM-APIs. Frühe Systeme stützten sich auf fragile Prompt-Anweisungen ("respond only with valid JSON"), kombiniert mit Regex-Parsing und Wiederholungsschleifen. Dieser Ansatz scheiterte immer dann, wenn das Modell eine erklärende Einleitung hinzufügte, das JSON in einen Markdown-Code-Block einwickelte oder das Schema bei Randfällen subtil verletzte. Die nächste Generation führte Function Calling (OpenAI, Mitte 2023) und Tool Use (Anthropic) ein, die die Schema-Definition aus dem Prompt herausnehmen und in einen erstklassigen API-Parameter einbetten, sodass das Modell explizit auf den Ausgabe-Vertrag trainiert und eingeschränkt werden kann. Zuletzt haben Anbieter striktes grammatikbasiertes Dekodieren eingeführt, das die Schema-Einhaltung zu einer harten Garantie auf Token-Ebene macht, nicht zu einer weichen Prompt-Anweisung.
 
-Das Verständnis, welche Technik anzuwenden ist — und warum — ist für jeden wichtig, der Pipelines entwickelt, die von LLM-Ausgaben abhängen. JSON-Modus ist der einfachste Einstiegspunkt, bietet aber keine Schema-Validierung. Function Calling / Tool Use bietet ein typisiertes Schema und strukturiertes Parsing in der API-Antwort, erfordert aber das vorherige Definieren von Tool-Schemas. Pydantic-basierte Extraktionsbibliotheken (Instructor, LangChain Output Parser) sitzen über der API-Schicht und fügen Python-Level-Validierung, automatischen Retry bei Schema-Verletzungen und ergonomische Modelldefinition hinzu. Die richtige Wahl hängt von der Komplexität des Zielschemas, der Kritikalität der Validierung und dem gewünschten Ausmaß an Retry/Korrektur-Logik der Bibliothek ab.
+Das Verständnis, welche Technik wann angewendet werden soll, ist wichtig für alle, die Pipelines entwickeln, die von LLM-Ausgaben abhängen. Der JSON-Modus ist der einfachste Einstiegspunkt, bietet aber keine Schema-Validierung. Function Calling / Tool Use bietet ein typisiertes Schema und strukturiertes Parsing in der API-Antwort, erfordert aber die vorherige Definition von Tool-Schemas. Pydantic-basierte Extraktionsbibliotheken (Instructor, LangChain Output Parser) sitzen über der API-Schicht und ergänzen Python-Level-Validierung, automatische Wiederholung bei Schema-Verletzungen und ergonomische Modelldefinition. Die richtige Wahl hängt von der Komplexität des Zielschemas, der Kritikalität der Validierung und davon ab, wie viel Wiederholungs-/Korrekturlogik die Bibliothek übernehmen soll.
 
 ## Funktionsweise
 
@@ -27,25 +29,25 @@ flowchart LR
 
 ### JSON-Modus
 
-JSON-Modus ist der grundlegendste Mechanismus für strukturierte Ausgaben. Wenn aktiviert, ist das Modell eingeschränkt, nur valides JSON als seine Top-Level-Ausgabe zu erzeugen. In der API von OpenAI wird dies durch Setzen von `response_format={"type": "json_object"}` auf der Anfrage aktiviert; in der API von Anthropic kann ein ähnlicher Effekt durch Vorfüllen des Assistenten-Turns mit `{` erzielt werden. JSON-Modus garantiert syntaktische Gültigkeit (die Ausgabe kann immer durch `json.loads` geparst werden), validiert aber nicht gegen ein Schema — das Modell könnte `{"result": "yes"}` zurückgeben, wenn Sie `{"score": 0.87, "label": "positive", "confidence": 0.92}` erwartet haben. Sie müssen Schema-Validierung (z.B. mit Pydantic oder `jsonschema`) als separaten Schritt hinzufügen und Retry-Logik für Schema-Fehlanpassungen implementieren. JSON-Modus eignet sich am besten für einfache, flache Strukturen, bei denen das Risiko einer Schema-Drift gering ist.
+Der JSON-Modus ist der grundlegendste strukturierte Ausgabemechanismus. Wenn aktiviert, ist das Modell darauf beschränkt, nur gültiges JSON als oberste Ausgabe zu produzieren. In OpenAIs API wird dies durch Setzen von `response_format={"type": "json_object"}` auf der Anfrage aktiviert; in Anthropics API kann ein ähnlicher Effekt durch Vorfüllen des Assistenten-Turns mit `{` erreicht werden. Der JSON-Modus garantiert syntaktische Gültigkeit (die Ausgabe kann immer durch `json.loads` geparst werden), validiert aber nicht gegen ein Schema — das Modell könnte `{"result": "yes"}` zurückgeben, wenn man `{"score": 0.87, "label": "positive", "confidence": 0.92}` erwartet hatte. Man muss Schema-Validierung (z. B. mit Pydantic oder `jsonschema`) als separaten Schritt hinzufügen und Wiederholungslogik für Schema-Abweichungen implementieren. Der JSON-Modus eignet sich am besten für einfache, flache Strukturen, bei denen das Risiko einer Schema-Drift gering ist.
 
 ### Function Calling und Tool Use
 
-Function Calling (OpenAI) und Tool Use (Anthropic) stellen einen qualitativen Schritt nach vorne dar. Anstatt das Ausgabeschema in die Systemnachricht einzubetten, deklarieren Sie es als Tool- oder Funktionsdefinition mit einem JSON-Schema-Objekt. Die API gibt die Ausgabe des Modells als strukturierten `tool_use`-Block mit einem geparsten `input`-Dict zurück, getrennt von jedem Text-Inhalt. Diese Entkopplung ist bedeutsam: Text und strukturierte Daten befinden sich in verschiedenen Teilen der Antwort, und die API selbst behandelt das JSON-Parsing. Sie erhalten Typ-Annotationen für jedes Feld, Semantiken für erforderliche vs. optionale Felder, Enum-Einschränkungen und Unterstützung für verschachtelte Objekte — alles durch das Schema auf API-Ebene erzwungen. Der Strict-Modus von OpenAI (2024) geht weiter, indem er beschränktes Decoding aktiviert, was Schema-Adherenz zu einer harten Garantie macht. Tool Use ist die richtige Wahl für die Extraktion strukturierter Daten aus Dokumenten, das Befüllen von Datenbankeinträgen oder das Auslösen nachgelagerter API-Aufrufe mit typisierten Argumenten.
+Function Calling (OpenAI) und Tool Use (Anthropic) stellen einen qualitativen Sprung nach vorne dar. Anstatt das Ausgabe-Schema in die Systemnachricht einzubetten, deklariert man es als Tool- oder Funktionsdefinition mit einem JSON-Schema-Objekt. Die API gibt die Ausgabe des Modells als strukturierten `tool_use`-Block mit einem geparsten `input`-Dict zurück, getrennt von jeglichem Textinhalt. Diese Entkopplung ist bedeutsam: Text und strukturierte Daten leben in verschiedenen Teilen der Antwort, und die API selbst übernimmt das JSON-Parsing. Man erhält Typannotationen für jedes Feld, erforderliche vs. optionale Feldsemantik, Enum-Einschränkungen und Unterstützung für verschachtelte Objekte — alles auf API-Ebene durch das Schema erzwungen. OpenAIs Strict Mode (2024) geht weiter, indem er eingeschränktes Dekodieren ermöglicht und Schema-Einhaltung zu einer harten Garantie macht. Tool Use ist die richtige Wahl für die Extraktion strukturierter Daten aus Dokumenten, das Befüllen von Datenbankeinträgen oder das Ausführen nachgelagerter API-Aufrufe mit typisierten Argumenten.
 
 ### Schema-basierte Extraktion mit Pydantic
 
-Bibliotheken wie [Instructor](https://github.com/jxnl/instructor) und LangChains Output Parser umhüllen die Function Calling / Tool Use API mit einer Pydantic-first-Schnittstelle. Sie definieren Ihr Ausgabeschema als `pydantic.BaseModel`-Unterklasse und übergeben die Modellklasse an die Bibliothek; sie generiert automatisch das JSON-Schema für die Tool-Definition, ruft die API auf, validiert die Antwort gegen Ihr Modell und versucht es mit Validierungsfehler-Feedback erneut, wenn das Schema verletzt wird. Dieser Ansatz ist für Python-Praktiker am ergonomischsten, weil die Ausgabe ein vollständig typisiertes Python-Objekt ist — kein rohes Dict — mit Feldvalidierung, Standardwerten und verschachtelter Modellunterstützung. Automatischer Retry mit Fehlerkontext reduziert die Rate stiller Schema-Verletzungen dramatisch. Die Kosten sind eine zusätzliche Bibliotheksabhängigkeit und etwas mehr Token-Verbrauch, wenn Validierungsfehler Retry-Nachrichten auslösen.
+Bibliotheken wie [Instructor](https://github.com/jxnl/instructor) und LangChains Output Parser umhüllen die Function Calling / Tool Use API mit einer Pydantic-first-Schnittstelle. Man definiert sein Ausgabe-Schema als `pydantic.BaseModel`-Unterklasse und übergibt die Modellklasse an die Bibliothek; sie generiert automatisch das JSON-Schema für die Tool-Definition, ruft die API auf, validiert die Antwort gegen das Modell und wiederholt mit Validierungsfehler-Feedback, wenn das Schema verletzt wird. Dieser Ansatz ist der ergonomischste für Python-Praktiker, da die Ausgabe ein vollständig typisiertes Python-Objekt ist — kein rohes Dict — mit Feldvalidierung, Standardwerten und Unterstützung für verschachtelte Modelle. Automatische Wiederholung mit Fehlerkontext reduziert die Rate stiller Schema-Verletzungen drastisch. Der Kostenfaktor ist eine zusätzliche Bibliotheksabhängigkeit und etwas mehr Token-Verbrauch, wenn Validierungsfehler Wiederholungsnachrichten auslösen.
 
 ## Wann verwenden / Wann NICHT verwenden
 
 | Verwenden wenn | Vermeiden wenn |
-|----------------|----------------|
-| Die LLM-Ausgabe programmatisch verarbeitet werden muss (API-Antwort, DB-Insert, Workflow-Trigger) | Die Ausgabe nur von Menschen gelesen wird und kein nachgelagertes Parsing benötigt wird |
-| Sie ein typisiertes, validiertes Python-Objekt statt eines rohen Strings benötigen | Das Schema so einfach ist (einzelner String oder Zahl), dass Klartext einfacher zu parsen ist |
-| Pipelines entwickelt werden, bei denen Schema-Verletzungen stille Datenkorrompierung verursachen würden | Latenz extrem eng ist und Sie den Overhead von Retry-Schleifen nicht verkraften können |
-| Die Extraktion verschachtelte Strukturen, Arrays oder Enum-eingeschränkte Felder umfasst | Sie sich im frühen Prototyping befinden und das Ausgabeschema noch nicht stabil ist |
-| Sie reproduzierbares, testbares Extraktionsverhalten über Modellversionen hinweg benötigen | Das von Ihnen verwendete Modell schlechte Unterstützung für Tool Use / Function Calling hat |
+|----------|------------|
+| Die LLM-Ausgabe programmatisch genutzt werden muss (API-Antwort, DB-Einfügung, Workflow-Trigger) | Die Ausgabe nur von Menschen gelesen wird und kein nachgelagertes Parsing benötigt wird |
+| Ein typisiertes, validiertes Python-Objekt statt einer rohen Zeichenkette benötigt wird | Das Schema so einfach ist (einzelne Zeichenkette oder Zahl), dass Klartext einfacher zu parsen ist |
+| Pipelines entwickelt werden, bei denen Schema-Verletzungen zu stiller Datenbeschädigung führen würden | Latenz extrem knapp ist und kein Overhead für Wiederholungsschleifen geleistet werden kann |
+| Die Extraktion verschachtelte Strukturen, Arrays oder enum-eingeschränkte Felder umfasst | Man sich in frühem Prototyping befindet und das Ausgabe-Schema noch nicht stabil ist |
+| Reproduzierbares, testbares Extraktionsverhalten über Modellversionen hinweg benötigt wird | Das verwendete Modell schlechte Unterstützung für Tool Use / Function Calling hat |
 
 ## Code-Beispiele
 
@@ -222,20 +224,20 @@ if __name__ == "__main__":
 ## Vergleiche
 
 | Kriterium | JSON-Modus | Function Calling / Tool Use | Pydantic-basiert (Instructor) |
-|-----------|------------|-----------------------------|-------------------------------|
-| Schema-Durchsetzung | Nur syntaktisch (valides JSON, kein Schema) | Strukturell (Felder, Typen, erforderlich) | Strukturell + semantisch (Validatoren, Feldeinschränkungen) |
+|-----------|-----------|-----------------------------|-----------------------------|
+| Schema-Durchsetzung | Nur syntaktisch (gültiges JSON, kein Schema) | Strukturell (Felder, Typen, erforderlich) | Strukturell + semantisch (Validatoren, Feldeinschränkungen) |
 | API-Oberfläche | `response_format`-Parameter | `tools` + `tool_choice`-Parameter | Bibliotheks-Wrapper über Tools |
-| Ausgabetyp | Roher String, der `json.loads` erfordert | Geparste Dict in Tool-Call-Argumenten | Typisierte Pydantic-Modellinstanz |
-| Retry bei Fehler | Manuell — muss selbst implementiert werden | Manuell | Automatisch — Bibliothek behandelt Retry mit Fehlerkontext |
+| Ausgabetyp | Rohzeichenkette, die `json.loads` erfordert | Geparstetes Dict in Tool-Call-Argumenten | Typisierte Pydantic-Modellinstanz |
+| Wiederholung bei Fehler | Manuell — muss selbst implementiert werden | Manuell | Automatisch — Bibliothek übernimmt Wiederholung mit Fehlerkontext |
 | Verschachtelte Schemas | Möglich, aber fehleranfällig | Gut unterstützt via JSON Schema | Erstklassig via verschachteltem BaseModel |
-| Am besten für | Einfache, flache Strukturen; schnelles Prototyping | Produktionsextraktion und typisierter API-Dispatch | Komplexe Schemas mit Python-Level-Validierungsanforderungen |
+| Am besten für | Einfache, flache Strukturen; schnelles Prototyping | Produktionsextraktion und typisierter API-Dispatch | Komplexe Schemas mit Python-Level-Validierungsbedarf |
 
 ## Praktische Ressourcen
 
-- [OpenAI — Structured Outputs Guide](https://platform.openai.com/docs/guides/structured-outputs) — Offizieller Leitfaden zu JSON-Modus, Function Calling und Strict-Modus mit beschränktem Decoding.
-- [Anthropic — Tool Use Dokumentation](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Vollständige Referenz zum Definieren von Tool-Schemas und Behandeln von tool_use-Blöcken in Claude-Antworten.
-- [Instructor Bibliothek (jxnl/instructor)](https://github.com/jxnl/instructor) — Die am häufigsten verwendete Bibliothek für Pydantic-first strukturierte Extraktion; unterstützt OpenAI, Anthropic und andere Backends.
-- [Pydantic Dokumentation](https://docs.pydantic.dev/) — Wichtige Referenz für das Definieren von Schemas, Validatoren und verschachtelten Modellen, die in Extraktionspipelines verwendet werden.
+- [OpenAI — Structured Outputs Guide](https://platform.openai.com/docs/guides/structured-outputs) — Offizieller Leitfaden für JSON-Modus, Function Calling und Strict Mode mit eingeschränktem Dekodieren.
+- [Anthropic — Tool Use Dokumentation](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Vollständige Referenz für die Definition von Tool-Schemas und die Behandlung von tool_use-Blöcken in Claude-Antworten.
+- [Instructor-Bibliothek (jxnl/instructor)](https://github.com/jxnl/instructor) — Die am weitesten verbreitete Bibliothek für Pydantic-first strukturierte Extraktion; unterstützt OpenAI, Anthropic und andere Backends.
+- [Pydantic-Dokumentation](https://docs.pydantic.dev/) — Wesentliche Referenz für die Definition von Schemas, Validatoren und verschachtelten Modellen für Extraktionspipelines.
 
 ## Siehe auch
 
