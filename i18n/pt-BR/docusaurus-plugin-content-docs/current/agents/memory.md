@@ -1,40 +1,42 @@
 ---
-title: "Memória de agentes"
-description: Como os agentes de IA armazenam, recuperam e raciocinam sobre informações ao longo de turnos e sessões.
-keywords: [memória de agentes, memória de curto prazo, memória de longo prazo, memória episódica, memória semântica, memória de trabalho, janela de contexto]
+title: "Agent memory"
+description: How AI agents store, retrieve, and reason over information across turns and sessions.
+keywords: [agent memory, short-term memory, long-term memory, episodic memory, semantic memory, working memory, context window]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Memória de agentes
 
 ## Definição
 
-Memória de agentes refere-se aos mecanismos pelos quais um agente de IA armazena, indexa e recupera informações ao longo de sua operação. Sem memória, cada interação começa do zero — o agente não pode aprender com conversas passadas, acumular fatos ou rastrear o estado de uma tarefa de longa duração. A memória transforma uma chamada de LLM sem estado em um sistema persistente e orientado a objetivos.
+Agentengedächtnis bezieht sich auf die Mechanismen, durch die ein KI-Agent Informationen im Verlauf seines Betriebs speichert, indiziert und abruft. Ohne Gedächtnis beginnt jede Interaktion bei einem leeren Blatt – der Agent kann nicht aus vergangenen Gesprächen lernen, Fakten akkumulieren oder den Zustand einer lang laufenden Aufgabe verfolgen. Gedächtnis verwandelt einen zustandslosen LLM-Aufruf in ein persistentes, zielorientiertes System.
 
-Na ciência cognitiva, a memória é dividida em vários tipos: memória de trabalho (informação ativa mantida em mente agora), memória de curto prazo (eventos recentes retidos por um período limitado) e memória de longo prazo (conhecimento durável que persiste indefinidamente). Os agentes de IA espelham essa taxonomia de perto. A janela de contexto do LLM age como memória de trabalho; um buffer deslizante de mensagens recentes serve como memória de curto prazo; e um armazenamento externo — frequentemente um banco de dados vetorial — serve como memória de longo prazo.
+In der Kognitionswissenschaft wird Gedächtnis in mehrere Typen unterteilt: Arbeitsgedächtnis (aktive Informationen, die gerade im Kopf gehalten werden), Kurzzeitgedächtnis (kürzliche Ereignisse, die für einen begrenzten Zeitraum behalten werden) und Langzeitgedächtnis (dauerhaftes Wissen, das unbegrenzt persistiert). KI-Agenten spiegeln diese Taxonomie eng wider. Das Kontextfenster des LLM fungiert als Arbeitsgedächtnis; ein gleitender Puffer kürzlicher Nachrichten dient als Kurzzeitgedächtnis; und ein externer Speicher – oft eine Vektordatenbank – dient als Langzeitgedächtnis.
 
-A memória é o que habilita o raciocínio em múltiplos turnos. Quando um agente precisa responder a uma pergunta de acompanhamento, executar um plano ao longo de múltiplas etapas ou lembrar as preferências de um usuário de uma sessão anterior, ele está recorrendo a uma ou mais dessas camadas de memória. Projetar a memória corretamente determina se um agente parece um assistente conhecedor ou um chatbot amnésico.
+Gedächtnis ermöglicht mehrstufiges Reasoning. Wenn ein Agent eine Folgefrage beantworten, einen Plan über mehrere Schritte ausführen oder sich an die Präferenzen eines Benutzers aus einer früheren Sitzung erinnern muss, greift er auf eine oder mehrere dieser Gedächtnisschichten zurück. Die richtige Gestaltung des Gedächtnisses bestimmt, ob ein Agent sich wie ein kenntnisreicher Assistent oder ein amnestischer Chatbot anfühlt.
 
 ## Como funciona
 
-### Memória de trabalho e a janela de contexto
+### Arbeitsgedächtnis und das Kontextfenster
 
-A janela de contexto é a forma mais imediata de memória disponível para qualquer agente apoiado por LLM. Todas as mensagens, resultados de ferramentas e pensamentos intermediários dentro de uma única chamada de inferência residem na memória de trabalho. As janelas de contexto típicas variam de 8K a 200K tokens, definindo um teto rígido em quanto o agente pode raciocinar ativamente de uma vez. Quando esse limite se aproxima, as informações mais antigas devem ser resumidas, comprimidas ou removidas para abrir espaço. A memória de trabalho é rápida e de latência zero, mas completamente volátil — desaparece quando a chamada termina.
+Das Kontextfenster ist die unmittelbarste Form des Gedächtnisses, die für jeden LLM-gestützten Agenten verfügbar ist. Alle Nachrichten, Werkzeug-Ergebnisse und Zwischengedanken innerhalb eines einzigen Inferenzaufrufs befinden sich im Arbeitsgedächtnis. Typische Kontextfenster reichen von 8K bis 200K Token und setzen eine harte Obergrenze dafür, worüber der Agent aktiv nachdenken kann. Wenn diese Grenze erreicht wird, müssen ältere Informationen entweder zusammengefasst, komprimiert oder entfernt werden, um Platz zu schaffen. Arbeitsgedächtnis ist schnell und nulllatentig, aber vollständig flüchtig – es verschwindet, wenn der Aufruf endet.
 
-### Memória buffer de curto prazo
+### Kurzzeit-Pufferspeicher
 
-A memória de curto prazo é implementada como um buffer rotativo que mantém os últimos N turnos da conversa. Quando um novo turno chega, o turno mais antigo é descartado se o buffer estiver cheio. Essa abordagem é simples, barata e suficiente para continuidade conversacional dentro de uma única sessão. O buffer é geralmente serializado e passado de volta para a janela de contexto no início de cada nova chamada de inferência. Sua principal limitação é que não escala para sessões longas ou recall entre sessões.
+Kurzzeitgedächtnis wird als rollierender Puffer implementiert, der die letzten N Gesprächsrunden hält. Wenn eine neue Runde eintrifft, wird die älteste Runde verworfen, wenn der Puffer voll ist. Dieser Ansatz ist einfach, günstig und ausreichend für Gesprächskontinuität innerhalb einer einzigen Sitzung. Der Puffer wird üblicherweise serialisiert und zu Beginn jedes neuen Inferenzaufrufs zurück in das Kontextfenster übergeben. Seine Hauptbeschränkung ist, dass er nicht für lange Sitzungen oder sitzungsübergreifenden Abruf skaliert.
 
-### Memória semântica de longo prazo
+### Langzeit-Semantikspeicher
 
-A memória de longo prazo usa um armazenamento persistente externo — tipicamente um banco de dados vetorial — para manter embeddings de eventos passados, fatos e resumos. Quando o agente precisa se lembrar de algo, ele embute a consulta atual e realiza uma busca aproximada por vizinho mais próximo para recuperar as memórias mais semanticamente relevantes. Os trechos recuperados são injetados na janela de contexto antes da inferência. Esse padrão escala para milhões de fatos armazenados e suporta recall entre sessões, mas adiciona latência de recuperação e requer um modelo de embedding.
+Langzeitgedächtnis verwendet einen externen persistenten Speicher – typischerweise eine Vektordatenbank – um Einbettungen vergangener Ereignisse, Fakten und Zusammenfassungen zu halten. Wenn der Agent sich an etwas erinnern muss, bettet er die aktuelle Anfrage ein und führt eine Approximate-Nearest-Neighbor-Suche durch, um die semantisch relevantesten Erinnerungen abzurufen. Abgerufene Chunks werden vor der Inferenz in das Kontextfenster eingefügt. Dieses Muster skaliert auf Millionen gespeicherter Fakten und unterstützt sitzungsübergreifenden Abruf, fügt aber Abruf-Latenz hinzu und erfordert ein Einbettungsmodell.
 
-### Memória episódica vs semântica
+### Episodisches vs. semantisches Gedächtnis
 
-A memória episódica armazena eventos passados específicos com seu contexto: "Na sessão 23, o usuário perguntou sobre a política de reembolso e ficou frustrado." A memória semântica armazena conhecimento geral do mundo ou fatos acumulados: "O prazo de reembolso é de 30 dias." Ambos os tipos podem coexistir no mesmo vetor de armazenamento, distinguidos por metadados. A memória episódica é valiosa para personalização; a memória semântica é valiosa para fundamentar o agente em conhecimento de domínio.
+Episodisches Gedächtnis speichert spezifische vergangene Ereignisse mit ihrem Kontext: „In Sitzung 23 fragte der Benutzer nach der Rückgaberichtlinie und war frustriert." Semantisches Gedächtnis speichert allgemeines Weltwissen oder akkumulierte Fakten: „Das Rückgabefenster beträgt 30 Tage." Beide Typen können im selben Vektorspeicher koexistieren, unterschieden durch Metadaten. Episodisches Gedächtnis ist wertvoll für Personalisierung; semantisches Gedächtnis ist wertvoll, um den Agenten in Domänenwissen zu verankern.
 
-### Loop de recuperação
+### Abrufschleife
 
-O loop de recuperação conecta todas as camadas. Em cada turno, o agente consulta a memória de longo prazo para contexto relevante, mescla-o com o buffer de curto prazo e alimenta o contexto combinado na memória de trabalho do LLM. Após a geração, fatos importantes do novo turno podem ser gravados de volta no armazenamento de longo prazo, fechando o loop.
+Die Abrufschleife verbindet alle Schichten. Bei jeder Runde fragt der Agent das Langzeitgedächtnis nach relevantem Kontext, fügt diesen mit dem Kurzzeit-Puffer zusammen und speist den kombinierten Kontext in das Arbeitsgedächtnis des LLM ein. Nach der Generierung können wichtige Fakten aus der neuen Runde zurück in den Langzeitspeicher geschrieben werden, was die Schleife schließt.
 
 ```mermaid
 flowchart LR
@@ -53,21 +55,21 @@ flowchart LR
 
 | Usar quando | Evitar quando |
 |---|---|
-| O agente deve se lembrar de informações de sessões ou turnos anteriores | A tarefa é totalmente autocontida em um único prompt sem acompanhamento |
-| Os usuários esperam personalização baseada em interações passadas | O custo ou a latência de armazenamento de memória é inaceitável para o caso de uso |
-| O agente rastreia tarefas de longa duração com muitos resultados intermediários | A janela de contexto é grande o suficiente para conter todas as informações relevantes |
-| O conhecimento do domínio excede o que cabe em uma única janela de contexto | Os requisitos de privacidade proíbem armazenar dados de conversa do usuário |
-| Você precisa de comportamento consistente em múltiplas invocações do agente | A complexidade adicionada supera o benefício marginal da persistência |
+| Der Agent Informationen aus früheren Sitzungen oder Runden abrufen muss | Die Aufgabe vollständig in einem einzigen Prompt selbstenthalten ist und keine Folgefragen hat |
+| Benutzer Personalisierung basierend auf vergangenen Interaktionen erwarten | Speicherkosten oder Latenz für den Anwendungsfall inakzeptabel sind |
+| Der Agent lang laufende Aufgaben mit vielen Zwischenergebnissen verfolgt | Das Kontextfenster groß genug ist, um alle relevanten Informationen zu halten |
+| Domänenwissen das hineinpasst, was in ein einzelnes Kontextfenster passt, übersteigt | Datenschutzanforderungen das Speichern von Benutzergesprächen verbieten |
+| Konsistentes Verhalten über mehrere Agenten-Aufrufe hinweg benötigt wird | Die hinzugefügte Komplexität den marginalen Nutzen der Persistenz überwiegt |
 
-## Prós e contras
+## Vantagens e desvantagens
 
-| Prós | Contras |
+| Vantagens | Desvantagens |
 |---|---|
-| Habilita continuidade em múltiplos turnos e entre sessões | Armazenamentos de longo prazo adicionam latência de recuperação |
-| Suporta personalização e contexto específico do usuário | Bancos de dados vetoriais introduzem complexidade de infraestrutura |
-| Escala além dos limites da janela de contexto | A qualidade de recuperação depende da precisão do modelo de embedding |
-| A memória episódica melhora significativamente a experiência do usuário | A desatualização da memória requer estratégias de remoção ou atualização |
-| A memória semântica fundamenta o agente em conhecimento de domínio | Políticas de privacidade e retenção de dados devem ser gerenciadas explicitamente |
+| Ermöglicht mehrstufige und sitzungsübergreifende Kontinuität | Langzeitspeicher fügen Abruf-Latenz hinzu |
+| Unterstützt Personalisierung und benutzerspezifischen Kontext | Vektordatenbanken führen Infrastrukturkomplexität ein |
+| Skaliert jenseits von Kontextfenstergrenzen | Abrufqualität hängt von der Genauigkeit des Einbettungsmodells ab |
+| Episodisches Gedächtnis verbessert die Benutzererfahrung erheblich | Gedächtnisveralterung erfordert Eviktions- oder Update-Strategien |
+| Semantisches Gedächtnis verankert den Agenten in Domänenwissen | Datenschutz- und Datenhaltungsrichtlinien müssen explizit verwaltet werden |
 
 ## Exemplos de código
 
@@ -221,13 +223,13 @@ if __name__ == "__main__":
 
 ## Recursos práticos
 
-- [Conceitos de Memória do LangChain](https://python.langchain.com/docs/concepts/memory/) — Documentação oficial do LangChain cobrindo todos os tipos de memória embutidos e quando aplicar cada um.
-- [MemGPT: Towards LLMs as Operating Systems](https://arxiv.org/abs/2310.08560) — Artigo de pesquisa introduzindo gerenciamento de contexto virtual para memória ilimitada de agentes, comparável à memória virtual de SO.
-- [Chroma – Banco de dados de embeddings de código aberto](https://docs.trychroma.com/) — Vetor store leve e popular usado em muitas implementações de memória de agentes.
-- [Threads de Assistentes OpenAI](https://platform.openai.com/docs/assistants/how-it-works/managing-threads) — Como a API gerenciada de agentes da OpenAI lida com threads de conversa e memória persistente.
+- [LangChain Memory Concepts](https://python.langchain.com/docs/concepts/memory/) — Offizielle LangChain-Dokumentation zu allen eingebauten Gedächtnistypen und wann jeder angewendet werden sollte.
+- [MemGPT: Towards LLMs as Operating Systems](https://arxiv.org/abs/2310.08560) — Forschungspaper, das virtuelles Kontextverwaltung für unbegrenzte Agenten-Gedächtniskapazität einführt, vergleichbar mit virtuellem OS-Speicher.
+- [Chroma – Open-source embedding database](https://docs.trychroma.com/) — Beliebter leichtgewichtiger Vektorspeicher, der in vielen Agenten-Gedächtnisimplementierungen verwendet wird.
+- [OpenAI Assistants Threads](https://platform.openai.com/docs/assistants/how-it-works/managing-threads) — Wie OpenAIs verwaltete Agenten-API Gesprächs-Threads und persistenten Speicher behandelt.
 
 ## Veja também
 
-- [Agentes de IA](/docs/agents)
-- [Memória conversacional](/docs/agents/conversational-memory)
+- [AI agents](/docs/agents)
+- [Conversational memory](/docs/agents/conversational-memory)
 - [RAG](/docs/rag)

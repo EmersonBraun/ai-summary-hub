@@ -1,35 +1,45 @@
 ---
 title: Autocodificadores variacionales (VAE)
-description: Autoencoders probabilísticos para generación y representación.
-keywords: [VAE, variational, autoencoder, latent]
+description: Autocodificadores probabilísticos para generación y representación.
+keywords: [VAE, variacional, autocodificador, latente]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Autocodificadores variacionales (VAE)
 
 ## Definición
 
-Los VAEs aprenden un espacio latente entrenando un encoder-decoder with a variational (reparameterized) objective. They support generation and smooth interpolation in latent space.
+Los VAEs aprenden un espacio latente entrenando un codificador-decodificador con un objetivo variacional (reparametrizado). Soportan la generación e interpolación suave en el espacio latente.
 
-Se diferencian de [GANs](/docs/gans) (adversariales) y [difusión](/docs/diffusion-models) (eliminación de ruido): el espacio latente está regularizado (KL hacia un prior) so it is smooth and interpretable. Generation can be blurrier than GANs/diffusion, but VAEs are useful for representation learning, anomaly detection, and when a low-D latent is desired.
+Se diferencian de las [GANs](/docs/gans) (adversariales) y la [difusión](/docs/diffusion-models) (eliminación de ruido): el espacio latente está regularizado (KL hacia un prior) para que sea suave e interpretable. La generación puede ser más borrosa que las GANs/difusión, pero los VAEs son útiles para el aprendizaje de representaciones, la detección de anomalías y cuando se desea un espacio latente de baja dimensionalidad.
 
 ## Cómo funciona
 
-**Input** se pasa a un **encoder** que produce parameters of a latent distribution (por ej. mean and log-variance for Gaussian). A **z** vector is sampled (reparameterization trick: z = mean + std * epsilon) and fed to the **decoder**, which **reconstructs** the input. **Loss** = reconstruction loss (por ej. MSE or cross-entropy) + KL divergence from the latent to a prior (por ej. standard normal). The KL term regularizes the latent space; the reconstruction term keeps it informative. At generation time, sample z from the prior and run the decoder.
+```mermaid
+flowchart LR
+  Input[Entrada] --> Encoder[Codificador]
+  Encoder --> Z[z latente]
+  Z --> Decoder[Decodificador]
+  Decoder --> Output[Reconstrucción]
+```
+
+La **entrada** se pasa a un **codificador** que produce parámetros de una distribución latente (como media y log-varianza para Gaussiana). Se muestrea un vector **z** (truco de reparametrización: z = media + std * epsilon) y se alimenta al **decodificador**, que **reconstruye** la entrada. La **pérdida** = pérdida de reconstrucción (como MSE o entropía cruzada) + divergencia KL del latente al prior (como normal estándar). El término KL regulariza el espacio latente; el término de reconstrucción lo mantiene informativo. En el momento de la generación, muestree z del prior y ejecute el decodificador.
 
 ## Casos de uso
 
-VAEs suit tasks that need a continuous latent space: smooth generation, anomaly detection, or learned representations.
+Los VAEs son adecuados para tareas que necesitan un espacio latente continuo: generación suave, detección de anomalías o representaciones aprendidas.
 
-- Generative modeling with smooth latent interpolation
-- Anomaly detection via reconstruction error
-- Learned representations for downstream tasks
+- Modelado generativo con interpolación latente suave
+- Detección de anomalías mediante error de reconstrucción
+- Representaciones aprendidas para tareas posteriores
 
-## Documentación externa
+## Recursos prácticos
 
-- [Auto-Encodificación Variational Bayes (Kingma & Welling)](https://arxiv.org/abs/1312.6114)
-- [PyTorch – VAE tutorial](https://github.com/pytorch/examples/tree/main/vae)
+- [Auto-Encoding Variational Bayes (Kingma & Welling)](https://arxiv.org/abs/1312.6114)
+- [PyTorch – Tutorial VAE](https://github.com/pytorch/examples/tree/main/vae)
 
 ## Ver también
 
 - [GANs](/docs/gans)
-- [Diffusion models](/docs/diffusion-models)
+- [Modelos de difusión](/docs/diffusion-models)

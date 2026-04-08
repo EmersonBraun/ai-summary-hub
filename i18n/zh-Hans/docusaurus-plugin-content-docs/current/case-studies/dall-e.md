@@ -2,27 +2,29 @@
 title: Case study — DALL·E
 description: 基于扩散和语言的文本到图像生成。
 keywords: [DALL-E, text-to-image, diffusion]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Case study: DALL·E
 
 ## 定义
 
-DALL·E (and DALL·E 2) are 来自 OpenAI 的文本到图像模型. They generate images from text prompts using [diffusion models](/docs/diffusion-models) and language–image alignment.
+DALL·E（及 DALL·E 2）是 OpenAI 的文本到图像模型。它们使用[扩散模型](/docs/diffusion-models)和语言-图像对齐，从文本提示词生成图像。
 
-它们是 a leading example of [multimodal](/docs/multimodal-ai) generation: text in, image out. The same [diffusion](/docs/diffusion-models) and conditioning ideas appear in Stable Diffusion and other open models. Use case: creative and product imagery from natural language; safety and content policies apply.
+它们是[多模态](/docs/multimodal-ai)生成的领先示例：文本输入，图像输出。相同的[扩散](/docs/diffusion-models)和条件化思路也出现在 Stable Diffusion 和其他开放模型中。使用场景：从自然语言生成创意和产品图像；安全和内容策略适用。
 
 ## 工作原理
 
-**Text** is encoded with a language or [multimodal](/docs/multimodal-ai) encoder (例如 CLIP text encoder, T5) into a **text embedding**. A **diffusion** model (例如 UNet) is **conditioned** on this embedding: the denoising process is guided so the generated image matches the text. Training uses large datasets of captioned images; the model learns to associate text and image content. **Sampling**: start from noise, run the reverse diffusion process with the text embedding as condition, and decode to an image. **Safety filters** (例如 classifier, policy) limit harmful or restricted outputs before delivery. Variants (inpainting, editing) condition on both text and an existing image or mask.
+**文本**通过语言或[多模态](/docs/multimodal-ai)编码器（例如 CLIP 文本编码器、T5）编码为**文本嵌入**。**扩散**模型（例如 UNet）在此嵌入上**条件化**：去噪过程被引导，使生成的图像与文本匹配。训练使用带有说明文字的大型图像数据集；模型学习将文本和图像内容关联起来。**采样**：从噪声开始，以文本嵌入为条件运行逆扩散过程，解码为图像。**安全过滤器**（例如分类器、策略）在交付前限制有害或受限制的输出。变体（内补绘制、编辑）同时在文本和现有图像或掩码上进行条件化。
 
 ## 应用场景
 
-Text-to-image models like DALL·E are used wherever you need images generated or edited from natural language (creative, product, UI).
+像 DALL·E 这样的文本到图像模型用于任何需要从自然语言生成或编辑图像的地方（创意、产品、UI）。
 
-- Creative and marketing asset generation from text prompts
-- Concept art, illustration, and 设计 exploration
-- Product and UI mockups from natural language descriptions
+- 从文本提示词生成创意和营销素材
+- 概念艺术、插图和设计探索
+- 从自然语言描述创建产品和 UI 原型
 
 ## 外部文档
 
@@ -31,5 +33,5 @@ Text-to-image models like DALL·E are used wherever you need images generated or
 
 ## 另请参阅
 
-- [Diffusion models](/docs/diffusion-models)
-- [Multimodal AI](/docs/multimodal-ai)
+- [扩散模型](/docs/diffusion-models)
+- [多模态 AI](/docs/multimodal-ai)

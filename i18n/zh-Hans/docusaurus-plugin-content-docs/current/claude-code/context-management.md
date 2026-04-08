@@ -2,6 +2,8 @@
 title: 上下文管理
 description: Claude Code 如何在长会话中管理上下文窗口——自动压缩、对话历史策略以及在大规模场景中保持会话有效性的实用技巧。
 keywords: [上下文管理, 上下文窗口, 对话历史, /clear, 上下文压缩, token 限制, Claude Code 会话, 长会话]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # 上下文管理

@@ -1,18 +1,20 @@
 ---
-title: Agenten-Evaluation und -Testing
-description: Wie die Leistung von KI-Agenten in Produktion und Entwicklung gemessen, benchmarked und systematisch getestet wird.
-keywords: [Agenten-Evaluation, Benchmarks, LangSmith, Ragas, DeepEval, AgentBench, SWE-bench, Aufgabenabschlussrate, Latenz, Genauigkeit]
+title: Agent evaluation and testing
+description: How to measure, benchmark, and systematically test AI agent performance in production and development.
+keywords: [agent evaluation, benchmarks, LangSmith, Ragas, DeepEval, AgentBench, SWE-bench, task completion rate, latency, accuracy]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Agenten-Evaluation und -Testing
 
 ## Definition
 
-Agenten-Evaluation ist die Praxis, zu messen, wie gut ein KI-Agent Aufgaben erledigt, Tools korrekt verwendet, innerhalb von Kosten- und Latenzbudgets bleibt und genaue Ausgaben produziert. Anders als die statische Modellevaluation – bei der man eine feste Ausgabe mit einer Referenz vergleicht – muss die Agenten-Evaluation mehrstufige Trajektorien, nicht-deterministische Pfade, Zwischen-Tool-Aufrufe und die kumulierende Wirkung von Fehlern über Schritte hinweg berücksichtigen. Eine einzelne Aufgabe kann durch viele verschiedene Ausführungspfade erfolgreich abgeschlossen werden, was traditionelle Genauigkeitswerte allein unzureichend macht.
+Agenten-Evaluation ist die Praxis, zu messen, wie gut ein KI-Agent Aufgaben erfüllt, Werkzeuge korrekt einsetzt, innerhalb von Kosten- und Latenzbudgets bleibt und genaue Ausgaben erzeugt. Anders als bei der statischen Modell-Evaluation – wo man eine feste Ausgabe mit einer Referenz vergleicht – muss die Agenten-Evaluation mehrstufige Trajektorien, nicht-deterministische Pfade, intermediäre Werkzeugaufrufe und den kumulativen Effekt von Fehlern über Schritte hinweg berücksichtigen. Eine einzelne Aufgabe kann durch viele verschiedene Ausführungspfade erfolgreich sein, was traditionelle Genauigkeitswerte allein unzureichend macht.
 
-Rigorose Evaluation trennt eine Demo von einem Produktionssystem. Ohne sie kann man nicht wissen, ob eine Prompt-Änderung das Verhalten verbessert oder verschlechtert hat, ob eine neue Tool-Definition korrekt verwendet wird oder ob die Latenz unter realer Last akzeptabel ist. Evaluation sollte auf mehreren Ebenen stattfinden: Unit-Level-Testing einzelner Tools, Integration-Level-Testing vollständiger Agentenläufe und Regressions-Testing gegen einen Golden-Dataset repräsentativer Aufgaben.
+Rigorose Evaluation ist das, was eine Demo von einem Produktionssystem unterscheidet. Ohne sie können Sie nicht wissen, ob eine Prompt-Änderung das Verhalten verbessert oder verschlechtert hat, ob eine neue Werkzeugdefinition korrekt verwendet wird oder ob die Latenz unter realer Last akzeptabel ist. Evaluation sollte auf mehreren Ebenen stattfinden: Unit-Level-Testing einzelner Werkzeuge, Integration-Level-Testing vollständiger Agenten-Läufe und Regressionstesting gegen einen goldenen Datensatz repräsentativer Aufgaben.
 
-Eine ausgereifte Evaluationsstrategie kombiniert automatisierte Metriken (Aufgabenabschlussrate, Genauigkeit, Latenz, Kosten, Tool-Nutzungseffizienz) mit menschlicher Überprüfung für Randfälle und subjektive Qualität. Benchmarks wie AgentBench und SWE-bench bieten standardisierte Aufgabensätze zum Vergleich über Modelle und Frameworks hinweg, während Frameworks wie LangSmith, Ragas und DeepEval Infrastruktur zum Ausführen von Evaluationen im großen Maßstab und zur Verfolgung von Ergebnissen über die Zeit bereitstellen.
+Eine ausgereifte Evaluierungsstrategie kombiniert automatisierte Metriken (Aufgabenabschlussrate, Genauigkeit, Latenz, Kosten, Werkzeugnutzungseffizienz) mit menschlicher Überprüfung für Randfälle und subjektive Qualität. Benchmarks wie AgentBench und SWE-bench bieten standardisierte Aufgabensets für den Vergleich über Modelle und Frameworks hinweg, während Frameworks wie LangSmith, Ragas und DeepEval Infrastruktur für das Ausführen von Evaluierungen im großen Maßstab und die Verfolgung von Ergebnissen im Laufe der Zeit bereitstellen.
 
 ## Funktionsweise
 
@@ -26,55 +28,55 @@ flowchart LR
   Evaluate -->|summarized in| Report[Evaluation Report]
 ```
 
-### Aufgaben- und Dataset-Vorbereitung
+### Aufgaben- und Datensatz-Vorbereitung
 
-Ein gutes Evaluations-Dataset enthält repräsentative Aufgaben aus echten oder realistischen Benutzeranfragen, jeweils mit erwarteten Ergebnissen oder Referenzantworten. Aufgaben sollten Happy Paths, Randfälle, adversarielle Eingaben und mehrstufige Workflows abdecken. Für die Agenten-Evaluation sollte jede Aufgabe die erwartete endgültige Antwort spezifizieren und optional die erwartete Sequenz von Tool-Aufrufen. Die Dataset-Qualität ist der wichtigste Hebel für die Evaluationsqualität – garbage in, garbage out.
+Ein guter Evaluierungsdatensatz enthält repräsentative Aufgaben aus echten oder realistischen Benutzeranfragen, jeweils mit erwarteten Ergebnissen oder Referenzantworten. Aufgaben sollten Happy Paths, Randfälle, adversarielle Eingaben und mehrstufige Workflows abdecken. Für die Agenten-Evaluation sollte jede Aufgabe die erwartete Endantwort und optional die erwartete Sequenz von Werkzeugaufrufen spezifizieren. Die Datensatzqualität ist der größte Hebel für die Evaluierungsqualität – Müll rein, Müll raus.
 
 ### Ausführung und Trace-Sammlung
 
-Der Agent führt jede Aufgabe im Dataset aus, und jeder Schritt – LLM-Aufrufe, Tool-Invokationen, Gedächtnislesungen und Ausgaben – wird als strukturierter Trace erfasst. Traces zeichnen Eingaben, Ausgaben, Zeitstempel, Token-Counts und Fehler für jeden Span auf. Dies ist das Rohmaterial für alle nachgelagerten Metriken und ist auch für das Debugging von Fehlern unschätzbar. Determinismus kann durch Fixieren von Zufalls-Seeds und Temperatur verbessert werden, aber einige Variabilität sollte durch mehrere Versuche pro Aufgabe erwartet und berücksichtigt werden.
+Der Agent führt jede Aufgabe im Datensatz aus, und jeder Schritt – LLM-Aufrufe, Werkzeugaufrufungen, Speicherlesungen und Ausgaben – wird als strukturierter Trace erfasst. Traces zeichnen Eingaben, Ausgaben, Zeitstempel, Token-Zählungen und Fehler für jeden Span auf. Dies ist das Rohmaterial für alle nachgelagerten Metriken und ist auch für das Debugging von Fehlern unschätzbar. Determinismus kann durch das Fixieren von Zufalls-Seeds und Temperatur verbessert werden, aber einige Variabilität ist zu erwarten und sollte durch das Ausführen mehrerer Trials pro Aufgabe berücksichtigt werden.
 
-### Metrik-Sammlung
+### Metrikerfassung
 
-Kernmetriken für die Agenten-Evaluation umfassen: **Aufgabenabschlussrate** (hat der Agent die Aufgabe erfolgreich abgeschlossen?), **Genauigkeit** (ist die endgültige Antwort korrekt?), **Latenz** (End-to-End-Wanduhrzeit), **Kosten** (Gesamttokens × Preis) und **Tool-Nutzungseffizienz** (wurden Tools die richtige Anzahl von Malen mit korrekten Argumenten aufgerufen?). Sekundäre Metriken umfassen Schritt-Anzahl, Wiederholungsrate, Halluzinationsrate und Treue zu abgerufenem Kontext. Metriken werden pro Aufgabe berechnet und über das Dataset aggregiert.
+Kernmetriken für die Agenten-Evaluation umfassen: **Aufgabenabschlussrate** (hat der Agent die Aufgabe erfolgreich abgeschlossen?), **Genauigkeit** (ist die Endantwort korrekt?), **Latenz** (End-to-End-Wanduhrzeit), **Kosten** (Gesamttokens × Preis) und **Werkzeugnutzungseffizienz** (wurden Werkzeuge die richtige Anzahl von Malen mit korrekten Argumenten aufgerufen?). Sekundäre Metriken umfassen Schrittanzahl, Wiederholungsrate, Halluzinationsrate und Treue zum abgerufenen Kontext. Metriken werden pro Aufgabe berechnet und über den Datensatz aggregiert.
 
 ### Evaluation und Bewertung
 
-Viele Metriken – besonders Korrektheit für offene Ausgaben – erfordern einen Richter. Ein LLM-Richter (z. B. GPT-4 oder Claude) erhält die Aufgabe, die Antwort des Agenten und optional eine Referenzantwort und bewertet die Qualität anhand einer Rubrik. Dies wird manchmal "LLM-as-a-judge" genannt und ist das Rückgrat von Frameworks wie Ragas und DeepEval. Für deterministische Aufgaben (Code-Ausführung, SQL-Abfragen, strukturierte Extraktion) sind regelbasierte Überprüfungen zuverlässiger und kostengünstiger. Menschliche Überprüfung sollte verwendet werden, um LLM-Richter zu kalibrieren und systematische Verzerrungen zu erkennen.
+Viele Metriken – insbesondere Korrektheit für offene Ausgaben – erfordern einen Richter. Ein LLM-Richter (z. B. GPT-4 oder Claude) erhält die Aufgabe, die Antwort des Agenten und optional eine Referenzantwort und bewertet die Qualität auf einer Rubrik. Dies wird manchmal als „LLM-as-a-judge" bezeichnet und ist das Rückgrat von Frameworks wie Ragas und DeepEval. Für deterministische Aufgaben (Code-Ausführung, SQL-Abfragen, strukturierte Extraktion) sind regelbasierte Prüfungen zuverlässiger und günstiger. Menschliche Überprüfung sollte verwendet werden, um LLM-Richter zu kalibrieren und systematische Verzerrungen zu erkennen.
 
-### Berichterstattung und Regressions-Tracking
+### Berichterstattung und Regressionsverfolgung
 
-Evaluationsergebnisse werden in einem Bericht zusammengefasst und zusammen mit der Agenten-Version, Prompt-Version und Modell-Version gespeichert. Dies ermöglicht Regressions-Tracking: Man kann den aktuellen Agenten mit einer Baseline vergleichen und Regressionen erkennen, bevor sie deployed werden. Dashboards in Tools wie LangSmith zeigen Metrik-Trends über die Zeit und helfen Teams, subtile Degradierungen zu erkennen, die einzelne Test-Läufe verpassen würden.
+Evaluierungsergebnisse werden in einem Bericht aggregiert und neben der Agenten-Version, Prompt-Version und Modell-Version gespeichert. Dies ermöglicht Regressionsverfolgung: Sie können den aktuellen Agenten mit einer Baseline vergleichen und Regressionen erkennen, bevor sie bereitgestellt werden. Dashboards in Tools wie LangSmith zeigen Metriktrends über die Zeit und helfen Teams, subtile Degradierungen zu erkennen, die einzelne Testläufe übersehen würden.
 
 ## Wann verwenden / Wann NICHT verwenden
 
 | Verwenden wenn | Vermeiden wenn |
 |---|---|
-| Zwei Agenten-Versionen oder Prompts vor dem Deployment verglichen werden | Evaluation übersprungen wird, weil die Aufgabe in einer Demo "richtig aussieht" |
-| Eine Regressions-Suite aufgebaut wird, um prompt-brechende Änderungen zu erkennen | Evaluation nur einmal zu Projektbeginn und nie wieder durchgeführt wird |
-| Kosten und Latenz gemessen werden, um SLAs zu erfüllen | Nur eine einzige Metrik (z. B. nur Genauigkeit) zur Beurteilung der Gesamtqualität verwendet wird |
-| Tool-Aufruf-Verhalten und Argumentkorrektheit validiert werden | Ein Dataset mit nur einfachen, sauberen Aufgaben ohne Randfälle verwendet wird |
-| Ein neues Modell integriert wird, um den Fähigkeitstransfer zu überprüfen | LLM-Richter-Scores als Ground Truth ohne menschliche Kalibrierung behandelt werden |
+| Zwei Agenten-Versionen oder Prompts vor der Bereitstellung vergleichen | Evaluation überspringen, weil die Aufgabe in einer Demo „richtig aussieht" |
+| Eine Regressionssuite aufbauen, um Prompt-brechende Änderungen zu erkennen | Evaluation nur einmal zu Projektbeginn durchführen und nie wieder |
+| Kosten und Latenz messen, um SLAs zu erfüllen | Eine einzelne Metrik (z. B. nur Genauigkeit) zur Beurteilung der Gesamtqualität verwenden |
+| Werkzeugaufruf-Verhalten und Argumentkorrektheit validieren | Einen Datensatz mit nur einfachen, sauberen Aufgaben ohne Randfälle verwenden |
+| Ein neues Modell einbinden, um die Fähigkeitsübertragung zu prüfen | LLM-Richterbewertungen als absolute Wahrheit ohne menschliche Kalibrierung behandeln |
 
 ## Vergleiche
 
 | Kriterium | LangSmith | DeepEval | Ragas |
 |---|---|---|---|
-| **Benutzerfreundlichkeit** | Enge LangChain-Integration, schnelle Einrichtung für LangChain-Nutzer; steiler für andere | Saubere Python-API, minimaler Boilerplate, leicht zu jeder Pipeline hinzuzufügen | Optimiert für RAG-Pipelines; unkompliziert für Retrieval-Aufgaben |
-| **Metrik-Abdeckung** | Tracing, benutzerdefinierte Evaluatoren, Dataset-Management; weniger eingebaute LLM-Metriken | 20+ eingebaute Metriken (Halluzination, Treue, Tool-Korrektheit, Toxizität) | RAG-fokussierte Metriken (Treue, Antwortrelevanz, Kontext-Recall, Präzision) |
+| **Benutzerfreundlichkeit** | Enge LangChain-Integration, schnelle Einrichtung für LangChain-Benutzer; steiler für andere | Saubere Python-API, minimaler Boilerplate, einfach zu jeder Pipeline hinzuzufügen | Für RAG-Pipelines optimiert; unkompliziert für Abruf-Aufgaben |
+| **Metrikabdeckung** | Tracing, benutzerdefinierte Evaluatoren, Datensatz-Management; weniger integrierte LLM-Metriken | 20+ integrierte Metriken (Halluzination, Treue, Werkzeugkorrektheit, Toxizität) | RAG-fokussierte Metriken (Treue, Antwortrelevanz, Kontext-Recall, Präzision) |
 | **Tracing-Integration** | Erstklassig: vollständige Trace-Erfassung, Span-Visualisierung, Lauf-Vergleich | Trace-Erfassung über Dekoratoren; weniger native Visualisierung | Kein eingebautes Tracing; integriert über LangSmith oder W&B |
-| **Preisgestaltung** | Kostenloser Tarif + bezahlte gehostete Pläne; selbst hostbar | Open Source; Cloud-Dashboard verfügbar | Open Source; kein gehostetes Dashboard |
-| **Anpassbarkeit** | Benutzerdefinierte Evaluatoren über Python oder Prompt-Templates | Erweiterbar durch Subklassen von Metrik-Klassen | Benutzerdefinierte Metriken über Python; starke NLP-Metrik-Bibliotheksunterstützung |
+| **Preisgestaltung** | Kostenloser Tarif + bezahlte gehostete Pläne; selbst-hostbar | Open Source; Cloud-Dashboard verfügbar | Open Source; kein gehostetes Dashboard |
+| **Anpassbarkeit** | Benutzerdefinierte Evaluatoren über Python oder Prompt-Vorlagen | Erweiterbar durch Unterklassen von Metrik-Klassen | Benutzerdefinierte Metriken über Python; starke NLP-Metrik-Bibliotheksunterstützung |
 
 ## Vor- und Nachteile
 
 | Vorteile | Nachteile |
 |---|---|
-| Erkennt Regressionen, bevor sie Benutzer erreichen | Das Aufbauen eines guten Datasets ist zeitaufwändig |
-| Liefert objektive Beweise für Prompt-/Modell-Entscheidungen | LLM-Richter können voreingenommen oder inkonsistent sein |
-| Ermöglicht Kosten- und Latenzbudgetierung | Nicht-Determinismus erfordert mehrere Versuche, was die Kosten erhöht |
-| Skaliert auf große Datasets mit Automatisierung | Agenten-Traces können groß und teuer zu speichern sein |
-| Integriert sich in CI/CD für kontinuierliche Qualitätsgates | Metrik-Auswahl ist schwierig und domänenspezifisch |
+| Erkennt Regressionen, bevor sie Benutzer erreichen | Das Aufbauen eines guten Datensatzes ist zeitaufwendig |
+| Liefert objektive Belege für Prompt-/Modellentscheidungen | LLM-Richter können voreingenommen oder inkonsistent sein |
+| Ermöglicht Kosten- und Latenzbudgetierung | Nicht-Determinismus erfordert mehrere Trials und erhöht die Kosten |
+| Skaliert auf große Datensätze mit Automatisierung | Agenten-Traces können groß und teuer zu speichern sein |
+| Integriert sich in CI/CD für kontinuierliche Qualitätsgates | Metrikauswahl ist schwierig und domänenspezifisch |
 
 ## Code-Beispiele
 
@@ -190,15 +192,15 @@ for tc, result in zip(test_cases, results.test_results):
 
 ## Praktische Ressourcen
 
-- [DeepEval Dokumentation](https://docs.confident-ai.com/) — Umfassender Leitfaden zu DeepEval-Metriken, Testfällen und CI/CD-Integration für LLM- und Agenten-Evaluation.
-- [Ragas Dokumentation](https://docs.ragas.io/) — Ragas-Framework zur Evaluation von RAG-Pipelines und Agenten-Treue mit Metriken wie Antwortrelevanz und Kontext-Recall.
-- [LangSmith Dokumentation](https://docs.smith.langchain.com/) — LangSmith-Evaluations-, Tracing- und Dataset-Management-Funktionen für LangChain-basierte Agenten.
-- [AgentBench Paper und Leaderboard](https://github.com/THUDM/AgentBench) — Benchmark zur Evaluation von LLM-Agenten über diverse reale Aufgaben hinweg, einschließlich Web, Coding und OS-Umgebungen.
-- [SWE-bench](https://www.swebench.com/) — Benchmark zur Messung der Agentenfähigkeit, echte GitHub-Issues in Software-Engineering-Repositories zu lösen.
+- [DeepEval documentation](https://docs.confident-ai.com/) — Umfassender Leitfaden zu DeepEval-Metriken, Testfällen und CI/CD-Integration für LLM- und Agenten-Evaluation.
+- [Ragas documentation](https://docs.ragas.io/) — Ragas-Framework für die Evaluierung von RAG-Pipelines und Agenten-Treue, mit Metriken wie Antwortrelevanz und Kontext-Recall.
+- [LangSmith documentation](https://docs.smith.langchain.com/) — LangSmith's Evaluierungs-, Tracing- und Datensatz-Management-Funktionen für LangChain-basierte Agenten.
+- [AgentBench paper and leaderboard](https://github.com/THUDM/AgentBench) — Benchmark für die Evaluierung von LLM-Agenten über verschiedene Aufgaben aus der realen Welt, einschließlich Web, Coding und OS-Umgebungen.
+- [SWE-bench](https://www.swebench.com/) — Benchmark, der die Fähigkeit von Agenten misst, echte GitHub-Issues in Software-Engineering-Repositories zu lösen.
 
 ## Siehe auch
 
-- [Agenten](/docs/agents)
-- [Agenten-Debugging und Beobachtbarkeit](/docs/agents/debugging)
-- [Evaluationsmetriken](/docs/evaluation-metrics)
+- [Agents](/docs/agents)
+- [Agent debugging and observability](/docs/agents/debugging)
+- [Evaluation metrics](/docs/evaluation-metrics)
 - [Benchmarks](/docs/benchmarks)

@@ -1,43 +1,45 @@
 ---
 title: Destilación de conocimiento
-description: Training a small student model to mimic a large teacher.
-keywords: [knowledge distillation, distillation, student-teacher]
+description: Entrenamiento de un modelo estudiante pequeño para imitar a uno maestro grande.
+keywords: [destilación de conocimiento, destilación, estudiante-maestro]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Destilación de conocimiento
 
 ## Definición
 
-La destilación de conocimiento entrena un modelo estudiante más pequeño para igualar las salidas (y a veces representaciones intermedias) de un maestro más grande. El estudiante gains from the teacher’s soft labels and can run with less compute.
+La destilación de conocimiento entrena un modelo estudiante más pequeño para igualar las salidas (y a veces representaciones intermedias) de un maestro más grande. El estudiante se beneficia de las etiquetas blandas del maestro y puede ejecutarse con menos cómputo.
 
-Es a [model compression](/docs/model-compression) technique that preserves more of the teacher’s behavior than training the student on hard labels alone. Used for BERT → DistilBERT, large [LLMs](/docs/llms) → smaller variants, and [transfer learning](/docs/transfer-learning) from ensembles.
+Es una técnica de [compresión de modelos](/docs/model-compression) que preserva más del comportamiento del maestro que entrenar al estudiante solo con etiquetas duras. Se usa para BERT → DistilBERT, [LLMs](/docs/llms) grandes → variantes más pequeñas, y [aprendizaje por transferencia](/docs/transfer-learning) a partir de conjuntos de modelos.
 
 ## Cómo funciona
 
 ```mermaid
 flowchart LR
-  Teacher[Teacher] --> Logits[Logits]
-  Student[Student] --> Match[Match logits]
-  HardLabels[Hard labels] --> Match
+  Teacher[Maestro] --> Logits[Logits]
+  Student[Estudiante] --> Match[Igualar logits]
+  HardLabels[Etiquetas duras] --> Match
   Match --> Student
 ```
 
-The **teacher** (modelo grande) produce **logits** (o embeddings) en datos de entrenamiento. The **student** (modelo más pequeño) se entrena para **igualar** the teacher’s logits (por ej. KL divergence with temperature scaling) in addition to or instead of **hard labels** (ground truth). Temperature softens the teacher distribution so the student learns from dark knowledge (relative scores across classes). Optionally, intermediate layers or attention can be igualared. El estudiante is trained with a mix of distillation loss and task loss; after training it runs with the student’s capacity and latency.
+El **maestro** (modelo grande) produce **logits** (o embeddings) sobre los datos de entrenamiento. El **estudiante** (modelo más pequeño) se entrena para **igualar** los logits del maestro (como divergencia KL con escala de temperatura) además de o en lugar de **etiquetas duras** (verdad de base). La temperatura suaviza la distribución del maestro para que el estudiante aprenda del conocimiento oscuro (puntuaciones relativas entre clases). Opcionalmente, se pueden igualar capas intermedias o atención. El estudiante se entrena con una mezcla de pérdida de destilación y pérdida de tarea; después del entrenamiento se ejecuta con la capacidad y latencia del estudiante.
 
 ## Casos de uso
 
-Knowledge distillation fits when you want a small, fast student that approximates a large teacher for deployment.
+La destilación de conocimiento es adecuada cuando se desea un estudiante pequeño y rápido que aproxime a un maestro grande para el despliegue.
 
-- Training smaller, faster models that approximate large ones (por ej. BERT → DistilBERT)
-- Enabling deployment when the teacher is too heavy for production
-- Transferring knowledge from ensembles or from multiple teachers
+- Entrenar modelos más pequeños y rápidos que aproximen a los grandes (como BERT → DistilBERT)
+- Habilitar el despliegue cuando el maestro es demasiado pesado para producción
+- Transferir conocimiento de conjuntos de modelos o de múltiples maestros
 
-## Documentación externa
+## Recursos prácticos
 
-- [Distilling the Knowledge in a Neural Network (Hinton et al.)](https://arxiv.org/abs/1503.02531)
-- [Hugging Face – Distillation](https://huggingface.co/docs/transformers/tasks/distillation)
+- [Destilando el conocimiento en una red neuronal (Hinton et al.)](https://arxiv.org/abs/1503.02531)
+- [Hugging Face – Destilación](https://huggingface.co/docs/transformers/tasks/distillation)
 
 ## Ver también
 
-- [Model compression](/docs/model-compression)
-- [Transfer learning](/docs/transfer-learning)
+- [Compresión de modelos](/docs/model-compression)
+- [Aprendizaje por transferencia](/docs/transfer-learning)

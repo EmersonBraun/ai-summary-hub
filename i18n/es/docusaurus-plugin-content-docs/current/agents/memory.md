@@ -1,40 +1,42 @@
 ---
-title: "Memoria de agentes"
-description: Cómo los agentes de IA almacenan, recuperan y razonan sobre información a través de turnos y sesiones.
-keywords: [memoria de agentes, memoria a corto plazo, memoria a largo plazo, memoria episódica, memoria semántica, memoria de trabajo, ventana de contexto]
+title: "Agent memory"
+description: How AI agents store, retrieve, and reason over information across turns and sessions.
+keywords: [agent memory, short-term memory, long-term memory, episodic memory, semantic memory, working memory, context window]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Memoria de agentes
 
 ## Definición
 
-La memoria de agentes se refiere a los mecanismos por los cuales un agente de IA almacena, indexa y recupera información a lo largo de su operación. Sin memoria, cada interacción comienza desde cero — el agente no puede aprender de conversaciones pasadas, acumular hechos ni rastrear el estado de una tarea de larga duración. La memoria transforma una llamada LLM sin estado en un sistema persistente y orientado a objetivos.
+La memoria de agentes se refiere a los mecanismos mediante los cuales un agente de IA almacena, indexa y recupera información durante su operación. Sin memoria, cada interacción comienza desde cero — el agente no puede aprender de conversaciones pasadas, acumular hechos ni rastrear el estado de una tarea de larga duración. La memoria transforma una llamada LLM sin estado en un sistema persistente y orientado a objetivos.
 
-En las ciencias cognitivas, la memoria se divide en varios tipos: memoria de trabajo (información activa que se mantiene en mente ahora mismo), memoria a corto plazo (eventos recientes retenidos por un período limitado) y memoria a largo plazo (conocimiento duradero que persiste indefinidamente). Los agentes de IA reflejan esta taxonomía de cerca. La ventana de contexto del LLM actúa como memoria de trabajo; un buffer deslizante de mensajes recientes sirve como memoria a corto plazo; y un almacén externo — a menudo una base de datos vectorial — sirve como memoria a largo plazo.
+En las ciencias cognitivas, la memoria se divide en varios tipos: memoria de trabajo (información activa que se mantiene en mente en ese momento), memoria a corto plazo (eventos recientes que se retienen durante un período limitado) y memoria a largo plazo (conocimiento duradero que persiste indefinidamente). Los agentes de IA reflejan de cerca esta taxonomía. La ventana de contexto del LLM actúa como memoria de trabajo; un buffer deslizante de mensajes recientes sirve como memoria a corto plazo; y un almacén externo — a menudo una base de datos vectorial — sirve como memoria a largo plazo.
 
-La memoria es lo que permite el razonamiento en múltiples turnos. Cuando un agente necesita responder una pregunta de seguimiento, ejecutar un plan en múltiples pasos o recordar las preferencias de un usuario de una sesión anterior, está recurriendo a una o más de estas capas de memoria. Diseñar la memoria correctamente determina si un agente se siente como un asistente conocedor o un chatbot amnésico.
+La memoria habilita el razonamiento de múltiples pasos. Cuando un agente necesita responder una pregunta de seguimiento, ejecutar un plan a través de varios pasos o recordar las preferencias de un usuario de una sesión anterior, recurre a una o más de estas capas de memoria. El diseño correcto de la memoria determina si un agente se siente como un asistente con conocimiento o un chatbot amnésico.
 
 ## Cómo funciona
 
 ### Memoria de trabajo y la ventana de contexto
 
-La ventana de contexto es la forma más inmediata de memoria disponible para cualquier agente respaldado por LLM. Todos los mensajes, resultados de herramientas y pensamientos intermedios dentro de una sola llamada de inferencia residen en la memoria de trabajo. Las ventanas de contexto típicas van de 8K a 200K tokens, estableciendo un límite máximo en cuánto puede razonar activamente el agente a la vez. Cuando se acerca a este límite, la información más antigua debe resumirse, comprimirse o eliminarse para hacer espacio. La memoria de trabajo es rápida y de latencia cero, pero completamente volátil — desaparece cuando termina la llamada.
+La ventana de contexto es la forma más inmediata de memoria disponible para cualquier agente impulsado por LLM. Todos los mensajes, resultados de herramientas y pensamientos intermedios dentro de una única llamada de inferencia residen en la memoria de trabajo. Las ventanas de contexto típicas van de 8K a 200K tokens y establecen un límite estricto de sobre qué puede razonar activamente el agente. Cuando se alcanza este límite, la información más antigua debe resumirse, comprimirse o eliminarse para hacer espacio. La memoria de trabajo es rápida y de latencia cero, pero completamente volátil — desaparece cuando termina la llamada.
 
-### Memoria de buffer a corto plazo
+### Buffer de memoria a corto plazo
 
-La memoria a corto plazo se implementa como un buffer rotativo que mantiene los últimos N turnos de conversación. Cuando llega un nuevo turno, el más antiguo se descarta si el buffer está lleno. Este enfoque es simple, económico y suficiente para la continuidad conversacional dentro de una sola sesión. El buffer generalmente se serializa y se pasa de vuelta a la ventana de contexto al inicio de cada nueva llamada de inferencia. Su principal limitación es que no escala a sesiones largas o recuerdo entre sesiones.
+La memoria a corto plazo se implementa como un buffer rotativo que mantiene las últimas N rondas de conversación. Cuando llega una nueva ronda, la más antigua se descarta cuando el buffer está lleno. Este enfoque es simple, económico y suficiente para la continuidad conversacional dentro de una sola sesión. El buffer normalmente se serializa y se pasa de vuelta a la ventana de contexto al comienzo de cada nueva llamada de inferencia. Su principal limitación es que no escala para sesiones largas ni para recuperación entre sesiones.
 
-### Memoria semántica a largo plazo
+### Almacén semántico a largo plazo
 
-La memoria a largo plazo utiliza un almacén persistente externo — típicamente una base de datos vectorial — para contener embeddings de eventos pasados, hechos y resúmenes. Cuando el agente necesita recordar algo, incrusta la consulta actual y realiza una búsqueda aproximada de vecino más cercano para recuperar los recuerdos semánticamente más relevantes. Los fragmentos recuperados se inyectan en la ventana de contexto antes de la inferencia. Este patrón escala a millones de hechos almacenados y admite el recuerdo entre sesiones, pero añade latencia de recuperación y requiere un modelo de embedding.
+La memoria a largo plazo utiliza un almacén persistente externo — típicamente una base de datos vectorial — para mantener incrustaciones de eventos pasados, hechos y resúmenes. Cuando el agente necesita recordar algo, incrusta la consulta actual y realiza una búsqueda de vecinos aproximados para recuperar los recuerdos semánticamente más relevantes. Los fragmentos recuperados se inyectan en la ventana de contexto antes de la inferencia. Este patrón escala a millones de hechos almacenados y admite recuperación entre sesiones, pero añade latencia de recuperación y requiere un modelo de incrustación.
 
 ### Memoria episódica vs. semántica
 
-La memoria episódica almacena eventos pasados específicos con su contexto: "En la sesión 23, el usuario preguntó sobre la política de reembolso y estaba frustrado." La memoria semántica almacena conocimiento general del mundo o hechos acumulados: "La ventana de reembolso es de 30 días." Ambos tipos pueden coexistir en el mismo almacén vectorial, distinguidos por metadatos. La memoria episódica es valiosa para la personalización; la memoria semántica es valiosa para anclar al agente en el conocimiento del dominio.
+La memoria episódica almacena eventos pasados específicos con su contexto: "En la sesión 23, el usuario preguntó sobre la política de devoluciones y estaba frustrado." La memoria semántica almacena conocimiento general del mundo o hechos acumulados: "La ventana de devoluciones es de 30 días." Ambos tipos pueden coexistir en el mismo almacén vectorial, distinguidos por metadatos. La memoria episódica es valiosa para la personalización; la semántica es valiosa para anclar al agente en el conocimiento del dominio.
 
 ### Bucle de recuperación
 
-El bucle de recuperación conecta todas las capas. En cada turno, el agente consulta la memoria a largo plazo para obtener contexto relevante, lo fusiona con el buffer a corto plazo y alimenta el contexto combinado a la memoria de trabajo del LLM. Después de la generación, los hechos importantes del nuevo turno pueden escribirse de vuelta al almacenamiento a largo plazo, cerrando el bucle.
+El bucle de recuperación conecta todas las capas. En cada ronda, el agente consulta la memoria a largo plazo para obtener contexto relevante, lo fusiona con el buffer a corto plazo y alimenta el contexto combinado en la memoria de trabajo del LLM. Después de la generación, los hechos importantes de la nueva ronda pueden escribirse de vuelta en el almacén a largo plazo, cerrando el bucle.
 
 ```mermaid
 flowchart LR
@@ -53,20 +55,20 @@ flowchart LR
 
 | Usar cuando | Evitar cuando |
 |---|---|
-| El agente debe recordar información de sesiones o turnos anteriores | La tarea es completamente autocontenida en un solo prompt sin seguimiento |
-| Los usuarios esperan personalización basada en interacciones pasadas | El costo o latencia del almacenamiento de memoria es inaceptable para el caso de uso |
+| El agente necesita recuperar información de sesiones o rondas anteriores | La tarea es completamente autocontenida en un único prompt y no tiene preguntas de seguimiento |
+| Los usuarios esperan personalización basada en interacciones pasadas | Los costos de almacenamiento o la latencia son inaceptables para el caso de uso |
 | El agente rastrea tareas de larga duración con muchos resultados intermedios | La ventana de contexto es lo suficientemente grande como para contener toda la información relevante |
-| El conocimiento del dominio supera lo que cabe en una sola ventana de contexto | Los requisitos de privacidad prohíben almacenar datos de conversación del usuario |
-| Necesitas un comportamiento consistente en múltiples invocaciones del agente | La complejidad añadida supera el beneficio marginal de la persistencia |
+| El conocimiento del dominio supera lo que cabe en una sola ventana de contexto | Los requisitos de privacidad prohíben almacenar conversaciones de usuarios |
+| Se necesita comportamiento consistente a través de múltiples invocaciones del agente | La complejidad añadida supera el beneficio marginal de la persistencia |
 
-## Pros y contras
+## Ventajas y desventajas
 
-| Pros | Contras |
+| Ventajas | Desventajas |
 |---|---|
-| Permite la continuidad en múltiples turnos y entre sesiones | Los almacenes a largo plazo añaden latencia de recuperación |
-| Admite la personalización y el contexto específico del usuario | Las bases de datos vectoriales introducen complejidad de infraestructura |
-| Escala más allá de los límites de la ventana de contexto | La calidad de la recuperación depende de la precisión del modelo de embedding |
-| La memoria episódica mejora significativamente la experiencia del usuario | La obsolescencia de la memoria requiere estrategias de expulsión o actualización |
+| Permite continuidad de múltiples pasos y entre sesiones | Los almacenes a largo plazo añaden latencia de recuperación |
+| Admite personalización y contexto específico del usuario | Las bases de datos vectoriales introducen complejidad de infraestructura |
+| Escala más allá de los límites de la ventana de contexto | La calidad de recuperación depende de la precisión del modelo de incrustación |
+| La memoria episódica mejora significativamente la experiencia del usuario | El envejecimiento de la memoria requiere estrategias de desalojo o actualización |
 | La memoria semántica ancla al agente en el conocimiento del dominio | Las políticas de privacidad y retención de datos deben gestionarse explícitamente |
 
 ## Ejemplos de código
@@ -221,13 +223,13 @@ if __name__ == "__main__":
 
 ## Recursos prácticos
 
-- [Conceptos de memoria de LangChain](https://python.langchain.com/docs/concepts/memory/) — Documentación oficial de LangChain que cubre todos los tipos de memoria integrados y cuándo aplicar cada uno.
-- [MemGPT: Towards LLMs as Operating Systems](https://arxiv.org/abs/2310.08560) — Artículo de investigación que introduce la gestión de contexto virtual para memoria ilimitada de agentes, comparable a la memoria virtual del SO.
-- [Chroma – Base de datos de embeddings de código abierto](https://docs.trychroma.com/) — Almacén vectorial ligero y popular utilizado en muchas implementaciones de memoria de agentes.
-- [Hilos de OpenAI Assistants](https://platform.openai.com/docs/assistants/how-it-works/managing-threads) — Cómo la API de agentes gestionada de OpenAI maneja los hilos de conversación y la memoria persistente.
+- [LangChain Memory Concepts](https://python.langchain.com/docs/concepts/memory/) — Documentación oficial de LangChain sobre todos los tipos de memoria integrados y cuándo aplicar cada uno.
+- [MemGPT: Towards LLMs as Operating Systems](https://arxiv.org/abs/2310.08560) — Artículo de investigación que introduce la gestión de contexto virtual para capacidad de memoria de agentes ilimitada, análogo a la memoria virtual del SO.
+- [Chroma – Open-source embedding database](https://docs.trychroma.com/) — Almacén vectorial ligero y popular utilizado en muchas implementaciones de memoria de agentes.
+- [OpenAI Assistants Threads](https://platform.openai.com/docs/assistants/how-it-works/managing-threads) — Cómo la API de agentes gestionada de OpenAI maneja los hilos de conversación y el almacenamiento persistente.
 
 ## Ver también
 
-- [Agentes de IA](/docs/agents)
-- [Memoria conversacional](/docs/agents/conversational-memory)
+- [AI agents](/docs/agents)
+- [Conversational memory](/docs/agents/conversational-memory)
 - [RAG](/docs/rag)

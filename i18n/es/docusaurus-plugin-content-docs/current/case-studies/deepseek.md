@@ -2,35 +2,37 @@
 title: Case study — DeepSeek
 description: LLMs de pesos abiertos de DeepSeek AI con razonamiento y código sólidos; MoE y escalado eficiente.
 keywords: [DeepSeek, open weights, razonamiento, code, MoE]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Case study: DeepSeek
 
 ## Definición
 
-DeepSeek es una familia de [LLMs](/docs/llms) de DeepSeek AI. Los modelos son conocidos por su fuerte rendimiento en razonamiento y código, released as **open weights** so they can be run [locally](/docs/local-inference) or fine-tuned. Variants include dense and mixture-of-experts (MoE) architectures for different scale and cost trade-offs.
+DeepSeek es una familia de [LLMs](/docs/llms) de DeepSeek AI. Los modelos son conocidos por su sólido rendimiento en razonamiento y código, publicados como **pesos abiertos** para que puedan ejecutarse [localmente](/docs/local-inference) o ajustarse finamente. Las variantes incluyen arquitecturas densas y de mezcla de expertos (MoE) para diferentes equilibrios de escala y costo.
 
-They illustrate the same core stack (pretraining, ajuste de instrucciones, alignment) as [ChatGPT](/docs/case-studies/chatgpt) and [Claude](/docs/case-studies/claude), with an emphasis on open release and efficiency. Use case: chat, code generation, razonamiento tasks, and [RAG](/docs/rag) or [agents](/docs/agents) when self-hosted or cost control matters.
+Ilustran el mismo stack central (preentrenamiento, ajuste de instrucciones, alineamiento) que [ChatGPT](/docs/case-studies/chatgpt) y [Claude](/docs/case-studies/claude), con énfasis en la publicación abierta y la eficiencia. Caso de uso: chat, generación de código, tareas de razonamiento y [RAG](/docs/rag) o [agentes](/docs/agents) cuando el autoalojamiento o el control de costos importan.
 
 ## Cómo funciona
 
-**Base models** se preentrenan en large text and code corpora; **ajuste de instrucciones** and **preference optimization** (por ej. DPO) align them for chat and tool use. **MoE** variants activate a subset of parameters per token to scale capacity without proportionally increasing compute. Weights are published in standard formats (por ej. SafeTensors); teams run them with [quantization](/docs/quantization) on consumer GPUs or deploy via [local inference](/docs/local-inference) runtimes (vLLM, Ollama, etc.). [Prompt engineering](/docs/prompt-engineering) and [fine-tuning](/docs/llms/fine-tuning) extend use for specific domains.
+Los **modelos base** se preentrenan en grandes corpus de texto y código; el **ajuste de instrucciones** y la **optimización de preferencias** (p. ej., DPO) los alinean para chat y uso de herramientas. Las variantes **MoE** activan un subconjunto de parámetros por token para escalar la capacidad sin aumentar el cómputo de forma proporcional. Los pesos se publican en formatos estándar (p. ej., SafeTensors); los equipos los ejecutan con [cuantización](/docs/quantization) en GPUs de consumo o los despliegan mediante tiempos de ejecución de [inferencia local](/docs/local-inference) (vLLM, Ollama, etc.). La [ingeniería de prompts](/docs/prompt-engineering) y el [ajuste fino](/docs/llms/fine-tuning) amplían el uso para dominios específicos.
 
 ## Casos de uso
 
-DeepSeek fits when you want strong razonamiento and code capability with open weights and local or cost-effective deployment.
+DeepSeek es adecuado cuando se desea una sólida capacidad de razonamiento y código con pesos abiertos y despliegue local o rentable.
 
-- Code generation and code-assisted workflows (IDE, agents)
-- Reasoning and math with open, self-hostable models
-- Fine-tuning and [local inference](/docs/local-inference) for privacidad or cost
+- Generación de código y flujos de trabajo asistidos por código (IDE, agentes)
+- Razonamiento y matemáticas con modelos abiertos y autoalojables
+- Ajuste fino e [inferencia local](/docs/local-inference) para privacidad o costo
 
 ## Documentación externa
 
 - [DeepSeek – Official site](https://www.deepseek.com/)
-- [DeepSeek – Models on Hugging Face](https://huggingface.co/deepseek-ai) — Weights and cards
+- [DeepSeek – Models on Hugging Face](https://huggingface.co/deepseek-ai) — Pesos y tarjetas
 
 ## Ver también
 
 - [LLMs](/docs/llms)
-- [Local inference](/docs/local-inference)
-- [Fine-tuning](/docs/llms/fine-tuning)
+- [Inferencia local](/docs/local-inference)
+- [Ajuste fino](/docs/llms/fine-tuning)

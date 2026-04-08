@@ -1,56 +1,142 @@
 ---
-title: Récupération-décision-conception (RDD)
-description: "Modèle d'agents : récupérer, décider, concevoir."
-keywords: [RDD, récupération-décision-conception, spec-driven, raisonnement]
+title: Retrieval-decision-design (RDD)
+description: Spec-driven reasoning pattern combining retrieval and decision design.
+keywords: [RDD, retrieval-decision-design, spec-driven, reasoning]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Récupération-décision-conception (RDD)
 
 ## Définition
 
-**RDD (récupération-décision-conception)** est un schéma de raisonnement qui relie **récupération** (fetching relevant specs, docs, or examples), **décision** (making choices aligned with specs or policies), and **conception** (producing outputs that satisfy requirements). C'est often used in spec-driven development: behavior is guided by explicit specifications that are retrieved and enforced during generation.
+**RDD (récupération-décision-conception)** est un modèle de raisonnement qui unit la **récupération** (obtention de spécifications, documents ou exemples pertinents), la **décision** (prise de décisions alignées sur des spécifications ou politiques) et la **conception** (production de sorties qui satisfont des exigences). Il est souvent utilisé dans le développement piloté par spécifications : le comportement est guidé par des spécifications explicites récupérées et appliquées pendant la génération.
 
-## Comment ça fonctionne
+Contrairement à [CoT](/docs/reasoning-patterns/cot), qui génère du raisonnement à partir de la connaissance interne du modèle, ou à [ReAct](/docs/reasoning-patterns/react), qui entrelace le raisonnement avec des appels d'outils arbitraires, RDD contraint chaque décision par rapport à une source de vérité récupérée. Cela le rend particulièrement adapté aux domaines réglementés (juridique, conformité, sécurité) ou aux flux de travail d'ingénierie où le code ou les configurations doivent se conformer aux spécifications documentées.
 
-1. **Retrieval:** Given the current task, retrieve relevant specification fragments, examples, or constraints (par ex. from a vector store or structured specs).
-2. **Decision:** Use the retrieved context to decide next steps, allowed actions, or output format.
-3. **Conception :** Générer ou exécuter conformément à la spécification ; optionnellement valider les sorties par rapport à la spécification.
+RDD peut être implémenté comme un pipeline en une seule étape (récupérer → décider → générer → valider) ou comme une boucle dans un [agent](/docs/agents), où la validation échouée déclenche une nouvelle récupération et un raffinement. Le modèle est composable : l'étape de récupération de RDD peut être alimentée par un pipeline [RAG](/docs/rag), et sa boucle d'agent peut utiliser [ReAct](/docs/reasoning-patterns/react) pour le raisonnement au niveau des étapes.
 
-Cela peut être implémenté dans une boucle d'[agent](/docs/agents) : récupérer la spécification → raisonner avec la spécification en contexte → agir ou générer → validate → repeat. The diagram below shows the cycle: **task** triggers **retrieve**; retrieved spec feeds **décision**; **generate/act** produces output; **validate** checks against the spec and can loop back to the task (par ex. retry or refine).
+## Fonctionnement
+
+### Cycle RDD
 
 ```mermaid
 flowchart LR
-  T[Task] --> R["Retrieve spec/docs"]
-  R --> D[Decision with spec]
-  D --> G["Generate/Act"]
-  G --> V[Validate]
-  V --> T
+  Task[Task or requirement] -->|query spec store| Retrieve["Retrieve spec / docs / examples"]
+  Retrieve -->|spec in context| Decision[Decision aligned with spec]
+  Decision -->|produce output| Generate["Generate or act"]
+  Generate -->|check conformance| Validate[Validate against spec]
+  Validate -->|passes| Done[Done]
+  Validate -->|fails, refine| Task
 ```
 
-## Cas d'utilisation
+### Étapes en détail
 
-RDD is a fit when outputs must align with retrievable specs (compliance, policy, or documented requirements).
+```mermaid
+flowchart LR
+  Spec[Spec store] -->|vector or structured search| Fragment[Relevant spec fragment]
+  Fragment -->|inject into prompt| Context[Decision context]
+  Context -->|LLM reasons with spec| Output[Draft output]
+  Output -->|rule-based or LLM check| Valid{Valid?}
+  Valid -->|yes| Final[Final output]
+  Valid -->|no, with error| Refine[Refine prompt + retry]
+```
 
-- Spec-driven agents that retrieve requirements and validate outputs
-- Compliance and policy-aware generation (par ex. legal, safety)
-- Code or config generation aligned with documented specs
+1. **Récupération :** Étant donné la tâche actuelle, récupérer les fragments de spécification pertinents, les exemples ou les contraintes (p. ex. depuis un magasin vectoriel ou des spécifications structurées).
+2. **Décision :** Utiliser le contexte récupéré pour décider des prochaines étapes, des actions autorisées ou du format de sortie — la spécification est toujours en contexte pendant le raisonnement.
+3. **Conception :** Générer ou exécuter en accord avec la spécification ; valider optionnellement les sorties contre la spécification avant de retourner.
+
+Cela peut être implémenté dans une boucle d'[agent](/docs/agents) : récupérer la spécification → raisonner avec la spécification en contexte → agir ou générer → valider → répéter. La validation échouée déclenche une nouvelle récupération (possiblement avec une requête différente) ou un raffinement du prompt.
+
+## Quand utiliser / Quand NE PAS utiliser
+
+| Scénario | Utiliser RDD | Ne pas utiliser RDD |
+|---|---|---|
+| Générer du code qui doit se conformer à une spécification d'API | Oui — récupérer la spec, générer, valider | Non — codage libre sans contraintes formelles |
+| Génération de documents pilotée par la conformité | Oui — récupérer la politique, générer une sortie alignée | Non — écriture créative sans règles strictes |
+| Agents opérant dans des domaines réglementés (juridique, sécurité) | Oui — chaque décision est ancrée dans la politique récupérée | Non — Q&A informel sans exigences de conformité |
+| Ingénierie avec des documents de conception versionnés | Oui — les specs changent ; RDD récupère toujours la plus récente | Non — CRUD simple sans spécification formelle |
+| Inférence en temps réel avec des budgets de latence serrés | Non — la récupération + validation ajoute de la latence | Oui — la génération directe est plus rapide pour les tâches sans contraintes |
+
+## Comparaisons
+
+| Modèle | Utilise des connaissances récupérées | Valide la sortie | Piloté par spec | Meilleur pour |
+|---|---|---|---|---|
+| CoT | Non (connaissance interne du modèle) | Non | Non | Mathématiques, logique |
+| ReAct | Via appels d'outils | Non | Non | Agents à usage général avec outils |
+| RAG | Oui (documents) | Non | Non | Q&A de connaissances |
+| RDD | Oui (specs et documents) | Oui | Oui | Conformité, génération pilotée par spec |
 
 ## Avantages et inconvénients
 
-| Pros | Cons |
-|------|------|
-| Outputs align with specs | Requires good spec coverage and récupération |
-| Reduces drift and ad-hoc behavior | Extra récupération and validation cost |
-| Fits regulated or safety-critical flows | Spec conception and maintenance overhead |
+| Avantages | Inconvénients |
+|---|---|
+| Les sorties s'alignent sur les specs explicitement récupérées | Nécessite un magasin de specs bien maintenu et interrogeable |
+| Réduit la dérive et le comportement ad-hoc | La récupération supplémentaire et la validation augmentent les coûts et la latence |
+| Piste d'audit : les fragments de spec sont traçables dans la sortie | Les lacunes dans la couverture des specs conduisent à des décisions insuffisamment contraintes |
+| Composable avec RAG et ReAct | La conception et la maintenance des specs constituent une charge de travail continue |
+| S'adapte aux flux réglementés ou critiques pour la sécurité | La logique de validation doit être maintenue synchronisée avec les mises à jour des specs |
 
-## Documentation externe
+## Exemples de code
 
-- [RAG paper (Lewis et al.)](https://arxiv.org/abs/2005.11401) — Retrieval component used in RDD
-- [LangChain – Agents and tools](https://python.langchain.com/docs/concepts/agents/) — Orchestration patterns
+```python
+from openai import OpenAI
+from langchain_community.vectorstores import Chroma
+from langchain_openai import OpenAIEmbeddings
+
+client = OpenAI()
+# Assume a Chroma vector store pre-loaded with spec fragments
+spec_store = Chroma(
+    collection_name="api_spec",
+    embedding_function=OpenAIEmbeddings(),
+)
+
+def rdd_generate(task: str) -> str:
+    # 1. Retrieve relevant spec fragments
+    spec_docs = spec_store.similarity_search(task, k=3)
+    spec_context = "\n\n".join(d.page_content for d in spec_docs)
+
+    # 2. Decision + Design: generate with spec in context
+    prompt = (
+        f"You must follow the specifications below exactly.\n\n"
+        f"SPECIFICATIONS:\n{spec_context}\n\n"
+        f"TASK: {task}\n\n"
+        f"Generate an output that strictly complies with the specifications."
+    )
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+    )
+    draft = response.choices[0].message.content
+
+    # 3. Validate (simple: ask model to check conformance)
+    validation_prompt = (
+        f"Check if the following output complies with the spec. "
+        f"Reply with PASS or FAIL and a brief reason.\n\n"
+        f"SPEC:\n{spec_context}\n\nOUTPUT:\n{draft}"
+    )
+    validation = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": validation_prompt}],
+    ).choices[0].message.content
+
+    if "FAIL" in validation.upper():
+        return f"[Validation failed: {validation}]\nDraft:\n{draft}"
+    return draft
+
+result = rdd_generate("Generate a JSON API request to create a new user.")
+print(result)
+```
+
+## Ressources pratiques
+
+- [RAG paper (Lewis et al.)](https://arxiv.org/abs/2005.11401) — Composant de récupération utilisé comme base pour l'étape de récupération de specs de RDD
+- [LangChain – Agents and tools](https://python.langchain.com/docs/concepts/agents/) — Modèles d'orchestration pour construire des boucles de type RDD
+- [Constitutional AI (Anthropic)](https://arxiv.org/abs/2212.08073) — Idée connexe : utiliser des principes récupérés pour guider et valider les sorties du modèle
 
 ## Voir aussi
 
-- [Spec-driven development](/docs/spec-driven-development)
+- [Développement piloté par spécifications](/docs/spec-driven-development)
 - [RAG](/docs/rag)
 - [Agents](/docs/agents)
 - [ReAct](/docs/reasoning-patterns/react)

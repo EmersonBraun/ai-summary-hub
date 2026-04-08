@@ -1,40 +1,42 @@
 ---
-title: "Mémoire des agents"
-description: Comment les agents IA stockent, récupèrent et raisonnent sur les informations à travers les tours et les sessions.
-keywords: [mémoire des agents, mémoire à court terme, mémoire à long terme, mémoire épisodique, mémoire sémantique, mémoire de travail, fenêtre de contexte]
+title: "Agent memory"
+description: How AI agents store, retrieve, and reason over information across turns and sessions.
+keywords: [agent memory, short-term memory, long-term memory, episodic memory, semantic memory, working memory, context window]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Mémoire des agents
 
 ## Définition
 
-La mémoire des agents désigne les mécanismes par lesquels un agent IA stocke, indexe et récupère des informations au cours de son fonctionnement. Sans mémoire, chaque interaction commence avec une ardoise vierge — l'agent ne peut pas apprendre des conversations passées, accumuler des faits ou suivre l'état d'une tâche de longue durée. La mémoire transforme un appel LLM sans état en un système persistant et orienté vers les objectifs.
+Agentengedächtnis bezieht sich auf die Mechanismen, durch die ein KI-Agent Informationen im Verlauf seines Betriebs speichert, indiziert und abruft. Ohne Gedächtnis beginnt jede Interaktion bei einem leeren Blatt – der Agent kann nicht aus vergangenen Gesprächen lernen, Fakten akkumulieren oder den Zustand einer lang laufenden Aufgabe verfolgen. Gedächtnis verwandelt einen zustandslosen LLM-Aufruf in ein persistentes, zielorientiertes System.
 
-En sciences cognitives, la mémoire est divisée en plusieurs types : la mémoire de travail (informations actives maintenues en tête en ce moment), la mémoire à court terme (événements récents retenus pendant une période limitée) et la mémoire à long terme (connaissances durables qui persistent indéfiniment). Les agents IA reflètent étroitement cette taxonomie. La fenêtre de contexte du LLM agit comme mémoire de travail ; un tampon glissant de messages récents sert de mémoire à court terme ; et un store externe — souvent une base de données vectorielle — sert de mémoire à long terme.
+In der Kognitionswissenschaft wird Gedächtnis in mehrere Typen unterteilt: Arbeitsgedächtnis (aktive Informationen, die gerade im Kopf gehalten werden), Kurzzeitgedächtnis (kürzliche Ereignisse, die für einen begrenzten Zeitraum behalten werden) und Langzeitgedächtnis (dauerhaftes Wissen, das unbegrenzt persistiert). KI-Agenten spiegeln diese Taxonomie eng wider. Das Kontextfenster des LLM fungiert als Arbeitsgedächtnis; ein gleitender Puffer kürzlicher Nachrichten dient als Kurzzeitgedächtnis; und ein externer Speicher – oft eine Vektordatenbank – dient als Langzeitgedächtnis.
 
-La mémoire est ce qui permet le raisonnement multi-tours. Quand un agent doit répondre à une question de suivi, exécuter un plan sur plusieurs étapes ou se souvenir des préférences d'un utilisateur d'une session précédente, il fait appel à une ou plusieurs de ces couches de mémoire. Concevoir correctement la mémoire détermine si un agent ressemble à un assistant compétent ou à un chatbot amnésique.
+Gedächtnis ermöglicht mehrstufiges Reasoning. Wenn ein Agent eine Folgefrage beantworten, einen Plan über mehrere Schritte ausführen oder sich an die Präferenzen eines Benutzers aus einer früheren Sitzung erinnern muss, greift er auf eine oder mehrere dieser Gedächtnisschichten zurück. Die richtige Gestaltung des Gedächtnisses bestimmt, ob ein Agent sich wie ein kenntnisreicher Assistent oder ein amnestischer Chatbot anfühlt.
 
 ## Comment ça fonctionne
 
-### Mémoire de travail et fenêtre de contexte
+### Arbeitsgedächtnis und das Kontextfenster
 
-La fenêtre de contexte est la forme de mémoire la plus immédiate disponible pour tout agent alimenté par LLM. Tous les messages, résultats d'outils et pensées intermédiaires dans un seul appel d'inférence résident dans la mémoire de travail. Les fenêtres de contexte typiques vont de 8K à 200K tokens, établissant un plafond strict sur la quantité sur laquelle l'agent peut raisonner activement à la fois. Quand cette limite est approchée, les informations plus anciennes doivent être soit résumées, compressées ou évincées pour faire de la place. La mémoire de travail est rapide et sans latence mais entièrement volatile — elle disparaît quand l'appel se termine.
+Das Kontextfenster ist die unmittelbarste Form des Gedächtnisses, die für jeden LLM-gestützten Agenten verfügbar ist. Alle Nachrichten, Werkzeug-Ergebnisse und Zwischengedanken innerhalb eines einzigen Inferenzaufrufs befinden sich im Arbeitsgedächtnis. Typische Kontextfenster reichen von 8K bis 200K Token und setzen eine harte Obergrenze dafür, worüber der Agent aktiv nachdenken kann. Wenn diese Grenze erreicht wird, müssen ältere Informationen entweder zusammengefasst, komprimiert oder entfernt werden, um Platz zu schaffen. Arbeitsgedächtnis ist schnell und nulllatentig, aber vollständig flüchtig – es verschwindet, wenn der Aufruf endet.
 
-### Mémoire tampon à court terme
+### Kurzzeit-Pufferspeicher
 
-La mémoire à court terme est implémentée comme un tampon roulant qui contient les N derniers tours de conversation. Quand un nouveau tour arrive, le tour le plus ancien est supprimé si le tampon est plein. Cette approche est simple, peu coûteuse et suffisante pour la continuité conversationnelle dans une seule session. Le tampon est généralement sérialisé et renvoyé dans la fenêtre de contexte au début de chaque nouvel appel d'inférence. Sa principale limitation est qu'il ne se met pas à l'échelle pour les longues sessions ou le rappel inter-sessions.
+Kurzzeitgedächtnis wird als rollierender Puffer implementiert, der die letzten N Gesprächsrunden hält. Wenn eine neue Runde eintrifft, wird die älteste Runde verworfen, wenn der Puffer voll ist. Dieser Ansatz ist einfach, günstig und ausreichend für Gesprächskontinuität innerhalb einer einzigen Sitzung. Der Puffer wird üblicherweise serialisiert und zu Beginn jedes neuen Inferenzaufrufs zurück in das Kontextfenster übergeben. Seine Hauptbeschränkung ist, dass er nicht für lange Sitzungen oder sitzungsübergreifenden Abruf skaliert.
 
-### Mémoire sémantique à long terme
+### Langzeit-Semantikspeicher
 
-La mémoire à long terme utilise un store persistant externe — généralement une base de données vectorielle — pour contenir des embeddings d'événements passés, de faits et de résumés. Quand l'agent a besoin de se souvenir de quelque chose, il encode la requête actuelle et effectue une recherche approximative du plus proche voisin pour récupérer les souvenirs les plus sémantiquement pertinents. Les blocs récupérés sont injectés dans la fenêtre de contexte avant l'inférence. Ce modèle se met à l'échelle à des millions de faits stockés et prend en charge le rappel inter-sessions, mais ajoute de la latence de récupération et nécessite un modèle d'embedding.
+Langzeitgedächtnis verwendet einen externen persistenten Speicher – typischerweise eine Vektordatenbank – um Einbettungen vergangener Ereignisse, Fakten und Zusammenfassungen zu halten. Wenn der Agent sich an etwas erinnern muss, bettet er die aktuelle Anfrage ein und führt eine Approximate-Nearest-Neighbor-Suche durch, um die semantisch relevantesten Erinnerungen abzurufen. Abgerufene Chunks werden vor der Inferenz in das Kontextfenster eingefügt. Dieses Muster skaliert auf Millionen gespeicherter Fakten und unterstützt sitzungsübergreifenden Abruf, fügt aber Abruf-Latenz hinzu und erfordert ein Einbettungsmodell.
 
-### Mémoire épisodique vs sémantique
+### Episodisches vs. semantisches Gedächtnis
 
-La mémoire épisodique stocke des événements passés spécifiques avec leur contexte : « Dans la session 23, l'utilisateur a demandé la politique de remboursement et était frustré. » La mémoire sémantique stocke des connaissances générales du monde ou des faits accumulés : « La fenêtre de remboursement est de 30 jours. » Les deux types peuvent coexister dans le même store vectoriel, distingués par des métadonnées. La mémoire épisodique est précieuse pour la personnalisation ; la mémoire sémantique est précieuse pour ancrer l'agent dans la connaissance du domaine.
+Episodisches Gedächtnis speichert spezifische vergangene Ereignisse mit ihrem Kontext: „In Sitzung 23 fragte der Benutzer nach der Rückgaberichtlinie und war frustriert." Semantisches Gedächtnis speichert allgemeines Weltwissen oder akkumulierte Fakten: „Das Rückgabefenster beträgt 30 Tage." Beide Typen können im selben Vektorspeicher koexistieren, unterschieden durch Metadaten. Episodisches Gedächtnis ist wertvoll für Personalisierung; semantisches Gedächtnis ist wertvoll, um den Agenten in Domänenwissen zu verankern.
 
-### Boucle de récupération
+### Abrufschleife
 
-La boucle de récupération connecte toutes les couches. À chaque tour, l'agent interroge la mémoire à long terme pour le contexte pertinent, le fusionne avec le tampon à court terme et alimente le contexte combiné dans la mémoire de travail du LLM. Après la génération, les faits importants du nouveau tour peuvent être réécrits dans le stockage à long terme, fermant la boucle.
+Die Abrufschleife verbindet alle Schichten. Bei jeder Runde fragt der Agent das Langzeitgedächtnis nach relevantem Kontext, fügt diesen mit dem Kurzzeit-Puffer zusammen und speist den kombinierten Kontext in das Arbeitsgedächtnis des LLM ein. Nach der Generierung können wichtige Fakten aus der neuen Runde zurück in den Langzeitspeicher geschrieben werden, was die Schleife schließt.
 
 ```mermaid
 flowchart LR
@@ -53,21 +55,21 @@ flowchart LR
 
 | Utiliser quand | Éviter quand |
 |---|---|
-| L'agent doit rappeler des informations de sessions ou de tours précédents | La tâche est entièrement autonome dans un seul prompt sans suivi |
-| Les utilisateurs s'attendent à une personnalisation basée sur les interactions passées | Le coût de stockage de la mémoire ou la latence est inacceptable pour le cas d'utilisation |
-| L'agent suit des tâches de longue durée avec de nombreux résultats intermédiaires | La fenêtre de contexte est suffisamment grande pour contenir toutes les informations pertinentes |
-| Les connaissances du domaine dépassent ce qui tient dans une seule fenêtre de contexte | Les exigences de confidentialité interdisent le stockage des données de conversation des utilisateurs |
-| Vous avez besoin d'un comportement cohérent à travers plusieurs invocations d'agents | La complexité ajoutée l'emporte sur le bénéfice marginal de la persistance |
+| Der Agent Informationen aus früheren Sitzungen oder Runden abrufen muss | Die Aufgabe vollständig in einem einzigen Prompt selbstenthalten ist und keine Folgefragen hat |
+| Benutzer Personalisierung basierend auf vergangenen Interaktionen erwarten | Speicherkosten oder Latenz für den Anwendungsfall inakzeptabel sind |
+| Der Agent lang laufende Aufgaben mit vielen Zwischenergebnissen verfolgt | Das Kontextfenster groß genug ist, um alle relevanten Informationen zu halten |
+| Domänenwissen das hineinpasst, was in ein einzelnes Kontextfenster passt, übersteigt | Datenschutzanforderungen das Speichern von Benutzergesprächen verbieten |
+| Konsistentes Verhalten über mehrere Agenten-Aufrufe hinweg benötigt wird | Die hinzugefügte Komplexität den marginalen Nutzen der Persistenz überwiegt |
 
 ## Avantages et inconvénients
 
 | Avantages | Inconvénients |
 |---|---|
-| Permet la continuité multi-tours et inter-sessions | Les stores à long terme ajoutent de la latence de récupération |
-| Prend en charge la personnalisation et le contexte spécifique à l'utilisateur | Les bases de données vectorielles introduisent une complexité d'infrastructure |
-| Se met à l'échelle au-delà des limites de fenêtre de contexte | La qualité de récupération dépend de la précision du modèle d'embedding |
-| La mémoire épisodique améliore significativement l'expérience utilisateur | La stagnation de la mémoire nécessite des stratégies d'éviction ou de mise à jour |
-| La mémoire sémantique ancre l'agent dans la connaissance du domaine | Les politiques de confidentialité et de rétention des données doivent être gérées explicitement |
+| Ermöglicht mehrstufige und sitzungsübergreifende Kontinuität | Langzeitspeicher fügen Abruf-Latenz hinzu |
+| Unterstützt Personalisierung und benutzerspezifischen Kontext | Vektordatenbanken führen Infrastrukturkomplexität ein |
+| Skaliert jenseits von Kontextfenstergrenzen | Abrufqualität hängt von der Genauigkeit des Einbettungsmodells ab |
+| Episodisches Gedächtnis verbessert die Benutzererfahrung erheblich | Gedächtnisveralterung erfordert Eviktions- oder Update-Strategien |
+| Semantisches Gedächtnis verankert den Agenten in Domänenwissen | Datenschutz- und Datenhaltungsrichtlinien müssen explizit verwaltet werden |
 
 ## Exemples de code
 
@@ -221,13 +223,13 @@ if __name__ == "__main__":
 
 ## Ressources pratiques
 
-- [Concepts de mémoire LangChain](https://python.langchain.com/docs/concepts/memory/) — Documentation officielle LangChain couvrant tous les types de mémoire intégrés et quand appliquer chacun.
-- [MemGPT: Towards LLMs as Operating Systems](https://arxiv.org/abs/2310.08560) — Article de recherche introduisant la gestion virtuelle du contexte pour une mémoire d'agent illimitée, comparable à la mémoire virtuelle d'OS.
-- [Chroma – Base de données d'embeddings open-source](https://docs.trychroma.com/) — Store vectoriel léger populaire utilisé dans de nombreuses implémentations de mémoire d'agents.
-- [Threads des assistants OpenAI](https://platform.openai.com/docs/assistants/how-it-works/managing-threads) — Comment l'API d'agents gérée d'OpenAI gère les threads de conversation et la mémoire persistante.
+- [LangChain Memory Concepts](https://python.langchain.com/docs/concepts/memory/) — Offizielle LangChain-Dokumentation zu allen eingebauten Gedächtnistypen und wann jeder angewendet werden sollte.
+- [MemGPT: Towards LLMs as Operating Systems](https://arxiv.org/abs/2310.08560) — Forschungspaper, das virtuelles Kontextverwaltung für unbegrenzte Agenten-Gedächtniskapazität einführt, vergleichbar mit virtuellem OS-Speicher.
+- [Chroma – Open-source embedding database](https://docs.trychroma.com/) — Beliebter leichtgewichtiger Vektorspeicher, der in vielen Agenten-Gedächtnisimplementierungen verwendet wird.
+- [OpenAI Assistants Threads](https://platform.openai.com/docs/assistants/how-it-works/managing-threads) — Wie OpenAIs verwaltete Agenten-API Gesprächs-Threads und persistenten Speicher behandelt.
 
 ## Voir aussi
 
-- [Agents IA](/docs/agents)
-- [Mémoire conversationnelle](/docs/agents/conversational-memory)
+- [AI agents](/docs/agents)
+- [Conversational memory](/docs/agents/conversational-memory)
 - [RAG](/docs/rag)

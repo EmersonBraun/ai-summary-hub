@@ -2,35 +2,37 @@
 title: Biais dans l'IA
 description: Sources et atténuation des biais dans les systèmes de ML.
 keywords: [biais, équité, discrimination]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Biais dans l'IA
 
 ## Définition
 
-Le biais en IA fait référence à des erreurs systématiques ou des résultats injustes (par ex. across demographics) arising from data, model conception, or deployment. Mitigation includes data audits, fairness metrics, and debiasing methods.
+Le biais en IA désigne des erreurs systématiques ou des résultats injustes (par exemple entre groupes démographiques) provenant des données, de la conception du modèle ou du déploiement. L'atténuation comprend les audits de données, les métriques d'équité et les méthodes de débiaisage.
 
-C'est a core concern in [AI ethics](/docs/ai-ethics) and [AI safety](/docs/ai-safety). [Evaluation metrics](/docs/evaluation-metrics) for fairness (par ex. demographic parity, equalized odds) are used in audits and before deploying in regulated domains. [Explainable AI](/docs/xai) can help identify when and why bias appears.
+C'est une préoccupation centrale dans l'[éthique de l'IA](/docs/ai-ethics) et la [sécurité de l'IA](/docs/ai-safety). Les [métriques d'évaluation](/docs/evaluation-metrics) d'équité (comme la parité démographique, les chances égalisées) sont utilisées dans les audits et avant le déploiement dans les domaines réglementés. L'[IA explicable](/docs/xai) peut aider à identifier quand et pourquoi le biais apparaît.
 
 ## Comment ça fonctionne
 
-Bias can **enter** via des données d'entraînement biaisées (underrepresentation, label bias), proxy variables (par ex. zip code for race), or feedback loops (model outputs influence future data). **Detection** uses fairness metrics (par ex. demographic parity, equalized odds, calibration by group) on [evaluation](/docs/evaluation-metrics) sets stratified by protected attributes. **Mitigation** includes: data (reweighting, resampling, collecting more representative data); training (fairness constraints, adversarial debiasing); and post-processing (thresholds or rules per group). Trade-offs exist between fairness metrics and accuracy; legal and domain norms define which metrics and thresholds to use. Audits should be run before deployment and monitored in production.
+Le biais peut **entrer** via des données d'entraînement biaisées (sous-représentation, biais d'étiquettes), des variables proxy (comme le code postal pour l'ethnie) ou des boucles de rétroaction (les sorties du modèle influencent les données futures). La **détection** utilise des métriques d'équité (comme la parité démographique, les chances égalisées, la calibration par groupe) sur des ensembles d'[évaluation](/docs/evaluation-metrics) stratifiés par attributs protégés. L'**atténuation** comprend : les données (repesage, rééchantillonnage, collecte de données plus représentatives) ; l'entraînement (contraintes d'équité, débiaisage adversarial) ; et le post-traitement (seuils ou règles par groupe). Des compromis existent entre les métriques d'équité et l'exactitude ; les normes légales et du domaine définissent quelles métriques et seuils utiliser. Les audits doivent être effectués avant le déploiement et surveillés en production.
 
 ## Cas d'utilisation
 
-Bias work applies when model décisions affect people in regulated or sensitive domains (hiring, lending, scoring, content).
+Le travail sur les biais s'applique lorsque les décisions du modèle affectent les personnes dans des domaines réglementés ou sensibles (recrutement, prêts, notation, contenu).
 
-- Auditing hiring, lending, or scoring systems for discriminatory impact
-- Fairness checks before deploying models in regulated domains
-- Explainability and remediation when bias is detected
+- Auditer les systèmes de recrutement, de prêts ou de notation pour l'impact discriminatoire
+- Vérifications d'équité avant de déployer des modèles dans des domaines réglementés
+- Explicabilité et remédiation lorsque le biais est détecté
 
-## Documentation externe
+## Ressources pratiques
 
-- [Google – Responsible AI – Fairness](https://ai.google.dev/responsible-ai)
-- [Fairness and Machine Learning (Barocas et al.)](https://fairmlbook.org/) — Free book
+- [Google – IA responsable – Équité](https://ai.google.dev/responsible-ai)
+- [Fairness and Machine Learning (Barocas et al.)](https://fairmlbook.org/) — Livre gratuit
 
 ## Voir aussi
 
-- [AI ethics](/docs/ai-ethics)
-- [AI safety](/docs/ai-safety)
-- [Evaluation metrics](/docs/evaluation-metrics)
+- [Éthique de l'IA](/docs/ai-ethics)
+- [Sécurité de l'IA](/docs/ai-safety)
+- [Métriques d'évaluation](/docs/evaluation-metrics)

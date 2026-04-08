@@ -2,6 +2,8 @@
 title: Claude Code
 description: Anthropic 的代理式 AI 编码助手，可作为 CLI、VS Code/JetBrains 扩展和 Web 应用使用——能够在整个代码库中自主执行多步骤任务。
 keywords: [Claude Code, Anthropic, AI 编码代理, CLI, VS Code 扩展, JetBrains, 代理式编码, 代码生成, 重构, 调试]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Claude Code

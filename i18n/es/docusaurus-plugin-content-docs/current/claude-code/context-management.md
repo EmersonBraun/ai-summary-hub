@@ -2,6 +2,8 @@
 title: Gestión de contexto
 description: Cómo Claude Code gestiona la ventana de contexto en sesiones largas — compresión automática, estrategias de historial de conversación y técnicas prácticas para mantener las sesiones efectivas a escala.
 keywords: [gestión de contexto, ventana de contexto, historial de conversación, /clear, compresión de contexto, límites de tokens, sesiones de Claude Code, sesiones largas]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Gestión de contexto

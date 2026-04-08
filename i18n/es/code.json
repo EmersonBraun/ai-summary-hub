@@ -16,11 +16,11 @@
     "description": "The ARIA label for the docs pagination"
   },
   "home.hero.title": {
-    "message": "AI Summary Hub",
+    "message": "Domina la IA: de fundamentos a producción",
     "description": "Hero section title"
   },
   "home.hero.tagline": {
-    "message": "Tu fuente única de verdad para conceptos de IA, desde fundamentos hasta agentes avanzados",
+    "message": "Más de 145 artículos en profundidad con ejemplos de código, tablas comparativas y diagramas Mermaid. Sigue rutas de aprendizaje o navega por categoría.",
     "description": "Hero section tagline"
   },
   "home.hero.startLearning": {
@@ -86,5 +86,205 @@
   "allTopics.intro": {
     "message": "Explora cada tema del hub por categoría. También puedes usar la {sidebarLink} o la búsqueda.",
     "description": "All topics page intro"
+  },
+  "allTopics.description": {
+    "message": "Lista completa de temas de documentación de AI Summary Hub, agrupados por categoría.",
+    "description": "All topics meta description"
+  },
+  "allTopics.sidebarLink": {
+    "message": "barra lateral",
+    "description": "Inline link label in allTopics intro"
+  },
+  "allTopics.level.beginner": {
+    "message": "Principiante",
+    "description": "Difficulty filter"
+  },
+  "allTopics.level.intermediate": {
+    "message": "Intermedio",
+    "description": "Difficulty filter"
+  },
+  "allTopics.level.advanced": {
+    "message": "Avanzado",
+    "description": "Difficulty filter"
+  },
+  "docLink.intro": {
+    "message": "Introducción",
+    "description": "Doc title for intro"
+  },
+  "docLink.overview": {
+    "message": "Resumen",
+    "description": "Doc title for index pages"
+  },
+  "notFound.title": {
+    "message": "Página no encontrada",
+    "description": "404 page title"
+  },
+  "notFound.description": {
+    "message": "No se pudo encontrar la página que buscabas.",
+    "description": "404 meta description"
+  },
+  "notFound.message": {
+    "message": "No pudimos encontrar la página que buscabas. Puede haberse movido, renombrado o ya no existir.",
+    "description": "404 body"
+  },
+  "notFound.docs": {
+    "message": "Explorar docs",
+    "description": "404 link to docs"
+  },
+  "notFound.home": {
+    "message": "Ir al inicio",
+    "description": "404 link home"
+  },
+  "sidebarSwitcher.title": {
+    "message": "Rutas de aprendizaje",
+    "description": "Sidebar learning path dropdown title"
+  },
+  "home.hero.browseTopics": {
+    "message": "Explorar todos los temas",
+    "description": "Home secondary CTA"
+  },
+  "home.meta.description": {
+    "message": "Domina la IA desde fundamentos hasta producción. Más de 145 artículos con ejemplos de código, comparativas, rutas de aprendizaje y diagramas.",
+    "description": "Home meta description"
+  },
+  "home.feat.heading": {
+    "message": "Todo lo que necesitas para aprender IA: estructurado, práctico y en profundidad",
+    "description": "Features section heading"
+  },
+  "home.banner.agentskit": {
+    "message": "La biblioteca más completa para construir agentes de IA. Framework listo para producción con memoria, herramientas, orquestación multi-agente y más.",
+    "description": "AgentsKit banner"
+  },
+  "home.banner.agentskitCta": {
+    "message": "Ver documentación →",
+    "description": "AgentsKit banner CTA"
+  },
+  "home.banner.skills": {
+    "message": "Repositorio curado de skills reutilizables para Claude Code y otros asistentes de código con IA. Mejora tu flujo de desarrollo al instante.",
+    "description": "Skills banner"
+  },
+  "home.banner.skillsCta": {
+    "message": "Ver en GitHub →",
+    "description": "Skills banner CTA"
+  },
+  "home.topics.heading": {
+    "message": "Cobertura de todo el stack de IA",
+    "description": "Topic highlights heading"
+  },
+  "home.paths.heading": {
+    "message": "8 rutas de aprendizaje guiadas",
+    "description": "Learning paths heading"
+  },
+  "home.paths.subtitle": {
+    "message": "¿No sabes por dónde empezar? Elige una ruta y síguela paso a paso.",
+    "description": "Learning paths subtitle"
+  },
+  "home.contribute.heading": {
+    "message": "Código abierto impulsado por la comunidad",
+    "description": "Contribute heading"
+  },
+  "home.contribute.body": {
+    "message": "AI Summary Hub es gratuito y de código abierto. Añade temas, mejora artículos, aporta ejemplos de código o ayuda a traducir el contenido a 6 idiomas.",
+    "description": "Contribute body"
+  },
+  "home.contribute.cta": {
+    "message": "Contribuir en GitHub",
+    "description": "Contribute button"
+  },
+  "learningPath.aiFundamentals.label": {
+    "message": "Fundamentos de IA",
+    "description": "Learning path name"
+  },
+  "learningPath.aiFundamentals.description": {
+    "message": "Conceptos clave desde ML hasta transformers",
+    "description": "Learning path description"
+  },
+  "learningPath.aiFundamentals.level": {
+    "message": "principiante",
+    "description": "Learning path level"
+  },
+  "learningPath.ragFromZero.label": {
+    "message": "RAG desde cero",
+    "description": "Learning path name"
+  },
+  "learningPath.ragFromZero.description": {
+    "message": "Construye sistemas de generación aumentada por recuperación",
+    "description": "Learning path description"
+  },
+  "learningPath.ragFromZero.level": {
+    "message": "principiante → intermedio",
+    "description": "Learning path level"
+  },
+  "learningPath.masteringAgents.label": {
+    "message": "Dominando agentes",
+    "description": "Learning path name"
+  },
+  "learningPath.masteringAgents.description": {
+    "message": "Desde agentes básicos hasta sistemas multi-agente",
+    "description": "Learning path description"
+  },
+  "learningPath.masteringAgents.level": {
+    "message": "intermedio → avanzado",
+    "description": "Learning path level"
+  },
+  "learningPath.promptEngineeringMastery.label": {
+    "message": "Dominio del prompt engineering",
+    "description": "Learning path name"
+  },
+  "learningPath.promptEngineeringMastery.description": {
+    "message": "Configuración, técnicas y fiabilidad",
+    "description": "Learning path description"
+  },
+  "learningPath.promptEngineeringMastery.level": {
+    "message": "principiante → avanzado",
+    "description": "Learning path level"
+  },
+  "learningPath.practicalMlops.label": {
+    "message": "MLOps práctico",
+    "description": "Learning path name"
+  },
+  "learningPath.practicalMlops.description": {
+    "message": "Pipeline de operaciones ML de extremo a extremo",
+    "description": "Learning path description"
+  },
+  "learningPath.practicalMlops.level": {
+    "message": "intermedio → avanzado",
+    "description": "Learning path level"
+  },
+  "learningPath.aiToolsFrameworks.label": {
+    "message": "Herramientas y frameworks de IA",
+    "description": "Learning path name"
+  },
+  "learningPath.aiToolsFrameworks.description": {
+    "message": "Proveedores de modelos, frameworks y herramientas de desarrollo",
+    "description": "Learning path description"
+  },
+  "learningPath.aiToolsFrameworks.level": {
+    "message": "principiante → intermedio",
+    "description": "Learning path level"
+  },
+  "learningPath.aiSafetyEthics.label": {
+    "message": "Seguridad y ética de la IA",
+    "description": "Learning path name"
+  },
+  "learningPath.aiSafetyEthics.description": {
+    "message": "Seguridad, sesgo, explicabilidad y ética",
+    "description": "Learning path description"
+  },
+  "learningPath.aiSafetyEthics.level": {
+    "message": "principiante → intermedio",
+    "description": "Learning path level"
+  },
+  "learningPath.claudeCodeDeepDive.label": {
+    "message": "Claude Code a fondo",
+    "description": "Learning path name"
+  },
+  "learningPath.claudeCodeDeepDive.description": {
+    "message": "Domina Claude Code y MCP",
+    "description": "Learning path description"
+  },
+  "learningPath.claudeCodeDeepDive.level": {
+    "message": "principiante → avanzado",
+    "description": "Learning path level"
   }
 }

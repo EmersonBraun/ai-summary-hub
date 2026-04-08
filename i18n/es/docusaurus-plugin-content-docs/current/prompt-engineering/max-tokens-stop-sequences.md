@@ -1,18 +1,20 @@
 ---
-title: Max tokens y stop sequences
-description: Cómo max tokens, stop sequences y penalizaciones de repetición controlan la longitud, los límites y la calidad del texto generado por los LLMs.
-keywords: [max tokens, stop sequences, penalización de repetición, frequency penalty, presence penalty, longitud de generación, configuración de LLM]
+title: Máximo de tokens y secuencias de parada
+description: Cómo el máximo de tokens, las secuencias de parada y las penalizaciones de repetición controlan la longitud, los límites y la calidad del texto generado por los LLM.
+keywords: [max tokens, stop sequences, repetition penalty, frequency penalty, presence penalty, generation length, LLM configuration]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
-# Max tokens y stop sequences
+# Máximo de tokens y secuencias de parada
 
 ## Definición
 
-Max tokens, stop sequences y penalizaciones de repetición son parámetros de control de generación que determinan cuándo el modelo deja de generar y cómo maneja el contenido repetido. Mientras que los parámetros de muestreo como la temperature determinan *qué* dice el modelo, los parámetros de control de generación determinan *cuánto* dice, *dónde* se detiene y *cuán variado* permanece a lo largo de una respuesta larga. Cada API de LLM expone alguna versión de estos controles, y entenderlos es esencial para construir pipelines fiables y eficientes en costes.
+El máximo de tokens, las secuencias de parada y las penalizaciones de repetición son parámetros de control de generación que determinan cuándo el modelo deja de generar y cómo maneja el contenido repetido. Mientras que los parámetros de muestreo como la temperatura determinan *qué* dice el modelo, los parámetros de control de generación determinan *cuánto* dice, *dónde* se detiene y *qué tan variado* se mantiene a lo largo de una respuesta larga. Cada API de LLM expone alguna versión de estos controles, y comprenderlos es esencial para construir pipelines fiables y rentables.
 
-**Max tokens** establece un límite superior estricto sobre el número de tokens que el modelo puede generar en una sola respuesta. Actúa como un techo de seguridad: el modelo se detiene en el momento en que emitiría un token que supera este presupuesto. No es una longitud objetivo — el modelo puede detenerse antes si genera un token de fin de secuencia de forma natural. Elegir un valor apropiado de max tokens importa tanto por el coste (generalmente se factura por token de salida) como por la corrección (una respuesta truncada puede dejar objetos JSON abiertos, cortar una cadena de razonamiento a mitad, o entregar resultados parciales a sistemas posteriores).
+El **máximo de tokens** establece un límite superior estricto sobre el número de tokens que el modelo puede generar en una sola respuesta. Actúa como un techo de seguridad: el modelo se detiene en el momento en que emitiría un token que excede este presupuesto. No es una longitud objetivo —el modelo puede detenerse antes si genera de forma natural un token de fin de secuencia. Elegir un valor apropiado de máximo de tokens importa tanto para el costo (generalmente se cobra por token de salida) como para la corrección (una respuesta truncada puede dejar objetos JSON abiertos, cortar una cadena de razonamiento a la mitad o entregar resultados parciales a sistemas posteriores).
 
-**Stop sequences** proporcionan condiciones de parada semánticas: una o más cadenas que, cuando se generan, hacen que el modelo se detenga de inmediato (la propia cadena de parada se excluye de la salida). Son indispensables para la generación estructurada — envolver la salida del LLM en un delimitador conocido y usar el delimitador de cierre como stop sequence hace que la extracción sea trivial y robusta. Las **penalizaciones de repetición** (frequency penalty y presence penalty en OpenAI; no expuestas de forma nativa en la API de mensajes de Anthropic) reducen la probabilidad de regenerar tokens que ya han aparecido, desalentando el bucle y el texto de relleno que puede surgir en generaciones largas.
+Las **secuencias de parada** proporcionan condiciones de parada semánticas: una o más cadenas que, cuando se generan, hacen que el modelo se detenga inmediatamente (la propia cadena de parada se excluye de la salida). Son indispensables para la generación estructurada —envolver la salida del LLM en un delimitador conocido y usar el delimitador de cierre como secuencia de parada hace que la extracción sea trivial y robusta. Las **penalizaciones de repetición** (penalización de frecuencia y penalización de presencia en OpenAI; no expuestas de forma nativa en la API de mensajes de Anthropic) reducen la probabilidad de regenerar tokens que ya han aparecido, desalentando el bucle y el texto de relleno que puede surgir en generaciones largas.
 
 ## Cómo funciona
 
@@ -29,30 +31,30 @@ flowchart TD
   REP --> LOOP
 ```
 
-Cada token generado pasa por tres puntos de control en secuencia: detección de fin de secuencia, aplicación del presupuesto de max tokens y comparación con stop sequences. Si ninguna de las condiciones de parada se activa, la penalización de repetición se aplica a los logits para el siguiente token antes de que el muestreo se reanude.
+Cada token generado pasa por tres puntos de control en secuencia: detección de fin de secuencia, aplicación del presupuesto máximo de tokens y coincidencia de secuencias de parada. Si ninguna de las condiciones de parada se activa, la penalización de repetición se aplica a los logits del siguiente token antes de que se reanude el muestreo.
 
-### Max tokens
+### Máximo de tokens
 
-El parámetro `max_tokens` (llamado `max_tokens_to_sample` en SDKs más antiguos de Anthropic, ahora `max_tokens`) es un campo requerido o fuertemente recomendado en la mayoría de las APIs de LLM. Establecerlo demasiado bajo arriesga truncar la salida; establecerlo innecesariamente alto desperdicia cómputo y aumenta la latencia en endpoints de streaming. Una heurística práctica: estima la longitud esperada de la salida, luego establece `max_tokens` a 1.5–2× ese estimado como techo seguro. Para salidas estructuradas como JSON, perfila el recuento de tokens en el peor caso de tu esquema y agrega un 20% de margen.
+El parámetro `max_tokens` (llamado `max_tokens_to_sample` en los SDK de Anthropic más antiguos, ahora `max_tokens`) es un campo requerido o altamente recomendado en la mayoría de las APIs de LLM. Establecerlo demasiado bajo arriesga una salida truncada; establecerlo innecesariamente alto desperdicia cómputo y aumenta la latencia en los endpoints de transmisión en flujo. Una heurística práctica: estimar la longitud de salida esperada y luego establecer `max_tokens` en 1.5–2× esa estimación como techo de seguridad. Para salidas estructuradas como JSON, perfilar el recuento máximo de tokens de su esquema y agregar un búfer del 20%.
 
-### Stop sequences
+### Secuencias de parada
 
-Las stop sequences se definen como una lista de cadenas. El modelo escanea su salida después de cada token y se detiene tan pronto como el texto generado termina con cualquier entrada de la lista. Los patrones comunes incluyen `["###", "\n\n", "</answer>", "```"]` para plantillas de prompts estructurados, `["\nHuman:", "\nUser:"]` para simuladores de chat que no deben generar el siguiente turno del usuario, y delimitadores de cierre como `["</json>"]` para extracción etiquetada. Las stop sequences se comparan con el texto generado sin procesar, no con límites tokenizados, por lo que las cadenas de múltiples tokens funcionan correctamente. Un gotcha clave: la stop sequence *no* se incluye en el texto devuelto, por lo que tu lógica de análisis debe tener en cuenta su ausencia.
+Las secuencias de parada se definen como una lista de cadenas. El modelo escanea su salida después de cada token y se detiene tan pronto como el texto generado termine con cualquier entrada de la lista. Los patrones comunes incluyen `["###", "\n\n", "</answer>", "```"]` para plantillas de prompts estructurados, `["\nHuman:", "\nUser:"]` para simuladores de chat que no deben generar el siguiente turno del usuario, y delimitadores de cierre como `["</json>"]` para extracción etiquetada. Las secuencias de parada se comparan con el texto generado sin procesar, no con los límites tokenizados, por lo que las cadenas de múltiples tokens funcionan correctamente. Un aspecto a tener en cuenta: la secuencia de parada *no* se incluye en el texto devuelto, por lo que la lógica de análisis debe tener en cuenta su ausencia.
 
 ### Penalizaciones de repetición
 
-La API de OpenAI expone dos parámetros de penalización distintos. **Frequency penalty** (`frequency_penalty`, rango −2.0 a 2.0) reduce el logit de un token en proporción a cuántas veces ya ha aparecido en el texto generado — desalentando la repetición de palabras usadas con frecuencia. **Presence penalty** (`presence_penalty`, rango −2.0 a 2.0) aplica una reducción de logit plana a cualquier token que haya aparecido al menos una vez, independientemente de la frecuencia — desalentando la reutilización de cualquier token ya visto. Los valores positivos reducen la repetición; los valores negativos la fomentan. Los valores en el rango 0.1–0.5 suelen ser suficientes para suprimir el bucle sin degradar significativamente la calidad de la salida. Los valores superiores a 1.0 pueden hacer que el modelo evite palabras de conexión útiles y degrade la coherencia.
+La API de OpenAI expone dos parámetros de penalización distintos. La **penalización de frecuencia** (`frequency_penalty`, rango de −2.0 a 2.0) reduce el logit de un token en proporción a cuántas veces ya ha aparecido en el texto generado, desalentando la repetición de palabras usadas con frecuencia. La **penalización de presencia** (`presence_penalty`, rango de −2.0 a 2.0) aplica una reducción plana de logit a cualquier token que ya haya aparecido al menos una vez, independientemente de la frecuencia, desalentando la reutilización de cualquier token ya visto. Los valores positivos reducen la repetición; los valores negativos la fomentan. Los valores en el rango de 0.1–0.5 generalmente son suficientes para suprimir los bucles sin degradar significativamente la calidad de la salida. Los valores por encima de 1.0 pueden hacer que el modelo evite palabras de conexión útiles y degradar la coherencia.
 
 ## Cuándo usar / Cuándo NO usar
 
 | Escenario | Configuración recomendada | Evitar |
 |-----------|---------------------------|--------|
-| Respuestas factuales cortas o clasificaciones | `max_tokens=50–150`; no se necesitan stop sequences | `max_tokens` muy alto; desperdicia presupuesto y puede invitar a relleno |
-| Extracción estructurada JSON o etiquetada | Detener en delimitador de cierre (por ejemplo, `["</json>"]`); `max_tokens` ajustado al peor caso del esquema | Omitir stop sequences; el modelo puede añadir prosa después de la llave de cierre |
-| Simulación de chat multi-turno | Stop sequences `["\nHuman:", "\nUser:"]` para evitar que el modelo genere el siguiente turno del usuario | Sin stop sequences; el modelo alucinará el siguiente turno de la conversación |
-| Generación de formato largo (ensayos, informes) | `max_tokens` alto (2048–4096+); leve `frequency_penalty=0.2` para evitar frases repetitivas | `frequency_penalty > 1.0`; rompe la coherencia estilística y evita términos legítimamente repetidos |
-| Generación de código | Detener en delimitadores apropiados al lenguaje (por ejemplo, triple backtick); `max_tokens` ajustado a la longitud de la función | `presence_penalty > 0.5`; los nombres de variables y palabras clave necesitan repetirse — las penalizaciones perjudican la corrección |
-| Inferencia por lotes sensible a costes | Ajustar `max_tokens` al percentil 95 de la longitud de salida esperada | Dejar `max_tokens` en el máximo de la API (por ejemplo, 4096) cuando la salida típica es de 100 tokens |
+| Respuestas factuales cortas o clasificaciones | `max_tokens=50–150`; no se necesitan secuencias de parada | `max_tokens` muy alto; desperdicia presupuesto y puede invitar a relleno |
+| Extracción JSON estructurada o etiquetada | Parar en el delimitador de cierre (p. ej., `["</json>"]`); `max_tokens` dimensionado al esquema del peor caso | Omitir secuencias de parada; el modelo puede agregar prosa después de la llave de cierre |
+| Simulación de chat multiturno | Secuencias de parada `["\nHuman:", "\nUser:"]` para evitar que el modelo genere el siguiente turno del usuario | Sin secuencias de parada; el modelo alucinará el siguiente turno de conversación |
+| Generación de formato largo (ensayos, informes) | `max_tokens` alto (2048–4096+); `frequency_penalty=0.2` suave para evitar frases repetitivas | `frequency_penalty > 1.0`; rompe la coherencia estilística y evita términos repetidos legítimos |
+| Generación de código | Parar en delimitadores apropiados para el lenguaje (p. ej., triple acento invertido); `max_tokens` dimensionado a la longitud de la función | `presence_penalty > 0.5`; los nombres de variables y palabras clave necesitan repetirse — las penalizaciones perjudican la corrección |
+| Inferencia en lote sensible al costo | Establecer `max_tokens` ajustadamente al percentil 95 de la longitud de salida esperada | Dejar `max_tokens` en el máximo de la API (p. ej., 4096) cuando la salida típica es de 100 tokens |
 
 ## Ejemplos de código
 
@@ -188,16 +190,16 @@ if __name__ == "__main__":
 ## Recursos prácticos
 
 - [OpenAI — Referencia de API: chat completions](https://platform.openai.com/docs/api-reference/chat/create) — Referencia completa de parámetros para `max_tokens`, `stop`, `frequency_penalty` y `presence_penalty`
-- [Anthropic — Referencia de API: messages](https://docs.anthropic.com/en/api/messages) — Referencia para `max_tokens` y `stop_sequences` en la API de Mensajes
-- [OpenAI — Gestión de tokens](https://platform.openai.com/docs/guides/text-generation/managing-tokens) — Guía para contar tokens, entender ventanas de contexto y ajustar `max_tokens` apropiadamente
-- [Hugging Face — Control de generación de texto](https://huggingface.co/docs/transformers/main_classes/text_generation) — Documentación de bajo nivel sobre `max_new_tokens`, `eos_token_id`, `repetition_penalty` y parámetros relacionados en la librería Transformers
-- [tiktoken (tokenizador de OpenAI)](https://github.com/openai/tiktoken) — Librería de recuento de tokens para estimar presupuestos de tokens de salida antes de hacer llamadas a la API
+- [Anthropic — Referencia de API: messages](https://docs.anthropic.com/en/api/messages) — Referencia para `max_tokens` y `stop_sequences` en la API de Messages
+- [OpenAI — Gestión de tokens](https://platform.openai.com/docs/guides/text-generation/managing-tokens) — Guía para contar tokens, comprender ventanas de contexto y dimensionar `max_tokens` apropiadamente
+- [Hugging Face — Control de generación de texto](https://huggingface.co/docs/transformers/main_classes/text_generation) — Documentación de bajo nivel sobre `max_new_tokens`, `eos_token_id`, `repetition_penalty` y parámetros relacionados en la biblioteca Transformers
+- [tiktoken (tokenizador de OpenAI)](https://github.com/openai/tiktoken) — Biblioteca de conteo de tokens para estimar presupuestos de tokens de salida antes de realizar llamadas a la API
 
 ## Ver también
 
 - [Ingeniería de prompts](/docs/prompt-engineering)
-- [Temperature, Top-K, Top-P](/docs/prompt-engineering/temperature-top-k-top-p)
+- [Temperatura, Top-K, Top-P](/docs/prompt-engineering/temperature-top-k-top-p)
 - [Salidas estructuradas](/docs/prompt-engineering/structured-outputs)
-- [Self-consistency](/docs/prompt-engineering/self-consistency)
+- [Autoconsistencia](/docs/prompt-engineering/self-consistency)
 - [LLMs](/docs/llms)
-- [Chain-of-thought](/docs/reasoning-patterns/cot)
+- [Cadena de pensamiento](/docs/reasoning-patterns/cot)

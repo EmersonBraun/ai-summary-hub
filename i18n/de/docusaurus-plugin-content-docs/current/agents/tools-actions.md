@@ -1,36 +1,38 @@
 ---
-title: "Agenten-Tools und -Aktionen"
-description: Was Tools und Aktionen im Agenten-Kontext sind, ihre Typen, Schemas und wie Agenten auswählen, welches Tool sie verwenden.
-keywords: [Agenten-Tools, Function Calling, Aktionen, Tool Use, Websuche, Code-Ausführung, OpenAI Tools, Tool-Schema, API-Aufrufe]
+title: "Agent tools and actions"
+description: What tools and actions are in the agent context, their types, schemas, and how agents select which tool to use.
+keywords: [agent tools, function calling, actions, tool use, web search, code execution, OpenAI tools, tool schema, API calls]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
-# Agenten-Tools und -Aktionen
+# Agenten-Werkzeuge und -Aktionen
 
 ## Definition
 
-Tools und Aktionen sind die Hände eines KI-Agenten. Während das LLM Reasoning und Sprachverständnis bereitstellt, geben Tools dem Agenten die Fähigkeit, die Welt zu beeinflussen: das Web zu durchsuchen, Code auszuführen, eine Datenbank abzufragen, Nachrichten zu senden oder eine externe API aufzurufen. Ohne Tools ist ein Agent auf das beschränkt, was er aus seinen Trainingsdaten weiß; mit Tools kann er auf Echtzeit-Informationen zugreifen, Berechnungen durchführen und Aktionen mit Seiteneffekten ausführen.
+Werkzeuge und Aktionen sind die Hände eines KI-Agenten. Während das LLM Reasoning und Sprachverständnis bietet, geben Werkzeuge dem Agenten die Fähigkeit, auf die Welt einzuwirken: das Web durchsuchen, Code ausführen, eine Datenbank abfragen, Nachrichten senden oder eine externe API aufrufen. Ohne Werkzeuge ist ein Agent auf das beschränkt, was er aus seinen Trainingsdaten weiß; mit Werkzeugen kann er auf Echtzeit-Informationen zugreifen, Berechnungen durchführen und seiteneffektbehaftete Aktionen ausführen.
 
-In den OpenAI- und Anthropic-Ökosystemen wird der Mechanismus für Tool Use als **function calling** (OpenAI) oder **tool use** (Anthropic) bezeichnet. Der Entwickler definiert eine Reihe von Tool-Schemas – strukturierte JSON-Beschreibungen des Namens, Zwecks und der Parameter jedes Tools – und schließt sie in die API-Anfrage ein. Wenn das LLM entscheidet, dass ein Tool benötigt wird, gibt es ein strukturiertes Tool-Aufruf-Objekt zurück anstatt Klartext. Der aufrufende Code führt das Tool aus und speist das Ergebnis in die Konversation zurück. Diese Schleife wiederholt sich, bis der Agent eine endgültige Antwort produziert.
+Im OpenAI- und Anthropic-Ökosystem wird der Mechanismus für die Werkzeug-Nutzung als **Function Calling** (OpenAI) oder **Tool Use** (Anthropic) bezeichnet. Der Entwickler definiert einen Satz von Werkzeug-Schemas – strukturierte JSON-Beschreibungen des Namens, Zwecks und der Parameter jedes Werkzeugs – und nimmt diese in die API-Anfrage auf. Wenn das LLM entscheidet, dass ein Werkzeug benötigt wird, gibt es ein strukturiertes Werkzeugaufruf-Objekt statt einfachen Texts zurück. Der aufrufende Code führt das Werkzeug aus und speist das Ergebnis zurück in das Gespräch ein. Diese Schleife wiederholt sich, bis der Agent eine Endantwort produziert.
 
-Die Bandbreite verfügbarer Tools ist im Wesentlichen unbegrenzt: Wenn sich etwas als Python-Funktion ausdrücken lässt, kann es ein Tool sein. Häufige Kategorien umfassen Websuche, Code-Ausführungs-Sandboxes, SQL- oder NoSQL-Datenbankabfragen, Dateisystemzugriff, REST-API-Aufrufe, E-Mail- und Messaging-Integrationen sowie Computer-Use-Tools, die mit GUIs interagieren. Das Entwerfen guter Tools – mit klaren Schemas, vorhersehbarem Verhalten und hilfreichen Fehlermeldungen – ist eines der wirkungsvollsten Dinge, die ein Entwickler tun kann, um die Agenten-Zuverlässigkeit zu verbessern.
+Die Breite der verfügbaren Werkzeuge ist im Wesentlichen unbegrenzt: Wenn etwas als Python-Funktion ausgedrückt werden kann, kann es ein Werkzeug sein. Häufige Kategorien umfassen Websuche, Code-Ausführungs-Sandboxes, SQL- oder NoSQL-Datenbankabfragen, Dateisystemzugriff, REST-API-Aufrufe, E-Mail- und Messaging-Integrationen und Computer-Use-Werkzeuge, die mit GUIs interagieren. Das Entwerfen guter Werkzeuge – mit klaren Schemas, vorhersehbarem Verhalten und hilfreichen Fehlermeldungen – ist eines der wirkungsvollsten Dinge, die ein Entwickler tun kann, um die Agenten-Zuverlässigkeit zu verbessern.
 
 ## Funktionsweise
 
-### Tool-Schema-Definition
+### Werkzeug-Schema-Definition
 
-Jedes Tool wird durch ein Schema beschrieben, das das LLM verwendet, um zu verstehen, wann und wie es aufzurufen ist. Ein Schema enthält: einen Namen (kurzer, snake_case-Bezeichner), eine Beschreibung (klare natürlichsprachliche Erklärung, was das Tool tut und wann es zu verwenden ist) und ein Parameter-Objekt (JSON Schema, das jedes Argument beschreibt: Name, Typ, Beschreibung und ob es erforderlich ist). Die Qualität der Beschreibung beeinflusst direkt, wie zuverlässig der Agent das Tool korrekt auswählt und aufruft. Vage Beschreibungen führen zu Fehlgebrauch; präzise Beschreibungen mit Beispielen führen zu genauen Tool-Aufrufen.
+Jedes Werkzeug wird durch ein Schema beschrieben, das das LLM verwendet, um zu verstehen, wann und wie es aufgerufen werden soll. Ein Schema enthält: einen Namen (kurzer, snake_case-Identifier), eine Beschreibung (klare natürlichsprachliche Erklärung, was das Werkzeug tut und wann es verwendet werden soll) und ein Parameter-Objekt (JSON Schema, das jedes Argument beschreibt: Name, Typ, Beschreibung und ob es erforderlich ist). Die Qualität der Beschreibung beeinflusst direkt, wie zuverlässig der Agent das Werkzeug korrekt auswählt und aufruft. Vage Beschreibungen führen zu Missbrauch; präzise Beschreibungen mit Beispielen führen zu genauen Werkzeugaufrufen.
 
-### Tool-Auswahl
+### Werkzeugauswahl
 
-Wenn das LLM eine Benutzernachricht zusammen mit einer Reihe von Tool-Schemas empfängt, entscheidet es bei jedem Schritt, ob es direkt antwortet oder ein Tool aufruft. Diese Entscheidung wird implizit beim Fine-Tuning auf Function-Calling-Daten gelernt. In der Praxis wird die Tool-Auswahl durch den System-Prompt (der den Agenten anweisen kann, wann bestimmte Tools zu bevorzugen sind), die Spezifität der Tool-Beschreibungen und das Vertrauen des Modells beeinflusst, ob es aus den Trainingsdaten allein antworten kann. Die Bereitstellung eines `tool_choice`-Parameters kann die Tool-Auswahl programmatisch erzwingen oder einschränken.
+Wenn das LLM eine Benutzernachricht zusammen mit einem Satz von Werkzeug-Schemas erhält, entscheidet es bei jedem Schritt, ob es direkt antwortet oder ein Werkzeug aufruft. Diese Entscheidung wird implizit beim Fine-Tuning auf Function-Calling-Daten erlernt. In der Praxis wird die Werkzeugauswahl durch den System-Prompt beeinflusst (der den Agenten anweisen kann, wann bestimmte Werkzeuge bevorzugt werden sollen), die Spezifität der Werkzeugbeschreibungen und das Vertrauen des Modells, dass es aus Trainingsdaten direkt antworten kann. Die Angabe eines `tool_choice`-Parameters kann die Werkzeugauswahl programmatisch erzwingen oder einschränken.
 
-### Tool-Ausführung und Ergebnis-Injektion
+### Werkzeugausführung und Ergebniseinspeisung
 
-Wenn das LLM einen Tool-Aufruf ausgibt, fängt der aufrufende Code ihn ab, validiert die Argumente gegen das Schema, führt die entsprechende Funktion aus und erhält ein Ergebnis. Dieses Ergebnis – ob ein String, JSON-Objekt oder eine Fehlermeldung – wird als `tool`-Rollennachricht formatiert und der Konversationshistorie angehängt. Das LLM generiert dann den nächsten Schritt mit vollständiger Kenntnis der Tool-Ausgabe. Fehlermeldungen von fehlgeschlagenen Tool-Aufrufen sind wichtig: Der Agent muss wissen, dass ein Tool fehlgeschlagen ist, damit er erneut versuchen, eine Alternative versuchen oder den Benutzer um Klärung bitten kann.
+Wenn das LLM einen Werkzeugaufruf ausgibt, fängt der aufrufende Code ihn ab, validiert die Argumente gegen das Schema, führt die entsprechende Funktion aus und erhält ein Ergebnis. Dieses Ergebnis – ob eine Zeichenfolge, ein JSON-Objekt oder eine Fehlermeldung – wird als `tool`-Rollen-Nachricht formatiert und dem Konversationsverlauf hinzugefügt. Das LLM generiert dann den nächsten Schritt mit vollständiger Kenntnis der Ausgabe des Werkzeugs. Fehlermeldungen von fehlgeschlagenen Werkzeugaufrufen sind wichtig: Der Agent muss wissen, dass ein Werkzeug fehlgeschlagen ist, damit er es erneut versuchen, eine Alternative versuchen oder den Benutzer um Klärung bitten kann.
 
-### Multi-Tool- und parallele Tool-Aufrufe
+### Multi-Werkzeug und parallele Werkzeugaufrufe
 
-Moderne LLM-APIs unterstützen parallele Tool-Aufrufe: Das Modell kann mehrere Tool-Invokationen in einer einzigen Antwort anfordern, wenn es feststellt, dass sie unabhängig sind. Beispielsweise könnte ein Agent `web_search` für drei verschiedene Abfragen gleichzeitig aufrufen anstatt sequenziell, was die Latenz um zwei Drittel reduziert. Der aufrufende Code führt alle Tools parallel aus, sammelt die Ergebnisse und speist sie zusammen in den nächsten Turn ein. Tools wo möglich zustandslos und idempotent zu gestalten, maximiert den Nutzen der parallelen Ausführung.
+Moderne LLM-APIs unterstützen parallele Werkzeugaufrufe: Das Modell kann mehrere Werkzeugaufrufungen in einer einzigen Antwort anfordern, wenn es feststellt, dass sie unabhängig sind. Zum Beispiel könnte ein Agent `web_search` für drei verschiedene Anfragen gleichzeitig aufrufen statt sequentiell und die Latenz um zwei Drittel reduzieren. Der aufrufende Code führt alle Werkzeuge parallel aus, sammelt die Ergebnisse und speist sie zusammen im nächsten Turn zurück. Das Entwerfen von Werkzeugen als zustandslos und idempotent, wo möglich, maximiert den Nutzen paralleler Ausführung.
 
 ```mermaid
 flowchart LR
@@ -49,20 +51,20 @@ flowchart LR
 | Verwenden wenn | Vermeiden wenn |
 |---|---|
 | Der Agent Echtzeit- oder externe Informationen benötigt, die nicht in den Trainingsdaten sind | Die Aufgabe vollständig aus dem Wissen des Modells beantwortet werden kann |
-| Aktionen mit Seiteneffekten erforderlich sind (E-Mail senden, Datei schreiben, DB aktualisieren) | Tools Sicherheitsrisiken ohne ordnungsgemäßes Sandboxing oder Rate-Limiting einführen |
-| Berechnungen über die Fähigkeiten des LLM hinaus benötigt werden (Arithmetik, Code-Ausführung) | Jeder Tool-Aufruf Latenz hinzufügt und die Aufgabe zeitkritisch ist |
-| Strukturierter Datenabruf (SQL-Abfragen, API-Antworten) wesentlich ist | Das Tool-Schema so komplex ist, dass das Modell es häufig missbraucht |
-| Mehrere spezialisierte Tools kombiniert werden können, um komplexe Aufgaben zu lösen | Die Fehlerszenarien des Tools nicht wiederherstellbar sind und Schaden verursachen könnten |
+| Aktionen mit Nebenwirkungen erforderlich sind (E-Mail senden, Datei schreiben, DB aktualisieren) | Werkzeuge Sicherheitsrisiken einführen ohne ordnungsgemäßes Sandboxing oder Rate-Limiting |
+| Berechnungen jenseits der LLM-Fähigkeiten benötigt werden (Arithmetik, Code-Ausführung) | Jeder Werkzeugaufruf Latenz hinzufügt und die Aufgabe zeitkritisch ist |
+| Strukturierter Datenabruf (SQL-Abfragen, API-Antworten) wesentlich ist | Das Werkzeug-Schema so komplex ist, dass das Modell es häufig falsch verwendet |
+| Mehrere spezialisierte Werkzeuge kombiniert werden können, um komplexe Aufgaben zu lösen | Die Fehlermodi des Werkzeugs nicht wiederherstellbar sind und Schaden verursachen könnten |
 
 ## Vor- und Nachteile
 
 | Vorteile | Nachteile |
 |---|---|
-| Erweitert den Agenten über statische Trainingsdaten hinaus | Jeder Tool-Aufruf fügt Latenz und API-Kosten hinzu |
-| Ermöglicht reale Seiteneffekte und Automatisierung | Tool-Missbrauch kann irreversible Aktionen verursachen |
+| Erweitert den Agenten über statische Trainingsdaten hinaus | Jeder Werkzeugaufruf fügt Latenz und API-Kosten hinzu |
+| Ermöglicht reale Nebenwirkungen und Automatisierung | Werkzeugmissbrauch kann irreversible Aktionen verursachen |
 | Unterstützt strukturierte, validierte I/O über JSON Schema | Das Entwerfen klarer Schemas erfordert sorgfältiges Prompt Engineering |
-| Parallele Tool-Aufrufe reduzieren die Gesamtantwortzeit | Mehr Tools erhöhen die kognitive Last auf das Modell für die Auswahl |
-| Vollständig erweiterbar – jede Python-Funktion kann ein Tool werden | Fehlerbehandlung und Wiederholungen müssen explizit implementiert werden |
+| Parallele Werkzeugaufrufe reduzieren die Gesamtantwortzeit | Mehr Werkzeuge erhöhen die kognitive Last für das Modell bei der Auswahl |
+| Vollständig erweiterbar — jede Python-Funktion kann ein Werkzeug werden | Fehlerbehandlung und Wiederholungen müssen explizit implementiert werden |
 
 ## Code-Beispiele
 
@@ -321,14 +323,14 @@ if __name__ == "__main__":
 
 ## Praktische Ressourcen
 
-- [OpenAI Function Calling Leitfaden](https://platform.openai.com/docs/guides/function-calling) — Offizielle Dokumentation zu Tool-Schemas, parallelen Aufrufen und Best Practices für Funktionsdefinitionen.
-- [Anthropic Tool Use Dokumentation](https://docs.anthropic.com/en/docs/tool-use) — Anthropics Leitfaden für Tool Use mit Claude, einschließlich Streaming, Computer Use und Multi-Tool-Muster.
-- [Tavily AI Search API](https://tavily.com/) — Zweckgebaute Such-API für LLM-Agenten, die saubere strukturierte Ergebnisse ideal für Tool Use liefert.
-- [LangChain Tools Konzepte](https://python.langchain.com/docs/concepts/tools/) — Überblick über Tool-Design-Muster in LangChain, einschließlich benutzerdefinierter Tools und eingebauter Integrationen.
-- [Gorilla: Large Language Model Connected with Massive APIs (Patil et al., 2023)](https://arxiv.org/abs/2305.15334) — Forschung zum Fine-Tuning von LLMs für genaue API-/Tool-Auswahl über Tausende von Tools hinweg.
+- [OpenAI Function Calling Guide](https://platform.openai.com/docs/guides/function-calling) — Offizielle Dokumentation zu Werkzeug-Schemas, parallelen Aufrufen und Best Practices für Funktionsdefinitionen.
+- [Anthropic Tool Use Documentation](https://docs.anthropic.com/en/docs/tool-use) — Anthropics Leitfaden zur Werkzeug-Nutzung mit Claude, einschließlich Streaming, Computer Use und Multi-Werkzeug-Muster.
+- [Tavily AI Search API](https://tavily.com/) — Zweckgebundene Such-API für LLM-Agenten, die saubere strukturierte Ergebnisse ideal für Werkzeug-Nutzung liefert.
+- [LangChain Tools Concepts](https://python.langchain.com/docs/concepts/tools/) — Überblick über Werkzeug-Design-Muster in LangChain, einschließlich benutzerdefinierter Werkzeuge und eingebauter Integrationen.
+- [Gorilla: Large Language Model Connected with Massive APIs (Patil et al., 2023)](https://arxiv.org/abs/2305.15334) — Forschung zum Fine-Tuning von LLMs für genaue API/Werkzeug-Auswahl über Tausende von Werkzeugen.
 
 ## Siehe auch
 
-- [KI-Agenten](/docs/agents)
-- [Anthropic Tool Use](/docs/agents/anthropic-tool-use)
-- [Überblick über Agent-Frameworks](/docs/agents/frameworks-overview)
+- [AI agents](/docs/agents)
+- [Anthropic tool use](/docs/agents/anthropic-tool-use)
+- [Agent frameworks overview](/docs/agents/frameworks-overview)

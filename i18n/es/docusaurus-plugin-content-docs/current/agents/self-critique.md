@@ -1,36 +1,38 @@
 ---
-title: "Autocrítica y reflexión"
-description: Agentes que evalúan sus propias salidas y mejoran iterativamente mediante reflexión, agentes críticos y el framework Reflexion.
-keywords: [autocrítica, reflexión, evaluación de agentes, agente crítico, Reflexion, Constitutional AI, refinamiento iterativo, autoevaluación LLM]
+title: "Self-critique and reflection"
+description: Agents that evaluate their own output and iteratively improve through reflection, critic agents, and the Reflexion framework.
+keywords: [self-critique, reflection, agent evaluation, critic agent, Reflexion, constitutional AI, iterative refinement, LLM self-evaluation]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Autocrítica y reflexión
 
 ## Definición
 
-La autocrítica y la reflexión es la capacidad de un agente de IA para evaluar la calidad de sus propias salidas y usar esa evaluación para mejorarlas iterativamente. En lugar de producir una sola respuesta y detenerse, un agente con autocrítica entra en un bucle de generar-evaluar-refinar: genera una respuesta inicial, la puntúa o critica según una rúbrica o conjunto de principios, y revisa la respuesta hasta que cumple un umbral de calidad o se alcanza un número máximo de iteraciones.
+Selbstkritik und Reflexion ist die Fähigkeit eines KI-Agenten, die Qualität seiner eigenen Ausgaben zu bewerten und diese Bewertung zu verwenden, um sie iterativ zu verbessern. Anstatt eine einzelne Antwort zu produzieren und zu stoppen, tritt ein selbstkritisierender Agent in eine Generieren-Evaluieren-Verfeinern-Schleife ein: Er generiert eine anfängliche Antwort, bewertet oder kritisiert sie anhand einer Rubrik oder eines Satzes von Prinzipien und überarbeitet die Antwort, bis sie einen Qualitätsschwellenwert erreicht oder eine maximale Iterationsanzahl erreicht wird.
 
-Esta capacidad está inspirada en cómo trabajan los expertos humanos: un escritor redacta un ensayo, lo relee con ojos críticos, identifica debilidades y revisa. Un programador escribe código, lo revisa en busca de errores y estilo, luego refactoriza. La autocrítica formaliza este proceso para los agentes LLM, permitiendo salidas que son sustancialmente mejores que una generación de un solo paso — a costa de llamadas de inferencia adicionales y latencia.
+Diese Fähigkeit ist inspiriert davon, wie menschliche Experten arbeiten: Ein Schriftsteller entwirft einen Aufsatz, liest ihn mit kritischen Augen, identifiziert Schwächen und überarbeitet. Ein Programmierer schreibt Code, überprüft ihn auf Fehler und Stil, dann refaktoriert. Selbstkritik formalisiert diesen Prozess für LLM-Agenten und ermöglicht Ausgaben, die erheblich besser sind als eine Single-Pass-Generierung – auf Kosten zusätzlicher Inferenzaufrufe und Latenz.
 
-Las técnicas abarcan un espectro de complejidad. La forma más simple es un único LLM al que se le pide que evalúe y reescriba su propia salida en un turno. Los enfoques más sofisticados utilizan un **agente crítico** dedicado (una llamada separada al LLM con un prompt de evaluación especializado), la crítica de conjunto (múltiples críticos con diferentes perspectivas), o **Constitutional AI** — un método desarrollado por Anthropic en el que un conjunto fijo de principios guía la crítica. El framework **Reflexion** extiende la autocrítica a los agentes de múltiples pasos, usando el aprendizaje por refuerzo verbal para acumular lecciones de intentos fallidos a través de episodios.
+Die Techniken umfassen ein Spektrum der Komplexität. Die einfachste Form ist ein einzelnes LLM, das aufgefordert wird, seine eigene Ausgabe in einem Zug zu bewerten und umzuschreiben. Ausgefeiltere Ansätze verwenden einen dedizierten **Kritiker-Agenten** (ein separater LLM-Aufruf mit einem spezialisierten Evaluierungsprompt), Ensemble-Kritik (mehrere Kritiker mit unterschiedlichen Perspektiven) oder **Constitutional AI** – eine von Anthropic entwickelte Methode, bei der ein fester Satz von Prinzipien die Kritik leitet. Das **Reflexion**-Framework erweitert Selbstkritik auf mehrstufige Agenten und verwendet verbales Reinforcement Learning, um Lektionen aus gescheiterten Versuchen über Episoden hinweg zu akkumulieren.
 
 ## Cómo funciona
 
 ### Fase de generación
 
-El agente produce un borrador inicial o respuesta en respuesta a una tarea. Esta generación del primer paso usa un prompt de sistema estándar y aún no involucra ninguna lógica de crítica. La calidad de la salida en esta etapa depende del modelo base y el prompt, pero se espera que sea imperfecta — el objetivo completo del bucle de crítica posterior es detectar y corregir esas imperfecciones. Mantener la generación y la crítica como pasos separados permite que cada uno sea prompting y monitoreado de forma independiente.
+Der Agent produziert einen anfänglichen Entwurf oder eine Antwort auf eine Aufgabe. Diese First-Pass-Generierung verwendet einen Standard-System-Prompt und umfasst noch keine Kritiklogik. Die Ausgabequalität in dieser Phase hängt vom Basismodell und Prompt ab, wird aber als unvollkommen erwartet – der gesamte Punkt der nachfolgenden Kritikschleife ist es, diese Unvollkommenheiten zu erkennen und zu korrigieren. Das Trennen von Generierung und Kritik als separate Schritte ermöglicht es, jeden unabhängig mit Prompts zu versehen und zu überwachen.
 
 ### Fase de evaluación
 
-Un crítico — ya sea el mismo LLM o uno separado — evalúa el borrador contra una rúbrica. La rúbrica puede ser una instrucción simple ("puntúa esta respuesta en precisión, completitud y claridad del 1 al 10 y explica cada puntuación"), un conjunto de principios constitucionales ("¿respeta esta respuesta la privacidad del usuario? ¿Es útil? ¿Es inofensiva?"), o una comparación basada en referencia ("compara este código con la salida esperada y lista todas las discrepancias"). El crítico produce tanto una puntuación como una explicación estructurada de las debilidades. Usar salida estructurada (JSON) para la crítica hace que sea más fácil analizar puntuaciones y enrutar decisiones programáticamente.
+Ein Kritiker – entweder dasselbe LLM oder ein separates – bewertet den Entwurf anhand einer Rubrik. Die Rubrik kann eine einfache Anweisung sein („Bewerten Sie diese Antwort auf Genauigkeit, Vollständigkeit und Klarheit von 1-10 und erläutern Sie jede Bewertung"), ein Satz konstitutioneller Prinzipien („Respektiert diese Antwort die Privatsphäre des Benutzers? Ist sie hilfreich? Ist sie harmlos?") oder ein referenzbasierter Vergleich („Vergleichen Sie diesen Code mit der erwarteten Ausgabe und listen Sie alle Abweichungen auf"). Der Kritiker gibt sowohl eine Bewertung als auch eine strukturierte Erklärung von Schwächen aus. Die Verwendung strukturierter Ausgaben (JSON) für die Kritik erleichtert das programmatische Parsen von Bewertungen und Routing-Entscheidungen.
 
 ### Fase de crítica y refinamiento
 
-La crítica se devuelve al agente como contexto adicional, y genera una salida revisada. El prompt de revisión pide explícitamente al agente que aborde cada debilidad identificada. En la práctica, dos o tres pasadas de revisión generalmente son suficientes; las iteraciones adicionales producen rendimientos decrecientes y pueden introducir nuevos errores por sobreedición. Un bucle bien diseñado incluye una condición de salida temprana: si la puntuación supera un umbral, la salida actual se acepta sin refinamiento adicional.
+Die Kritik wird als zusätzlicher Kontext an den Agenten zurückgefügt, und er generiert eine überarbeitete Ausgabe. Der Revisionsprompt bittet den Agenten explizit, jede identifizierte Schwäche zu beheben. In der Praxis sind zwei oder drei Revisionsdurchgänge normalerweise ausreichend; weitere Iterationen liefern abnehmende Erträge und können durch Überbearbeitung neue Fehler einführen. Eine gut gestaltete Schleife enthält eine Frühausstiegsbedingung: Wenn die Bewertung einen Schwellenwert überschreitet, wird die aktuelle Ausgabe ohne weitere Verfeinerung akzeptiert.
 
 ### Framework Reflexion
 
-Reflexion (Shinn et al., 2023) aplica la reflexión a nivel de episodio en lugar de a nivel de salida. Después de cada intento fallido en una tarea, el agente genera una "reflexión" verbal — un diagnóstico en lenguaje natural de qué salió mal y qué debería hacer diferente la próxima vez. Esta reflexión se almacena en la memoria del agente y se antepone al contexto del siguiente intento, implementando efectivamente el aprendizaje por refuerzo verbal sin ninguna actualización de gradiente. Reflexion es particularmente poderoso para tareas como desafíos de codificación y toma de decisiones secuencial donde la misma tarea puede intentarse múltiples veces.
+Reflexion (Shinn et al., 2023) wendet Reflexion auf Episode-Ebene statt auf Ausgabe-Ebene an. Nach jedem gescheiterten Versuch an einer Aufgabe generiert der Agent eine verbale „Reflexion" – eine natürlichsprachliche Diagnose, was schief gelaufen ist und was er beim nächsten Mal anders tun sollte. Diese Reflexion wird im Gedächtnis des Agenten gespeichert und dem Kontext des nächsten Versuchs vorangestellt, was effektiv verbales Reinforcement Learning ohne Gradientenaktualisierungen implementiert. Reflexion ist besonders leistungsstark für Aufgaben wie Coding-Challenges und sequentielle Entscheidungsfindung, bei denen dieselbe Aufgabe mehrmals versucht werden kann.
 
 ```mermaid
 flowchart TD
@@ -48,21 +50,21 @@ flowchart TD
 
 | Usar cuando | Evitar cuando |
 |---|---|
-| La calidad de la salida es crítica y un único paso es insuficiente | La latencia es la principal restricción y las llamadas de inferencia adicionales son inaceptables |
-| La tarea tiene una rúbrica de calidad clara y verificable (precisión, seguridad, estilo) | No hay forma confiable de evaluar la calidad de la salida automáticamente |
-| Se espera un refinamiento iterativo (escritura creativa, generación de código, informes) | La tarea está tan bien especificada que el primer paso ya está cerca de ser perfecto |
-| Los requisitos de seguridad o alineación demandan una revisión constitucional | El costo de las llamadas adicionales al LLM supera la mejora de calidad |
-| El agente necesita aprender de los fracasos a través de múltiples episodios (Reflexion) | La tarea no puede reintentarse (por ejemplo, efectos secundarios irreversibles como enviar correos electrónicos) |
+| Ausgabequalität kritisch ist und ein einzelner Durchgang nicht ausreicht | Latenz die primäre Einschränkung ist und zusätzliche Inferenzaufrufe inakzeptabel sind |
+| Die Aufgabe eine klare, verifizierbare Qualitätsrubrik hat (Genauigkeit, Sicherheit, Stil) | Es keine zuverlässige Möglichkeit gibt, Ausgabequalität automatisch zu bewerten |
+| Iterative Verfeinerung erwartet wird (kreatives Schreiben, Code-Generierung, Berichte) | Die Aufgabe so gut spezifiziert ist, dass der erste Durchgang bereits nahezu perfekt ist |
+| Sicherheits- oder Alignment-Anforderungen konstitutionelle Überprüfung verlangen | Die Kosten zusätzlicher LLM-Aufrufe die Qualitätsverbesserung überwiegen |
+| Der Agent aus Fehlern über mehrere Episoden lernen muss (Reflexion) | Die Aufgabe nicht wiederholt werden kann (z. B. irreversible Nebenwirkungen wie E-Mails senden) |
 
-## Pros y contras
+## Ventajas y desventajas
 
-| Pros | Contras |
+| Ventajas | Desventajas |
 |---|---|
-| Mejora sustancialmente la calidad de la salida para tareas complejas | Añade múltiples llamadas al LLM, aumentando el costo y la latencia |
-| Puede hacer cumplir principios de seguridad y alineación sin fine-tuning | Riesgo de "refinamiento adulador" donde el modelo está de acuerdo con su propia crítica |
-| Reflexion permite la mejora sin entrenamiento basado en gradientes | Se necesitan guardrails de máximas iteraciones para evitar bucles infinitos |
-| Modular — el crítico puede ser un modelo diferente y especializado | La calidad del crítico determina el techo de la mejora |
-| Funciona directamente con cualquier LLM, sin necesidad de entrenamiento | No es adecuado para acciones irreversibles (llamadas a herramientas) en medio del bucle |
+| Verbessert die Ausgabequalität bei komplexen Aufgaben erheblich | Fügt mehrere LLM-Aufrufe hinzu, was Kosten und Latenz erhöht |
+| Kann Sicherheits- und Alignment-Prinzipien ohne Fine-Tuning durchsetzen | Risiko von „sycophantischer Verfeinerung", wo das Modell seiner eigenen Kritik zustimmt |
+| Reflexion ermöglicht Verbesserung ohne gradientenbasiertes Training | Maximale Iterations-Guardrails sind erforderlich, um Endlosschleifen zu verhindern |
+| Modular — Kritiker kann ein anderes, spezialisiertes Modell sein | Kritikerqualität bestimmt die Obergrenze der Verbesserung |
+| Funktioniert sofort mit jedem LLM, kein Training erforderlich | Nicht geeignet für irreversible Aktionen (Werkzeugaufrufe) mitten in der Schleife |
 
 ## Ejemplos de código
 
@@ -250,13 +252,13 @@ if __name__ == "__main__":
 
 ## Recursos prácticos
 
-- [Reflexion: Language Agents with Verbal Reinforcement Learning (Shinn et al., 2023)](https://arxiv.org/abs/2303.11366) — Artículo fundamental que introduce el framework Reflexion para la autorreflexión a nivel de episodio.
-- [Constitutional AI: Harmlessness from AI Feedback (Anthropic, 2022)](https://arxiv.org/abs/2212.08073) — Artículo de Anthropic que describe cómo un conjunto fijo de principios puede guiar la crítica y la revisión sin etiquetado humano.
-- [Self-Refine: Iterative Refinement with Self-Feedback (Madaan et al., 2023)](https://arxiv.org/abs/2303.17651) — Artículo que muestra mejoras consistentes de calidad en todas las tareas usando retroalimentación iterativa sin entrenamiento adicional.
-- [LangGraph — Reflection Agent Tutorial](https://langchain-ai.github.io/langgraph/tutorials/reflection/reflection/) — Implementación práctica de un agente de reflexión usando LangGraph.
+- [Reflexion: Language Agents with Verbal Reinforcement Learning (Shinn et al., 2023)](https://arxiv.org/abs/2303.11366) — Grundlegendes Paper, das das Reflexion-Framework für episodische Selbstreflexion einführt.
+- [Constitutional AI: Harmlessness from AI Feedback (Anthropic, 2022)](https://arxiv.org/abs/2212.08073) — Anthropics Paper, das beschreibt, wie ein fester Satz von Prinzipien Kritik und Revision ohne menschliche Kennzeichnung leiten kann.
+- [Self-Refine: Iterative Refinement with Self-Feedback (Madaan et al., 2023)](https://arxiv.org/abs/2303.17651) — Paper, das konsistente Qualitätsverbesserungen über Aufgaben hinweg mit iterativem Selbst-Feedback ohne zusätzliches Training zeigt.
+- [LangGraph — Reflection Agent Tutorial](https://langchain-ai.github.io/langgraph/tutorials/reflection/reflection/) — Praktische Implementierung eines Reflexions-Agenten mit LangGraph.
 
 ## Ver también
 
-- [Agentes de IA](/docs/agents)
-- [Razonamiento chain-of-thought](/docs/reasoning-patterns/cot)
-- [Evaluación de agentes](/docs/agents/evaluation)
+- [AI agents](/docs/agents)
+- [Chain-of-thought reasoning](/docs/reasoning-patterns/cot)
+- [Agent evaluation](/docs/agents/evaluation)

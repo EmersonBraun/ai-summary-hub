@@ -1,18 +1,20 @@
 ---
-title: Agenten-Debugging und Beobachtbarkeit
-description: Techniken und Tools zum Tracing, Logging und zur Diagnose von Fehlern in KI-Agentensystemen.
-keywords: [Agenten-Debugging, Beobachtbarkeit, verteiltes Tracing, LangSmith, Phoenix, Weights & Biases, OpenTelemetry, strukturiertes Logging]
+title: Agent debugging and observability
+description: Techniques and tools for tracing, logging, and diagnosing failures in AI agent systems.
+keywords: [agent debugging, observability, distributed tracing, LangSmith, Phoenix, Weights & Biases, OpenTelemetry, structured logging]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Agenten-Debugging und Beobachtbarkeit
 
 ## Definition
 
-Agenten-Debugging und Beobachtbarkeit ist die Disziplin, KI-Agentensysteme so transparent zu machen, dass Fehler, Regressionen und Ineffizienzen identifiziert, diagnostiziert und behoben werden können. Anders als herkömmliches Software-Debugging – bei dem ein Stack-Trace auf eine exakte Zeile zeigt – sind Agentenfehler oft emergent: Ein korrekter LLM-Aufruf produziert plausible, aber falsche Ausgabe, die sich durch nachfolgende Tool-Aufrufe fortpflanzt, den Agentenzustand korrumpiert und eine falsche Endantwort liefert, ohne dass eine Exception ausgelöst wird. Beobachtbarkeit liefert die Daten, die benötigt werden, um nachzuvollziehen, was passiert ist.
+Agenten-Debugging und Beobachtbarkeit ist die Disziplin, KI-Agentensysteme so transparent zu machen, dass Fehler, Regressionen und Ineffizienzen identifiziert, diagnostiziert und behoben werden können. Anders als beim traditionellen Software-Debugging – wo ein Stack-Trace auf eine genaue Zeile zeigt – sind Agentenfehler oft emergent: Ein korrekter LLM-Aufruf produziert plausible, aber falsche Ausgaben, die sich durch nachfolgende Werkzeugaufrufe kaskadieren, den Agentenzustand korrumpieren und eine falsche Endantwort erzeugen, ohne dass eine Ausnahme ausgelöst wird. Beobachtbarkeit liefert die Daten, die nötig sind, um zu rekonstruieren, was geschehen ist.
 
-Die drei Säulen der Beobachtbarkeit – Logs, Metriken und Traces – gelten für Agenten wie für verteilte Systeme, aber mit wichtigen Anpassungen. Logs müssen nicht nur Fehler, sondern auch den semantischen Inhalt von LLM-Ein- und -Ausgaben erfassen. Metriken müssen Token-Counts, Latenz pro Span und Tool-Aufruf-Häufigkeiten neben den üblichen Systemmetriken beinhalten. Traces müssen die hierarchische Struktur eines Agenten-Laufs modellieren: ein Root-Span für die Gesamtaufgabe, Child-Spans für jeden LLM-Aufruf, Grandchild-Spans für jede Tool-Invokation und so weiter. Zusammen geben diese einen vollständigen, wiederabspielbarern Datensatz jeder Agentenausführung.
+Die drei Säulen der Beobachtbarkeit – Logs, Metriken und Traces – gelten für Agenten wie für verteilte Systeme, aber mit wichtigen Anpassungen. Logs müssen nicht nur Fehler, sondern auch den semantischen Inhalt von LLM-Eingaben und -Ausgaben erfassen. Metriken müssen Token-Zählungen, Latenz pro Span und Werkzeugaufruf-Häufigkeiten neben den üblichen Systemmetriken einschließen. Traces müssen die hierarchische Struktur eines Agenten-Laufs modellieren: ein Root-Span für die Gesamtaufgabe, Child-Spans für jeden LLM-Aufruf, Grandchild-Spans für jede Werkzeugaufruf und so weiter. Zusammen ergeben diese ein vollständiges, reproduzierbares Protokoll jeder Agenten-Ausführung.
 
-Ohne gute Beobachtbarkeit wird Debugging zur Raterei: Man startet den Agenten neu, erhält vielleicht aufgrund von Nicht-Determinismus ein anderes Ergebnis und kann nicht sicher sein, ob die Lösung die Ursache behoben hat. Mit Beobachtbarkeit kann man den genauen LLM-Aufruf identifizieren, bei dem das Reasoning falsch lief, feststellen, welches Tool unerwartete Daten zurückgegeben hat, den Latenz-Beitrag jedes Schritts messen und zwei Läufe nebeneinander vergleichen, um zu verstehen, was sich geändert hat.
+Ohne gute Beobachtbarkeit wird Debugging zum Raten: Sie führen den Agenten erneut aus, erhalten möglicherweise aufgrund von Nicht-Determinismus ein anderes Ergebnis und können nicht sicher sein, ob Ihre Lösung die Grundursache behebt. Mit ihr können Sie den genauen LLM-Aufruf identifizieren, bei dem die Überlegung falsch lief, feststellen, welches Werkzeug unerwartete Daten zurückgegeben hat, den Latenzanteil jedes Schritts messen und zwei Läufe nebeneinander vergleichen, um zu verstehen, was sich geändert hat.
 
 ## Funktionsweise
 
@@ -30,43 +32,43 @@ flowchart LR
 
 ### Strukturiertes Logging
 
-Strukturiertes Logging bedeutet, maschinenlesbare JSON-Logs anstatt freiem Text auszugeben. Für Agenten sollte jeder Log-Eintrag enthalten: Run-ID, Schritt-Nummer, Span-Typ (llm/tool/memory), Eingabe-Payload, Ausgabe-Payload, Zeitstempel, Token-Counts und alle Fehler. Strukturierte Logs ermöglichen es, Ereignisse über einen verteilten Lauf hinweg zu filtern, zu aggregieren und zu korrelieren, ohne manuellem String-Parsing. Bibliotheken wie Pythons `structlog` oder `loguru` machen dies unkompliziert.
+Strukturiertes Logging bedeutet, maschinenlesbare JSON-Logs anstelle von Freitextzeichenfolgen auszugeben. Bei Agenten sollte jeder Log-Eintrag Folgendes enthalten: Lauf-ID, Schrittnummer, Span-Typ (llm/tool/memory), Eingabe-Payload, Ausgabe-Payload, Zeitstempel, Token-Zählungen und etwaige Fehler. Strukturierte Logs ermöglichen es, Ereignisse über einen verteilten Lauf hinweg zu filtern, zu aggregieren und zu korrelieren, ohne manuelles String-Parsing. Bibliotheken wie Pythons `structlog` oder `loguru` machen dies unkompliziert.
 
 ### Verteiltes Tracing und Spans
 
-Ein Trace ist ein gerichteter azyklischer Graph von Spans, der eine einzelne Agentenausführung repräsentiert. Der Root-Span deckt den gesamten Lauf ab; Child-Spans decken LLM-Aufrufe, Tool-Invokationen und Gedächtnisabfragen ab. Jeder Span trägt eine Trace-ID (geteilt über den Lauf) und eine Span-ID (einzigartig pro Span), was eine vollständige Rekonstruktion ermöglicht. OpenTelemetry (OTel) ist der offene Standard zum Ausgeben von Traces; es hat Exporter für Jaeger, Zipkin, Phoenix und LangSmith. Die Instrumentierung eines Agenten mit OTel-Spans erfordert das Einwickeln von LLM-Aufrufen und Tool-Aufrufen mit Span-Kontext-Managern.
+Ein Trace ist ein gerichteter azyklischer Graph von Spans, der eine einzelne Agenten-Ausführung repräsentiert. Der Root-Span deckt den gesamten Lauf ab; Child-Spans decken LLM-Aufrufe, Werkzeugaufrufungen und Speicherabfragen ab. Jeder Span trägt eine Trace-ID (über den gesamten Lauf geteilt) und eine Span-ID (eindeutig pro Span), was eine vollständige Rekonstruktion ermöglicht. OpenTelemetry (OTel) ist der offene Standard für die Ausgabe von Traces; es hat Exporteure für Jaeger, Zipkin, Phoenix und LangSmith. Die Instrumentierung eines Agenten mit OTel-Spans erfordert das Umhüllen von LLM-Aufrufen und Werkzeugaufrufen mit Span-Kontextmanagern.
 
 ### Trace-Visualisierung
 
-Trace-Viewer rendern den Span-Baum visuell und zeigen die Zeitleiste, Dauer, Eingaben, Ausgaben und Fehler für jeden Span. LangSmith bietet einen zweckgebauten Trace-Viewer für LangChain-Agenten mit Token-Level-Detail. Phoenix (Arize) ist eine Open-Source-Alternative, die jede OpenTelemetry-kompatible Quelle unterstützt. Weights & Biases Traces integriert sich mit W&B-Läufen für Teams, die es bereits für Experiment-Tracking nutzen. Gute Trace-Viewer erlauben es, zwei Läufe nebeneinander zu vergleichen, Spans nach Typ zu filtern und in die exakte token-level Ein-/Ausgabe einzutauchen, die einen Fehler verursacht hat.
+Trace-Viewer rendern den Span-Baum visuell und zeigen die Zeitleiste, Dauer, Eingaben, Ausgaben und Fehler für jeden Span. LangSmith bietet einen zweckgebundenen Trace-Viewer für LangChain-Agenten mit Token-Level-Details. Phoenix (Arize) ist eine Open-Source-Alternative, die jede OpenTelemetry-kompatible Quelle unterstützt. Weights & Biases Traces integriert sich in W&B-Läufe für Teams, die es bereits für Experiment-Tracking verwenden. Gute Trace-Viewer ermöglichen es Ihnen, zwei Läufe nebeneinander zu vergleichen, Spans nach Typ zu filtern und in die genaue Token-Level-Eingabe/Ausgabe zu bohren, die einen Fehler verursacht hat.
 
 ### Ursachenanalyse
 
-Mit vorliegenden Traces folgt die Ursachenanalyse einem systematischen Prozess: Den ersten Span finden, bei dem die Ausgabe von der Erwartung abwich, seine Eingaben inspizieren (waren sie korrekt?) und bestimmen, ob der Fehler im LLM-Reasoning, einem Tool, das schlechte Daten zurückgab, oder einem Gedächtnis-/Kontextproblem lag. Nicht-Determinismus macht dies schwieriger – dasselbe Input zweimal zu starten kann unterschiedliche Ergebnisse produzieren – daher ist es wesentlich, Traces für jeden Lauf (nicht nur Fehler) zu erfassen und mit einem bekannt guten Trace zu vergleichen. Das Markieren von Traces mit Metadaten (User-ID, Aufgabentyp, Prompt-Version) ermöglicht Kohorten-Analyse, um Muster über viele Läufe hinweg zu erkennen.
+Mit Traces in der Hand folgt die Ursachenanalyse einem systematischen Prozess: Finden Sie den ersten Span, bei dem die Ausgabe von der Erwartung abwich, inspizieren Sie seine Eingaben (waren sie korrekt?) und bestimmen Sie, ob der Fehler in der LLM-Überlegung lag, ein Werkzeug schlechte Daten zurückgegeben hat oder ein Speicher-/Kontextproblem vorlag. Nicht-Determinismus erschwert dies – das Ausführen derselben Eingabe zweimal kann unterschiedliche Ergebnisse erzeugen – daher ist das Erfassen von Traces für jeden Lauf (nicht nur für Fehler) und der Vergleich mit einem bekannt-guten Trace unerlässlich. Das Markieren von Traces mit Metadaten (Benutzer-ID, Aufgabentyp, Prompt-Version) ermöglicht eine Kohorten-Analyse, um Muster über viele Läufe hinweg zu erkennen.
 
 ### Häufige Debugging-Herausforderungen
 
-Nicht-Determinismus bedeutet, dass derselbe Bug beim nächsten Lauf möglicherweise nicht reproduzierbar ist, was statistische Analyse über viele Traces hinweg erfordert. Mehrstufige Fehler häufen sich: Ein Fehler in Schritt 2 tritt möglicherweise erst in Schritt 7 auf, weshalb man die Fehlerausbreitung rückwärts verfolgen muss. Tool-Fehler – Netzwerk-Timeouts, fehlerhafte API-Antworten, Berechtigungsfehler – sind oft still (der Agent erhält einen Fehler-String als Tool-Ergebnis und macht weiter). Prompt Injection und Kontextfenster-Limits können plötzliche Verhaltensänderungen verursachen, die ohne Trace-Kontext zufällig erscheinen.
+Nicht-Determinismus bedeutet, dass derselbe Fehler beim nächsten Lauf möglicherweise nicht reproduzierbar ist, was eine statistische Analyse über viele Traces hinweg erfordert. Mehrstufige Fehler kumulieren: Ein Fehler in Schritt 2 taucht möglicherweise erst in Schritt 7 auf, sodass Sie die Fehlerausbreitung rückwärts verfolgen müssen. Werkzeugfehler – Netzwerk-Timeouts, fehlerhafte API-Antworten, Berechtigungsfehler – sind oft still (der Agent erhält eine Fehlerzeichenfolge als Werkzeug-Ergebnis und setzt fort). Prompt-Injection und Kontextfenster-Grenzen können plötzliche Verhaltensänderungen verursachen, die ohne Trace-Kontext zufällig erscheinen.
 
 ## Wann verwenden / Wann NICHT verwenden
 
 | Verwenden wenn | Vermeiden wenn |
 |---|---|
-| Ein spezifischer Agentenfehler in Produktion diagnostiziert wird | Beobachtbarkeit als nachträglichen Gedanken nach dem Deployment behandelt wird |
-| Zwei Prompt-Versionen verglichen werden, um Verhaltensunterschiede zu verstehen | Jedes Token in einer Niedrig-Latenz-Hochvolumen-Pipeline ohne Sampling überprotokolliert wird |
-| Identifiziert werden soll, welcher Tool-Aufruf der Latenz-Flaschenhals ist | Nur auf die endgültige Antwort vertraut wird, um zu beurteilen, ob ein Lauf erfolgreich war |
-| Eine Regressions-Suite aufgebaut wird, die Trace-Level-Assertionen erfordert | Rohe PII ohne Schwärzung in Multi-Tenant-Systemen protokolliert wird |
-| Tool-Aufruf-Häufigkeiten und Argumentverteilungen überprüft werden | Print-Statements anstatt strukturierter, korrelierter Traces verwendet werden |
+| Einen spezifischen Agentenfehler in der Produktion diagnostizieren | Beobachtbarkeit als nachträglichen Gedanken nach der Bereitstellung behandeln |
+| Zwei Prompt-Versionen vergleichen, um Verhaltensunterschiede zu verstehen | Jeden Token in einer latenzarmen, hochvolumigen Pipeline ohne Sampling übermäßig protokollieren |
+| Identifizieren, welcher Werkzeugaufruf der Engpass für die Latenz ist | Sich nur auf die endgültige Antwort verlassen, um zu beurteilen, ob ein Lauf erfolgreich war |
+| Eine Regressionssuite erstellen, die Trace-Level-Assertionen erfordert | Rohe PII ohne Redaktion in mandantenfähigen Systemen protokollieren |
+| Werkzeugaufruf-Häufigkeiten und Argumentverteilungen prüfen | Print-Anweisungen statt strukturierter, korrelierter Traces verwenden |
 
 ## Vor- und Nachteile
 
 | Vorteile | Nachteile |
 |---|---|
-| Ermöglicht präzise Ursachenanalyse bei mehrstufigen Fehlern | Instrumentierung fügt Code-Komplexität und geringen Latenz-Overhead hinzu |
-| Bietet einen vollständigen Prüfpfad für Compliance und Debugging | Die Speicherung vollständiger LLM-I/O-Traces erzeugt erhebliches Datenvolumen |
+| Ermöglicht präzise Ursachenanalyse für mehrstufige Fehler | Instrumentierung fügt Code-Komplexität und geringe Latenz-Overhead hinzu |
+| Bietet einen vollständigen Prüfpfad für Compliance und Debugging | Das Speichern vollständiger LLM-I/O-Traces erzeugt erhebliches Datenvolumen |
 | Macht nicht-deterministisches Verhalten durch Lauf-Vergleich handhabbar | Trace-Viewer haben eine Lernkurve für neue Teammitglieder |
-| Integriert sich mit vorhandenen MLOps- und Monitoring-Stacks | Sampling-Strategien müssen abgestimmt werden, um Abdeckung vs. Kosten zu balancieren |
-| Strukturierte Logs ermöglichen automatische Anomalie-Erkennung | Sensible Benutzerdaten in Traces erfordern sorgfältige Zugangskontrolle |
+| Integriert sich in bestehende MLOps- und Monitoring-Stacks | Sampling-Strategien müssen ausbalanciert werden zwischen Abdeckung und Kosten |
+| Strukturierte Logs ermöglichen automatisierte Anomalieerkennung | Sensible Benutzerdaten in Traces erfordern sorgfältige Zugangskontrolle |
 
 ## Code-Beispiele
 
@@ -195,14 +197,14 @@ if __name__ == "__main__":
 
 ## Praktische Ressourcen
 
-- [LangSmith Dokumentation](https://docs.smith.langchain.com/) — Vollständige Tracing-, Dataset-Management- und Evaluationsplattform für LangChain-basierte Agenten mit einem zweckgebauten Trace-Viewer.
-- [Phoenix by Arize Dokumentation](https://docs.arize.com/phoenix) — Open-Source-LLM-Beobachtbarkeitsplattform mit Unterstützung für OpenTelemetry-Traces; funktioniert mit jedem Agent-Framework.
-- [OpenTelemetry Python Dokumentation](https://opentelemetry-python.readthedocs.io/) — Offizielle Docs zur Instrumentierung von Python-Anwendungen mit verteiltem Tracing, Metriken und Logs.
-- [Weights & Biases Weave](https://wandb.github.io/weave/) — W&Bs Tracing- und Evaluations-Tool für LLM-Apps, integriert mit W&B Experiment-Tracking.
-- [OpenInference Instrumentierung](https://github.com/Arize-ai/openinference) — Open-Source-OTel-basierte Instrumentierungsbibliotheken für LLMs, Agenten und Vektorspeicher (verwendet von Phoenix).
+- [LangSmith documentation](https://docs.smith.langchain.com/) — Vollständige Tracing-, Datensatz-Management- und Evaluierungsplattform für LangChain-basierte Agenten, mit einem zweckgebundenen Trace-Viewer.
+- [Phoenix by Arize documentation](https://docs.arize.com/phoenix) — Open-Source LLM-Beobachtbarkeitsplattform, die OpenTelemetry-Traces unterstützt; funktioniert mit jedem Agenten-Framework.
+- [OpenTelemetry Python documentation](https://opentelemetry-python.readthedocs.io/) — Offizielle Docs für die Instrumentierung von Python-Anwendungen mit verteiltem Tracing, Metriken und Logs.
+- [Weights & Biases Weave](https://wandb.github.io/weave/) — W&Bs Tracing- und Evaluierungswerkzeug für LLM-Apps, integriert mit W&B Experiment-Tracking.
+- [OpenInference instrumentation](https://github.com/Arize-ai/openinference) — Open-Source OTel-basierte Instrumentierungsbibliotheken für LLMs, Agenten und Vektorspeicher (verwendet von Phoenix).
 
 ## Siehe auch
 
-- [Agenten-Evaluation und -Testing](/docs/agents/evaluation)
-- [Agenten](/docs/agents)
-- [MLOps-Monitoring](/docs/mlops/monitoring)
+- [Agent evaluation and testing](/docs/agents/evaluation)
+- [Agents](/docs/agents)
+- [MLOps monitoring](/docs/mlops/monitoring)

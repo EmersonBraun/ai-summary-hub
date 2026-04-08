@@ -1,37 +1,74 @@
 ---
 title: Kiro
 description: IDE de IA com desenvolvimento orientado por especificações e hooks de agentes do protótipo à produção.
-keywords: [Kiro, spec-driven, AI IDE, agent hooks]
+keywords: [Kiro, IDE de IA, desenvolvimento orientado a especificações, hooks de agentes]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Kiro
 
 ## Definição
 
-Kiro é uma **IDE impulsionada por IA** que aplica [desenvolvimento orientado por especificações](/docs/spec-driven-development): ele converte prompts em requisitos estruturados, projetos de sistema e tarefas de implementação mantendong the developer in control. **Agent hooks** run autonomous [agents](/docs/agents) on events (por ex. file save) for documentation, tests, or optimization; **Autopilot** allows larger tasks to run with oversight.
+Kiro é uma IDE de IA desenvolvida pela AWS que introduz **desenvolvimento orientado por especificações**: antes de escrever código, você colabora com um agente de IA para produzir requisitos, histórias de usuário e design técnico. Uma vez aprovadas as especificações, o agente as implementa, mantendo a base de código em sincronia com as intenções documentadas durante toda a vida do projeto.
 
-It integrates multimodal chat, code diff views, and [MCP](https://modelcontextprotocol.io/) for docs, databases, and APIs. Built on VS Code–compatible foundations (Open VSX, themes, settings). Useful for [spec-driven development](/docs/spec-driven-development), [agent](/docs/agents) workflows, and going from prototype to production with clear structure.
+Kiro também apresenta **hooks de agentes** — gatilhos automáticos que executam tarefas de IA em resposta a eventos de desenvolvimento (arquivo salvo, PR aberto, testes executados). Por exemplo, um hook pode gerar automaticamente testes unitários sempre que um novo arquivo de função for criado, ou atualizar documentação quando uma API mudar. Essa abordagem mira o gap entre prototipagem rápida com IA e código de qualidade de produção: especificações capturam o porquê e o quê, enquanto hooks aplicam garantias contínuas de qualidade.
 
-## Como funciona
+## Funcionamento
 
-Você descreve objetivos em **prompts**; Kiro ajuda a produzir **requisitos**, **projetos** e **tarefas** de forma estruturada. **Hooks de agente** são acionados por eventos (por ex. salvar, commit) para executar tarefas comoe generating docs or tests. **Chat** and **diff views** support review and editing with optional image-based guidance. **Autopilot** runs multi-step work with checkpoints. **Steering files** configure agent behavior and project standards. **Kiro CLI** brings the same agents and flows to the terminal. MCP connects to external data and tools.
+```mermaid
+flowchart LR
+  Idea["Ideia do usuário"] -->|"colaboração em chat"| Spec["Especificações\n(requisitos + histórias + design)"]
+  Spec -->|"aprovado"| Agent["Agente Kiro"]
+  Agent -->|"implementa"| Code["Base de código"]
+  Code -->|"evento: salvar / PR / teste"| Hooks["Hooks de agentes"]
+  Hooks -->|"testes / docs / revisão"| Code
+```
 
-## Casos de uso
+### Fluxo de especificações
 
-Kiro fits teams that want spec-driven, agent-augmented development with control and visibility.
+Em vez de iniciar com um prompt vazio, o Kiro guia você por um processo estruturado: definir o problema, elaborar casos de uso, escolher abordagens técnicas. A especificação resultante age como uma fonte de verdade que o agente referencia ao implementar ou refatorar.
 
-- Turning prompts into requirements and implementation tasks
-- Event-driven agents (docs, tests, optimization) on save or commit
-- Prototype-to-production workflows with structure and steering
+### Hooks de agentes
 
-## Documentação externa
+Hooks são regras disparadas por eventos definidas em um arquivo de configuração. Eles executam tarefas de IA em segundo plano: revisar alterações para problemas de segurança, gerar docstrings, verificar conformidade com padrões de arquitetura. Os hooks tornam o processo de desenvolvimento ativo em vez de passivo.
 
-- [Kiro – AI IDE](https://kiro.dev/) — Product and overview
-- [Kiro – Docs and chat](https://kiro.dev/docs/chat) — Documentation
+## Quando usar / Quando NÃO usar
+
+| Cenário | Usar Kiro | NÃO usar Kiro |
+|---------|----------|--------------|
+| Construir um recurso complexo que precisa de documentação de design | Sim — o fluxo de especificações captura decisões antes do código | |
+| Projetos de equipe onde a intenção precisa ser rastreável | Sim — as especificações atuam como documentação viva | |
+| Aplicando padrões de qualidade de forma consistente em uma base de código grande | Sim — hooks automatizam verificações de qualidade | |
+| Pequenos scripts de uso único | | O fluxo de especificações adiciona overhead desnecessário |
+| Quando você precisa de completação inline mínima e rápida | | Prefira Cursor ou Copilot para inserção de código direta |
+
+## Comparações
+
+| Funcionalidade | Kiro | Cursor | Claude Code |
+|---------|------|--------|-------------|
+| Fluxo de especificações primeiro | Sim | Não | Não |
+| Hooks de agentes orientados a eventos | Sim | Não | Parcial (via MCP) |
+| Completação inline | Sim | Sim | Não |
+| Modo agente autônomo | Sim | Sim (Composer) | Sim |
+| Melhor para | Design orientado a especificações | Desenvolvimento diário | Tarefas multi-arquivo |
+
+## Vantagens e desvantagens
+
+| Vantagens | Desvantagens |
+|---------|------------|
+| As especificações reduzem a deriva de implementação | Fluxo de trabalho mais lento para tarefas rápidas e únicas |
+| Hooks aplicam padrões de qualidade automaticamente | Ainda em acesso antecipado — funcionalidades podem mudar |
+| Ponte entre prototipagem rápida e qualidade de produção | Menor ecossistema do que VS Code / JetBrains |
+| Desenvolvido pela AWS com integração cloud-native | Dependência de fornecedor em serviços AWS |
+
+## Recursos práticos
+
+- [Site oficial do Kiro](https://kiro.dev/) — Listas de espera para acesso antecipado, documentação e exemplos
 
 ## Veja também
 
-- [Spec-driven development](/docs/spec-driven-development)
-- [Agents](/docs/agents)
+- [Claude Code](/docs/tools/claude-code)
 - [Cursor](/docs/tools/cursor)
-- [LLMs](/docs/llms)
+- [GitHub Copilot](/docs/tools/github-copilot)
+- [Antigravity](/docs/tools/antigravity)

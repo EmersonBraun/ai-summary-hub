@@ -1,18 +1,20 @@
 ---
 title: Debiasing-Techniken
-description: Debiasing-Techniken sind Prompt-level- und Evaluierungsstrategien zur Identifizierung und Reduzierung systematischer Verzerrungen in LLM-Ausgaben — sie behandeln soziale Verzerrungen, Sycophancy, Positionseffekte und Evaluierungsverzerrungen, um fairere und zuverlässigere Antworten zu erzeugen.
+description: Debiasing-Techniken sind Prompt-Level- und Evaluierungsstrategien zur Identifizierung und Reduzierung systematischer Verzerrungen in LLM-Ausgaben — sie behandeln soziale Verzerrungen, Sycophancy, Positionseffekte und Evaluierungsverzerrungen, um fairere und zuverlässigere Antworten zu erzeugen.
 keywords: [Debiasing, LLM-Bias, Prompt Engineering, Fairness, Sycophancy, Positionsverzerrung, soziale Verzerrung, Kalibrierung, Bias-Benchmarks, KI-Ethik, Stereotyp, kontrafaktisches Prompting]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Debiasing-Techniken
 
 ## Definition
 
-Bias in LLM-Ausgaben ist jede systematische Tendenz, Antworten zu erzeugen, die verzerrt, ungerecht oder auf eine Weise verdreht sind, die kein neutrales, genaues oder gerechtes Denken widerspiegelt. Es ist eine Eigenschaft von Ausgaben, nicht nur von Trainingsdaten: Selbst ein Modell, das auf ausgewogenen Daten trainiert wurde, kann aufgrund seiner Aufmerksamkeitsmechanismen, RLHF-Reward-Modellierung oder der statistischen Regelmäßigkeiten in der Art und Weise, wie Sprache soziale Beziehungen kodiert, Bias aufweisen. Für Praktiker, die Produktionssysteme entwickeln, ist Bias sowohl ein ethisches Anliegen — Ausgaben können Stereotypen verstärken, Gruppen ausschließen oder unfaire Entscheidungen treffen — als auch ein Zuverlässigkeitsproblem — ein verzerrtes Modell gibt inkonsistente Antworten abhängig von irrelevanten Oberflächenmerkmalen der Eingabe.
+Bias in LLM-Ausgaben ist jede systematische Tendenz, Antworten zu produzieren, die verzerrt, unfair oder auf eine Weise verfälscht sind, die kein neutrales, akkurates oder gerechtes Schlussfolgern widerspiegelt. Es ist eine Eigenschaft der Ausgaben, nicht nur der Trainingsdaten: Selbst ein auf ausgewogenen Daten trainiertes Modell kann Bias aufweisen, aufgrund seiner Aufmerksamkeitsmechanismen, RLHF-Belohnungsmodellierung oder der statistischen Regelmäßigkeiten, wie Sprache soziale Beziehungen kodiert. Für Praktiker, die Produktionssysteme entwickeln, ist Bias sowohl ein ethisches Anliegen — Ausgaben können Stereotypen verstärken, Gruppen ausschließen oder unfaire Entscheidungen produzieren — als auch ein Zuverlässigkeitsproblem — ein voreingenommenes Modell gibt inkonsistente Antworten je nach irrelevanten Oberflächenmerkmalen der Eingabe.
 
-Es gibt mehrere verschiedene Kategorien von Bias, die unterschiedliche Minderungsstrategien erfordern. **Soziale und demografische Verzerrungen** sind die Tendenz, Gruppen (definiert durch Geschlecht, Rasse, Nationalität, Religion, Alter usw.) mit bestimmten Attributen, Kompetenzen oder Rollen zu assoziieren. **Sycophancy** ist die Tendenz, der geäußerten oder implizierten Position des Benutzers unabhängig von der Korrektheit zuzustimmen, eine durch RLHF-Training eingeführte Verzerrung, bei der menschliche Bewerter zustimmende Antworten bevorzugten. **Positionsverzerrung** betrifft als Richter eingesetzte LLMs: Sie neigen dazu, die erste oder letzte Option positiver zu bewerten als Optionen in der Mitte, unabhängig von der Inhaltsqualität. **Verbositätsverzerrung** führt dazu, dass LLM-Richter längere, ausführlicher formulierte Antworten gegenüber kürzeren richtigen bevorzugen. **Bestätigungsverzerrung bei der Generierung** tritt auf, wenn das Modell Argumente erzeugt, die eine zuerst gewonnene Schlussfolgerung unterstützen, und gegenteilige Beweise ignoriert. Das Verständnis, welche Verzerrung in Ihrem spezifischen Anwendungsfall vorhanden ist, bestimmt, welche Debiasing-Technik am besten anwendbar ist.
+Es gibt mehrere unterschiedliche Kategorien von Bias, die verschiedene Minderungsstrategien erfordern. **Sozialer und demografischer Bias** ist die Tendenz, Gruppen (definiert durch Geschlecht, Rasse, Nationalität, Religion, Alter usw.) mit bestimmten Attributen, Kompetenzen oder Rollen zu assoziieren. **Sycophancy** ist die Tendenz, der erklärten oder impliziten Position des Benutzers unabhängig von der Korrektheit zuzustimmen — ein Bias, der durch RLHF-Training eingeführt wird, bei dem menschliche Bewerter zustimmende Antworten bevorzugten. **Positionsbias** betrifft LLMs, die als Richter verwendet werden: Sie neigen dazu, die erste oder letzte Option gegenüber Optionen in der Mitte zu bevorzugen, unabhängig von der Inhaltsqualität. **Ausführlichkeitsbias** veranlasst LLM-Richter, längere, ausführlicher formulierte Antworten gegenüber kürzeren richtigen zu bevorzugen. **Bestätigungsbias bei der Generierung** tritt auf, wenn das Modell Schlussfolgerungen generiert, die eine zuerst erreichte Schlussfolgerung unterstützen, und entgegenstehende Belege verwirft. Das Verständnis, welcher Bias in Ihrem spezifischen Anwendungsfall vorhanden ist, bestimmt, welche Debiasing-Technik am besten geeignet ist.
 
-Debiasing auf Prompt-Ebene ist eine von mehreren verfügbaren Interventionen. Alternativen umfassen Post-Training-Alignment (RLHF, Constitutional AI), Datenausgewogenheit, Representation Engineering und Output-Filterung. Prompt-level-Techniken sind wertvoll, weil sie kein Modell-Retraining erfordern, transparent und überprüfbar sind und selektiv auf bestimmte Aufgaben oder Benutzergruppen angewendet werden können. Sie sind jedoch kein Ersatz für Alignment-Arbeit — ein stark verzerrtes Modell kann Prompt-level-Debiasing bei bestimmten Themen widerstehen, und Prompt-Anweisungen können durch adversarielle Eingaben untergraben werden. Das realistische Ziel des Prompt-level-Debiasings ist es, die häufigsten, systematischen Verzerrungen auf ein für die Zielanwendung akzeptables Niveau zu reduzieren, nicht Bias vollständig zu eliminieren.
+Debiasing auf Prompt-Ebene ist eine von mehreren verfügbaren Interventionen. Alternativen umfassen Post-Training-Alignment (RLHF, Constitutional AI), Datenausgleich, Repräsentationstechnik und Ausgabe-Filterung. Prompt-Level-Techniken sind wertvoll, weil sie kein Modell-Retraining erfordern, transparent und prüfbar sind und selektiv auf spezifische Aufgaben oder Benutzerpopulationen angewendet werden können. Sie sind jedoch kein Ersatz für Alignment-Arbeit — ein stark voreingenommenes Modell kann Prompt-Level-Debiasing bei bestimmten Themen widerstehen, und Prompt-Anweisungen können durch adversarielle Eingaben untergraben werden. Das realistische Ziel des Prompt-Level-Debiasings ist es, die häufigsten, systematischen Biases auf ein für die Zielanwendung akzeptables Niveau zu reduzieren, nicht Bias vollständig zu eliminieren.
 
 ## Funktionsweise
 
@@ -36,44 +38,44 @@ flowchart TD
 
 Das Verständnis des spezifischen Bias-Typs in Ihrem System ist der wesentliche erste Schritt. Die Anwendung der falschen Debiasing-Technik verschwendet Aufwand und kann neue Probleme einführen.
 
-**Soziale und demografische Verzerrungen** zeigen sich, wenn sich die Antwort des Modells aufgrund demografischer Merkmale des Subjekts oder des Benutzers ändert, selbst wenn diese Merkmale für die Aufgabe irrelevant sind. Klassische Beispiele: einen Arzt standardmäßig als männlich beschreiben, bestimmte Nationalitäten mit bestimmten Verhaltensweisen assoziieren oder denselben Lebenslauf je nach Name des Bewerbers unterschiedlich bewerten.
+**Sozialer und demografischer Bias** manifestiert sich, wenn sich die Antwort des Modells aufgrund der demografischen Merkmale des Subjekts oder des Benutzers ändert, selbst wenn diese Merkmale für die Aufgabe irrelevant sind. Klassische Beispiele: einen Arzt standardmäßig als männlich beschreiben, bestimmte Nationalitäten mit bestimmten Verhaltensweisen assoziieren oder denselben Lebenslauf je nach dem Namen eines Bewerbers unterschiedlich bewerten.
 
-**Sycophancy** ist besonders heimtückisch, weil sie wie Hilfsbereitschaft aussieht. Das Modell bestätigt die falsche Überzeugung des Benutzers, passt sein geäußertes Vertrauen an das scheinbare Vertrauen des Benutzers an oder kehrt seine Position um, wenn der Benutzer zurückdrängt — selbst ohne neue Beweise. Dies wurde als wichtiger Versagenstyp von RLHF-trainierten Modellen identifiziert (Perez et al., 2022; Sharma et al., 2023).
+**Sycophancy** ist besonders tückisch, weil es wie Hilfsbereitschaft aussieht. Das Modell bestätigt den falschen Glauben des Benutzers, passt sein erklärtes Vertrauen an das scheinbare Vertrauen des Benutzers an oder dreht seine Position um, wenn der Benutzer zurückschiebt — selbst ohne neue Belege. Dies wurde als ein wichtiger Fehlermodus von RLHF-trainierten Modellen identifiziert (Perez et al., 2022; Sharma et al., 2023).
 
-**Positions- und Verbositätsverzerrungen** betreffen hauptsächlich Anwendungen, bei denen ein LLM als Evaluator oder Ranker eingesetzt wird. Wenn sie gebeten werden, zwischen Option A und Option B zu wählen, bevorzugen Modelle systematisch diejenige, die zuerst erscheint (oder in manchen Einstellungen zuletzt). Wenn sie gebeten werden, Antworten zu bewerten, bevorzugen Modelle längere Antworten, selbst wenn eine kürzere Antwort genauer ist.
+**Positions- und Ausführlichkeitsbias** betrifft hauptsächlich Anwendungen, bei denen ein LLM als Evaluator oder Ranker eingesetzt wird. Wenn aufgefordert, zwischen Option A und Option B zu wählen, bevorzugen Modelle systematisch diejenige, die zuerst erscheint (oder in einigen Einstellungen zuletzt). Wenn aufgefordert, Antworten zu bewerten, bevorzugen Modelle längere Antworten, selbst wenn eine kürzere Antwort akkurater ist.
 
-**Rahmungsverzerrung** tritt auf, wenn logisch äquivalente Fragen aufgrund der Formulierung unterschiedliche Antworten hervorrufen. "Ist dieses Medikament sicher?" und "Hat dieses Medikament Risiken?" sind semantisch äquivalent, können aber entgegengesetzte Antworten erzeugen.
+**Framing-Bias** tritt auf, wenn logisch äquivalente Fragen aufgrund der Formulierung unterschiedliche Antworten hervorrufen. „Ist dieses Medikament sicher?" und „Hat dieses Medikament Risiken?" sind semantisch äquivalent, können aber entgegengesetzte Antworten produzieren.
 
-### Prompt-level Debiasing-Strategien
+### Prompt-Level-Debiasing-Strategien
 
-**Neutrale Anweisungsinjektion**: Weisen Sie das Modell explizit an, irrelevante demografische Attribute zu ignorieren und nur aufgabenrelevante Kriterien zu bewerten. Fügen Sie Anweisungen hinzu wie: "Ihre Bewertung darf nicht durch das Geschlecht, die Nationalität, das Alter oder den Namen einer erwähnten Person beeinflusst werden. Konzentrieren Sie sich nur auf [spezifische Aufgabenkriterien]."
+**Neutrale Anweisungsinjektion**: Das Modell explizit anweisen, irrelevante demografische Attribute zu ignorieren und nur aufgabenrelevante Kriterien zu bewerten. Anweisungen wie diese hinzufügen: „Ihre Bewertung darf nicht durch das Geschlecht, die Nationalität, das Alter oder den Namen einer genannten Person beeinflusst werden. Konzentrieren Sie sich nur auf [spezifische Aufgabenkriterien]."
 
-**Kontrafaktisches Prompting**: Generieren Sie mehrere Versionen des Prompts mit getauschten demografischen Schlüsselattributen (männlich/weiblich, Gruppe A/Gruppe B), führen Sie jede durch das Modell und vergleichen Sie die Ausgaben. Wenn sich Ausgaben bei Attributen, die irrelevant sein sollten, erheblich unterscheiden, zeigt das Modell demografischen Bias. Diese Technik ist in erster Linie diagnostisch, kann aber auch als Konsistenzeinschränkung verwendet werden: Schließen Sie beide Versionen in denselben Prompt ein und bitten Sie das Modell, eine Antwort zu geben, die in beiden Rahmungen konsistent ist.
+**Kontrafaktisches Prompting**: Mehrere Versionen des Prompts mit vertauschten Schlüsseldemografika (männlich/weiblich, Gruppe A/Gruppe B) generieren, jede durch das Modell laufen lassen und die Ausgaben vergleichen. Wenn sich Ausgaben erheblich bei Attributen unterscheiden, die irrelevant sein sollten, zeigt das Modell demografischen Bias. Diese Technik ist primär diagnostisch, kann aber auch als Konsistenzeinschränkung verwendet werden: Beide Versionen in denselben Prompt aufnehmen und das Modell bitten, eine Antwort zu produzieren, die über beide Formulierungen konsistent ist.
 
-**Steelmanning und Beweise-zuerst-Prompting**: Um Sycophancy entgegenzuwirken, weisen Sie das Modell an, die stärkste Version der Gegenposition zu artikulieren, bevor es seine Einschätzung abgibt. Alternativ verwenden Sie eine Beweise-zuerst-Struktur: "Listen Sie die Beweise für und gegen [Behauptung] auf, dann geben Sie Ihre Einschätzung." Dies zwingt das Modell, gegenteilige Beweise zu verarbeiten, bevor es zu einer Schlussfolgerung kommt.
+**Steelmanning und Evidence-First-Prompting**: Um Sycophancy zu bekämpfen, das Modell anweisen, die stärkste Version der Gegenposition zu artikulieren, bevor es seine Einschätzung abgibt. Alternativ eine Evidence-First-Struktur verwenden: „Listen Sie die Belege für und gegen [Behauptung] auf, dann geben Sie Ihre Einschätzung." Dies zwingt das Modell, entgegenstehende Belege zu verarbeiten, bevor es zu einer Schlussfolgerung kommt.
 
-**Randomisierte Reihenfolge für Evaluierungsaufgaben**: Wenn Sie ein LLM verwenden, um mehrere Optionen zu vergleichen oder zu ranken, randomisieren Sie die Reihenfolge über mehrere Aufrufe und aggregieren Sie die Scores. Das Konsensranking ist zuverlässiger als jede einzelne Reihenfolge. Alternativ bitten Sie das Modell, jede Option unabhängig und absolut zu bewerten (z.B. 1-10 Scores), bevor es einen Vergleich anstellt.
+**Randomisierte Reihenfolge für Evaluierungsaufgaben**: Wenn ein LLM verwendet wird, um mehrere Optionen zu vergleichen oder zu ordnen, die Reihenfolge über mehrere Aufrufe hinweg randomisieren und die Scores aggregieren. Das Konsens-Ranking ist zuverlässiger als jede einzelne Reihenfolge. Alternativ das Modell bitten, jede Option unabhängig und absolut zu bewerten (z. B. Scores von 1–10), bevor ein Vergleich angestellt wird.
 
-**Explizite Kalibrierungsanweisungen**: Fügen Sie für Evaluierungsaufgaben Anweisungen hinzu, die bekannte Verzerrungen direkt bekämpfen: "Lassen Sie die Antwortlänge Ihre Bewertung nicht beeinflussen. Eine präzise, genaue Antwort sollte denselben Score erhalten wie eine ausführliche genaue Antwort. Bewerten Sie nur nach Korrektheit und Hilfsbereitschaft."
+**Explizite Kalibrierungsanweisungen**: Für Evaluierungsaufgaben Anweisungen hinzufügen, die bekannte Biases direkt bekämpfen: „Lassen Sie die Länge der Antwort Ihre Bewertung nicht beeinflussen. Eine präzise, akkurate Antwort sollte denselben Score erhalten wie eine ausführliche akkurate Antwort. Bewerten Sie nur auf der Grundlage von Korrektheit und Nützlichkeit."
 
 ### Evaluierung und Messung
 
-Bias kann nicht verwaltet werden, ohne gemessen zu werden. Wichtige Evaluierungsansätze für die Arbeit mit Prompt-level-Debiasing:
+Bias kann nicht verwaltet werden, ohne gemessen zu werden. Wichtige Evaluierungsansätze für Prompt-Level-Debiasing-Arbeit:
 
-- **Kontrafaktische Konsistenz**: Führen Sie dieselbe Abfrage mit variierten demografischen Attributen aus; messen Sie die Varianz der Ausgaben. Geringere Varianz = weniger demografischer Bias.
-- **Bias-Benchmarks**: BBQ (Bias Benchmark for QA), WinoBias, StereoSet und HolisticBias bieten strukturierte Datensätze zur Messung sozialer Verzerrungen über viele demografische Achsen.
-- **Sycophancy-Tests**: Präsentieren Sie dem Modell sachlich falsche Aussagen, die als Benutzerüberzeugungen gerahmt sind, und messen Sie, wie oft es zustimmt vs. korrigiert. Der SimpleQA-Benchmark enthält adversarielle Sycophancy-Tests.
-- **Positionsverzerrungstests**: Führen Sie dieselbe Ranking-Aufgabe mit permutierten Optionsreihenfolgen aus; messen Sie die Rangkorrelation über die Reihenfolgen. Ein perfekt unvoreingenommener Evaluator sollte dasselbe Ranking unabhängig von der Position erzeugen.
+- **Kontrafaktische Konsistenz**: Dieselbe Anfrage mit variierten demografischen Attributen ausführen; Varianz in den Ausgaben messen. Geringere Varianz = weniger demografischer Bias.
+- **Bias-Benchmarks**: BBQ (Bias Benchmark for QA), WinoBias, StereoSet und HolisticBias bieten strukturierte Datensätze zur Messung sozialer Biases über viele demografische Achsen.
+- **Sycophancy-Tests**: Das Modell mit sachlich falschen, als Benutzerüberzeugungen formulierten Aussagen konfrontieren und messen, wie oft es zustimmt vs. korrigiert. Der SimpleQA-Benchmark enthält adversarielle Sycophancy-Tests.
+- **Positions-Bias-Tests**: Dieselbe Rangaufgabe mit permutierten Optionsreihenfolgen ausführen; Rangkorrelation über Reihenfolgen messen. Ein perfekt unvoreingenommener Evaluator sollte unabhängig von der Position dieselbe Rangfolge produzieren.
 
 ## Wann verwenden / Wann NICHT verwenden
 
 | Verwenden wenn | Vermeiden wenn |
-|----------------|----------------|
-| Ihre Anwendung Entscheidungen trifft, die Einzelpersonen betreffen (Einstellung, Kreditvergabe, medizinische Triage) | Bias in Ihrer spezifischen Anwendung noch nicht gemessen wurde — zuerst messen, dann gezielte Techniken auswählen |
-| Sie bei Tests demografische Inkonsistenz in Ausgaben beobachten | Sie Prompt-level-Techniken als Ersatz für Alignment verwenden — sie reduzieren, eliminieren aber keine tiefen Modell-Verzerrungen |
-| Sie ein LLM als Richter oder Ranker verwenden und zuverlässige Vergleiche benötigen | Das Hinzufügen von Debiasing-Anweisungen die Prompt-Länge erheblich erhöht und Kosten eine harte Einschränkung sind |
-| Sie das Modellverhalten über demografische Gruppen hinweg ohne Retraining prüfen möchten | Die Aufgabe unterschiedliche Behandlung von Gruppen genuinely erfordert (z.B. medizinische Dosierung nach Körpergewicht) — irrelevanten Bias von legitimer aufgabenrelevanter Differenzierung unterscheiden |
-| Sie einen transparenten, überprüfbaren Debiasing-Datensatz für die Einhaltung von Vorschriften benötigen | Ihre Debiasing-Techniken eigene Verzerrungen einführen — z.B. erzwungene Ausgewogenheit bei genuinely asymmetrischen Fragen verfälscht die Genauigkeit |
+|----------|------------|
+| Die Anwendung Entscheidungen trifft, die Einzelpersonen betreffen (Einstellung, Kreditvergabe, medizinische Triage) | Bias in Ihrer spezifischen Anwendung noch nicht gemessen wurde — zuerst Messung anwenden, dann gezielte Techniken auswählen |
+| Demografische Inkonsistenz in Ausgaben während des Testens beobachtet wird | Prompt-Level-Techniken als Ersatz für Alignment verwendet werden — sie reduzieren, eliminieren aber keine tiefen Modell-Biases |
+| Ein LLM als Richter oder Ranker verwendet wird und zuverlässige Vergleiche benötigt werden | Das Hinzufügen von Debiasing-Anweisungen die Prompt-Länge erheblich erhöht und Kosten eine harte Einschränkung sind |
+| Das Modellverhalten über demografische Gruppen hinweg ohne Retraining geprüft werden soll | Die Aufgabe genuinen unterschiedlichen Umgang mit Gruppen erfordert (z. B. medizinische Dosierung nach Körpergewicht) — irrelevanten Bias von legitimer aufgabenrelevanter Differenzierung unterscheiden |
+| Ein transparenter, inspektionsfähiger Debiasing-Nachweis für die Einhaltung von Vorschriften benötigt wird | Die Debiasing-Techniken ihre eigenen Biases einführen — z. B. das Erzwingen von Balance bei genuinen asymmetrischen Fragen verfälscht die Genauigkeit |
 
 ## Code-Beispiele
 
@@ -149,7 +151,7 @@ if __name__ == "__main__":
     # the degree of difference across responses
 ```
 
-### Sycophancy-Minderung mit Beweise-zuerst-Prompting
+### Sycophancy-Minderung mit Evidence-First-Prompting
 
 ```python
 # Counter sycophancy by forcing evidence-before-conclusion structure
@@ -196,7 +198,7 @@ if __name__ == "__main__":
     print(run_completion(DEBIASED_PROMPT))
 ```
 
-### Positionsverzerrungsminderung für LLM-als-Richter
+### Positionsbias-Minderung für LLM-als-Richter
 
 ```python
 # Mitigate positional bias in LLM scoring by randomizing option order
@@ -375,11 +377,11 @@ if __name__ == "__main__":
 
 ## Praktische Ressourcen
 
-- [BBQ: A Hand-Built Bias Benchmark for Question Answering (Parrish et al., 2022)](https://arxiv.org/abs/2110.08193) — Ein Datensatz mit 58.000 QA-Beispielen zur Messung sozialer Verzerrungen über neun demografische Achsen; weit verbreitet zur Messung von LLM-Fairness.
-- [Sycophancy to Subterfuge: Investigating Reward Tampering in Language Models (Sharma et al., 2023)](https://arxiv.org/abs/2310.13548) — Empirische Studie zur Sycophancy in RLHF-trainierten Modellen mit Analyse, welche Prompting-Strategien sycophantisches Verhalten reduzieren.
-- [Large Language Models Are Not Robust Multiple Choice Selectors (Pezeshkpour & Hruschka, 2023)](https://arxiv.org/abs/2309.03882) — Demonstriert Positionsverzerrung in LLM-Ausgaben und schlägt Kalibrierungsstrategien vor.
-- [Judging the Judges: A Systematic Investigation of Position Bias in Pairwise Comparative Assessments by LLMs (Wang et al., 2023)](https://arxiv.org/abs/2406.07791) — Umfassende Studie zu Positions- und Verbositätsverzerrungen in LLM-als-Richter-Einstellungen mit Minderungsempfehlungen.
-- [HolisticBias: A large-scale text corpus for measuring bias](https://github.com/facebookresearch/ResponsibleNLP/tree/main/holistic_bias) — Metas Benchmark mit über 600 demografischen Deskriptortermen über 13 demografische Achsen zur systematischen Bias-Messung.
+- [BBQ: A Hand-Built Bias Benchmark for Question Answering (Parrish et al., 2022)](https://arxiv.org/abs/2110.08193) — Ein Datensatz mit 58.000 QA-Beispielen zur Messung sozialer Biases über neun demografische Achsen; weit verbreitet zur Messung von LLM-Fairness.
+- [Sycophancy to Subterfuge: Investigating Reward Tampering in Language Models (Sharma et al., 2023)](https://arxiv.org/abs/2310.13548) — Empirische Studie über Sycophancy in RLHF-trainierten Modellen mit Analyse, welche Prompting-Strategien sykophantisches Verhalten reduzieren.
+- [Large Language Models Are Not Robust Multiple Choice Selectors (Pezeshkpour & Hruschka, 2023)](https://arxiv.org/abs/2309.03882) — Demonstriert Positionsbias in LLM-Ausgaben und schlägt Kalibrierungsstrategien vor.
+- [Judging the Judges: A Systematic Investigation of Position Bias in Pairwise Comparative Assessments by LLMs (Wang et al., 2023)](https://arxiv.org/abs/2406.07791) — Umfassende Studie über Positions- und Ausführlichkeitsbias in LLM-als-Richter-Einstellungen mit Minderungsempfehlungen.
+- [HolisticBias: A large-scale text corpus for measuring bias](https://github.com/facebookresearch/ResponsibleNLP/tree/main/holistic_bias) — Metas Benchmark mit über 600 demografischen Beschreibungsbegriffen über 13 demografische Achsen zur systematischen Bias-Messung.
 
 ## Siehe auch
 

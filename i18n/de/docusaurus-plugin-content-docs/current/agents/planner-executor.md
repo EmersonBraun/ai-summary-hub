@@ -1,36 +1,38 @@
 ---
-title: "Planner-Executor-Architektur"
-description: Architektur, bei der ein LLM einen Schritt-für-Schritt-Plan erstellt und ein anderes jeden Schritt unabhängig ausführt.
-keywords: [Planner Executor, LLM-Planung, Agenten-Architektur, Multi-Agenten, Aufgabenzerlegung, Replanning]
+title: "Planner-Executor architecture"
+description: Architecture where one LLM creates a step-by-step plan and another executes each step independently.
+keywords: [planner executor, LLM planning, agent architecture, multi-agent, task decomposition, replanning]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Planner-Executor-Architektur
 
 ## Definition
 
-Die Planner-Executor-Architektur trennt das Anliegen, *zu entscheiden, was zu tun ist*, von dem Anliegen, *es zu tun*. Ein **Planner**-LLM empfängt ein übergeordnetes Ziel und produziert einen strukturierten, schrittweisen Plan – eine Sequenz von Teilaufgaben, die zusammen das Ziel erreichen. Ein **Executor**-LLM (oder ein deterministisches Programm) arbeitet dann den Plan Schritt für Schritt durch, ruft Tools auf und produziert Ergebnisse. Die beiden Komponenten kommunizieren über ein gemeinsames Plan-Artefakt, nicht über einen einzelnen monolithischen Prompt.
+Die Planner-Executor-Architektur trennt die Entscheidung darüber, *was zu tun ist*, von der *Ausführung*. Ein **Planner**-LLM empfängt ein übergeordnetes Ziel und erzeugt einen strukturierten, schrittweisen Plan – eine Sequenz von Teilaufgaben, die zusammen das Ziel erreichen. Ein **Executor**-LLM (oder ein deterministisches Programm) arbeitet dann den Plan Schritt für Schritt ab, ruft Werkzeuge auf und erzeugt Ergebnisse. Die beiden Komponenten kommunizieren über ein gemeinsames Plan-Artefakt statt über einen einzigen monolithischen Prompt.
 
-Diese Trennung der Belange adressiert eine fundamentale Einschränkung einzelner ReAct-Schleifen: Wenn eine Aufgabe komplex ist, führt das Bitten eines LLMs, gleichzeitig über Strategie nachzudenken, die nächste Aktion zu wählen und niedrigstufige Tool-Details zu handhaben, zu Fehlern und Halluzinationen. Durch die Delegierung der übergeordneten Zerlegung an den Planner und der niedrigstufigen Ausführung an den Executor kann jede Komponente unabhängig optimiert, ge-promptet und überwacht werden. Der Planner kann ein leistungsfähigeres Modell verwenden; der Executor kann ein schnelleres, kostengünstigeres Modell oder sogar ein Nicht-LLM-Programm sein.
+Diese Trennung der Zuständigkeiten behebt eine fundamentale Einschränkung von Single-Agent-ReAct-Schleifen: Wenn eine Aufgabe komplex ist, führt das gleichzeitige Nachdenken über Strategie, Auswahl der nächsten Aktion und Umgang mit Low-Level-Werkzeugdetails zu Fehlern und Halluzinationen. Durch die Delegation der übergeordneten Zerlegung an den Planner und der Low-Level-Ausführung an den Executor kann jede Komponente unabhängig optimiert, mit Prompts versehen und überwacht werden. Der Planner kann ein fähigeres Modell verwenden; der Executor kann ein schnelleres, günstigeres Modell oder sogar ein Nicht-LLM-Programm sein.
 
-Plan-Verfeinerung und Replanning sind kritische Erweiterungen der Grundarchitektur. Reale Aufgaben entfalten sich selten wie erwartet: Ein Tool-Aufruf könnte fehlschlagen, eine Webseite könnte unerwartete Daten zurückgeben oder ein Zwischenergebnis könnte zeigen, dass der ursprüngliche Plan falsch war. Ein robustes Planner-Executor-System überwacht Ausführungsergebnisse und ruft den Planner erneut auf, wenn Replanning benötigt wird. Diese Feedback-Schleife verwandelt eine brüchige Pipeline in einen adaptiven Agenten.
+Plan-Verfeinerung und Replanning sind kritische Erweiterungen der grundlegenden Architektur. Aufgaben aus der realen Welt verlaufen selten wie erwartet: Ein Werkzeugaufruf kann fehlschlagen, eine Webseite kann unerwartete Daten zurückgeben, oder ein Zwischenergebnis kann zeigen, dass der ursprüngliche Plan falsch war. Ein robustes Planner-Executor-System überwacht Ausführungsergebnisse und ruft den Planner erneut auf, wenn Replanning benötigt wird. Diese Feedback-Schleife verwandelt eine brüchige Pipeline in einen adaptiven Agenten.
 
 ## Funktionsweise
 
 ### Planner
 
-Der Planner empfängt das Ziel des Benutzers zusammen mit verfügbaren Tools und jedem relevanten Kontext. Er gibt einen strukturierten Plan aus – typischerweise eine JSON-Liste von Schrittobjekten, jedes beschreibt eine Teilaufgabe, die erwartete Ein-/Ausgabe und optional welches Tool zu verwenden ist. Ein guter Planungs-Prompt enthält die Tool-Schemas, damit der Planner genau auf sie verweisen kann. Der Planner ruft selbst keine Tools auf; er denkt nur über die Sequenz der benötigten Operationen nach. Die Temperatur sollte generell niedrig sein, um deterministische, gut strukturierte Pläne zu produzieren.
+Der Planner empfängt das Ziel des Benutzers zusammen mit verfügbaren Werkzeugen und relevantem Kontext. Er gibt einen strukturierten Plan aus – typischerweise eine JSON-Liste von Schrittobjekten, jedes beschreibt eine Teilaufgabe, die erwartete Ein-/Ausgabe und optional welches Werkzeug verwendet werden soll. Ein guter Planungs-Prompt enthält die Werkzeug-Schemas, damit der Planner diese genau referenzieren kann. Der Planner ruft selbst keine Werkzeuge auf; er denkt nur über die Sequenz der benötigten Operationen nach. Die Temperatur sollte im Allgemeinen niedrig sein, um deterministische, gut strukturierte Pläne zu erzeugen.
 
 ### Plan-Artefakt
 
-Der Plan ist der Vertrag zwischen Planner und Executor. Es ist ein maschinenlesbares Dokument (JSON oder strukturierter Text), das die Sequenz der Schritte, ihre Abhängigkeiten und ihre erwarteten Ergebnisse kodiert. Das Speichern des Plans als explizites Artefakt – anstatt ihn implizit in der Chain-of-Thought des Modells zu halten – macht das System überprüfbar, pausierbar und fortsetzbar. Ein Human-in-the-Loop-Genehmigungsschritt kann hier eingefügt werden, damit Benutzer den Plan vor dem Beginn der Ausführung prüfen und bearbeiten können.
+Der Plan ist der Vertrag zwischen Planner und Executor. Es ist ein maschinenlesbares Dokument (JSON oder strukturierter Text), das die Sequenz der Schritte, ihre Abhängigkeiten und ihre erwarteten Ergebnisse kodiert. Das Speichern des Plans als explizites Artefakt – anstatt ihn implizit in der Chain-of-Thought des Modells zu halten – macht das System auditierbar, pausierbar und fortsetzbar. Ein Human-in-the-Loop-Genehmigungsschritt kann hier eingefügt werden, damit Benutzer den Plan vor Beginn der Ausführung überprüfen und bearbeiten können.
 
 ### Executor
 
-Der Executor liest den Plan einen Schritt nach dem anderen, löst Eingabereferenzen auf frühere Schrittausgaben auf, ruft die entsprechenden Tools auf und zeichnet das Ergebnis auf. Der Executor kann ein zweites LLM sein (nützlich, wenn Schritte natürlichsprachliches Reasoning erfordern), ein deterministisches Skript (nützlich für strukturierte Schritte wie API-Aufrufe) oder ein Hybrid. Nach jedem Schritt wird das Ergebnis in das Plan-Artefakt zurückgeschrieben, damit nachfolgende Schritte darauf referenzieren können. Wenn ein Schritt fehlschlägt, markiert der Executor ihn und löst optional Replanning aus.
+Der Executor liest den Plan Schritt für Schritt, löst alle Eingabereferenzen zu früheren Schrittausgaben auf, ruft die entsprechenden Werkzeuge auf und zeichnet das Ergebnis auf. Der Executor kann ein zweites LLM sein (nützlich wenn Schritte natürlichsprachliches Reasoning erfordern), ein deterministisches Skript (nützlich für strukturierte Schritte wie API-Aufrufe) oder ein Hybrid. Nach jedem Schritt wird das Ergebnis zurück in das Plan-Artefakt geschrieben, sodass nachfolgende Schritte darauf referenzieren können. Wenn ein Schritt fehlschlägt, markiert der Executor ihn und löst optional Replanning aus.
 
 ### Replanning-Schleife
 
-Wenn die Ausführung vom Plan abweicht – aufgrund von Tool-Fehlern, unerwarteten Ausgaben oder geänderten Bedingungen – kehrt die Kontrolle mit dem partiellen Ausführungsdatensatz zum Planner zurück. Der Planner überarbeitet die verbleibenden Schritte angesichts der neuen Informationen. Replanning kann automatisch ausgelöst werden (z. B. bei jedem Schrittfehler) oder nach jedem Schritt für maximale Anpassungsfähigkeit. Die Begrenzung von Replanning-Iterationen verhindert Endlosschleifen.
+Wenn die Ausführung vom Plan abweicht – aufgrund von Werkzeugfehlern, unerwarteten Ausgaben oder geänderten Bedingungen – kehrt die Kontrolle zum Planner mit dem partiellen Ausführungsprotokoll zurück. Der Planner überarbeitet die verbleibenden Schritte angesichts der neuen Informationen. Replanning kann automatisch ausgelöst werden (z. B. bei jedem Schrittfehler) oder nach jedem Schritt für maximale Anpassungsfähigkeit. Das Begrenzen von Replanning-Iterationen verhindert Endlosschleifen.
 
 ```mermaid
 flowchart LR
@@ -48,22 +50,22 @@ flowchart LR
 
 | Verwenden wenn | Vermeiden wenn |
 |---|---|
-| Die Aufgabe mehrere sequenzielle Schritte erfordert, die vorab schwer aufzuzählen sind | Die Aufgabe einfach genug für einen einzelnen LLM-Aufruf oder eine ReAct-Schleife ist |
-| Menschliche Überprüfung oder Genehmigung vor der Ausführung gewünscht wird | Latenz kritisch ist und der zusätzliche Planner-Aufruf inakzeptabel ist |
-| Ausführungsschritte klare Abhängigkeiten haben und einzeln validiert werden können | Die Planstruktur trivial wäre und unnötige Komplexität hinzufügt |
-| Überprüft werden muss, was der Agent tat und warum jeder Schritt unternommen wurde | Die Aufgabe explorativ ist und überhaupt nicht vorab geplant werden kann |
-| Replanning bei Fehler für Zuverlässigkeit wichtig ist | Tool-APIs so unzuverlässig sind, dass kein Plan den ersten Kontakt überlebt |
+| Die Aufgabe mehrere sequentielle Schritte erfordert, die schwer im Voraus aufzuzählen sind | Die Aufgabe einfach genug für einen einzigen LLM-Aufruf oder eine ReAct-Schleife ist |
+| Menschliche Überprüfung oder Genehmigung vor der Ausführung gewünscht wird | Latenz kritisch ist und der zusätzliche Planner-Aufruf nicht akzeptabel ist |
+| Ausführungsschritte klare Abhängigkeiten haben und einzeln validiert werden können | Die Plan-Struktur trivial wäre und unnötige Komplexität hinzufügt |
+| Auditiert werden muss, was der Agent getan hat und warum jeder Schritt unternommen wurde | Die Aufgabe explorativ ist und überhaupt nicht im Voraus geplant werden kann |
+| Replanning bei Fehler für Zuverlässigkeit wichtig ist | Werkzeug-APIs so unzuverlässig sind, dass kein Plan den ersten Kontakt überlebt |
 
 ## Vergleiche
 
-| Kriterium | Planner-Executor | Single ReAct Agent | DAG-basierte Agenten |
+| Kriterium | Planner-Executor | Single ReAct agent | DAG-basierte Agenten |
 |---|---|---|---|
-| Trennung der Belange | Hoch – Planung und Ausführung sind getrennt | Keine – ein Agent erledigt beides | Hoch – jeder Knoten ist eine separate Einheit |
-| Anpassungsfähigkeit / Replanning | Moderat – Replanning fügt einen Round-Trip hinzu | Hoch – Agent passt sich bei jedem Schritt an | Niedrig – DAG-Struktur ist typischerweise fest |
-| Überprüfbarkeit | Hoch – Plan-Artefakt ist explizit | Niedrig – Reasoning ist nur im Kontext | Hoch – Graph-Struktur ist explizit |
-| Parallelismus | Standardmäßig keiner | Keiner | Nativ – unabhängige Branches laufen parallel |
+| Trennung der Zuständigkeiten | Hoch — Planung und Ausführung sind getrennt | Keine — ein Agent macht beides | Hoch — jeder Knoten ist eine separate Einheit |
+| Anpassungsfähigkeit / Replanning | Mittel — Replanning fügt einen Roundtrip hinzu | Hoch — Agent passt sich bei jedem Schritt an | Niedrig — DAG-Struktur ist typischerweise fest |
+| Nachvollziehbarkeit | Hoch — Plan-Artefakt ist explizit | Niedrig — Reasoning ist nur im Kontext | Hoch — Graphstruktur ist explizit |
+| Parallelismus | Standardmäßig keiner | Keiner | Nativ — unabhängige Zweige laufen parallel |
 | Implementierungskomplexität | Mittel | Niedrig | Hoch |
-| Beste Verwendung für | Mehrstufige Aufgaben mit sequenziellen Abhängigkeiten | Explorative, dynamische Aufgaben | Aufgaben mit bekannten parallelisierbaren Teilaufgaben |
+| Am besten für | Mehrstufige Aufgaben mit sequentiellen Abhängigkeiten | Explorative, dynamische Aufgaben | Aufgaben mit bekannten parallelisierbaren Teilaufgaben |
 
 ## Code-Beispiele
 
@@ -229,12 +231,12 @@ if __name__ == "__main__":
 ## Praktische Ressourcen
 
 - [Plan-and-Solve Prompting (Wang et al., 2023)](https://arxiv.org/abs/2305.04091) — Paper, das zeigt, dass die Trennung von Planung und Lösung die Reasoning-Genauigkeit gegenüber Standard-Chain-of-Thought verbessert.
-- [LangGraph — Plan-and-Execute Agent](https://langchain-ai.github.io/langgraph/tutorials/plan-and-execute/plan-and-execute/) — Offizielles LangGraph-Tutorial zur Implementierung einer Planner-Executor-Schleife mit Replanning.
-- [LLM Compiler (Kim et al., 2023)](https://arxiv.org/abs/2312.04511) — Erweitert Planner-Executor mit paralleler Ausführung unabhängiger Plan-Schritte.
-- [Anthropic — Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) — Praktische Anleitung zu Agenten-Architekturen einschließlich Orchestrator-Subagenten-Muster.
+- [LangGraph — Plan-and-Execute Agent](https://langchain-ai.github.io/langgraph/tutorials/plan-and-execute/plan-and-execute/) — Offizielles LangGraph-Tutorial, das eine Planner-Executor-Schleife mit Replanning implementiert.
+- [LLM Compiler (Kim et al., 2023)](https://arxiv.org/abs/2312.04511) — Erweitert Planner-Executor um parallele Ausführung unabhängiger Planschritte.
+- [Anthropic — Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) — Praktische Anleitungen zu Agenten-Architekturen einschließlich Orchestrator-Subagenten-Muster.
 
 ## Siehe auch
 
-- [KI-Agenten](/docs/agents)
-- [DAG-basierte Agenten](/docs/agents/dag-agents)
-- [Chain-of-Thought-Reasoning](/docs/reasoning-patterns/cot)
+- [AI agents](/docs/agents)
+- [DAG-based agents](/docs/agents/dag-agents)
+- [Chain-of-thought reasoning](/docs/reasoning-patterns/cot)

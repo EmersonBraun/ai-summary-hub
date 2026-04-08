@@ -1,37 +1,115 @@
 ---
 title: Hugging Face
 description: Plataforma e bibliotecas para modelos, conjuntos de dados e pipelines.
-keywords: [Hugging Face, Transformers, datasets]
+keywords: [Hugging Face, Transformers, conjuntos de dados]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Hugging Face
 
 ## Definição
 
-Hugging Face provides the [Transformers](/docs/transformers) library, Hub (models and datasets), and tools for training and deployment. É a central resource for [NLP](/docs/nlp) and [multimodal](/docs/multimodal-ai) models.
+Hugging Face é a plataforma central de código aberto para aprendizado de máquina: hospeda o **Hub** (mais de 500.000 modelos públicos e 50.000 conjuntos de dados), fornece a biblioteca `transformers` para carregar e executar modelos pré-treinados, e oferece ferramentas para [fine-tuning](/docs/llms/fine-tuning), avaliação e implantação. Abrange modelos de [NLP](/docs/nlp), visão computacional, fala e [multimodais](/docs/multimodal-ai) via uma API unificada, tornando prático a troca entre tarefas e arquiteturas sem aprender novas interfaces.
 
-Executa sobre [PyTorch](/docs/frameworks/pytorch) (and TensorFlow/JAX for some models). Use it to load pretrained [BERT](/docs/transformers/bert), [GPT](/docs/transformers/gpt), [LLMs](/docs/llms), and vision models; [fine-tune](/docs/llms/fine-tuning) with the same API; and share your own models and datasets on the Hub. Integrates with [RAG](/docs/rag) and [agents](/docs/agents) via community integrations.
+A biblioteca `transformers` funciona no [PyTorch](/docs/frameworks/pytorch), TensorFlow e JAX. Uma chamada `from_pretrained("nome-do-modelo")` baixa automaticamente pesos do modelo, tokenizadores e configuração do Hub. A mesma abstração funciona para [BERT](/docs/transformers/bert), decodificadores estilo [GPT](/docs/transformers/gpt), modelos de difusão, vision transformers e modelos de fala da classe whisper. `datasets` fornece carregamento e pré-processamento eficientes em streaming de grandes conjuntos de dados, e `accelerate` adiciona treinamento distribuído e de precisão mista com alterações mínimas de código.
 
-## Como funciona
+Hugging Face também se integra ao ecossistema de IA mais amplo: modelos hospedados no Hub podem ser usados diretamente no [LangChain](/docs/tools/langchain) e [LlamaIndex](/docs/tools/llamaindex) como backends de inferência, e a biblioteca `peft` permite [fine-tuning](/docs/llms/fine-tuning) eficiente em parâmetros (LoRA, QLoRA) para que [LLMs](/docs/llms) possam ser adaptados com hardware consumidor. Spaces fornece hospedagem de demos sem configuração usando Gradio ou Streamlit, fazendo a ponte entre pesquisa e acesso público.
 
-**Instale** `transformers`, `datasets` e opcionalmente `accelerate` (para treinamento distribuído e de precisão mista). **Carrregue** um modelo pré-treinado e tokenizer por nome (por ex. `from_pretrained("bert-base-uncased")`); the library downloads from the Hub if needed. **Inference**: call `model(input_ids)` or use pipelines (por ex. text classification, summarization). **Fine-tune**: use the `Trainer` or native PyTorch loops with your dataset; push the resulting model back to the Hub. The Hub hosts model cards, datasets, and spaces (demos). Tokenizers, configs, and model weights are versioned; you can pin versions for reproducibility.
+## Funcionamento
 
-## Casos de uso
+### Carregamento e inferência
 
-Hugging Face is the default for loading, fine-tuning, and sharing NLP and vision models and datasets.
+```mermaid
+flowchart LR
+  HubModel["Hub (modelo + tokenizador)"] -->|"from_pretrained()"| Local["Pesos locais"]
+  Local -->|"tokenizar"| Tokenizer["Tokenizador"]
+  Tokenizer -->|"input_ids"| Model["Forward pass do modelo"]
+  Model -->|"logits / embeddings"| Pipeline["Pipeline / decodificar"]
+  Pipeline -->|"saída"| App["Aplicação"]
+```
 
-- Loading and fine-tuning pretrained NLP and vision models
-- Sharing and discovering models and datasets on the Hub
-- Running inference and building pipelines with minimal code
+### Fluxo de fine-tuning
 
-## Documentação externa
+```mermaid
+flowchart LR
+  Base["Modelo base (Hub)"] -->|"carregar"| Trainer["Trainer / PEFT"]
+  Dataset["Conjunto de dados personalizado"] -->|"carregar & tokenizar"| Trainer
+  Trainer -->|"treinar"| FineTuned["Modelo ajustado"]
+  FineTuned -->|"push_to_hub()"| Hub["Hub (seu repositório)"]
+```
 
-- [Hugging Face documentation](https://huggingface.co/docs)
-- [Transformers library](https://huggingface.co/docs/transformers)
-- [Hugging Face NLP course](https://huggingface.co/learn/nlp-course/)
+### Bibliotecas principais
+
+**`transformers`** — carregamento de modelos, inferência, tokenização. **`datasets`** — carregamento e pré-processamento eficiente de dados. **`accelerate`** — treinamento distribuído e precisão mista. **`peft`** — fine-tuning eficiente em parâmetros LoRA e QLoRA. **`evaluate`** — métricas (BLEU, ROUGE, precisão). **`diffusers`** — pipelines de modelos de difusão.
+
+## Quando usar / Quando NÃO usar
+
+| Cenário | Usar Hugging Face | NÃO usar Hugging Face |
+|---------|-----------------|----------------------|
+| Carregar e executar um modelo NLP ou visão pré-treinado | Sim — `from_pretrained` fornece API unificada | |
+| Fine-tuning de um LLM em um conjunto de dados personalizado | Sim — Trainer + PEFT (LoRA/QLoRA) | |
+| Compartilhar modelos e conjuntos de dados com a comunidade | Sim — Hub com fichas de modelo e versionamento | |
+| Serviço de produção de alto throughput | | Usar vLLM, TGI ou TorchServe para inferência otimizada |
+| Implantação edge em tempo real | | TFLite ou ONNX Runtime são mais adequados |
+| Treinamento do zero de um grande modelo proprietário | | Ferramentas de fornecedores cloud (pods TPU, SLURM) podem ser preferidas |
+
+## Vantagens e desvantagens
+
+| Vantagens | Desvantagens |
+|---------|------------|
+| API unificada para centenas de arquiteturas | Grande footprint de dependências para casos simples |
+| O Hub fornece fichas de modelo, versionamento e descoberta | Alguns modelos são de qualidade de pesquisa com suporte limitado |
+| PEFT permite fine-tuning com hardware limitado | Throughput de inferência não é otimizado vs servidores especializados |
+| Comunidade ativa e atualizações frequentes | Mudanças frequentes de API podem quebrar código existente |
+
+## Exemplos de código
+
+```python
+# Load a pretrained text-classification model and run inference
+from transformers import pipeline
+
+classifier = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+result = classifier("Hugging Face makes NLP accessible to everyone.")
+print(result)  # [{'label': 'POSITIVE', 'score': 0.9998}]
+
+# Fine-tune with PEFT (LoRA) on a custom dataset
+from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, Trainer
+from peft import get_peft_model, LoraConfig, TaskType
+import datasets
+
+model_name = "meta-llama/Llama-3.2-1B"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+base_model = AutoModelForCausalLM.from_pretrained(model_name)
+
+lora_config = LoraConfig(task_type=TaskType.CAUSAL_LM, r=8, lora_alpha=32)
+model = get_peft_model(base_model, lora_config)
+model.print_trainable_parameters()  # shows only ~0.1% of params are trainable
+```
+
+## Comparações
+
+| Funcionalidade | Hugging Face Transformers | API direta (OpenAI, Anthropic) |
+|---------|--------------------------|-------------------------------|
+| Acesso a modelos | Modelos open-source do Hub | Modelos frontier proprietários |
+| Custo | Gratuito para executar (você paga pelo hardware) | Custo de API por token |
+| Controle | Acesso completo a pesos e parâmetros internos | Caixa preta, controle limitado |
+| Fine-tuning | Primeira classe (Trainer, PEFT) | Limitado (API de fine-tune da OpenAI) |
+| Implantação | Auto-gerenciado (vLLM, TGI, TFLite) | Gerenciado pelo fornecedor |
+| Melhor para | Pesquisa, fine-tuning personalizado, privacidade | Integração de produção rápida |
+
+## Recursos práticos
+
+- [Documentação do Hugging Face](https://huggingface.co/docs) — Docs completas da plataforma incluindo Hub, Transformers e Spaces
+- [Biblioteca Transformers](https://huggingface.co/docs/transformers) — Referência de API, pipelines e fichas de modelos
+- [Curso NLP do Hugging Face](https://huggingface.co/learn/nlp-course/) — Curso gratuito de ponta a ponta cobrindo Transformers e fine-tuning
+- [Documentação PEFT](https://huggingface.co/docs/peft) — LoRA, QLoRA e outros métodos eficientes em parâmetros
+- [Hub do Hugging Face](https://huggingface.co/models) — Navegar e filtrar mais de 500k modelos por tarefa, idioma e licença
 
 ## Veja também
 
 - [Transformers](/docs/transformers)
 - [LLMs](/docs/llms)
+- [Fine-tuning](/docs/llms/fine-tuning)
+- [RAG](/docs/rag)
 - [Frameworks](/docs/frameworks/pytorch)

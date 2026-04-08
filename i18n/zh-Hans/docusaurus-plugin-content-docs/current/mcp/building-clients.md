@@ -2,6 +2,8 @@
 title: 构建 MCP 客户端
 description: 如何构建将 AI 应用程序连接到 MCP 服务器的 MCP 客户端——涵盖客户端初始化、能力发现、工具调用、资源读取和传输选择。
 keywords: [MCP 客户端, 模型上下文协议, 构建 MCP 客户端, 能力发现, 工具调用, 资源读取, TypeScript, MCP SDK, stdio 传输, SSE 传输, AI 集成]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # 构建 MCP 客户端

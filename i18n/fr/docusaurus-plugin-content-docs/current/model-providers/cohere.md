@@ -1,36 +1,38 @@
 ---
 title: Cohere
-description: Plateforme d'IA orientée entreprise spécialisée dans les embeddings, le reranking et le RAG pour la recherche et la récupération d'information à grande échelle.
-keywords: [cohere, embeddings, reranking, RAG, recherche d'entreprise, multilingue, Command R, Embed, Rerank, recherche sémantique]
+description: Enterprise-focused AI platform specializing in embeddings, reranking, and RAG for search and information retrieval at scale.
+keywords: [cohere, embeddings, reranking, RAG, enterprise search, multilingual, Command R, Embed, Rerank, semantic search]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Cohere
 
 ## Définition
 
-**Cohere** est une entreprise d'IA d'entreprise qui développe des modèles de langage et des API conçus spécifiquement pour les applications professionnelles, avec un accent particulier sur la recherche, la récupération d'information et la génération augmentée par récupération (RAG). Contrairement aux fournisseurs généralistes qui proposent une large gamme de fonctionnalités grand public et développeur, Cohere cible les clients entreprise qui ont besoin d'une infrastructure NLP fiable et prête pour la production — notamment pour les cas d'usage où *trouver et remonter la bonne information* est le problème central.
+**Cohere** est une entreprise d'IA entreprise qui construit des modèles de langage et des API conçus spécifiquement pour les applications métier, avec un accent particulier sur la recherche, la récupération d'information et la génération augmentée par récupération (RAG). Contrairement aux fournisseurs polyvalents qui proposent une large gamme de fonctionnalités pour les consommateurs et les développeurs, Cohere cible les clients entreprise ayant besoin d'une infrastructure NLP fiable et prête pour la production — en particulier pour les cas d'usage où *trouver et présenter la bonne information* est le problème central.
 
-La gamme de modèles de Cohere reflète cet objectif. **Command R** et **Command R+** sont des modèles conversationnels et de suivi d'instructions optimisés spécifiquement pour les workflows RAG — ils prennent en charge de longues fenêtres de contexte et sont entraînés pour suivre de manière fiable les prompts ancrés dans des données récupérées. **Embed** fournit des embeddings vectoriels denses multilingues de pointe dans plus de 100 langues, en faisant le choix privilégié pour les applications de recherche d'entreprise mondiales. **Rerank** est un modèle cross-encoder qui prend un ensemble initial de documents récupérés et les re-score par rapport à la requête originale pour une précision que la récupération sparse et dense seule ne peut pas atteindre.
+La gamme de modèles de Cohere reflète cet objectif. **Command R** et **Command R+** sont des modèles conversationnels et de suivi d'instructions optimisés spécifiquement pour les flux de travail RAG — ils prennent en charge de larges fenêtres de contexte et sont entraînés à suivre de manière fiable les prompts ancrés dans la récupération. **Embed** fournit des embeddings vectoriels denses multilingues de pointe dans plus de 100 langues, en faisant le choix privilégié pour les applications de recherche entreprise mondiale. **Rerank** est un modèle cross-encoder qui prend un ensemble initial de documents récupérés et les reclasse par rapport à la requête originale pour atteindre une précision que la récupération sparse et dense seule ne peut atteindre.
 
-Ce qui différencie Cohere des fournisseurs généralistes comme OpenAI est que l'ensemble de sa gamme de produits est conçu autour du pipeline de récupération comme workflow de première classe. Les modèles Embed, Rerank et Command R sont conçus pour fonctionner ensemble comme une pile cohérente, et Cohere propose des options de déploiement on-premises et cloud privé qui répondent aux exigences strictes de gouvernance des données et de conformité des entreprises — une distinction critique pour les secteurs réglementés comme la finance, la santé et le gouvernement.
+Ce qui distingue Cohere des fournisseurs polyvalents comme OpenAI, c'est que toute sa suite de produits est conçue autour du pipeline de récupération comme flux de travail de première classe. Les modèles Embed, Rerank et Command R sont construits pour fonctionner ensemble comme une pile cohésive, et Cohere propose des options de déploiement sur site et en cloud privé qui répondent aux exigences strictes de gouvernance des données entreprise et de conformité — une distinction critique pour les secteurs réglementés comme la finance, la santé et le gouvernement.
 
-## Comment ça fonctionne
+## Fonctionnement
 
 ### API Chat et Generate
 
-Les modèles Command R et Command R+ sont accessibles via l'API Chat de Cohere et prennent en charge à la fois les interactions conversationnelles multi-tours et les tâches de génération en un seul tour. Command R+ est la variante plus grande et plus capable, adaptée au raisonnement complexe et au RAG intensif en documents, tandis que Command R est optimisé pour une latence plus faible et un coût inférieur dans les pipelines de production à fort débit. Les deux modèles acceptent un paramètre `documents` qui vous permet de passer du contexte récupéré directement dans le prompt, permettant un mode RAG natif où le modèle est instruit d'ancrer sa réponse dans le contenu fourni et de citer les sources.
+Les modèles Command R et Command R+ sont accessibles via l'API Chat de Cohere et prennent en charge à la fois les interactions conversationnelles multi-tours et les tâches de génération en un seul tour. Command R+ est la variante plus grande et plus capable, adaptée au raisonnement complexe et au RAG intensif en documents, tandis que Command R est optimisé pour une latence et un coût inférieurs dans les pipelines de production à haut débit. Les deux modèles acceptent un paramètre `documents` qui vous permet de passer le contexte récupéré directement dans le prompt, activant un mode RAG natif où le modèle reçoit l'instruction d'ancrer sa réponse dans le contenu fourni et de citer les sources.
 
 ### API Embed (embeddings multilingues)
 
-L'API Embed convertit le texte en représentations vectorielles denses adaptées à la recherche par similarité sémantique. Les modèles d'embedding de Cohere prennent en charge plus de 100 langues dans un seul modèle, permettant la recherche multilingue et la récupération de documents multilingues sans modèles séparés par langue. Les embeddings peuvent être générés avec différentes valeurs d'`input_type` — `search_document` pour indexer le contenu au repos, et `search_query` pour encoder les requêtes à l'exécution — une distinction qui applique des signaux d'entraînement asymétriques et améliore généralement la précision de récupération par rapport aux schémas d'embedding symétriques.
+L'API Embed convertit le texte en représentations vectorielles denses adaptées à la recherche de similarité sémantique. Les modèles d'embedding de Cohere prennent en charge plus de 100 langues dans un seul modèle, rendant possible la recherche interlinguistique et la récupération multilingue de documents sans modèles spécifiques à chaque langue. Les embeddings peuvent être générés avec différentes valeurs `input_type` — `search_document` pour indexer le contenu au repos et `search_query` pour encoder les requêtes à l'exécution — une distinction qui applique des signaux d'entraînement asymétriques et améliore généralement la précision de récupération par rapport aux schémas d'embedding symétriques.
 
 ### API Rerank
 
-L'API Rerank accepte une requête et une liste de documents candidats (généralement les k premiers résultats d'une recherche vectorielle ou par mots-clés) et renvoie chaque document avec un score de pertinence calculé par un cross-encoder. Les cross-encoders évaluent la requête et le document conjointement en un seul passage, offrant une précision bien supérieure aux bi-encodeurs qui encodent la requête et le document séparément. Le reranking est une étape légère mais très efficace qui améliore considérablement la précision@k — il est le plus utile lorsque la récupération initiale est relativement bon marché (recherche BM25 ou ANN) mais que la précision doit être maximisée avant de passer le contexte à un LLM.
+L'API Rerank accepte une requête et une liste de documents candidats (généralement les résultats top-k d'une recherche vectorielle ou par mots-clés) et renvoie chaque document avec un score de pertinence calculé par un cross-encoder. Les cross-encoders évaluent la requête et le document conjointement dans un seul passage avant, offrant une précision bien supérieure aux bi-encoders qui encodent la requête et le document séparément. Le reranking est une étape légère mais très efficace qui améliore considérablement la précision@k — elle est plus précieuse lorsque la récupération initiale est relativement peu coûteuse (BM25 ou recherche ANN) mais que la précision doit être maximisée avant de transmettre le contexte à un LLM.
 
 ### Intégration RAG
 
-L'intégration RAG de Cohere réunit Embed, Rerank et Command R dans un pipeline unifié. Le flux typique est : embedder la requête, exécuter une recherche de plus proches voisins approximatifs dans une base de données vectorielle, re-classer les meilleurs candidats pour obtenir les documents les plus pertinents, puis passer ces documents à Command R avec la requête originale pour une génération ancrée. Le modèle renvoie une réponse accompagnée d'objets de citation qui référencent des passages spécifiques dans les documents récupérés, facilitant la construction d'applications IA auditables avec des sources citées.
+L'intégration RAG de Cohere relie Embed, Rerank et Command R dans un pipeline unifié. Le flux typique est : intégrer la requête, exécuter une recherche des voisins les plus proches approximatifs dans une base de données vectorielle, reclasser les meilleurs candidats pour obtenir les documents les plus pertinents, puis transmettre ces documents à Command R avec la requête originale pour la génération ancrée. Le modèle renvoie une réponse accompagnée d'objets de citation référençant des passages spécifiques dans les documents récupérés, ce qui facilite la construction d'applications d'IA auditables avec citations de sources.
 
 ```mermaid
 flowchart LR
@@ -48,34 +50,34 @@ flowchart LR
 ## Quand utiliser / Quand NE PAS utiliser
 
 | Utiliser quand | Éviter quand |
-|----------|------------|
-| Vous construisez une recherche d'entreprise ou une Q&A sur une base de connaissances où la précision de récupération est critique | Vous avez besoin d'une assistance conversationnelle générale sans composant de récupération |
-| Votre contenu couvre plusieurs langues et vous avez besoin d'un seul modèle d'embedding pour toutes | Votre cas d'usage est principalement image, audio ou multimodal — Cohere est uniquement texte |
-| Vous souhaitez ajouter une étape de reranking pour améliorer la précision après une recherche vectorielle ou BM25 initiale | Vous avez besoin d'un raisonnement très performant, mathématiques ou codage pour des tâches autonomes (GPT-4o ou Claude peuvent être plus performants) |
-| Les exigences de gouvernance des données imposent un déploiement on-premises ou en cloud privé | Votre projet est un prototype rapide et vous souhaitez l'écosystème d'intégrations le plus large |
-| Vous avez besoin de citations de sources et d'ancrage dans les documents nativement dans la sortie du modèle | Le budget est extrêmement limité — la tarification entreprise de Cohere est plus élevée que certaines alternatives |
+|----------------|--------------|
+| Construction d'une recherche entreprise ou d'un Q&A de base de connaissances où la précision de récupération est critique | Vous avez besoin d'une assistance chat polyvalente sans composant de récupération |
+| Votre contenu couvre plusieurs langues et vous avez besoin d'un seul modèle d'embedding pour toutes | Votre cas d'usage est principalement l'image, l'audio ou le multimodal — Cohere est texte uniquement |
+| Vous souhaitez ajouter une étape de reranking pour améliorer la précision après une recherche vectorielle ou BM25 initiale | Vous avez besoin d'un raisonnement, de mathématiques ou d'un codage très capables pour des tâches autonomes |
+| Les exigences de gouvernance des données imposent un déploiement sur site ou en cloud privé | Votre projet est un prototype rapide et vous souhaitez l'écosystème d'intégrations le plus large |
+| Vous avez besoin de citations de sources et d'un ancrage documentaire nativement dans la sortie du modèle | Le budget est extrêmement serré — les prix entreprise de Cohere sont plus élevés que certaines alternatives |
 
 ## Comparaisons
 
 | Critère | Cohere | OpenAI | Mistral |
-|----------|--------|--------|---------|
-| Qualité d'embedding (MTEB) | Premier rang multilingue, 100+ langues | Fort en anglais en premier (text-embedding-3-large) | Compétitif ; mistral-embed disponible |
+|---------|--------|--------|---------|
+| Qualité des embeddings (MTEB) | Multilingue de premier niveau, 100+ langues | Fort en anglais en premier (text-embedding-3-large) | Compétitif ; mistral-embed disponible |
 | Reranking | API Rerank native (cross-encoder) | Pas d'endpoint de reranking natif | Pas d'endpoint de reranking natif |
-| Modèles natifs RAG | Command R/R+ conçus pour le RAG avec citations | GPT-4o fonctionne bien avec les prompts RAG mais n'est pas RAG-natif | Mixtral/Mistral fonctionnent avec les prompts RAG |
+| Modèles RAG natifs | Command R/R+ conçus pour RAG avec citations | GPT-4o fonctionne bien avec les prompts RAG mais pas natif RAG | Mixtral/Mistral fonctionnent avec les prompts RAG |
 | Poids ouverts | Non (API propriétaire uniquement) | Non (API propriétaire uniquement) | Oui (modèles Mistral sur Hugging Face) |
-| On-premises / cloud privé | Oui (contrats d'entreprise) | Azure OpenAI (limité) | Oui (auto-hébergement des poids ouverts) |
+| Sur site / cloud privé | Oui (contrats entreprise) | Azure OpenAI (limité) | Oui (auto-héberger les poids ouverts) |
 | Embedding multilingue | Modèle unique, 100+ langues | Support multilingue séparé ou limité | Support d'embedding multilingue limité |
-| Modèle de tarification | Entreprise / par token | Par token, bien documenté | Par token ; option auto-hébergement gratuite |
+| Modèle de tarification | Entreprise / paiement par token | Paiement par token, bien documenté | Paiement par token ; option auto-hébergement gratuite |
 
 ## Avantages et inconvénients
 
 | Avantages | Inconvénients |
-|------|------|
-| Embeddings multilingues de première classe dans un seul modèle | Écosystème général plus petit comparé à OpenAI |
-| L'API Rerank native améliore significativement la précision de récupération | Pas d'option à poids ouverts pour l'auto-hébergement |
-| Command R/R+ sont conçus spécifiquement pour le RAG ancré et cité | Moins performant que GPT-4o / Claude pour le raisonnement autonome complexe |
-| Options de déploiement de qualité entreprise incluant le cloud privé | Documentation et ressources communautaires plus limitées qu'OpenAI |
-| Les composants du pipeline RAG (Embed + Rerank + Command R) fonctionnent comme une pile cohérente | La tarification peut être plus élevée pour les expériences à petite échelle |
+|-----------|---------------|
+| Embeddings multilingues de premier niveau dans un seul modèle | Écosystème général plus petit par rapport à OpenAI |
+| L'API Rerank native améliore considérablement la précision de récupération | Pas d'option poids ouverts pour l'auto-hébergement |
+| Command R/R+ sont spécialement conçus pour le RAG ancré avec citations | Moins capable que GPT-4o / Claude pour le raisonnement autonome complexe |
+| Options de déploiement entreprise incluant le cloud privé | Documentation et ressources communautaires plus limitées qu'OpenAI |
+| Les composants du pipeline RAG (Embed + Rerank + Command R) fonctionnent comme une pile cohésive | Les prix peuvent être plus élevés pour les petits projets |
 
 ## Exemples de code
 
@@ -131,7 +133,7 @@ top_idx = int(np.argmax(scores))
 print(f"Most relevant: '{documents[top_idx]}' (score: {scores[top_idx]:.4f})")
 ```
 
-### Re-classement des candidats récupérés
+### Reranking des candidats récupérés
 
 ```python
 import cohere
@@ -185,11 +187,11 @@ for citation in response.citations:
 
 ## Ressources pratiques
 
-- [Documentation API Cohere](https://docs.cohere.com/) — Référence complète pour toutes les API Cohere incluant Chat, Embed et Rerank
+- [Documentation de l'API Cohere](https://docs.cohere.com/) — Référence complète pour toutes les API Cohere incluant Chat, Embed et Rerank
 - [Documentation Cohere Embed](https://docs.cohere.com/docs/embeddings) — Guide détaillé sur les modèles d'embedding, les types d'entrée et le support multilingue
-- [Documentation Cohere Rerank](https://docs.cohere.com/docs/reranking) — Guide de l'API Rerank avec des exemples et des conseils de sélection de modèle
-- [Guide RAG Cohere](https://docs.cohere.com/docs/retrieval-augmented-generation-rag) — Présentation de bout en bout de la construction d'un pipeline RAG avec Command R
-- [Classement MTEB](https://huggingface.co/spaces/mteb/leaderboard) — Benchmark indépendant comparant les modèles d'embedding incluant Cohere Embed
+- [Documentation Cohere Rerank](https://docs.cohere.com/docs/reranking) — Guide de l'API Rerank avec exemples et conseils de sélection de modèles
+- [Guide RAG de Cohere](https://docs.cohere.com/docs/retrieval-augmented-generation-rag) — Parcours complet pour construire un pipeline RAG avec Command R
+- [MTEB Leaderboard](https://huggingface.co/spaces/mteb/leaderboard) — Benchmark indépendant comparant les modèles d'embedding incluant Cohere Embed
 
 ## Voir aussi
 

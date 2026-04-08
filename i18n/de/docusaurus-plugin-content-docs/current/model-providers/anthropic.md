@@ -1,24 +1,26 @@
 ---
 title: Anthropic
-description: Anthropic als Entwicklerplattform — die Claude-Modellfamilie, Messages API, Tool-Nutzung, erweitertes Denken, Prompt-Caching und langer Kontext.
-keywords: [Anthropic, Claude, Claude Opus, Claude Sonnet, Claude Haiku, Tool-Nutzung, erweitertes Denken, Prompt-Caching, langer Kontext, API, SDK]
+description: Anthropic as a developer platform — Claude model family, Messages API, tool use, extended thinking, prompt caching, and long context.
+keywords: [Anthropic, Claude, Claude Opus, Claude Sonnet, Claude Haiku, tool use, extended thinking, prompt caching, long context, API, SDK]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Anthropic
 
 ## Definition
 
-**Anthropic** ist ein KI-Sicherheitsunternehmen und Modellanbieter, das 2021 von ehemaligen OpenAI-Forschern gegründet wurde. Die Kernthese lautet, dass der Aufbau leistungsfähiger KI-Modelle und die Lösung des Ausrichtungsproblems untrennbare Ziele sind – das Unternehmen verfolgt modernste Fähigkeiten zusammen mit Sicherheitsforschung wie Constitutional AI, Interpretierbarkeit und mechanistischem Verständnis von Modellinterna. Das kommerzielle Produkt dieser Forschung ist die **Claude**-Modellfamilie, verfügbar über die Anthropic-API und Enterprise-Produkte.
+**Anthropic** ist ein KI-Sicherheitsunternehmen und Modellanbieter, der 2021 von ehemaligen OpenAI-Forschern gegründet wurde. Seine Kernthese lautet: Der Aufbau leistungsfähiger KI-Modelle und die Lösung des Alignment-Problems sind untrennbare Ziele — das Unternehmen verfolgt modernste Leistungsfähigkeit gemeinsam mit Sicherheitsforschung wie Constitutional AI, Interpretierbarkeit und mechanistisches Verstehen der Modell-Interna. Das kommerzielle Produkt dieser Forschung ist die **Claude**-Modellfamilie, verfügbar über die Anthropic-API und Enterprise-Produkte.
 
-Die Claude-Modellreihe folgt einer dreigliedrigen Namenskonvention, die Fähigkeits- und Kostenkompromisse widerspiegelt: **Opus** (höchste Qualität, komplexes Schlussfolgern), **Sonnet** (ausgewogene Qualität und Geschwindigkeit) und **Haiku** (schnellstes und kosteneffizientestes). Stand 2025 ist die aktuelle Generation **Claude 3.7 Sonnet** – das Flaggschiffmodell mit erweiterten Denkfähigkeiten – zusammen mit **Claude 3 Opus**, **Claude 3.5 Sonnet** und **Claude 3.5 Haiku**. Alle Claude-3+-Modelle unterstützen visuelle Eingaben (Bilder), und die gesamte Familie ist um ein 200K-Token-Kontextfenster herum konzipiert, das Bücher, große Codebasen und lange Gesprächsverläufe ohne Kürzung verarbeiten kann.
+Die Claude-Modellreihe folgt einer dreigliedrigen Namenskonvention, die Leistungs- und Kosten-Kompromisse widerspiegelt: **Opus** (höchste Qualität, komplexes Denken), **Sonnet** (ausgewogene Qualität und Geschwindigkeit) und **Haiku** (schnellste und kosteneffizienteste). Stand 2025 ist die aktuelle Generation **Claude 3.7 Sonnet** — das Flaggschiffmodell mit erweitertem Denken — zusammen mit **Claude 3 Opus**, **Claude 3.5 Sonnet** und **Claude 3.5 Haiku**. Alle Claude 3+-Modelle unterstützen Bildeingaben, und die gesamte Familie ist auf ein 200K-Token-Kontextfenster ausgelegt, das Bücher, große Codebasen und lange Konversationsverläufe ohne Abschneiden verarbeiten kann.
 
-Aus Plattformperspektive dreht sich Anthropics API um die **Messages API** – eine saubere, zweckgebaute Schnittstelle für mehrstufige Gespräche. Die Plattform umfasst Tool-Nutzung (Anthropics Begriff für Funktionsaufrufe), erweitertes Denken (sichtbares Chain-of-Thought-Schlussfolgern), Prompt-Caching (reduziert Kosten und Latenz für große wiederholte Kontexte) und Stapelverarbeitung. Das Python-SDK (`anthropic`) und das TypeScript-SDK sind die primären Client-Bibliotheken. Claude-Modelle sind auch über Amazon Bedrock, Google Cloud Vertex AI und Enterprise-Verträge mit Optionen zur Datenspeicherung verfügbar.
+Aus Plattformperspektive dreht sich Anthropics API um die **Messages API** — eine saubere, zweckgebaute Schnittstelle für Multi-Turn-Konversationen. Die Plattform umfasst Tool-Nutzung (Anthropics Begriff für Funktionsaufruf), erweitertes Denken (sichtbares Chain-of-Thought-Reasoning), Prompt-Caching (reduziert Kosten und Latenz bei großen wiederholten Kontexten) und Stapelverarbeitung. Das Python-SDK (`anthropic`) und TypeScript-SDK sind die primären Client-Bibliotheken. Claude-Modelle sind auch über Amazon Bedrock, Google Cloud Vertex AI und Enterprise-Verträge mit Optionen für Datenspeicherorte verfügbar.
 
 ## Funktionsweise
 
 ### Messages API
 
-Die Messages API (`POST /v1/messages`) ist Anthropics primäre Schnittstelle. Im Gegensatz zu einigen APIs, die einen flachen `prompt`-String verwenden, ist die Messages API gesprächsorientiert: Sie senden ein `messages`-Array mit abwechselnden `user`- und `assistant`-Runden, mit einem optionalen `system`-Parameter für Kontext und Persona. Das Modell gibt ein `Message`-Objekt zurück, das eine `content`-Liste enthält – standardmäßig Textblöcke, Tool-Use-Blöcke wenn das Modell beschließt, ein Tool aufzurufen. Streaming wird unterstützt und für interaktive Nutzung empfohlen; das SDK bietet sowohl Streaming-Helfer als auch rohen SSE-Zugang.
+Die Messages API (`POST /v1/messages`) ist Anthropics primäre Schnittstelle. Im Gegensatz zu einigen APIs, die einen flachen `prompt`-String verwenden, ist die Messages API konversationsorientiert: Sie senden ein `messages`-Array mit abwechselnden `user`- und `assistant`-Turns sowie einen optionalen `system`-Parameter für Kontext und Persona. Das Modell gibt ein `Message`-Objekt zurück, das eine `content`-Liste enthält — standardmäßig Textblöcke, Tool-Use-Blöcke wenn das Modell ein Tool aufrufen möchte. Streaming wird unterstützt und für interaktive Nutzung empfohlen; das SDK bietet sowohl Streaming-Helfer als auch rohen SSE-Zugriff.
 
 ```mermaid
 flowchart LR
@@ -36,7 +38,7 @@ flowchart LR
 
 ### Tool-Nutzung
 
-Tool-Nutzung ermöglicht es Claude, externe Funktionen aufzurufen, indem strukturierte `tool_use`-Inhaltsblöcke ausgegeben werden. Sie deklarieren Tools als JSON-Schemas im `tools`-Parameter. Wenn Claude entscheidet, dass ein Tool benötigt wird, enthält die Antwort einen `tool_use`-Block mit dem Tool-Namen und der Eingabe; Ihr Code führt die Funktion aus und gibt ein `tool_result` im nächsten User-Zug zurück. Claude verwendet dann das Ergebnis, um seine Antwort zu vervollständigen. Dieses Muster ermöglicht Agenten, Code-Ausführungsumgebungen, Datenbankabfragen und API-Integrationen, ohne dass das Modell direkten Zugang zu einem System benötigt.
+Mit Tool-Nutzung kann Claude externe Funktionen aufrufen, indem es strukturierte `tool_use`-Inhaltsblöcke ausgibt. Sie deklarieren Tools als JSON-Schemas im `tools`-Parameter. Wenn Claude entscheidet, dass ein Tool benötigt wird, enthält die Antwort einen `tool_use`-Block mit dem Tool-Namen und der Eingabe; Ihr Code führt die Funktion aus und gibt ein `tool_result` im nächsten User-Turn zurück. Claude verwendet das Ergebnis dann, um seine Antwort abzuschließen. Dieses Muster ermöglicht Agents, Code-Ausführungsumgebungen, Datenbankabfragen und API-Integrationen, ohne dass das Modell direkten Zugriff auf ein System benötigt.
 
 ```mermaid
 flowchart LR
@@ -50,15 +52,15 @@ flowchart LR
 
 ### Erweitertes Denken
 
-Erweitertes Denken ist ein Modus, der auf Claude 3.7 Sonnet verfügbar ist und es dem Modell ermöglicht, ausführlich zu schlussfolgern, bevor es seine endgültige Antwort produziert. Wenn Sie `thinking: {type: "enabled", budget_tokens: N}` setzen, gibt das Modell `thinking`-Inhaltsblöcke aus, die sein internes Notizbuch enthalten – ähnlich wie Chain-of-Thought, aber nativ und strukturiert. Erweitertes Denken verbessert die Leistung bei Mathematikwettbewerben, komplexem Code, mehrstufigem Schlussfolgern und Aufgaben, die sorgfältige Schritt-für-Schritt-Analyse erfordern, erheblich. Die Denk-Tokens zählen zum Token-Budget, sind aber in der Antwort sichtbar, was Ihnen Transparenz darüber gibt, wie das Modell zu seiner Antwort gelangt ist.
+Erweitertes Denken ist ein Modus, der auf Claude 3.7 Sonnet verfügbar ist und es dem Modell ermöglicht, ausführlich zu denken, bevor es seine endgültige Antwort produziert. Wenn Sie `thinking: {type: "enabled", budget_tokens: N}` setzen, gibt das Modell `thinking`-Inhaltsblöcke aus, die seinen internen Arbeitsbereich enthalten — ähnlich wie Chain-of-Thought, aber nativ und strukturiert. Erweitertes Denken verbessert die Leistung bei Mathematikwettbewerben, komplexem Code, mehrstufigem Denken und Aufgaben, die sorgfältige schrittweise Analyse erfordern, erheblich. Die Denk-Tokens zählen zum Token-Budget, sind aber in der Antwort sichtbar und geben Transparenz darüber, wie das Modell zu seiner Antwort gelangt ist.
 
 ### Prompt-Caching
 
-Prompt-Caching reduziert Kosten und Latenz für Arbeitslasten, die wiederholt große System-Prompts oder Dokumentkontexte verwenden, drastisch. Sie markieren Präfixabschnitte Ihrer Anfrage mit `cache_control: {type: "ephemeral"}`. Beim ersten Aufruf speichert Anthropic das Prompt-Präfix auf seiner Infrastruktur; nachfolgende Aufrufe, die dem Präfix entsprechen, werden aus dem Cache bedient, mit 90 % niedrigeren Eingabe-Token-Kosten und erheblich reduzierter Zeit bis zum ersten Token. Dies ist besonders wertvoll für RAG-Pipelines (großer Kontext mit jeder Abfrage übergeben), Agenten-Schleifen (große System-Prompts bei jedem Durchlauf wiederholt) und Dokumentenstapelverarbeitung.
+Prompt-Caching reduziert Kosten und Latenz für Workloads, die wiederholt große System-Prompts oder Dokumentkontexte verwenden, erheblich. Sie markieren Präfixabschnitte Ihrer Anfrage mit `cache_control: {type: "ephemeral"}`. Beim ersten Aufruf speichert Anthropic das Prompt-Präfix in seiner Infrastruktur; nachfolgende Aufrufe, die dem Präfix entsprechen, werden aus dem Cache mit 90% niedrigeren Input-Token-Kosten und deutlich reduzierter Zeit-bis-ersten-Token bedient. Dies ist besonders wertvoll für RAG-Pipelines (großer Kontext mit jeder Anfrage übergeben), Agent-Schleifen (große System-Prompts in jedem Turn wiederholt) und Stapel-Dokumentenverarbeitung.
 
-### Langer Kontext (200K Tokens)
+### Langer Kontext (200K Token)
 
-Alle Claude-3- und späteren Modelle unterstützen ein 200K-Token-Kontextfenster – entspricht etwa 150.000 Wörtern oder ~500 Seiten Text. Langer Kontext ermöglicht es, ganze Codebasen, juristische Dokumente, Forschungsarbeiten oder vollständige Gesprächsverläufe in einem einzigen Aufruf ohne Chunking zu verarbeiten. Anthropics Forschung zur Langkontextleistung ("Nadel im Heuhaufen"-Auswertungen) zeigt, dass Claude über den gesamten 200K-Bereich eine starke Abrufgenauigkeit beibehält, was es zuverlässig für Dokument-Q&A, Vertragsanalyse und Code-Review über große Repositories macht. Dies ist einer von Anthropics deutlichsten Vorteilen gegenüber GPT-4os 128K-Fenster.
+Alle Claude 3 und spätere Modelle unterstützen ein 200K-Token-Kontextfenster — entspricht etwa 150.000 Wörtern oder ca. 500 Seiten Text. Langer Kontext ermöglicht es, ganze Codebasen, Rechtsdokumente, Forschungsarbeiten oder vollständige Konversationsverläufe in einem einzigen Aufruf ohne Aufteilung zu verarbeiten. Anthropics Forschung zur Langkontext-Leistung ("Nadel im Heuhaufen"-Evaluierungen) zeigt, dass Claude über den gesamten 200K-Bereich hinweg eine starke Rückrufgenauigkeit beibehält, was es zuverlässig für Dokument-Q&A, Vertragsanalyse und Code-Review über große Repositories macht. Dies ist einer von Anthropics deutlichsten Differenziatoren gegenüber GPT-4os 128K-Fenster.
 
 ```mermaid
 flowchart LR
@@ -72,39 +74,39 @@ flowchart LR
 ## Wann verwenden / Wann NICHT verwenden
 
 | Anthropic verwenden wenn | Alternativen in Betracht ziehen wenn |
-|--------------------|--------------------------------------|
-| Sie ein 200K-Kontextfenster benötigen, um lange Dokumente, Codebasen oder erweiterte Gespräche ohne Chunking zu verarbeiten | Ihre Arbeitslast Bildgenerierung, Audiotranskription oder Text-to-Speech erfordert — Claude ist nur Text/Vision; OpenAI deckt Audio ab |
-| Sicherheitseinschränkungen und vorhersehbares Ablehnungsverhalten kritisch sind (Compliance, Gesundheitswesen, Finanzen) | Sie Open-Weights-Modelle für Self-Hosting, Feinabstimmung oder Datenspeicherung benötigen — Anthropic bietet keine Open-Weights-Option |
-| Sie erweitertes Denken für tiefe Schlussfolgerungsaufgaben wollen (Mathematik, komplexer Code, mehrstufige Analyse) | Ihr primärer Anwendungsfall die Generierung hochvolumiger Einbettungen ist — Anthropic bietet keine Einbettungs-API |
-| Prompt-Caching die Kosten sinnvoll reduzieren wird (große wiederholte Kontexte, Agenten-System-Prompts) | Sie stark auf OpenAI-spezifisches Tooling angewiesen sind (Assistants API, DALL-E, Whisper), das kein Anthropic-Äquivalent hat |
-| Sie Tool-Nutzung oder Computer-Use-Workflows aufbauen und ein gut kalibriertes Modell für strukturierte Ausgaben wollen | Sie die absolut niedrigsten Kosten pro Token im großen Maßstab benötigen — Claude Haiku ist preislich wettbewerbsfähig, aber GPT-4o-mini und offene Modelle sind günstiger |
+|--------------------------|--------------------------------------|
+| Sie ein 200K-Kontextfenster benötigen, um lange Dokumente, Codebasen oder erweiterte Konversationen ohne Aufteilung zu verarbeiten | Ihr Workload Bildgenerierung, Audio-Transkription oder Text-to-Speech erfordert — Claude ist nur Text/Vision; OpenAI deckt Audio ab |
+| Sicherheitsbeschränkungen und vorhersehbares Ablehnungsverhalten kritisch sind (Compliance, Gesundheitswesen, Finanzen) | Sie Open-Weights-Modelle für Self-Hosting, Feinabstimmung oder Datenspeicherort benötigen — Anthropic bietet keine Open-Weights-Option |
+| Sie erweitertes Denken für tiefe Reasoning-Aufgaben möchten (Mathematik, komplexer Code, mehrstufige Analyse) | Ihr primärer Anwendungsfall hochvolumige Embedding-Generierung ist — Anthropic bietet keine Embeddings-API |
+| Prompt-Caching Kosten sinnvoll reduziert (große wiederholte Kontexte, Agent-System-Prompts) | Sie stark auf OpenAI-spezifisches Tooling angewiesen sind (Assistants API, DALL-E, Whisper), das kein Anthropic-Äquivalent hat |
+| Sie Tool-Nutzung oder Computer-Use-Workflows aufbauen und ein Modell möchten, das gut auf strukturierte Ausgaben kalibriert ist | Sie die absolut niedrigsten Kosten pro Token bei großem Volumen benötigen — Claude Haiku konkurriert preislich, aber GPT-4o-mini und offene Modelle sind günstiger |
 
 ## Vergleiche
 
 | Kriterium | Anthropic | OpenAI | Google Gemini |
-|----------|-----------|--------|---------------|
+|-----------|-----------|--------|---------------|
 | Flaggschiffmodell | Claude 3.7 Sonnet | GPT-4o | Gemini 2.5 Pro |
 | Kontextfenster | 200K (alle Claude 3+) | 128K (GPT-4o) | Bis zu 1M (Gemini 1.5 Pro) |
-| Schlussfolgern / Denken | Erweitertes Denken (natives CoT) | o1-, o3-Serie | Gemini 2.5 Pro thinking |
+| Reasoning / Denken | Erweitertes Denken (nativer CoT) | o1, o3-Serie | Gemini 2.5 Pro Denken |
 | Multimodale Eingabe | Text, Bild | Text, Bild, Audio, Video | Text, Bild, Audio, Video |
 | Audio / Sprache | Nein | Ja (Whisper, TTS) | Ja (Gemini) |
 | Bildgenerierung | Nein | Ja (DALL-E 3) | Ja (Imagen) |
-| Einbettungs-API | Nein | Ja | Ja |
-| Offene Gewichte | Nein | Nein | Gemma (teilweise) |
-| Prompt-Caching | Ja (nativ, 90 % Rabatt) | Kontext-Caching (begrenzt) | Ja (Gemini) |
-| Tool-Nutzung / Funktionsaufrufe | Ausgereift, Computer-Use-Unterstützung | Ausgereift, weit verbreitet | Ausgereift |
-| Sicherheitsphilosophie | Constitutional AI, ablehnungsabgestimmt | Moderation API, Nutzungsrichtlinie | Richtlinien für verantwortungsvolle KI |
-| Datenspeicherungsoptionen | Enterprise-Vertrag | Enterprise-Vertrag | Google-Cloud-Regionen |
+| Embeddings-API | Nein | Ja | Ja |
+| Open-Weights | Nein | Nein | Gemma (partiell) |
+| Prompt-Caching | Ja (nativ, 90% Rabatt) | Kontextzwischenspeicherung (begrenzt) | Ja (Gemini) |
+| Tool-Nutzung / Funktionsaufruf | Ausgereift, Computer-Use-Unterstützung | Ausgereift, weit verbreitet | Ausgereift |
+| Sicherheitsphilosophie | Constitutional AI, ablehnung-optimiert | Moderations-API, Nutzungsrichtlinie | Verantwortungsvolle KI-Richtlinien |
+| Datenspeicherort-Optionen | Enterprise-Vertrag | Enterprise-Vertrag | Google Cloud-Regionen |
 
 ## Vor- und Nachteile
 
 | Vorteile | Nachteile |
-|------|------|
-| 200K-Kontextfenster für alle Modelle — branchenführend für lange Dokumente | Keine Audio-, Sprach- oder Bildgenerungs-APIs |
-| Erweitertes Denken bietet transparentes Chain-of-Thought für schwierige Schlussfolgerungsaufgaben | Keine Einbettungs-API — Sie benötigen einen zweiten Anbieter für RAG |
+|----------|-----------|
+| 200K-Kontextfenster für alle Modelle — beste Klasse für lange Dokumente | Keine Audio-, Sprach- oder Bildgenerierungs-APIs |
+| Erweitertes Denken bietet transparenten Chain-of-Thought für schwierige Reasoning-Aufgaben | Keine Embeddings-API — Sie benötigen einen zweiten Anbieter für RAG |
 | Prompt-Caching reduziert Kosten für wiederholte große Kontexte erheblich | Geschlossenes Modell ohne Open-Weights-Option |
 | Sicherheitsorientiertes Design mit sorgfältiger Ablehnungskalibrierung und Constitutional AI | Kleineres Ökosystem als OpenAI — weniger Drittanbieter-Tutorials und Integrationen |
-| Computer Use (Beta) ermöglicht agentische Steuerung von Desktop-GUIs | Preise können für einfache Aufgaben höher sein als GPT-4o-mini oder Open-Weights-Alternativen |
+| Computer-Use (Beta) ermöglicht agentische Steuerung von Desktop-GUIs | Preise können für einfache Aufgaben höher sein als GPT-4o-mini oder Open-Weights-Alternativen |
 
 ## Codebeispiele
 
@@ -269,17 +271,17 @@ print(response.usage)
 
 ## Praktische Ressourcen
 
-- [Anthropic-API-Referenz](https://docs.anthropic.com/en/api/getting-started) — Vollständige Endpunkt-Dokumentation mit Anfrage-/Antwort-Schemas und Parameterreferenz
-- [Anthropic-Leitfaden zum Prompt Engineering](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Offizielle Best Practices für System-Prompts, Chain-of-Thought und aufgabenspezifische Techniken
-- [Anthropic Cookbook](https://github.com/anthropics/anthropic-cookbook) — Ausführbare Notebooks zu Tool-Nutzung, RAG, multimodal, Prompt-Caching und Agenten
-- [Claude-Modellübersicht](https://docs.anthropic.com/en/docs/about-claude/models) — Aktuelle Modell-IDs, Kontextfenster, Fähigkeitsvergleich und Abkündigungsplan
-- [Anthropic Python SDK auf GitHub](https://github.com/anthropics/anthropic-sdk-python) — Quellcode, Changelog, Typ-Stubs und Migrationsleitfäden
+- [Anthropic-API-Referenz](https://docs.anthropic.com/en/api/getting-started) — Vollständige Endpunkt-Dokumentation mit Request/Response-Schemas und Parameterreferenz
+- [Anthropic Prompt-Engineering-Leitfaden](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Offizielle Best Practices für System-Prompts, Chain-of-Thought und aufgabenspezifische Techniken
+- [Anthropic Cookbook](https://github.com/anthropics/anthropic-cookbook) — Ausführbare Notebooks zu Tool-Nutzung, RAG, Multimodal, Prompt-Caching und Agents
+- [Claude-Modellübersicht](https://docs.anthropic.com/en/docs/about-claude/models) — Aktuelle Modell-IDs, Kontextfenster, Fähigkeitsvergleich und Deprecation-Zeitplan
+- [Anthropic Python SDK auf GitHub](https://github.com/anthropics/anthropic-sdk-python) — Quellcode, Changelog, Typstubs und Migrationsleitfäden
 
 ## Siehe auch
 
 - [Modellanbieter](/docs/model-providers) — Übersicht und Vergleich aller Anbieter einschließlich einer 7-Anbieter-Vergleichstabelle
-- [Fallstudie: Claude](/docs/case-studies/claude) — Für einen tieferen Einblick in Modellarchitektur und Trainingsmethodik, siehe die Claude-Fallstudie
-- [OpenAI](/docs/model-providers/openai) — GPT-4o, o-Serien-Schlussfolgern, Funktionsaufrufe, DALL-E, Whisper
-- [Prompt Engineering](/docs/prompt-engineering) — Techniken, die für alle Claude-Modelle gelten
-- [Tools](/docs/tools/claude-code) — Claude Code, Anthropics KI-Coding-Agent, der auf der Claude-API aufbaut
-- [Agenten](/docs/agents) — Aufbau agentischer Workflows mit Claude-Tool-Nutzung
+- [Fallstudie: Claude](/docs/case-studies/claude) — Für einen tieferen Einblick in Modellarchitektur und Trainingsmethodik
+- [OpenAI](/docs/model-providers/openai) — GPT-4o, o-Serie Reasoning, Funktionsaufruf, DALL-E, Whisper
+- [Prompt-Engineering](/docs/prompt-engineering) — Techniken für alle Claude-Modelle anwendbar
+- [Tools](/docs/tools/claude-code) — Claude Code, Anthropics KI-Coding-Agent
+- [Agents](/docs/agents) — Aufbau agentischer Workflows mit Claude Tool-Nutzung

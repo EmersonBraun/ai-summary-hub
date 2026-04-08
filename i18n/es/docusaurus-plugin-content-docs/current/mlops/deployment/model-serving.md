@@ -1,18 +1,20 @@
 ---
 title: Servicio de modelos
-description: Estrategias y frameworks para desplegar modelos de ML como servicios de inferencia escalables — batch, tiempo real y streaming.
-keywords: [servicio de modelos, inferencia, TorchServe, TF Serving, Triton, BentoML, FastAPI, inferencia batch, API en tiempo real, streaming]
+description: Estrategias y frameworks para desplegar modelos de ML como servicios de inferencia escalables — por lotes, tiempo real y streaming.
+keywords: [servicio de modelos, inferencia, TorchServe, TF Serving, Triton, BentoML, FastAPI, inferencia por lotes, API en tiempo real, streaming]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Servicio de modelos
 
 ## Definición
 
-El servicio de modelos es el proceso de hacer disponible un modelo de ML entrenado para la inferencia — aceptar datos de entrada, ejecutar una predicción y devolver resultados a los llamantes. Es el puente entre el mundo offline del entrenamiento y la experimentación y el mundo online de las aplicaciones en producción. Una capa de servicio bien diseñada es tan importante como la calidad del modelo: un modelo con 98% de precisión desplegado con una latencia de 10 segundos es a menudo inútil en un contexto de producto.
+El servicio de modelos es el proceso de hacer que un modelo de ML entrenado esté disponible para inferencia — aceptar datos de entrada, ejecutar una predicción y devolver resultados a los llamantes. Es el puente entre el mundo offline del entrenamiento y la experimentación y el mundo online de las aplicaciones en producción. Una capa de servicio bien diseñada es tan importante como la calidad del modelo: un modelo con un 98 % de precisión desplegado con una latencia de 10 segundos suele ser inútil en un contexto de producto.
 
-El servicio de modelos abarca tres paradigmas distintos que difieren fundamentalmente en sus requisitos de latencia, throughput e infraestructura. La **inferencia batch** procesa grandes volúmenes de datos según un calendario, escribiendo predicciones en una base de datos o archivo; es la opción de mayor throughput pero no puede responder a solicitudes individuales en tiempo real. La **inferencia en tiempo real (online)** expone un endpoint de API que devuelve predicciones en milisegundos; prioriza la baja latencia sobre el throughput. La **inferencia de streaming** procesa eventos de una cola o stream a medida que llegan, situándose entre batch y tiempo real tanto en latencia como en complejidad.
+El servicio de modelos abarca tres paradigmas distintos que difieren fundamentalmente en su latencia, rendimiento y requisitos de infraestructura. La **inferencia por lotes** procesa grandes volúmenes de datos de forma programada, escribiendo predicciones en una base de datos o archivo; es la opción de mayor rendimiento pero no puede responder a solicitudes individuales en tiempo real. La **inferencia en tiempo real (en línea)** expone un endpoint de API que devuelve predicciones en milisegundos; prioriza la baja latencia sobre el rendimiento. La **inferencia por streaming** procesa eventos de una cola o flujo a medida que llegan, situándose entre el procesamiento por lotes y el tiempo real tanto en latencia como en complejidad.
 
-Escalar un sistema de servicio de modelos implica desafíos específicos del ML: los modelos son típicamente archivos grandes cargados en memoria (o VRAM de GPU), el tiempo de inicio importa para el autoescalado, la utilización de GPU debe maximizarse para ser rentable, y la distribución de latencia de predicción puede ser impredecible bajo carga. Frameworks como NVIDIA Triton Inference Server, TorchServe y BentoML existen específicamente para abordar estos desafíos.
+Escalar un sistema de servicio de modelos implica desafíos específicos del ML: los modelos suelen ser archivos grandes cargados en memoria (o VRAM de GPU), el tiempo de inicio importa para el autoescalado, la utilización de GPU debe maximizarse para ser rentable, y la latencia de predicción tiene una distribución de cola que puede ser impredecible bajo carga. Frameworks como NVIDIA Triton Inference Server, TorchServe y BentoML existen específicamente para abordar estos desafíos.
 
 ## Cómo funciona
 
@@ -28,51 +30,51 @@ flowchart LR
   Server -->|"metrics"| Monitor["Monitoring\n(latency, throughput)"]
 ```
 
-### Inferencia batch
+### Inferencia por lotes
 
-En la inferencia batch, un trabajo programado (cron, DAG de Airflow o un scheduler en la nube) lee un conjunto de datos del almacenamiento, ejecuta predicciones en todo el conjunto y escribe los resultados de vuelta. El modelo se carga una vez por ejecución del trabajo, por lo que el costo amortizado por predicción de la carga es despreciable. Este patrón es adecuado para casos de uso como generar recomendaciones nocturnas, puntuar a todos los clientes para el riesgo de abandono o anotar un data warehouse con sentimiento predicho. La palanca de escalado principal es el paralelismo entre particiones de datos — cada partición puede ser procesada por un worker separado. Un problema común es el skew entre entrenamiento y servicio: el script de puntuación batch usa una lógica de preprocesamiento diferente a la del pipeline de entrenamiento.
+En la inferencia por lotes, un trabajo programado (cron, DAG de Airflow o un programador en la nube) lee un conjunto de datos del almacenamiento, ejecuta predicciones sobre todo el conjunto y escribe los resultados de vuelta. El modelo se carga una vez por ejecución del trabajo, por lo que el costo amortizado de carga por predicción es insignificante. Este patrón se adapta a casos de uso como generar recomendaciones nocturnas, puntuar a todos los clientes por riesgo de abandono o anotar un almacén de datos con sentimiento predicho. El principal mecanismo de escalado es el paralelismo entre particiones de datos — cada partición puede ser procesada por un trabajador separado. Un error común es el sesgo entrenamiento-servicio: el script de puntuación por lotes usa una lógica de preprocesamiento diferente a la del pipeline de entrenamiento.
 
 ### Inferencia de API en tiempo real
 
-El servicio en tiempo real expone el modelo detrás de un endpoint HTTP (o gRPC) que responde sincrónicamente a solicitudes individuales. El desafío clave de ingeniería es la latencia: la carga del modelo es lenta (segundos a minutos para modelos grandes), por lo que las instancias deben mantenerse calientes o pre-escaladas. Frameworks como TorchServe y BentoML manejan la carga del modelo, la deserialización de solicitudes, el agrupamiento de solicitudes concurrentes (batching dinámico) y las verificaciones de salud. El escalado horizontal vía Kubernetes o servicios gestionados (AWS SageMaker Endpoints, GCP Vertex AI Endpoints) agrega réplicas cuando el throughput supera un umbral. La memoria GPU determina cuántas réplicas del modelo caben en un solo nodo, lo que impulsa directamente el costo.
+El servicio en tiempo real expone el modelo detrás de un endpoint HTTP (o gRPC) que responde sincrónicamente a solicitudes individuales. El principal desafío de ingeniería es la latencia: la carga del modelo es lenta (segundos a minutos para modelos grandes), por lo que las instancias deben mantenerse calientes o preescaladas. Frameworks como TorchServe y BentoML manejan la carga del modelo, la deserialización de solicitudes, el agrupamiento de solicitudes concurrentes (agrupamiento dinámico) y las comprobaciones de salud. El escalado horizontal mediante Kubernetes o servicios gestionados (AWS SageMaker Endpoints, GCP Vertex AI Endpoints) añade réplicas cuando el rendimiento supera un umbral. La memoria de la GPU determina cuántas réplicas del modelo caben en un solo nodo, lo que impacta directamente en los costos.
 
-### Inferencia de streaming
+### Inferencia por streaming
 
-La inferencia de streaming conecta el servidor de modelos a un stream de eventos (Kafka, Kinesis, Pub/Sub). Los eventos llegan continuamente y las predicciones se emiten a un topic de salida. Este patrón es adecuado para la detección de fraude en streams de transacciones, detección de anomalías en tiempo real en datos de sensores, o cualquier caso de uso donde un nuevo evento debe puntuarse en cientos de milisegundos pero el volumen es demasiado alto para HTTP síncrono. El servidor de modelos actúa como consumidor-productor: lee del topic de entrada, ejecuta la inferencia y escribe en el topic de salida. La gestión de la contrapresión es crítica — el consumidor no debe quedarse atrás del productor durante picos de tráfico.
+La inferencia por streaming conecta el servidor de modelos a un flujo de eventos (Kafka, Kinesis, Pub/Sub). Los eventos llegan continuamente y las predicciones se emiten a un topic de salida. Este patrón se adapta a la detección de fraude en flujos de transacciones, la detección de anomalías en tiempo real en datos de sensores, o cualquier caso de uso donde un nuevo evento debe puntuarse en cientos de milisegundos pero el volumen es demasiado alto para HTTP síncrono. El servidor de modelos actúa como consumidor-productor: lee del topic de entrada, ejecuta inferencia y escribe en el topic de salida. La gestión de contrapresión es crítica — el consumidor no debe quedarse atrás del productor durante picos de tráfico.
 
 ### Consideraciones de escalado
 
-La programación de GPU es el factor de costo dominante para modelos grandes. Las palancas clave incluyen: **batching dinámico** (acumular múltiples solicitudes en una sola llamada de GPU), **cuantización del modelo** (reducir la precisión de FP32 a INT8 para caber más modelos por GPU), **caché del modelo** (mantener el modelo en VRAM entre solicitudes) y **autoescalado** (agregar o eliminar réplicas basándose en la profundidad de la cola o los SLOs de latencia). Triton Inference Server soporta todo esto con un archivo de configuración declarativo por modelo, lo que lo convierte en la opción preferida para flotas de modelos heterogéneos en producción.
+La programación de GPU es el factor de costo dominante para modelos grandes. Los principales mecanismos incluyen: **agrupamiento dinámico** (acumular múltiples solicitudes en una sola llamada GPU), **cuantificación de modelos** (reducir la precisión de FP32 a INT8 para ajustar más modelos por GPU), **caché de modelos** (mantener el modelo en VRAM entre solicitudes) y **autoescalado** (agregar o eliminar réplicas según la profundidad de la cola o los SLOs de latencia). Triton Inference Server admite todo esto con un archivo de configuración declarativo por modelo, lo que lo convierte en la opción preferida para flotas de modelos heterogéneas en producción.
 
 ## Cuándo usar / Cuándo NO usar
 
 | Usar cuando | Evitar cuando |
 |---|---|
 | Una aplicación downstream necesita predicciones en el momento de la solicitud | Todos los consumidores pueden tolerar predicciones calculadas con horas de anticipación |
-| Las predicciones deben reflejar la última versión del modelo inmediatamente | El conjunto de datos es suficientemente pequeño para ser puntuado en un batch nocturno de forma económica |
-| Se necesita puntuación basada en eventos (streaming) | El modelo se usa solo para análisis offline sin sistema downstream |
-| El costo de inferencia del modelo es alto y la utilización de GPU debe maximizarse | Etapa de prototipo donde un script simple llamado directamente es suficiente |
+| Las predicciones deben reflejar inmediatamente la última versión del modelo | El conjunto de datos es lo suficientemente pequeño como para puntuarse en un lote nocturno de forma económica |
+| Se necesita puntuación orientada a eventos (streaming) | El modelo solo se usa para análisis offline sin sistema downstream |
+| El costo de inferencia del modelo es alto y la utilización de GPU debe maximizarse | En la etapa de prototipo donde un script simple llamado directamente es suficiente |
 
 ## Comparaciones
 
-| Criterio | TorchServe | TF Serving | NVIDIA Triton | BentoML | FastAPI (personalizado) |
+| Criterio | TorchServe | TF Serving | NVIDIA Triton | BentoML | FastAPI (custom) |
 |---|---|---|---|---|---|
-| Soporte de frameworks | Nativo de PyTorch | TensorFlow / Keras | Multi-framework (ONNX, TF, PyTorch, TensorRT) | Agnóstico al framework | Agnóstico al framework |
-| Batching dinámico | Sí | Sí | Sí (altamente configurable) | Sí | Implementación manual |
+| Soporte de framework | Nativo PyTorch | TensorFlow / Keras | Multi-framework (ONNX, TF, PyTorch, TensorRT) | Agnóstico al framework | Agnóstico al framework |
+| Agrupamiento dinámico | Sí | Sí | Sí (altamente configurable) | Sí | Implementación manual |
 | Soporte gRPC | Sí | Sí | Sí | Sí | Vía grpcio |
-| Optimización GPU | Buena | Buena | La mejor de su clase | Buena | Manual |
-| Facilidad de configuración | Media | Media | Alta (configuración compleja) | Baja (nativo Python) | Muy baja |
+| Optimización GPU | Buena | Buena | Mejor de su clase | Buena | Manual |
+| Facilidad de configuración | Media | Media | Alta (configuración compleja) | Baja (nativa Python) | Muy baja |
 | Preparación para producción | Alta | Alta | Muy alta | Alta | Depende de la implementación |
 
 ## Ventajas y desventajas
 
 | Ventajas | Desventajas |
 |---|---|
-| Desacopla las actualizaciones del modelo de las releases del código de la aplicación | Agrega complejidad de infraestructura sobre ejecutar la inferencia en línea |
-| Permite el escalado independiente de la capacidad de inferencia | La latencia de inicio en frío puede ser significativa para modelos grandes |
-| Los frameworks de propósito específico manejan batching, verificaciones de salud y versionado | Las instancias GPU son costosas; la gestión de costos requiere cuidado |
-| Soporta pruebas A/B y despliegues canary de forma nativa | La inferencia de streaming requiere experiencia en Kafka/Kinesis además del ML |
-| Hooks de monitoreo para latencia, throughput y drift de predicciones | El skew modelo-servicio (preprocesamiento diferente) es un riesgo persistente |
+| Desacopla las actualizaciones del modelo de los lanzamientos del código de aplicación | Añade complejidad de infraestructura sobre la ejecución de inferencia en línea |
+| Permite el escalado independiente de la capacidad de inferencia | La latencia de arranque en frío puede ser significativa para modelos grandes |
+| Los frameworks de propósito específico manejan el agrupamiento, las comprobaciones de salud y el versionado | Las instancias GPU son costosas; la gestión de costos requiere cuidado |
+| Admite de forma nativa pruebas A/B y despliegues canary | La inferencia por streaming requiere experiencia en Kafka/Kinesis además de ML |
+| Hooks de monitoreo para latencia, rendimiento y deriva de predicciones | El sesgo modelo-servicio (preprocesamiento diferente) es un riesgo persistente |
 
 ## Ejemplos de código
 
@@ -199,9 +201,9 @@ print(response.json())
 
 ## Recursos prácticos
 
-- [Documentación de BentoML](https://docs.bentoml.com/) — Servicio de modelos agnóstico al framework con batching integrado, contenedores y integraciones de despliegue.
+- [Documentación de BentoML](https://docs.bentoml.com/) — Servicio de modelos agnóstico al framework con agrupamiento integrado, contenerización e integraciones de despliegue.
 - [NVIDIA Triton Inference Server](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/index.html) — Servicio de alto rendimiento para flotas de modelos multi-framework con optimización GPU.
-- [Documentación de TorchServe](https://pytorch.org/serve/) — Solución oficial de servicio de modelos de PyTorch con personalización de handlers.
+- [Documentación de TorchServe](https://pytorch.org/serve/) — Solución oficial de servicio de modelos PyTorch con personalización de manejadores.
 - [Documentación de FastAPI](https://fastapi.tiangolo.com/) — Framework web Python moderno y de alto rendimiento ampliamente utilizado para APIs de servicio de ML personalizadas.
 
 ## Ver también

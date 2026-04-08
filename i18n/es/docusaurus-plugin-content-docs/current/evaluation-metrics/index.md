@@ -1,42 +1,44 @@
 ---
 title: Métricas de evaluación
-description: Measuring model performance across tasks.
-keywords: [evaluation, metrics, accuracy, F1]
+description: Medición del rendimiento del modelo a través de tareas.
+keywords: [evaluación, métricas, exactitud, F1]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Métricas de evaluación
 
 ## Definición
 
-Las métricas de evaluación cuantifican qué tan bien funcionan los modelos: accuracy, F1, BLEU, ROUGE, perplexity, human preference, etc. Choice depends on task (classification, generation, recuperación) and goals (fairness, robustness).
+Las métricas de evaluación cuantifican qué tan bien funcionan los modelos: exactitud, F1, BLEU, ROUGE, perplejidad, preferencia humana, etc. La elección depende de la tarea (clasificación, generación, recuperación) y los objetivos (equidad, robustez).
 
-Son used in [benchmarks](/docs/benchmarks), development, and production (A/B tests, monitoring). No single metric captures everything; combine automated metrics with human evaluation for [LLMs](/docs/llms) and subjective tasks. See [bias in AI](/docs/bias-in-ai) for fairness-related metrics.
+Se usan en [benchmarks](/docs/benchmarks), desarrollo y producción (pruebas A/B, monitorización). Ninguna métrica captura todo; combine métricas automatizadas con evaluación humana para [LLMs](/docs/llms) y tareas subjetivas. Ver [sesgo en la IA](/docs/bias-in-ai) para métricas relacionadas con la equidad.
 
 ## Cómo funciona
 
 ```mermaid
 flowchart LR
-  Predictions[Predictions] --> Metric[Metric]
-  References[References] --> Metric
-  Metric --> Score[Score]
+  Predictions[Predicciones] --> Metric[Métrica]
+  References[Referencias] --> Metric
+  Metric --> Score[Puntuación]
 ```
 
-**Predicciones** (salidas del modelo) y **referencias** (verdad de base o respuestas humanas) se alimentan en una **métrica** que calculaes a **score**. Classification: accuracy, F1, AUC. Generation: BLEU, ROUGE, BERTScore, or learned metrics. Retrieval: recall@k, MRR. For LLMs, [benchmarks](/docs/benchmarks) (MMLU, HumanEval) run fixed prompts and aggregate metrics; human eval (preference, correctness) is often needed for open-ended quality. Metrics should align with the product goal and be reported on held-out or standard splits.
+Las **predicciones** (salidas del modelo) y las **referencias** (verdad de base o respuestas humanas) se alimentan en una **métrica** que calcula una **puntuación**. Clasificación: exactitud, F1, AUC. Generación: BLEU, ROUGE, BERTScore o métricas aprendidas. Recuperación: recall@k, MRR. Para LLMs, los [benchmarks](/docs/benchmarks) (MMLU, HumanEval) ejecutan indicaciones fijas y agregan métricas; la evaluación humana (preferencia, corrección) a menudo es necesaria para la calidad de extremo abierto. Las métricas deben alinearse con el objetivo del producto y reportarse en divisiones retenidas o estándar.
 
 ## Casos de uso
 
-Evaluation metrics are needed whenever you train or ship a model: to compare runs, track quality, and audit fairness or safety.
+Las métricas de evaluación son necesarias siempre que entrene o publique un modelo: para comparar ejecuciones, hacer seguimiento de la calidad y auditar la equidad o la seguridad.
 
-- Comparing models on classification (accuracy, F1), generation (BLEU, ROUGE), or recuperación
-- Tracking progress in development and A/B tests
-- Auditing for fairness, robustness, or safety
+- Comparar modelos en clasificación (exactitud, F1), generación (BLEU, ROUGE) o recuperación
+- Hacer seguimiento del progreso en desarrollo y pruebas A/B
+- Auditar equidad, robustez o seguridad
 
-## Documentación externa
+## Recursos prácticos
 
 - [Hugging Face – Evaluate](https://huggingface.co/docs/evaluate/)
-- [Papers with Code – Metrics](https://paperswithcode.com/task/image-classification)
+- [Papers with Code – Métricas](https://paperswithcode.com/task/image-classification)
 
 ## Ver también
 
 - [Benchmarks](/docs/benchmarks)
-- [Bias in AI](/docs/bias-in-ai)
+- [Sesgo en la IA](/docs/bias-in-ai)

@@ -2,35 +2,37 @@
 title: Skills de Claude Code
 description: Plantillas de prompts reutilizables e invocables que extienden las capacidades de Claude Code — qué son las skills, cómo escribirlas, dónde almacenarlas y cómo invocarlas con /nombre-skill.
 keywords: [skills de Claude Code, comandos slash, skills personalizadas, prompts reutilizables, directorio de skills, frontmatter de skills, extensiones de Claude Code]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Skills de Claude Code
 
 ## Definición
 
-Las skills son archivos de prompts reutilizables e invocables que extienden el comportamiento de Claude Code más allá de sus valores predeterminados. Una skill es un archivo Markdown con frontmatter YAML que define un comando con nombre: cuando un desarrollador escribe `/nombre-skill` dentro de una sesión de Claude Code, el contenido de la skill se inyecta como una instrucción — convirtiendo efectivamente un flujo de trabajo común, complejo o específico del equipo en un único comando slash.
+Las skills son archivos de prompts reutilizables e invocables que extienden el comportamiento de Claude Code más allá de sus valores predeterminados. Una skill es un archivo Markdown con frontmatter YAML que define un comando nombrado: cuando un desarrollador escribe `/nombre-skill` dentro de una sesión de Claude Code, el contenido de la skill se inyecta como instrucción — convirtiendo efectivamente un flujo de trabajo común, complejo o específico del equipo en un solo comando slash.
 
-El modelo mental es similar a los alias de shell o los objetivos de Makefile, pero para flujos de trabajo asistidos por IA. En lugar de repetir un prompt largo y cuidadosamente elaborado cada vez que quieres que Claude siga un proceso específico (lista de verificación de revisión de código, generación de notas de versión, documentación de arquitectura, auditoría de seguridad), lo escribes una vez como una skill, lo confirmas en el repositorio y lo invocas con un comando corto. Las skills son versionables, compartibles y componibles con las instrucciones de CLAUDE.md.
+El modelo mental es similar a los alias de shell o los objetivos de Makefile, pero para flujos de trabajo asistidos por IA. En lugar de repetir un prompt largo y cuidadosamente elaborado cada vez que quieres que Claude siga un proceso específico (checklist de revisión de código, generación de notas de lanzamiento, documentación de arquitectura, auditoría de seguridad), lo escribes una vez como skill, lo confirmas en el repositorio y lo invocas con un comando corto. Las skills se controlan por versiones, son compartibles y son componibles con las instrucciones de CLAUDE.md.
 
-Las skills difieren de las instrucciones de CLAUDE.md de una manera importante: CLAUDE.md siempre está activo y se aplica a cada interacción, mientras que las skills son opcionales y se invocan explícitamente. Esto hace que las skills sean apropiadas para flujos de trabajo pesados o específicos del contexto que no deben ejecutarse en cada solicitud, mientras que CLAUDE.md es mejor para convenciones y restricciones ligeras que siempre deben estar en efecto.
+Las skills difieren de las instrucciones de CLAUDE.md de una manera importante: CLAUDE.md siempre está activo y se aplica a cada interacción, mientras que las skills son opt-in e invocadas explícitamente. Esto hace que las skills sean apropiadas para flujos de trabajo pesados o específicos del contexto que no deben ejecutarse en cada solicitud, mientras que CLAUDE.md es mejor para convenciones y restricciones ligeras que siempre deben estar en efecto.
 
 ## Cómo funciona
 
 ### Formato de archivo de skill
 
-Un archivo de skill es un archivo `.md` con frontmatter YAML. El frontmatter debe incluir como mínimo un campo `description` que le dice a Claude qué hace la skill. El cuerpo del archivo es el prompt que se inyectará cuando se invoque la skill. El nombre del archivo (sin `.md`) se convierte en el nombre del comando slash: un archivo llamado `code-review.md` se invoca como `/code-review`. Los nombres de skills pueden contener guiones pero no espacios.
+Un archivo de skill es un archivo `.md` con frontmatter YAML. El frontmatter debe incluir al menos un campo `description` que le diga a Claude qué hace la skill. El cuerpo del archivo es el prompt que se inyectará cuando se invoque la skill. El nombre del archivo (sin `.md`) se convierte en el nombre del comando slash: un archivo llamado `code-review.md` se invoca como `/code-review`. Los nombres de skill pueden contener guiones pero no espacios.
 
 ### Directorios de skills
 
-Claude Code busca skills en dos ubicaciones. Las **skills de proyecto** viven en `.claude/skills/` relativo a la raíz del proyecto y están disponibles solo cuando se trabaja en ese proyecto. Las **skills globales** viven en `~/.claude/skills/` y están disponibles en cada sesión de Claude Code. Las skills de proyecto tienen precedencia sobre las skills globales con el mismo nombre, permitiendo a los equipos anular las skills personales con versiones específicas del proyecto. También puedes apuntar a Claude Code a un directorio de skills personalizado a través de la configuración.
+Claude Code busca skills en dos ubicaciones. Las **skills de proyecto** viven en `.claude/skills/` relativo a la raíz del proyecto y están disponibles solo cuando se trabaja en ese proyecto. Las **skills globales** viven en `~/.claude/skills/` y están disponibles en cada sesión de Claude Code. Las skills de proyecto tienen precedencia sobre las skills globales con el mismo nombre, lo que permite a los equipos sobreescribir skills personales con versiones específicas del proyecto. También puedes apuntar a Claude Code a un directorio de skills personalizado a través de la configuración.
 
 ### Invocación de skills
 
-Dentro de una sesión de Claude Code, escribir `/nombre-skill` activa la skill. Claude Code encuentra el archivo de skill correspondiente, lee su cuerpo e inyecta el contenido como una instrucción de usuario en ese punto de la conversación. La skill puede hacer referencia al contexto que ya existe en la sesión (archivos leídos previamente, salidas anteriores de herramientas) y puede emitir sus propias llamadas a herramientas (leer archivos, ejecutar comandos) para recopilar información adicional antes de producir la salida. Las skills pueden aceptar argumentos en línea después del nombre del comando: `/generate-test src/utils/format.ts` pasa la ruta del archivo como contexto.
+Dentro de una sesión de Claude Code, escribir `/nombre-skill` activa la skill. Claude Code encuentra el archivo de skill correspondiente, lee su cuerpo e inyecta el contenido como instrucción de usuario en ese punto de la conversación. La skill puede hacer referencia al contexto que ya existe en la sesión (archivos leídos anteriormente, salidas de herramientas anteriores) y puede emitir sus propias llamadas a herramientas (leer archivos, ejecutar comandos) para reunir información adicional antes de producir la salida. Las skills pueden aceptar argumentos en línea después del nombre del comando: `/generate-test src/utils/format.ts` pasa la ruta del archivo como contexto.
 
 ### Composición de skills con CLAUDE.md
 
-Las skills y CLAUDE.md trabajan juntos. CLAUDE.md establece la línea base del proyecto (convenciones, patrones prohibidos, pila tecnológica) y las skills proporcionan flujos de trabajo invocables sobre esa línea base. Una skill `code-review`, por ejemplo, puede instruir a Claude a "verificar que todos los cambios cumplan con las convenciones en CLAUDE.md" — no necesita repetir esas convenciones porque ya están en el prompt del sistema. Esta separación de responsabilidades mantiene cada archivo enfocado y evita la duplicación.
+Las skills y CLAUDE.md trabajan juntas. CLAUDE.md establece la línea base del proyecto (convenciones, patrones prohibidos, stack tecnológico), y las skills proporcionan flujos de trabajo invocables sobre esa línea base. Una skill `code-review`, por ejemplo, puede instruir a Claude a "verificar que todos los cambios cumplan con las convenciones en CLAUDE.md" — no necesita repetir esas convenciones porque ya están en el prompt del sistema. Esta separación de responsabilidades mantiene cada archivo enfocado y evita la duplicación.
 
 ```mermaid
 flowchart LR
@@ -46,11 +48,11 @@ flowchart LR
 
 | Usar cuando | Evitar cuando |
 |---|---|
-| Tienes un flujo de trabajo de múltiples pasos que repites regularmente (p. ej., escribir changelogs, ejecutar una lista de verificación de revisión) | La tarea es verdaderamente única y no se repetirá — solo escribe el prompt directamente |
+| Tienes un flujo de trabajo de múltiples pasos que repites regularmente (p. ej., escribir changelogs, ejecutar un checklist de revisión) | La tarea es verdaderamente única y no se repetirá — simplemente escribe el prompt directamente |
 | Quieres estandarizar un proceso complejo en un equipo (p. ej., revisión de seguridad, formato de resumen de PR) | Las instrucciones pertenecen a CLAUDE.md porque se aplican a cada sesión, no solo bajo demanda |
 | El flujo de trabajo depende del contexto y se beneficia de aceptar argumentos (p. ej., `/document src/api/users.ts`) | La skill duplicaría documentación que ya existe en CLAUDE.md |
-| Quieres compartir mejores prácticas de prompting entre proyectos a través de tu directorio de skills global | El flujo de trabajo requiere integraciones de herramientas externas más allá de lo que soportan las herramientas integradas de Claude |
-| Estás construyendo una biblioteca de skills para tu equipo y quieres archivos de prompts versionables y revisables | Necesitas activar skills automáticamente — las skills se invocan manualmente, no son controladas por eventos |
+| Quieres compartir las mejores prácticas de prompting entre proyectos a través de tu directorio de skills global | El flujo de trabajo requiere integraciones de herramientas externas más allá de lo que soportan las herramientas integradas de Claude |
+| Estás construyendo una biblioteca de skills para tu equipo y quieres archivos de prompt controlados por versiones y revisables | Necesitas activar skills automáticamente — las skills se invocan manualmente, no son impulsadas por eventos |
 
 ## Ejemplos de código
 
@@ -166,11 +168,11 @@ If the error references a file path, read that file to provide more specific adv
 
 ## Recursos prácticos
 
-- [Documentación de memoria y skills de Claude Code](https://docs.anthropic.com/en/docs/claude-code/memory) — Referencia oficial para el formato de archivos de skills, directorios e invocación.
-- [Configuración de Claude Code](https://docs.anthropic.com/en/docs/claude-code/settings) — Opciones de configuración incluyendo rutas de directorio de skills personalizadas.
-- [GitHub de Claude Code de Anthropic](https://github.com/anthropics/claude-code) — Fuente y ejemplos aportados por la comunidad.
-- [Referencia de comandos slash de Claude Code](https://docs.anthropic.com/en/docs/claude-code/cli-reference) — Lista completa de comandos slash integrados junto con el sistema de skills personalizadas.
-- [Repositorio de skills](https://github.com/EmersonBraun/skills) — Colección curada de skills de IA reutilizables para Claude Code y otros asistentes de codificación con IA
+- [Documentación de memoria y skills de Claude Code](https://docs.anthropic.com/en/docs/claude-code/memory) — Referencia oficial para el formato de archivo de skill, directorios e invocación.
+- [Configuración de Claude Code](https://docs.anthropic.com/en/docs/claude-code/settings) — Opciones de configuración incluyendo rutas de directorios de skills personalizados.
+- [GitHub de Anthropic Claude Code](https://github.com/anthropics/claude-code) — Fuente y ejemplos contribuidos por la comunidad.
+- [Referencia de comandos slash de Claude Code](https://docs.anthropic.com/en/docs/claude-code/cli-reference) — Lista completa de comandos slash integrados junto al sistema de skills personalizadas.
+- [Repositorio de skills](https://github.com/EmersonBraun/skills) — Colección curada de skills de IA reutilizables para Claude Code y otros asistentes de codificación de IA
 
 ## Ver también
 

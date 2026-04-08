@@ -2,6 +2,8 @@
 title: PyTorch Mobile
 description: Implante modelos PyTorch em dispositivos móveis e de borda usando TorchScript e o runtime de próxima geração ExecuTorch.
 keywords: [PyTorch Mobile, TorchScript, ExecuTorch, inferência mobile, IA de borda, quantização, Android, iOS]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # PyTorch Mobile

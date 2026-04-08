@@ -2,6 +2,8 @@
 title: 构建 MCP 服务器
 description: 如何构建向任何 MCP 兼容的 AI 应用程序公开工具、资源和提示的 MCP 服务器——涵盖服务器设置、能力注册、传输配置和完整的服务器生命周期。
 keywords: [MCP 服务器, 模型上下文协议, 构建 MCP 服务器, 工具, 资源, 提示, TypeScript, MCP SDK, 工具 schema, stdio 传输, HTTP SSE]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # 构建 MCP 服务器

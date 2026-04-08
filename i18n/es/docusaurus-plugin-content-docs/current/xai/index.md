@@ -1,35 +1,44 @@
 ---
 title: IA explicable (XAI)
-description: Making AI decisións interpretable and explainable.
-keywords: [explainable AI, XAI, interpretability]
+description: Hacer que las decisiones de la IA sean interpretables y explicables.
+keywords: [IA explicable, XAI, interpretabilidad]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # IA explicable (XAI)
 
 ## Definición
 
-La IA explicable busca hacer comprensible el comportamiento del modelo: qué entradas o características motivaron una decisión, o quéhe model "thinks" in human terms. This supports trust, debugging, and compliance.
+La IA explicable busca hacer comprensible el comportamiento del modelo: qué entradas o características motivaron una decisión, o qué "piensa" el modelo en términos humanos. Esto apoya la confianza, la depuración y el cumplimiento.
 
-Soporta [seguridad de IA](/docs/ai-safety) (auditoría) y [sesgo en IA](/docs/bias-in-ai) (comprensión de resultados injustos). Required or recommended in regulated domains (por ej. credit, hiring, healthcare). Trade-off: post-hoc explanations (SHAP, LIME) are flexible but can be approximate; inherently interpretable models are limited in expressiveness.
+Apoya la [seguridad de la IA](/docs/ai-safety) (auditoría) y el [sesgo en la IA](/docs/bias-in-ai) (comprensión de resultados injustos). Requerido o recomendado en dominios regulados (como crédito, contratación, atención médica). Compensación: las explicaciones post-hoc (SHAP, LIME) son flexibles pero pueden ser aproximadas; los modelos inherentemente interpretables están limitados en expresividad.
 
 ## Cómo funciona
 
-**Feature attribution** (por ej. SHAP, LIME) asigna puntuaciones de importancia a las características de entrada para una predicción dada. **Attention visualization** shows which tokens or regions the model attended to. **Natural language explanations** (por ej. from an LLM or a dedicated module) describe the decisión in words. **Inherently interpretable** models (por ej. linear models, decisión trees, rule lists) are interpretable by diseño. Choice depends on the model type and use case: post-hoc methods work with black boxes but may not reflect the true mechanism; interpretable models are more faithful but less flexible. Evaluate explanations for fidelity (do they igualar the model?) and usefulness (do they help users or auditors?). Integrate with [evaluation](/docs/evaluation-metrics) and [bias](/docs/bias-in-ai) audits where needed.
+```mermaid
+flowchart LR
+  Model[Modelo] --> Explain[Método de explicación]
+  Input[Entrada] --> Explain
+  Explain --> Attribution[Atribución de características]
+```
+
+La **atribución de características** (como SHAP, LIME) asigna puntuaciones de importancia a las características de entrada para una predicción dada. La **visualización de atención** muestra qué tokens o regiones atendió el modelo. Las **explicaciones en lenguaje natural** (como de un LLM o un módulo dedicado) describen la decisión con palabras. Los modelos **inherentemente interpretables** (como modelos lineales, árboles de decisión, listas de reglas) son interpretables por diseño. La elección depende del tipo de modelo y el caso de uso: los métodos post-hoc funcionan con cajas negras pero pueden no reflejar el mecanismo verdadero; los modelos interpretables son más fieles pero menos flexibles. Evalúe las explicaciones por fidelidad (¿coinciden con el modelo?) y utilidad (¿ayudan a los usuarios o auditores?). Integre con auditorías de [evaluación](/docs/evaluation-metrics) y [sesgo](/docs/bias-in-ai) donde sea necesario.
 
 ## Casos de uso
 
-Explainability matters when users or regulators need to understand why a model made a given decisión (compliance, trust, debugging).
+La explicabilidad importa cuando los usuarios o reguladores necesitan entender por qué un modelo tomó una decisión dada (cumplimiento, confianza, depuración).
 
-- Explaining credit, hiring, or medical decisións for compliance and users
-- Debugging and improving model behavior via attributions
-- Building trust and transparency in high-stakes applications
+- Explicar decisiones de crédito, contratación o médicas para cumplimiento y usuarios
+- Depuración y mejora del comportamiento del modelo mediante atribuciones
+- Construir confianza y transparencia en aplicaciones de alto riesgo
 
-## Documentación externa
+## Recursos prácticos
 
-- [Interpretable Machine Learning (Molnar)](https://interpretable.ml/) — Free online book
-- [SHAP documentation](https://shap.readthedocs.io/)
+- [Interpretable Machine Learning (Molnar)](https://interpretable.ml/) — Libro gratuito en línea
+- [Documentación de SHAP](https://shap.readthedocs.io/)
 
 ## Ver también
 
-- [AI safety](/docs/ai-safety)
-- [Bias in AI](/docs/bias-in-ai)
+- [Seguridad de la IA](/docs/ai-safety)
+- [Sesgo en la IA](/docs/bias-in-ai)

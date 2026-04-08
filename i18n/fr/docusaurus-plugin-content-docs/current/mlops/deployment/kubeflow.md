@@ -1,18 +1,20 @@
 ---
 title: KubeFlow
-description: Boîte à outils ML open source pour Kubernetes — pipelines, réglage d'hyperparamètres et service de modèles à grande échelle.
-keywords: [KubeFlow, Kubernetes, pipelines ML, Katib, KFServing, réglage d'hyperparamètres, MLOps, entraînement distribué]
+description: Kit d'outils ML open source pour Kubernetes — pipelines, réglage des hyperparamètres et service de modèles à grande échelle.
+keywords: [KubeFlow, Kubernetes, pipelines ML, Katib, KFServing, réglage des hyperparamètres, MLOps, entraînement distribué]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # KubeFlow
 
 ## Définition
 
-KubeFlow est une boîte à outils ML open source conçue pour rendre le déploiement de workflows ML sur Kubernetes simple, portable et scalable. Elle a été créée à l'origine par Google et est maintenant un projet de la Cloud Native Computing Foundation (CNCF) avec une large adoption industrielle. KubeFlow n'essaie pas d'être une plateforme monolithique unique ; c'est plutôt une collection organisée de composants natifs Kubernetes qui résolvent chacun un problème d'infrastructure ML distinct.
+KubeFlow est un kit d'outils ML open source conçu pour rendre le déploiement de workflows ML sur Kubernetes simple, portable et évolutif. Il a été créé à l'origine par Google et est maintenant un projet de la Cloud Native Computing Foundation (CNCF) avec une large adoption industrielle. KubeFlow n'essaie pas d'être une plateforme monolithique unique ; c'est plutôt une collection soigneusement sélectionnée de composants natifs Kubernetes qui résolvent chacun un problème distinct d'infrastructure ML.
 
-Les composants principaux sont : **KubeFlow Pipelines (KFP)** pour définir et exécuter des workflows ML basés sur DAG en tant que jobs Kubernetes ; **Katib** pour le réglage automatisé d'hyperparamètres et la recherche d'architecture neuronale utilisant l'optimisation bayésienne, la recherche aléatoire ou l'apprentissage par renforcement ; **KFServing (maintenant KServe)** pour le service de modèles scalable avec scaling serverless, déploiements canary et support de plusieurs runtimes de service ; et des **Jupyter Notebook Servers** gérés par le tableau de bord KubeFlow pour le développement interactif dans un environnement multi-tenant. L'ensemble de la plateforme est installé via un seul ensemble de manifestes Kubernetes et géré via une interface web.
+Les composants principaux sont : **KubeFlow Pipelines (KFP)** pour définir et exécuter des workflows ML basés sur des DAGs en tant que travaux Kubernetes ; **Katib** pour le réglage automatisé des hyperparamètres et la recherche d'architecture neuronale utilisant l'optimisation bayésienne, la recherche aléatoire ou l'apprentissage par renforcement ; **KFServing (maintenant KServe)** pour le service de modèles évolutif avec mise à l'échelle sans serveur, déploiements canary et support de plusieurs runtimes de service ; et des **serveurs Jupyter Notebook** gérés par le tableau de bord KubeFlow pour le développement interactif dans un environnement multi-locataires. L'ensemble de la plateforme est installé via un ensemble unique de manifestes Kubernetes et géré via une interface web.
 
-La force de KubeFlow est qu'il fonctionne sur n'importe quel cluster Kubernetes — sur site, GKE, EKS, AKS ou un cluster kind local — ce qui le rend adapté aux organisations qui exigent que les données restent dans leur propre infrastructure. Son principal coût est la complexité opérationnelle : la courbe d'apprentissage est raide, et exploiter KubeFlow en production nécessite une solide expertise Kubernetes.
+La force de KubeFlow est qu'il fonctionne sur n'importe quel cluster Kubernetes — on-premises, GKE, EKS, AKS ou un cluster kind local —, ce qui le rend adapté aux organisations qui exigent que les données restent dans leur propre infrastructure. Son principal coût est la complexité opérationnelle : la courbe d'apprentissage est abrupte, et opérer KubeFlow en production nécessite une solide expertise Kubernetes.
 
 ## Fonctionnement
 
@@ -31,50 +33,50 @@ flowchart TB
 
 ### KubeFlow Pipelines (KFP)
 
-KFP permet aux data scientists de définir des pipelines ML sous forme de code Python à l'aide du SDK KFP. Chaque étape de pipeline est un composant conteneurisé : une fonction Python décorée avec `@dsl.component` est compilée en une spécification de conteneur que KFP exécute en tant que pod Kubernetes. Le DAG de pipeline est compilé vers un fichier IR YAML (Intermediate Representation) que le contrôleur backend de KFP planifie sur le cluster. Cette approche signifie que chaque étape est entièrement reproductible : l'image du conteneur est épinglée, les entrées et sorties sont des artefacts suivis dans le store de métadonnées de KFP (ML Metadata / MLMD), et l'ensemble du graphe d'exécution est visible dans l'interface avec les logs, les entrées, les sorties et le statut par étape.
+KFP permet aux data scientists de définir des pipelines ML comme code Python en utilisant le SDK KFP. Chaque étape du pipeline est un composant conteneurisé : une fonction Python décorée avec `@dsl.component` est compilée en une spécification de conteneur que KFP exécute comme un pod Kubernetes. Le DAG du pipeline est compilé en un fichier de Représentation Intermédiaire (IR YAML) que le contrôleur backend de KFP planifie sur le cluster. Cette approche signifie que chaque étape est entièrement reproductible : l'image du conteneur est épinglée, les entrées et sorties sont des artefacts suivis dans le store de métadonnées de KFP (ML Metadata / MLMD), et l'ensemble du graphe d'exécution est visible dans l'interface avec les logs, entrées, sorties et statut par étape.
 
-### Katib — Réglage d'hyperparamètres
+### Katib — Réglage des hyperparamètres
 
-Katib est le composant AutoML de KubeFlow. Il définit une ressource personnalisée Kubernetes `Experiment` qui spécifie l'espace de recherche (plages et types de paramètres), la métrique objectif (minimiser la perte, maximiser la précision) et l'algorithme de recherche (optimisation bayésienne via Processus Gaussien, CMA-ES, recherche aléatoire ou sur grille). Katib exécute des essais parallèles — chaque essai est un job d'entraînement complet — et utilise les résultats pour suggérer de meilleures configurations pour les essais suivants. L'intégration avec KFP signifie qu'un pipeline complet (données → ingénierie de features → entraînement → évaluation) peut être traité comme un seul essai Katib, permettant l'AutoML de bout en bout sur des pipelines complexes.
+Katib est le composant AutoML de KubeFlow. Il définit une ressource personnalisée Kubernetes `Experiment` qui spécifie l'espace de recherche (plages et types de paramètres), la métrique objective (minimiser la perte, maximiser la précision) et l'algorithme de recherche (optimisation bayésienne via Processus Gaussien, CMA-ES, recherche aléatoire ou recherche en grille). Katib exécute des essais en parallèle — chaque essai est un travail d'entraînement complet — et utilise les résultats pour suggérer de meilleures configurations pour les essais suivants. L'intégration avec KFP signifie qu'un pipeline complet (données → ingénierie des features → entraînement → évaluation) peut être traité comme un seul essai Katib, permettant l'AutoML de bout en bout sur des pipelines complexes.
 
 ### KServe (anciennement KFServing)
 
-KServe étend Kubernetes avec des ressources personnalisées `InferenceService` qui définissent déclarativement les déploiements de service de modèles. Spécifiez le framework (sklearn, xgboost, pytorch, tensorflow, custom) et l'URI du modèle (chemin S3, PVC) et KServe gère : tirer le modèle, sélectionner le bon runtime de service, configurer le proxy sidecar, exposer l'endpoint via Istio et faire évoluer les réplicas à zéro en cas d'inactivité (mode serverless). Les déploiements canary divisent le trafic entre deux versions de modèles par pourcentage, permettant des déploiements sûrs. Les composants transformer et explainer permettent de brancher une logique de prétraitement et une explicabilité basée sur SHAP aux côtés du prédicteur.
+KServe étend Kubernetes avec des ressources personnalisées `InferenceService` qui définissent de manière déclarative les déploiements de service de modèles. On spécifie le framework (sklearn, xgboost, pytorch, tensorflow, custom) et l'URI du modèle (chemin S3, PVC) et KServe gère : le téléchargement du modèle, la sélection du bon runtime de service, la configuration du proxy sidecar, l'exposition du point de terminaison via Istio et la mise à l'échelle des réplicas à zéro lorsqu'inactif (mode sans serveur). Les déploiements canary divisent le trafic entre deux versions du modèle par pourcentage, permettant des déploiements sécurisés. Les composants transformer et explainer permettent de connecter une logique de prétraitement et une explicabilité basée sur SHAP à côté du prédicteur.
 
-### Multi-tenancy et RBAC
+### Multi-location et RBAC
 
-Le tableau de bord KubeFlow implémente la multi-tenancy via des namespaces Kubernetes : chaque utilisateur ou équipe obtient un namespace isolé avec ses propres quotas de ressources, serveurs de notebooks et exécutions de pipelines. Le contrôle d'accès basé sur les rôles (RBAC) restreint quels utilisateurs peuvent voir, exécuter ou gérer les pipelines et les modèles. Cela rend KubeFlow adapté aux grandes organisations où plusieurs équipes partagent un seul cluster GPU et ont besoin d'isolation sans clusters séparés.
+Le tableau de bord KubeFlow implémente la multi-location via les espaces de noms Kubernetes : chaque utilisateur ou équipe obtient un espace de noms isolé avec ses propres quotas de ressources, serveurs de notebooks et exécutions de pipeline. Le Contrôle d'Accès Basé sur les Rôles (RBAC) restreint quels utilisateurs peuvent voir, exécuter ou gérer les pipelines et les modèles. Cela rend KubeFlow adapté aux grandes organisations où plusieurs équipes partagent un seul cluster GPU et ont besoin d'isolation sans clusters séparés.
 
 ## Quand utiliser / Quand NE PAS utiliser
 
 | Utiliser quand | Éviter quand |
 |---|---|
-| Exécution de charges de travail ML sur un cluster Kubernetes existant | Votre équipe n'a pas d'expertise Kubernetes et pas d'ingénieur de plateforme dédié |
-| Besoin d'orchestration de pipeline complète, d'AutoML et de service dans une seule plateforme | Un service géré (SageMaker, Vertex AI) correspond à votre stratégie de fournisseur cloud |
-| Les exigences de résidence des données empêchent l'utilisation de services ML cloud gérés | Vous avez uniquement besoin du service de modèles, pas d'une orchestration de pipeline complète |
-| L'organisation exploite un cluster GPU partagé avec des besoins multi-tenant | Vos workflows ML sont suffisamment simples pour un seul script d'entraînement |
-| Des fonctionnalités avancées de service (scaling serverless, canary, transformers) sont requises | Le temps de mise en production rapide est plus important que le contrôle de l'infrastructure |
+| Les charges de travail ML s'exécutent sur un cluster Kubernetes existant | L'équipe n'a pas d'expertise Kubernetes et pas d'ingénieur de plateforme dédié |
+| L'orchestration complète de pipelines, l'AutoML et le service dans une plateforme sont nécessaires | Un service géré (SageMaker, Vertex AI) correspond à la stratégie du fournisseur cloud |
+| Les exigences de résidence des données empêchent l'utilisation de services ML cloud gérés | Seul le service de modèles est nécessaire, pas l'orchestration complète de pipeline |
+| L'organisation opère un cluster GPU partagé avec des besoins de multi-location | Les workflows ML sont suffisamment simples pour un seul script d'entraînement |
+| Des fonctionnalités de service avancées (mise à l'échelle sans serveur, canary, transformers) sont requises | La rapidité de mise en production est plus importante que le contrôle de l'infrastructure |
 
 ## Comparaisons
 
 | Critère | KubeFlow | ML sur Kubernetes (vanilla) |
 |---|---|---|
-| Complexité | Élevée — nombreux CRDs, contrôleurs et dépendances Istio | Moyenne — uniquement des objets Kubernetes standard |
-| Fonctionnalités | Pipelines, AutoML (Katib), service (KServe), gestion des notebooks | Ce que vous construisez et configurez manuellement |
-| Courbe d'apprentissage | Raide — nécessite Kubernetes + connaissance du domaine KubeFlow | Moyenne — la connaissance K8s standard est suffisante |
+| Complexité | Élevée — nombreux CRDs, contrôleurs et dépendances Istio | Moyenne — uniquement des objets Kubernetes standards |
+| Fonctionnalités | Pipelines, AutoML (Katib), service (KServe), gestion des notebooks | Ce que l'on construit et configure manuellement |
+| Courbe d'apprentissage | Abrupte — nécessite une connaissance du domaine Kubernetes + KubeFlow | Moyenne — connaissance K8s standard suffisante |
 | Flexibilité | Modérée — extensible mais lié aux abstractions KubeFlow | Élevée — contrôle total sur chaque ressource Kubernetes |
-| Options gérées | Kubeflow sur GKE (Vertex AI Pipelines), AWS Managed KubeFlow | N'importe quel Kubernetes géré (EKS, GKE, AKS) |
-| Temps de configuration | Jours à semaines pour une installation qualité production | Heures à jours selon la complexité de la charge de travail |
+| Options gérées | KubeFlow sur GKE (Vertex AI Pipelines), AWS Managed KubeFlow | N'importe quel Kubernetes géré (EKS, GKE, AKS) |
+| Temps de configuration | Jours à semaines pour une installation de grade production | Heures à jours selon la complexité de la charge de travail |
 
 ## Avantages et inconvénients
 
 | Avantages | Inconvénients |
 |---|---|
-| Plateforme ML unifiée — pipelines, réglage, service dans un seul système | Complexité opérationnelle très élevée et grand nombre de composants mobiles |
-| Cloud-agnostique — fonctionne sur n'importe quel cluster Kubernetes | Courbe d'apprentissage abrupte ; nécessite une expertise Kubernetes pour l'exploitation |
-| Service de modèles serverless avec scale-to-zero automatique | Installation gourmande en ressources (Istio, Argo Workflows, MLMD, Knative) |
-| Forte multi-tenancy avec isolation de namespace et RBAC | Les mises à niveau entre les versions de KubeFlow peuvent être complexes |
-| Communauté CNCF active et intégrations d'écosystème larges | Le débogage des défaillances nécessite souvent de comprendre plusieurs couches (K8s → Argo → SDK Python) |
+| Plateforme ML unifiée — pipelines, réglage, service en un système | Complexité opérationnelle très élevée et grand nombre de pièces mobiles |
+| Agnostique au cloud — fonctionne sur n'importe quel cluster Kubernetes | Courbe d'apprentissage abrupte ; nécessite une expertise Kubernetes pour opérer |
+| Service de modèles sans serveur avec mise à l'échelle automatique à zéro | Installation gourmande en ressources (Istio, Argo Workflows, MLMD, Knative) |
+| Multi-location solide avec isolation des espaces de noms et RBAC | Les mises à niveau entre les versions KubeFlow peuvent être complexes |
+| Communauté CNCF active et larges intégrations d'écosystème | Le débogage des échecs nécessite souvent de comprendre plusieurs couches (K8s → Argo → Python SDK) |
 
 ## Exemples de code
 
@@ -203,9 +205,9 @@ if __name__ == "__main__":
 ## Ressources pratiques
 
 - [Documentation officielle KubeFlow](https://www.kubeflow.org/docs/) — Vue d'ensemble de l'architecture, guides des composants et instructions d'installation.
-- [Référence du SDK KubeFlow Pipelines](https://kubeflow-pipelines.readthedocs.io/) — Référence complète de l'API pour le SDK Python KFP v2.
+- [Référence SDK KubeFlow Pipelines](https://kubeflow-pipelines.readthedocs.io/) — Référence complète de l'API pour le SDK Python KFP v2.
 - [Documentation KServe](https://kserve.github.io/website/) — Runtime de service, spécification InferenceService et guide de déploiement canary.
-- [Guide de réglage d'hyperparamètres Katib](https://www.kubeflow.org/docs/components/katib/overview/) — Spécification d'expérience, algorithmes de recherche et intégration avec les opérateurs d'entraînement.
+- [Guide de réglage des hyperparamètres Katib](https://www.kubeflow.org/docs/components/katib/overview/) — Spécification des expériences, algorithmes de recherche et intégration avec les opérateurs d'entraînement.
 
 ## Voir aussi
 

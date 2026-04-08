@@ -1,36 +1,38 @@
 ---
-title: 基于 DAG 的代理
-description: 代理的有向无环图工作流——并行执行、任务依赖和动态图构建。
-keywords: [DAG 代理, 有向无环图, 并行代理, LangGraph, 工作流编排, 任务依赖, 拓扑排序]
+title: "DAG-based agents"
+description: Directed acyclic graph workflows for agents — parallel execution, task dependencies, and dynamic graph construction.
+keywords: [DAG agents, directed acyclic graph, parallel agents, LangGraph, workflow orchestration, task dependencies, topological sort]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # 基于 DAG 的代理
 
 ## 定义
 
-基于 DAG 的代理将其工作组织为**有向无环图（DAG）**：一组节点（任务或代理步骤）通过有向边连接，编码节点间的依赖关系。"无环"意味着没有循环依赖——执行严格地从输入流向输出。与顺序流水线相比，关键优势是**独立节点可以并行执行**，从而大幅减少复杂多步骤工作流的挂钟时间。
+Ein DAG-basierter Agent organisiert seine Arbeit als **gerichteten azyklischen Graphen (DAG)**: eine Menge von Knoten (Aufgaben oder Agentenschritte), die durch gerichtete Kanten verbunden sind, die Abhängigkeiten zwischen ihnen kodieren. „Azyklisch" bedeutet, dass es keine zirkulären Abhängigkeiten gibt – die Ausführung fließt strikt vorwärts von Eingaben zu Ausgaben. Der wesentliche Vorteil gegenüber sequentiellen Pipelines besteht darin, dass **unabhängige Knoten parallel ausgeführt werden können**, was die Wanduhrzeit für komplexe mehrstufige Workflows drastisch reduziert.
 
-在实践中，DAG 中的每个节点可以是 LLM 调用、工具调用、数据转换，甚至是子代理。一旦所有前驱节点成功完成，节点就会触发，将它们的输出作为输入传入。这个模型自然地映射到竞争分析（并行研究三家公司，然后综合）、代码审查（同时检查安全性、风格和测试，然后报告）或数据流水线（并行获取多个数据源，合并，然后聚合）等任务。
+In der Praxis kann jeder Knoten im DAG ein LLM-Aufruf, ein Werkzeugaufruf, eine Datentransformation oder sogar ein Subagent sein. Ein Knoten feuert, sobald alle seine Vorgänger erfolgreich abgeschlossen wurden, und übergibt deren Ausgaben als Eingaben. Dieses Modell passt natürlich zu Aufgaben wie der Wettbewerbsanalyse (drei Unternehmen parallel recherchieren, dann synthetisieren), dem Code-Review (Sicherheit, Stil und Tests gleichzeitig prüfen, dann berichten) oder Datenpipelines (mehrere Datenquellen parallel abrufen, zusammenführen und aggregieren).
 
-动态 DAG 构建更进一步：代理不是在设计时定义固定图，而是在运行时根据中间结果构建或修改图。规划代理可能会生成一个任务列表，其依赖关系在看到数据之前是未知的，然后即时构建并执行适当的 DAG。这将 DAG 的结构化并行性与规划代理的适应性相结合，但代价是增加了实现复杂性。
+Die dynamische DAG-Konstruktion geht noch weiter: Anstatt eines zur Entwurfszeit definierten festen Graphen erstellt oder modifiziert der Agent den Graphen zur Laufzeit auf der Grundlage von Zwischenergebnissen. Ein Planungsagent könnte eine Aufgabenliste erzeugen, deren Abhängigkeiten erst bekannt sind, wenn er die Daten sieht, und dann den entsprechenden DAG spontan aufbauen und ausführen. Dies kombiniert den strukturierten Parallelismus von DAGs mit der Anpassungsfähigkeit von Planungsagenten – auf Kosten zusätzlicher Implementierungskomplexität.
 
 ## 工作原理
 
-### 图定义和节点类型
+### Graphdefinition und Knotentypen
 
-DAG 由一组节点和一组有向边定义。每个节点携带一个函数（要做的工作）、一个输入规范（接受哪些上游节点输出）和一个输出规范（它产生什么）。边定义为 `(上游节点, 下游节点)` 对。没有入边的节点是入口点；没有出边的节点是出口点。节点函数可以是同步或异步的——异步节点对于在 I/O 密集型工作流中实现真正的并行性至关重要。
+Ein DAG wird durch eine Menge von Knoten und eine Menge gerichteter Kanten definiert. Jeder Knoten trägt eine Funktion (die zu erledigende Arbeit), eine Eingabespezifikation (welche Ausgaben der vorgelagerten Knoten akzeptiert werden) und eine Ausgabespezifikation (was er produziert). Kanten sind als `(upstream_node, downstream_node)`-Paare definiert. Knoten ohne eingehende Kanten sind Einstiegspunkte; Knoten ohne ausgehende Kanten sind Ausstiegspunkte. Knotenfunktionen können synchron oder asynchron sein – asynchrone Knoten sind für echte Parallelität in I/O-gebundenen Workflows unerlässlich.
 
-### 拓扑排序和调度
+### Topologische Sortierung und Scheduling
 
-在执行之前，调度器计算图的**拓扑排序**：节点的线性序列，使每个节点出现在其所有前驱之后。如果多个节点在同一深度（彼此之间没有依赖），它们可以并发分派。标准算法是 Kahn 算法，逐层处理节点。在运行时，队列保存所有依赖都已满足的节点；工作者从队列中取出节点并执行，然后将新解锁的下游节点加入队列。
+Vor der Ausführung berechnet der Scheduler eine **topologische Ordnung** des Graphen: eine lineare Sequenz von Knoten, sodass jeder Knoten nach allen seinen Vorgängern erscheint. Wenn mehrere Knoten auf derselben Tiefe liegen (keine Abhängigkeit voneinander), können sie gleichzeitig ausgeführt werden. Der Standardalgorithmus ist der Kahn-Algorithmus, der Knoten schichtweise verarbeitet. Zur Laufzeit hält eine Warteschlange Knoten, deren Abhängigkeiten alle erfüllt sind; Worker entnehmen der Warteschlange Knoten, führen sie aus und fügen neu freigeschaltete nachgelagerte Knoten in die Warteschlange ein.
 
-### 并行执行
+### Parallele Ausführung
 
-没有共享依赖的独立节点使用线程、异步协程或进程池并行执行。并行度受 DAG 结构的限制：完全顺序链不提供并行性，而宽扇出后接扇入聚合可以同时运行数十个任务。在代理工作流中，这对于批量网络搜索、多源数据获取或独立子代理调用等任务特别有价值。
+Unabhängige Knoten – solche ohne gemeinsame Abhängigkeiten – werden parallel mit Threads, asynchronen Coroutinen oder einem Prozesspool ausgeführt. Der Grad der Parallelität ist durch die Struktur des DAG begrenzt: Eine vollständig sequentielle Kette bietet keine Parallelität, während ein breites Fan-out gefolgt von einer Fan-in-Aggregation Dutzende von Aufgaben gleichzeitig ausführen kann. In Agenten-Workflows ist dies besonders wertvoll für Aufgaben wie Massen-Websuchen, Datenabrufe aus mehreren Quellen oder unabhängige Subagenten-Aufrufe.
 
-### 动态 DAG 构建
+### Dynamische DAG-Konstruktion
 
-在动态模式下，规划步骤首先运行并输出图规范（例如，JSON 格式的节点和边列表）。调度器实例化 DAG，验证无环性，然后开始执行。动态 DAG 必须在调度开始之前包含环检测——通常通过 DFS 实现。这种模式比静态 DAG 更脆弱，因为格式错误的计划会产生无效图，但它允许更丰富的适应性。
+Im dynamischen Modus läuft zunächst ein Planungsschritt und gibt eine Graphspezifikation aus (z. B. eine JSON-Liste von Knoten und Kanten). Der Scheduler instanziiert den DAG, validiert ihn auf Zyklen und beginnt die Ausführung. Dynamische DAGs müssen eine Zykluserkennung – typischerweise per DFS – enthalten, bevor das Scheduling beginnt. Dieses Muster ist anfälliger als statische DAGs, weil ein fehlerhafter Plan einen ungültigen Graphen erzeugen kann, aber es ermöglicht eine viel reichhaltigere Anpassungsfähigkeit.
 
 ```mermaid
 flowchart LR
@@ -42,26 +44,26 @@ flowchart LR
   TaskD -->|"report"| Output[Final Output]
 ```
 
-## 适用场景 / 不适用场景
+## 何时使用 / 何时不使用
 
-| 适用场景 | 不适用场景 |
+| 使用场景 | 避免场景 |
 |---|---|
-| 工作流有多个可并行运行的独立子任务 | 所有任务都是严格顺序的，没有并行机会 |
-| 执行时间是优先级，任务是 I/O 密集型 | 依赖图足够简单，线性流水线即可满足 |
-| 任务依赖项明确定义，可以提前指定 | 动态重新规划比并行执行更重要 |
-| 您需要对哪些任务通过或失败进行细粒度可观测性 | 团队对图调度概念不熟悉 |
-| 工作流类似于具有扇出和扇入阶段的数据流水线 | 任务执行速度如此之快，调度开销超过了并行收益 |
+| Der Workflow mehrere unabhängige Teilaufgaben hat, die parallel ausgeführt werden können | Alle Aufgaben streng sequentiell sind und keine Parallelisierungsmöglichkeit besteht |
+| Ausführungszeit Priorität hat und Aufgaben I/O-gebunden sind | Der Abhängigkeitsgraph einfach genug ist, dass eine lineare Pipeline ausreicht |
+| Aufgabenabhängigkeiten klar definiert und im Voraus spezifizierbar sind | Dynamisches Replanning wichtiger ist als parallele Ausführung |
+| Feingranulare Beobachtbarkeit darüber benötigt wird, welche Aufgaben bestanden oder fehlgeschlagen sind | Das Team mit Graphen-Scheduling-Konzepten nicht vertraut ist |
+| Der Workflow einer Datenpipeline mit Fan-out- und Fan-in-Phasen ähnelt | Aufgaben so schnell sind, dass der Scheduling-Overhead den Parallelisierungsnutzen übersteigt |
 
 ## 比较
 
-| 标准 | 基于 DAG 的代理 | 顺序流水线 | 规划器-执行器 |
+| Kriterium | DAG-basierte Agenten | Sequentielle Pipeline | Planner-Executor |
 |---|---|---|---|
-| 并行性 | 原生——独立分支并发运行 | 无 | 默认无 |
-| 灵活性/动态适应 | 低-中（固定图） | 低 | 高（重新规划循环） |
-| 实现复杂度 | 高（调度器、环检测、异步） | 非常低 | 中等 |
-| 可审计性 | 高——图结构是显式的 | 中等 | 高——计划工件是显式的 |
-| 失败处理 | 每节点重试，可能部分重新运行 | 从头重启 | 失败时重新规划 |
-| 最适合 | 宽泛、可并行化的工作流 | 简单顺序任务 | 多步骤自适应任务 |
+| Parallelismus | Nativ — unabhängige Zweige laufen gleichzeitig | Keiner | Standardmäßig keiner |
+| Flexibilität / dynamische Anpassung | Niedrig-mittel (fester Graph) | Niedrig | Hoch (Replanning-Schleife) |
+| Implementierungskomplexität | Hoch (Scheduler, Zykluserkennung, async) | Sehr niedrig | Mittel |
+| Nachvollziehbarkeit | Hoch — Graphstruktur ist explizit | Mittel | Hoch — Plan-Artefakt ist explizit |
+| Fehlerbehandlung | Wiederholung pro Knoten, teilweise Neuausführungen möglich | Neustart von Anfang an | Replanning bei Fehler |
+| 最适合 | Breite, parallelisierbare Workflows | Einfache sequentielle Aufgaben | Mehrstufige adaptive Aufgaben |
 
 ## 代码示例
 
@@ -237,13 +239,13 @@ if __name__ == "__main__":
 
 ## 实用资源
 
-- [LangGraph 文档](https://langchain-ai.github.io/langgraph/) — 用于 LLM 代理的生产级图执行框架，对分支、并行执行和循环提供一等支持。
-- [LLM Compiler：并行函数调用（Kim 等人，2023）](https://arxiv.org/abs/2312.04511) — 介绍 LLM 代理基于 DAG 的并行工具调用的论文，具有显著的延迟改进。
-- [Apache Airflow DAG 概念](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/dags.html) — 数据工程领域经过验证的 DAG 编排模型；许多代理 DAG 引擎借鉴了这些概念。
-- [Prefect——工作流编排](https://docs.prefect.io/latest/concepts/flows/) — 具有内置并行任务执行的现代工作流编排，适用于代理工作流。
+- [LangGraph Documentation](https://langchain-ai.github.io/langgraph/) — Produktionsreifes Graph-Ausführungs-Framework für LLM-Agenten, mit erstklassiger Unterstützung für Verzweigungen, parallele Ausführung und Zyklen.
+- [LLM Compiler: Parallel Function Calling (Kim et al., 2023)](https://arxiv.org/abs/2312.04511) — Paper, das DAG-basierte parallele Werkzeugaufrufe für LLM-Agenten einführt, mit signifikanten Latenzverbesserungen.
+- [Apache Airflow DAG Concepts](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/dags.html) — Bewährtes DAG-Orchestrierungsmodell aus der Datentechnik; viele Agenten-DAG-Engines übernehmen diese Konzepte.
+- [Prefect — Workflow Orchestration](https://docs.prefect.io/latest/concepts/flows/) — Moderne Workflow-Orchestrierung mit integrierter paralleler Aufgabenausführung, anwendbar auf Agenten-Workflows.
 
-## 另请参阅
+## 另见
 
-- [规划器-执行器架构](/docs/agents/planner-executor)
-- [AI 代理](/docs/agents)
+- [Planner-Executor architecture](/docs/agents/planner-executor)
+- [AI agents](/docs/agents)
 - [Airflow](/docs/mlops/data-engineering/airflow)

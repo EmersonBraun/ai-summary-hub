@@ -1,42 +1,42 @@
 ---
 title: Fundamentos de IA
 description: Conceitos fundamentais de inteligência artificial e aprendizado de máquina.
-keywords: [IA, fundamentos, básicos]
+keywords: [fundamentos de IA, aprendizado de máquina, inteligência artificial, conceitos básicos]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Fundamentos de IA
 
-## Definição
+## O que é Inteligência Artificial?
 
-Os fundamentos de IA abrangem as ideias centrais por trás da inteligência artificial: o que entendemos por aprendizado, representação e generalização. Isso inclui aprendizado supervisionado e não supervisionado, otimização e a relação entre dados, modelos e objetivos.
+Inteligência Artificial (IA) é o campo da ciência da computação dedicado a criar sistemas que podem realizar tarefas que normalmente requerem inteligência humana — como reconhecer padrões, entender linguagem, tomar decisões e aprender com experiência.
 
-Essas ideias fundamentam tanto o [aprendizado de máquina](/docs/fundamentals/machine-learning) clássico quanto o [aprendizado profundo](/docs/fundamentals/deep-learning). Compreendê-las ajuda a escolher o paradigma certo, interpretar resultados e raciocinar sobre limites (ex.: requisitos de dados, viés, robustez).
+IA é um campo amplo que abrange muitas subáreas:
 
-## Como funciona
+- **[Aprendizado de Máquina](/docs/fundamentals/machine-learning)** — sistemas que aprendem a partir de dados sem serem explicitamente programados
+- **[Deep Learning](/docs/fundamentals/deep-learning)** — aprendizado de máquina usando redes neurais com muitas camadas
+- **[NLP (Processamento de Linguagem Natural)](/docs/nlp)** — IA para entender e gerar texto
+- **[Visão Computacional](/docs/cv)** — IA para entender imagens e vídeos
+- **[Agentes de IA](/docs/agents)** — sistemas de IA que tomam ações para atingir objetivos
 
-```mermaid
-flowchart LR
-  Data[Dados] --> Model[Modelo]
-  Model --> Prediction[Predição]
-```
+## Por onde começar
 
-Na prática, os **dados** são coletados ou rotulados; um **modelo** (ex.: uma função ou rede) é escolhido; e um objetivo (perda ou recompensa) é otimizado para que o modelo se ajuste aos dados. O resultado é uma **predição** (ou ação) sobre novas entradas. O pipeline depende de fundamentos matemáticos — probabilidade, álgebra linear, otimização — e avaliação em dados reservados para garantir generalização em vez de memorização.
+Se você é novo em IA, aqui está uma progressão de aprendizado sugerida:
 
-## Casos de uso
+1. **[Aprendizado de Máquina](/docs/fundamentals/machine-learning)** — entenda os conceitos fundamentais: supervisionado vs. não supervisionado, treinamento vs. inferência, overfitting
+2. **[Deep Learning](/docs/fundamentals/deep-learning)** — como as redes neurais aprendem representações de dados
+3. **[Redes Neurais](/docs/neural-networks)** — os blocos de construção: camadas, pesos, backpropagation
+4. **[Transformers](/docs/transformers)** — a arquitetura por trás dos LLMs modernos
+5. **[LLMs](/docs/llms)** — grandes modelos de linguagem e como usá-los
 
-As ideias fundamentais de ML se aplicam onde houver dados e um objetivo de previsão ou otimização bem definido.
+## Recursos principais
 
-- Construção de classificadores (ex.: detecção de spam, análise de sentimentos) a partir de dados rotulados
-- Aprendizado de representações para sistemas de recomendação ou busca
-- Formulação de tomada de decisão como previsão ou otimização (ex.: previsão, controle)
-
-## Documentação externa
-
-- [Curso acelerado de ML do Google](https://developers.google.com/machine-learning/crash-course) — Introdução a conceitos de ML
-- [MIT 6.S191 – Introdução ao Deep Learning](http://introtodeeplearning.com/) — Aulas e materiais
-
-## Veja também
-
-- [Aprendizado de máquina](/docs/fundamentals/machine-learning)
-- [Aprendizado profundo](/docs/fundamentals/deep-learning)
-- [Redes neurais](/docs/neural-networks)
+| Tópico | Descrição |
+|--------|-----------|
+| [Aprendizado de Máquina](/docs/fundamentals/machine-learning) | Supervisionado, não supervisionado, por reforço |
+| [Deep Learning](/docs/fundamentals/deep-learning) | Redes neurais, otimização, regularização |
+| [Redes Neurais](/docs/neural-networks) | Arquitetura de rede, ativações, backpropagation |
+| [CNN](/docs/neural-networks/cnn) | Redes convolucionais para visão |
+| [RNN](/docs/neural-networks/rnn) | Redes recorrentes para sequências |
+| [Transformers](/docs/transformers) | Auto-atenção e arquiteturas modernas |

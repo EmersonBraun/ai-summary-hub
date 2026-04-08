@@ -1,36 +1,38 @@
 ---
-title: Prompt caching
-description: Como o Claude Code usa prompt caching para reduzir latência e custos de tokens reutilizando prompts de sistema, definições de ferramentas e prefixos de conversa previamente processados entre chamadas de API.
-keywords: [prompt caching, tokens de cache, cache_control, cache de prompt de sistema, redução de latência, economia de tokens, API Claude, cache efêmero]
+title: Cache de prompts
+description: Como o Claude Code usa cache de prompts para reduzir latência e custos de tokens reutilizando prompts de sistema, definições de ferramentas e prefixos de conversa previamente processados entre chamadas de API.
+keywords: [cache de prompts, tokens em cache, cache_control, cache de prompt de sistema, redução de latência, economia de tokens, API Claude, cache efêmero]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
-# Prompt caching
+# Cache de prompts
 
 ## Definição
 
-Prompt caching é uma funcionalidade da API Claude que permite que partes repetidas de um prompt — o prompt de sistema, definições de ferramentas, contexto de documentos ou longos prefixos de conversa — sejam processadas uma vez e reutilizadas em múltiplas chamadas de API subsequentes. Em vez de reprocessar sequências idênticas de tokens a cada requisição, o modelo as lê de um cache, o que reduz a latência e diminui o custo dos tokens em cache. No Claude Code, o prompt caching opera automaticamente em segundo plano para tornar sessões longas e uso repetido de ferramentas mais rápidos e baratos.
+Cache de prompts é uma funcionalidade da API Claude que permite que porções repetidas de um prompt — o prompt de sistema, definições de ferramentas, contexto de documentos ou longos prefixos de conversa — sejam processadas uma vez e reutilizadas em múltiplas chamadas de API subsequentes. Em vez de reprocessar sequências de tokens idênticas em cada requisição, o modelo as lê de um cache, o que reduz a latência e diminui o custo dos tokens em cache. No Claude Code, o cache de prompts opera automaticamente em segundo plano para tornar sessões longas e uso repetido de ferramentas mais rápidos e econômicos.
 
-O insight central por trás do prompt caching é que a maior parte do que muda entre chamadas de API em uma sessão de codificação é pequena: uma nova mensagem do usuário, um novo resultado de ferramenta ou um arquivo atualizado. As partes grandes e estáveis — o prompt de sistema contendo instruções do projeto, as definições de todas as ferramentas disponíveis e o histórico de conversa acumulado — permanecem inalteradas na maioria dos turnos. Processar essas partes estáveis de forma redundante em cada requisição é desperdício. O prompt caching elimina esse desperdício armazenando estados de chave-valor processados e reutilizando-os quando o prefixo do prompt corresponde.
+A ideia central por trás do cache de prompts é que a maior parte do que muda entre chamadas de API em uma sessão de codificação é pequena: uma nova mensagem do usuário, um novo resultado de ferramenta ou um arquivo atualizado. As partes grandes e estáveis — o prompt de sistema contendo instruções do projeto, as definições de todas as ferramentas disponíveis e o histórico de conversa acumulado — permanecem inalteradas na maioria dos turnos. Processar essas partes estáveis de forma redundante em cada requisição é um desperdício. O cache de prompts elimina esse desperdício armazenando estados chave-valor processados e reutilizando-os quando o prefixo do prompt corresponde.
 
-Da perspectiva do desenvolvedor, o prompt caching é amplamente transparente nas sessões do Claude Code — ocorre automaticamente sem configuração. Entendê-lo importa mais quando se constrói diretamente sobre a API Claude, projetando loops de agentes de longa duração ou solucionando latência ou custos inesperadamente altos. Nesses contextos, saber como estruturar prompts para utilização otimizada do cache pode gerar economias substanciais: os tokens de entrada em cache são cobrados a uma fração do custo dos tokens de entrada regulares, e os cache hits eliminam completamente a latência de processamento para as partes em cache.
+Da perspectiva de um desenvolvedor, o cache de prompts é amplamente transparente em sessões do Claude Code — acontece automaticamente sem configuração. Entendê-lo importa mais quando se constrói diretamente sobre a API Claude, projetando loops de agentes de longa duração, ou solucionando problemas de latência ou custos inesperadamente altos. Nesses contextos, saber como estruturar prompts para utilização ótima do cache pode gerar economias substanciais: tokens de entrada em cache são cobrados a uma fração do custo dos tokens de entrada regulares, e os acertos de cache eliminam completamente a latência de processamento das partes em cache.
 
 ## Como funciona
 
 ### Marcadores de controle de cache
 
-O prompt caching usa anotações explícitas de `cache_control` para marcar onde no prompt um ponto de verificação de cache deve ser criado. Quando a API processa uma requisição com `{"type": "ephemeral"}` de controle de cache em um bloco de conteúdo, ela armazena o estado processado de todos os tokens até e incluindo aquele bloco. Em requisições subsequentes com o mesmo prefixo, a API detecta o cache hit e ignora o reprocessamento desses tokens. Um prompt pode ter até quatro pontos de verificação de cache ativos simultaneamente, permitindo que desenvolvedores façam cache do prompt de sistema separadamente das definições de ferramentas e do histórico de conversa.
+O cache de prompts usa anotações `cache_control` explícitas para marcar onde no prompt um ponto de verificação de cache deve ser criado. Quando a API processa uma requisição com controle de cache `{"type": "ephemeral"}` em um bloco de conteúdo, ela armazena o estado processado de todos os tokens até e incluindo aquele bloco. Em requisições subsequentes com o mesmo prefixo, a API detecta o acerto de cache e pula o reprocessamento desses tokens. Um prompt pode ter até quatro pontos de verificação de cache ativos simultaneamente, permitindo que desenvolvedores façam cache do prompt de sistema separadamente das definições de ferramentas e do histórico de conversa.
 
-### Tempo de vida do cache e invalidação
+### Vida útil do cache e invalidação
 
-O cache efêmero tem um tempo de vida de aproximadamente cinco minutos de inatividade. Se nenhuma chamada de API referenciar um prefixo em cache dentro dessa janela, a entrada do cache é removida e deve ser reconstruída na próxima requisição. Isso significa que o prompt caching é mais eficaz para casos de uso de alta frequência: sessões de codificação interativas onde as requisições chegam a cada poucos segundos, loops de agentes que executam muitas chamadas de ferramentas em rápida sucessão ou pipelines de processamento em lote que processam muitos documentos com um prompt de sistema compartilhado. Para fluxos de trabalho de baixa frequência onde minutos se passam entre requisições, o cache pode expirar e não fornecer benefício.
+O cache efêmero tem um tempo de vida de aproximadamente cinco minutos de inatividade. Se nenhuma chamada de API referenciar um prefixo em cache dentro dessa janela, a entrada de cache é removida e deve ser reconstruída na próxima requisição. Isso significa que o cache de prompts é mais eficaz para casos de uso de alta frequência: sessões de codificação interativas onde requisições chegam a cada poucos segundos, loops de agentes que executam muitas chamadas de ferramentas em rápida sucessão, ou pipelines de processamento em lote que processam muitos documentos com um prompt de sistema compartilhado. Para fluxos de trabalho de baixa frequência onde minutos se passam entre requisições, o cache pode expirar e não fornecer nenhum benefício.
 
 ### O que fazer cache
 
-Os candidatos de maior valor para cache são conteúdos que são grandes, estáveis e reutilizados frequentemente. O prompt de sistema é o candidato mais óbvio: no Claude Code ele contém instruções do projeto do CLAUDE.md, definições de ferramentas e diretrizes de comportamento — frequentemente milhares de tokens que são idênticos em cada turno. As definições de ferramentas (schemas JSON para todas as ferramentas disponíveis) são outro candidato forte. Em fluxos de trabalho de RAG ou com muitos documentos, grandes documentos de referência carregados no início de uma sessão podem ser armazenados em cache para que perguntas subsequentes sobre esses documentos incorram apenas no custo marginal da nova pergunta, não no custo de reler os documentos.
+Os melhores candidatos para cache são conteúdos que são grandes, estáveis e reutilizados com frequência. O prompt de sistema é o candidato mais óbvio: no Claude Code ele contém instruções do projeto do CLAUDE.md, definições de ferramentas e diretrizes de comportamento — frequentemente milhares de tokens que são idênticos em cada turno. As definições de ferramentas (esquemas JSON para todas as ferramentas disponíveis) são outro candidato sólido. Em fluxos de trabalho RAG ou com muitos documentos, grandes documentos de referência carregados no início de uma sessão podem ter cache para que perguntas subsequentes sobre esses documentos incorram apenas no custo marginal da nova pergunta, não no custo de reler os documentos.
 
-### Detecção de cache hit e relatório de uso
+### Detecção de acertos de cache e relatórios de uso
 
-A resposta da API inclui um objeto `usage` que distingue entre tokens de entrada regulares, tokens de criação de cache e tokens de leitura de cache. Os tokens de criação de cache são cobrados a 1,25x a taxa base (o custo único de gravar no cache). Os tokens de leitura de cache são cobrados a 0,1x a taxa base — um desconto de 90% em relação aos tokens de entrada regulares. Monitorar esses campos permite que desenvolvedores meçam a eficácia real do cache: a proporção de tokens de leitura de cache em relação ao total de tokens de entrada indica quanto do prompt está sendo servido do cache.
+A resposta da API inclui um objeto `usage` que distingue entre tokens de entrada regulares, tokens de criação de cache e tokens de leitura de cache. Os tokens de criação de cache são cobrados a 1,25x da taxa base (o custo único de escrever no cache). Os tokens de leitura de cache são cobrados a 0,1x da taxa base — um desconto de 90% versus tokens de entrada regulares. Monitorar esses campos permite que desenvolvedores meçam a eficácia real do cache: a proporção de tokens de leitura de cache em relação ao total de tokens de entrada indica quanto do prompt está sendo servido do cache.
 
 ```mermaid
 flowchart LR
@@ -44,13 +46,13 @@ flowchart LR
 
 ## Quando usar / Quando NÃO usar
 
-| Use quando | Evite quando |
+| Usar quando | Evitar quando |
 |---|---|
 | Seu prompt de sistema é grande (>1.000 tokens) e constante em muitas requisições | Seus prompts mudam significativamente em cada requisição — sem prefixo estável para fazer cache |
-| Você está executando um loop de agente com muitas chamadas de ferramentas sequenciais em uma única sessão | As requisições são infrequentes (>5 min entre turnos) — o cache expira antes de poder ser reutilizado |
-| Você carrega grandes documentos de referência (specs, bases de código) no início da sessão | Seu caso de uso é requisições únicas sem contexto repetido |
-| Você quer reduzir a latência na primeira resposta visível ao usuário em uma sessão interativa | Você está testando ou depurando e quer contagens de tokens determinísticas por requisição |
-| Você está otimizando custos em um sistema de produção com alto volume de chamadas de API | O overhead de estruturar marcadores cache_control supera as economias em baixo volume |
+| Você está rodando um loop de agente com muitas chamadas de ferramentas sequenciais em uma única sessão | Requisições são infrequentes (>5 min entre turnos) — o cache expira antes de poder ser reutilizado |
+| Você carrega grandes documentos de referência (especificações, bases de código) no início da sessão | Seu caso de uso são requisições únicas sem contexto repetido |
+| Você quer reduzir a latência na primeira resposta visível ao usuário em uma sessão interativa | Você está testando ou depurando e quer contagens determinísticas de tokens por requisição |
+| Você está otimizando custos em um sistema de produção com alto volume de chamadas de API | A sobrecarga de estruturar marcadores cache_control supera as economias com baixo volume |
 
 ## Exemplos de código
 
@@ -176,13 +178,13 @@ claude --verbose
 
 ## Recursos práticos
 
-- [Documentação de prompt caching — Anthropic](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) — Referência oficial completa: formato de controle de cache, preços de tokens, TTL e modelos suportados.
-- [Cookbook de prompt caching](https://github.com/anthropics/anthropic-cookbook/blob/main/misc/prompt_caching.ipynb) — Notebook Jupyter com exemplos funcionais incluindo cálculo de custos e medição de cache hits.
+- [Documentação de cache de prompts — Anthropic](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) — Referência oficial completa: formato de controle de cache, preços de tokens, TTL e modelos suportados.
+- [Cookbook de cache de prompts](https://github.com/anthropics/anthropic-cookbook/blob/main/misc/prompt_caching.ipynb) — Jupyter notebook com exemplos funcionais incluindo cálculo de custo e medição de acertos de cache.
 - [Preços da API Claude](https://www.anthropic.com/pricing) — Taxas atuais de tokens para entrada, criação de cache e leitura de cache em todos os modelos.
-- [Monitoramento de uso Anthropic](https://console.anthropic.com/usage) — Painel do console para inspecionar detalhamentos de uso de tokens por chave de API.
+- [Monitoramento de uso da Anthropic](https://console.anthropic.com/usage) — Painel do console para inspecionar desagregações de uso de tokens por chave de API.
 
 ## Veja também
 
 - [Visão geral do Claude Code](/docs/claude-code)
 - [Gerenciamento de contexto](/docs/claude-code/context-management)
-- [Modos de thinking e esforço](/docs/claude-code/thinking-modes)
+- [Modos de raciocínio e esforço](/docs/claude-code/thinking-modes)

@@ -1,36 +1,38 @@
 ---
-title: "Herramientas y acciones de agentes"
-description: Qué son las herramientas y acciones en el contexto de los agentes, sus tipos, esquemas y cómo los agentes seleccionan qué herramienta usar.
-keywords: [herramientas de agentes, llamada a funciones, acciones, uso de herramientas, búsqueda web, ejecución de código, herramientas OpenAI, esquema de herramientas, llamadas a APIs]
+title: "Agent tools and actions"
+description: What tools and actions are in the agent context, their types, schemas, and how agents select which tool to use.
+keywords: [agent tools, function calling, actions, tool use, web search, code execution, OpenAI tools, tool schema, API calls]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Herramientas y acciones de agentes
 
 ## Definición
 
-Las herramientas y acciones son las manos de un agente de IA. Mientras el LLM proporciona razonamiento y comprensión del lenguaje, las herramientas dan al agente la capacidad de afectar al mundo: buscar en la web, ejecutar código, consultar una base de datos, enviar mensajes o llamar a cualquier API externa. Sin herramientas, un agente está limitado a lo que sabe de sus datos de entrenamiento; con herramientas, puede acceder a información en tiempo real, realizar cómputos y tomar acciones con efectos secundarios.
+Werkzeuge und Aktionen sind die Hände eines KI-Agenten. Während das LLM Reasoning und Sprachverständnis bietet, geben Werkzeuge dem Agenten die Fähigkeit, auf die Welt einzuwirken: das Web durchsuchen, Code ausführen, eine Datenbank abfragen, Nachrichten senden oder eine externe API aufrufen. Ohne Werkzeuge ist ein Agent auf das beschränkt, was er aus seinen Trainingsdaten weiß; mit Werkzeugen kann er auf Echtzeit-Informationen zugreifen, Berechnungen durchführen und seiteneffektbehaftete Aktionen ausführen.
 
-En los ecosistemas de OpenAI y Anthropic, el mecanismo para el uso de herramientas se llama **function calling** (OpenAI) o **tool use** (Anthropic). El desarrollador define un conjunto de esquemas de herramientas — descripciones JSON estructuradas del nombre, propósito y parámetros de cada herramienta — y los incluye en la solicitud a la API. Cuando el LLM decide que se necesita una herramienta, devuelve un objeto de llamada a herramienta estructurado en lugar de texto plano. El código llamante ejecuta la herramienta y alimenta el resultado de vuelta a la conversación. Este bucle se repite hasta que el agente produce una respuesta final.
+Im OpenAI- und Anthropic-Ökosystem wird der Mechanismus für die Werkzeug-Nutzung als **Function Calling** (OpenAI) oder **Tool Use** (Anthropic) bezeichnet. Der Entwickler definiert einen Satz von Werkzeug-Schemas – strukturierte JSON-Beschreibungen des Namens, Zwecks und der Parameter jedes Werkzeugs – und nimmt diese in die API-Anfrage auf. Wenn das LLM entscheidet, dass ein Werkzeug benötigt wird, gibt es ein strukturiertes Werkzeugaufruf-Objekt statt einfachen Texts zurück. Der aufrufende Code führt das Werkzeug aus und speist das Ergebnis zurück in das Gespräch ein. Diese Schleife wiederholt sich, bis der Agent eine Endantwort produziert.
 
-La amplitud de las herramientas disponibles es esencialmente ilimitada: si algo puede expresarse como una función Python, puede ser una herramienta. Las categorías comunes incluyen búsqueda web, sandboxes de ejecución de código, consultas a bases de datos SQL o NoSQL, acceso al sistema de archivos, llamadas a APIs REST, integraciones de correo electrónico y mensajería, y herramientas de uso del computador que interactúan con interfaces gráficas de usuario. Diseñar buenas herramientas — con esquemas claros, comportamiento predecible y mensajes de error útiles — es una de las cosas más impactantes que un desarrollador puede hacer para mejorar la confiabilidad del agente.
+Die Breite der verfügbaren Werkzeuge ist im Wesentlichen unbegrenzt: Wenn etwas als Python-Funktion ausgedrückt werden kann, kann es ein Werkzeug sein. Häufige Kategorien umfassen Websuche, Code-Ausführungs-Sandboxes, SQL- oder NoSQL-Datenbankabfragen, Dateisystemzugriff, REST-API-Aufrufe, E-Mail- und Messaging-Integrationen und Computer-Use-Werkzeuge, die mit GUIs interagieren. Das Entwerfen guter Werkzeuge – mit klaren Schemas, vorhersehbarem Verhalten und hilfreichen Fehlermeldungen – ist eines der wirkungsvollsten Dinge, die ein Entwickler tun kann, um die Agenten-Zuverlässigkeit zu verbessern.
 
 ## Cómo funciona
 
 ### Definición del esquema de herramientas
 
-Cada herramienta se describe mediante un esquema que el LLM usa para entender cuándo y cómo llamarla. Un esquema incluye: un nombre (identificador corto en snake_case), una descripción (explicación clara en lenguaje natural de qué hace la herramienta y cuándo usarla) y un objeto de parámetros (JSON Schema que describe cada argumento: nombre, tipo, descripción y si es requerido). La calidad de la descripción afecta directamente a qué tan confiablemente el agente selecciona e invoca la herramienta correctamente. Las descripciones vagas llevan al mal uso; las descripciones precisas con ejemplos llevan a llamadas a herramientas precisas.
+Jedes Werkzeug wird durch ein Schema beschrieben, das das LLM verwendet, um zu verstehen, wann und wie es aufgerufen werden soll. Ein Schema enthält: einen Namen (kurzer, snake_case-Identifier), eine Beschreibung (klare natürlichsprachliche Erklärung, was das Werkzeug tut und wann es verwendet werden soll) und ein Parameter-Objekt (JSON Schema, das jedes Argument beschreibt: Name, Typ, Beschreibung und ob es erforderlich ist). Die Qualität der Beschreibung beeinflusst direkt, wie zuverlässig der Agent das Werkzeug korrekt auswählt und aufruft. Vage Beschreibungen führen zu Missbrauch; präzise Beschreibungen mit Beispielen führen zu genauen Werkzeugaufrufen.
 
 ### Selección de herramientas
 
-Cuando el LLM recibe un mensaje del usuario junto con un conjunto de esquemas de herramientas, decide en cada paso si responder directamente o invocar una herramienta. Esta decisión se aprende implícitamente durante el fine-tuning en datos de llamada a funciones. En la práctica, la selección de herramientas está influenciada por el prompt de sistema (que puede instruir al agente sobre cuándo preferir ciertas herramientas), la especificidad de las descripciones de herramientas y la confianza del modelo en que puede responder desde los datos de entrenamiento solos. Proporcionar un parámetro `tool_choice` puede forzar o restringir la selección de herramientas programáticamente.
+Wenn das LLM eine Benutzernachricht zusammen mit einem Satz von Werkzeug-Schemas erhält, entscheidet es bei jedem Schritt, ob es direkt antwortet oder ein Werkzeug aufruft. Diese Entscheidung wird implizit beim Fine-Tuning auf Function-Calling-Daten erlernt. In der Praxis wird die Werkzeugauswahl durch den System-Prompt beeinflusst (der den Agenten anweisen kann, wann bestimmte Werkzeuge bevorzugt werden sollen), die Spezifität der Werkzeugbeschreibungen und das Vertrauen des Modells, dass es aus Trainingsdaten direkt antworten kann. Die Angabe eines `tool_choice`-Parameters kann die Werkzeugauswahl programmatisch erzwingen oder einschränken.
 
 ### Ejecución de herramientas e inyección de resultados
 
-Cuando el LLM produce una llamada a herramienta, el código llamante la intercepta, valida los argumentos contra el esquema, ejecuta la función correspondiente y recibe un resultado. Este resultado — ya sea una cadena, un objeto JSON o un mensaje de error — se formatea como un mensaje con rol `tool` y se añade al historial de conversación. El LLM genera entonces el siguiente paso con pleno conocimiento de la salida de la herramienta. Los mensajes de error de llamadas a herramientas fallidas son importantes: el agente debe saber que una herramienta falló para que pueda reintentar, probar una alternativa o pedir aclaraciones al usuario.
+Wenn das LLM einen Werkzeugaufruf ausgibt, fängt der aufrufende Code ihn ab, validiert die Argumente gegen das Schema, führt die entsprechende Funktion aus und erhält ein Ergebnis. Dieses Ergebnis – ob eine Zeichenfolge, ein JSON-Objekt oder eine Fehlermeldung – wird als `tool`-Rollen-Nachricht formatiert und dem Konversationsverlauf hinzugefügt. Das LLM generiert dann den nächsten Schritt mit vollständiger Kenntnis der Ausgabe des Werkzeugs. Fehlermeldungen von fehlgeschlagenen Werkzeugaufrufen sind wichtig: Der Agent muss wissen, dass ein Werkzeug fehlgeschlagen ist, damit er es erneut versuchen, eine Alternative versuchen oder den Benutzer um Klärung bitten kann.
 
-### Llamadas a múltiples herramientas y llamadas paralelas
+### Herramientas múltiples y llamadas paralelas
 
-Las APIs modernas de LLM admiten llamadas paralelas a herramientas: el modelo puede solicitar múltiples invocaciones de herramientas en una sola respuesta cuando identifica que son independientes. Por ejemplo, un agente podría llamar a web_search para tres consultas diferentes simultáneamente en lugar de secuencialmente, reduciendo la latencia en dos tercios. El código llamante ejecuta todas las herramientas en paralelo, recopila los resultados y los alimenta juntos en el siguiente turno. Diseñar herramientas para que sean sin estado e idempotentes donde sea posible maximiza el beneficio de la ejecución en paralelo.
+Moderne LLM-APIs unterstützen parallele Werkzeugaufrufe: Das Modell kann mehrere Werkzeugaufrufungen in einer einzigen Antwort anfordern, wenn es feststellt, dass sie unabhängig sind. Zum Beispiel könnte ein Agent `web_search` für drei verschiedene Anfragen gleichzeitig aufrufen statt sequentiell und die Latenz um zwei Drittel reduzieren. Der aufrufende Code führt alle Werkzeuge parallel aus, sammelt die Ergebnisse und speist sie zusammen im nächsten Turn zurück. Das Entwerfen von Werkzeugen als zustandslos und idempotent, wo möglich, maximiert den Nutzen paralleler Ausführung.
 
 ```mermaid
 flowchart LR
@@ -48,21 +50,21 @@ flowchart LR
 
 | Usar cuando | Evitar cuando |
 |---|---|
-| El agente necesita información en tiempo real o externa no presente en los datos de entrenamiento | La tarea puede responderse completamente desde el conocimiento del modelo |
-| Se requieren acciones con efectos secundarios (enviar correo, escribir archivo, actualizar BD) | Las herramientas introducen riesgos de seguridad sin sandboxing o limitación de tasa adecuados |
-| Se necesita cómputo más allá de las capacidades del LLM (aritmética, ejecución de código) | Cada llamada a herramienta añade latencia y la tarea es sensible al tiempo |
-| La recuperación de datos estructurados (consultas SQL, respuestas de API) es esencial | El esquema de la herramienta es tan complejo que el modelo frecuentemente lo usa incorrectamente |
-| Se pueden componer múltiples herramientas especializadas para resolver tareas complejas | Los modos de fallo de la herramienta son irrecuperables y podrían causar daño |
+| Der Agent Echtzeit- oder externe Informationen benötigt, die nicht in den Trainingsdaten sind | Die Aufgabe vollständig aus dem Wissen des Modells beantwortet werden kann |
+| Aktionen mit Nebenwirkungen erforderlich sind (E-Mail senden, Datei schreiben, DB aktualisieren) | Werkzeuge Sicherheitsrisiken einführen ohne ordnungsgemäßes Sandboxing oder Rate-Limiting |
+| Berechnungen jenseits der LLM-Fähigkeiten benötigt werden (Arithmetik, Code-Ausführung) | Jeder Werkzeugaufruf Latenz hinzufügt und die Aufgabe zeitkritisch ist |
+| Strukturierter Datenabruf (SQL-Abfragen, API-Antworten) wesentlich ist | Das Werkzeug-Schema so komplex ist, dass das Modell es häufig falsch verwendet |
+| Mehrere spezialisierte Werkzeuge kombiniert werden können, um komplexe Aufgaben zu lösen | Die Fehlermodi des Werkzeugs nicht wiederherstellbar sind und Schaden verursachen könnten |
 
-## Pros y contras
+## Ventajas y desventajas
 
-| Pros | Contras |
+| Ventajas | Desventajas |
 |---|---|
-| Extiende al agente más allá de los datos de entrenamiento estáticos | Cada llamada a herramienta añade latencia y costo de API |
-| Permite efectos secundarios en el mundo real y automatización | El mal uso de herramientas puede causar acciones irreversibles |
-| Admite E/S estructurada y validada mediante JSON Schema | Diseñar esquemas claros requiere un prompt engineering cuidadoso |
-| Las llamadas paralelas a herramientas reducen el tiempo de respuesta general | Más herramientas aumentan la carga cognitiva del modelo para la selección |
-| Completamente extensible — cualquier función Python puede convertirse en una herramienta | El manejo de errores y los reintentos deben implementarse explícitamente |
+| Erweitert den Agenten über statische Trainingsdaten hinaus | Jeder Werkzeugaufruf fügt Latenz und API-Kosten hinzu |
+| Ermöglicht reale Nebenwirkungen und Automatisierung | Werkzeugmissbrauch kann irreversible Aktionen verursachen |
+| Unterstützt strukturierte, validierte I/O über JSON Schema | Das Entwerfen klarer Schemas erfordert sorgfältiges Prompt Engineering |
+| Parallele Werkzeugaufrufe reduzieren die Gesamtantwortzeit | Mehr Werkzeuge erhöhen die kognitive Last für das Modell bei der Auswahl |
+| Vollständig erweiterbar — jede Python-Funktion kann ein Werkzeug werden | Fehlerbehandlung und Wiederholungen müssen explizit implementiert werden |
 
 ## Ejemplos de código
 
@@ -321,14 +323,14 @@ if __name__ == "__main__":
 
 ## Recursos prácticos
 
-- [Guía de Function Calling de OpenAI](https://platform.openai.com/docs/guides/function-calling) — Documentación oficial que cubre esquemas de herramientas, llamadas paralelas y mejores prácticas para definiciones de funciones.
-- [Documentación de Anthropic Tool Use](https://docs.anthropic.com/en/docs/tool-use) — Guía de Anthropic para el uso de herramientas con Claude, incluyendo streaming, uso del computador y patrones de múltiples herramientas.
-- [Tavily AI Search API](https://tavily.com/) — API de búsqueda diseñada específicamente para agentes LLM, que proporciona resultados estructurados limpios ideales para el uso de herramientas.
-- [Conceptos de herramientas de LangChain](https://python.langchain.com/docs/concepts/tools/) — Visión general de los patrones de diseño de herramientas en LangChain, incluyendo herramientas personalizadas e integraciones incorporadas.
-- [Gorilla: Large Language Model Connected with Massive APIs (Patil et al., 2023)](https://arxiv.org/abs/2305.15334) — Investigación sobre el fine-tuning de LLMs para la selección precisa de API/herramientas a través de miles de herramientas.
+- [OpenAI Function Calling Guide](https://platform.openai.com/docs/guides/function-calling) — Offizielle Dokumentation zu Werkzeug-Schemas, parallelen Aufrufen und Best Practices für Funktionsdefinitionen.
+- [Anthropic Tool Use Documentation](https://docs.anthropic.com/en/docs/tool-use) — Anthropics Leitfaden zur Werkzeug-Nutzung mit Claude, einschließlich Streaming, Computer Use und Multi-Werkzeug-Muster.
+- [Tavily AI Search API](https://tavily.com/) — Zweckgebundene Such-API für LLM-Agenten, die saubere strukturierte Ergebnisse ideal für Werkzeug-Nutzung liefert.
+- [LangChain Tools Concepts](https://python.langchain.com/docs/concepts/tools/) — Überblick über Werkzeug-Design-Muster in LangChain, einschließlich benutzerdefinierter Werkzeuge und eingebauter Integrationen.
+- [Gorilla: Large Language Model Connected with Massive APIs (Patil et al., 2023)](https://arxiv.org/abs/2305.15334) — Forschung zum Fine-Tuning von LLMs für genaue API/Werkzeug-Auswahl über Tausende von Werkzeugen.
 
 ## Ver también
 
-- [Agentes de IA](/docs/agents)
+- [AI agents](/docs/agents)
 - [Anthropic tool use](/docs/agents/anthropic-tool-use)
-- [Resumen de frameworks de agentes](/docs/agents/frameworks-overview)
+- [Agent frameworks overview](/docs/agents/frameworks-overview)

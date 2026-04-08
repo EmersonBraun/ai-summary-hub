@@ -1,18 +1,20 @@
 ---
-title: 代理评估与测试
-description: 如何在生产和开发中测量、基准测试和系统化测试 AI 代理性能。
-keywords: [代理评估, 基准测试, LangSmith, Ragas, DeepEval, AgentBench, SWE-bench, 任务完成率, 延迟, 准确性]
+title: Agent evaluation and testing
+description: How to measure, benchmark, and systematically test AI agent performance in production and development.
+keywords: [agent evaluation, benchmarks, LangSmith, Ragas, DeepEval, AgentBench, SWE-bench, task completion rate, latency, accuracy]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # 代理评估与测试
 
 ## 定义
 
-代理评估是测量 AI 代理完成任务的程度、正确使用工具、在成本和延迟预算内运行以及产生准确输出的实践。与静态模型评估——将固定输出与参考进行比较——不同，代理评估必须考虑多步骤轨迹、非确定性路径、中间工具调用以及跨步骤错误的累积效应。单个任务可以通过许多不同的执行路径成功，使传统的准确性分数本身不够充分。
+Agenten-Evaluation ist die Praxis, zu messen, wie gut ein KI-Agent Aufgaben erfüllt, Werkzeuge korrekt einsetzt, innerhalb von Kosten- und Latenzbudgets bleibt und genaue Ausgaben erzeugt. Anders als bei der statischen Modell-Evaluation – wo man eine feste Ausgabe mit einer Referenz vergleicht – muss die Agenten-Evaluation mehrstufige Trajektorien, nicht-deterministische Pfade, intermediäre Werkzeugaufrufe und den kumulativen Effekt von Fehlern über Schritte hinweg berücksichtigen. Eine einzelne Aufgabe kann durch viele verschiedene Ausführungspfade erfolgreich sein, was traditionelle Genauigkeitswerte allein unzureichend macht.
 
-严格的评估是将演示与生产系统区分开来的关键。没有它，您无法知道提示更改是改善了还是回退了行为，新的工具定义是否被正确使用，或者延迟是否在真实负载下可接受。评估应在多个层次进行：单工具的单元级测试、完整代理运行的集成级测试，以及针对代表性任务黄金数据集的回归测试。
+Rigorose Evaluation ist das, was eine Demo von einem Produktionssystem unterscheidet. Ohne sie können Sie nicht wissen, ob eine Prompt-Änderung das Verhalten verbessert oder verschlechtert hat, ob eine neue Werkzeugdefinition korrekt verwendet wird oder ob die Latenz unter realer Last akzeptabel ist. Evaluation sollte auf mehreren Ebenen stattfinden: Unit-Level-Testing einzelner Werkzeuge, Integration-Level-Testing vollständiger Agenten-Läufe und Regressionstesting gegen einen goldenen Datensatz repräsentativer Aufgaben.
 
-成熟的评估策略将自动化指标（任务完成率、准确性、延迟、成本、工具使用效率）与针对边缘案例和主观质量的人工审查相结合。AgentBench 和 SWE-bench 等基准提供了跨模型和框架比较的标准化任务集，而 LangSmith、Ragas 和 DeepEval 等框架提供了大规模运行评估和随时间追踪结果的基础设施。
+Eine ausgereifte Evaluierungsstrategie kombiniert automatisierte Metriken (Aufgabenabschlussrate, Genauigkeit, Latenz, Kosten, Werkzeugnutzungseffizienz) mit menschlicher Überprüfung für Randfälle und subjektive Qualität. Benchmarks wie AgentBench und SWE-bench bieten standardisierte Aufgabensets für den Vergleich über Modelle und Frameworks hinweg, während Frameworks wie LangSmith, Ragas und DeepEval Infrastruktur für das Ausführen von Evaluierungen im großen Maßstab und die Verfolgung von Ergebnissen im Laufe der Zeit bereitstellen.
 
 ## 工作原理
 
@@ -26,55 +28,55 @@ flowchart LR
   Evaluate -->|summarized in| Report[Evaluation Report]
 ```
 
-### 任务和数据集准备
+### Aufgaben- und Datensatz-Vorbereitung
 
-良好的评估数据集包含从真实或逼真的用户请求中抽取的代表性任务，每个任务都有预期结果或参考答案。任务应涵盖正常路径、边缘案例、对抗性输入和多步骤工作流。对于代理评估，每个任务应指定预期的最终答案，以及可选的预期工具调用序列。数据集质量是影响评估质量的最大杠杆——垃圾进，垃圾出。
+Ein guter Evaluierungsdatensatz enthält repräsentative Aufgaben aus echten oder realistischen Benutzeranfragen, jeweils mit erwarteten Ergebnissen oder Referenzantworten. Aufgaben sollten Happy Paths, Randfälle, adversarielle Eingaben und mehrstufige Workflows abdecken. Für die Agenten-Evaluation sollte jede Aufgabe die erwartete Endantwort und optional die erwartete Sequenz von Werkzeugaufrufen spezifizieren. Die Datensatzqualität ist der größte Hebel für die Evaluierungsqualität – Müll rein, Müll raus.
 
-### 执行和追踪收集
+### Ausführung und Trace-Sammlung
 
-代理运行数据集中的每个任务，每个步骤——LLM 调用、工具调用、内存读取和输出——都被捕获为结构化追踪。追踪记录每个跨度的输入、输出、时间戳、令牌计数和错误。这是所有下游指标的原材料，对于调试失败也非常宝贵。通过固定随机种子和温度可以提高确定性，但应预期一些变异性，并通过每个任务运行多次试验来处理。
+Der Agent führt jede Aufgabe im Datensatz aus, und jeder Schritt – LLM-Aufrufe, Werkzeugaufrufungen, Speicherlesungen und Ausgaben – wird als strukturierter Trace erfasst. Traces zeichnen Eingaben, Ausgaben, Zeitstempel, Token-Zählungen und Fehler für jeden Span auf. Dies ist das Rohmaterial für alle nachgelagerten Metriken und ist auch für das Debugging von Fehlern unschätzbar. Determinismus kann durch das Fixieren von Zufalls-Seeds und Temperatur verbessert werden, aber einige Variabilität ist zu erwarten und sollte durch das Ausführen mehrerer Trials pro Aufgabe berücksichtigt werden.
 
-### 指标收集
+### Metrikerfassung
 
-代理评估的核心指标包括：**任务完成率**（代理是否成功完成了任务？）、**准确性**（最终答案是否正确？）、**延迟**（端到端挂钟时间）、**成本**（总令牌 × 价格）和**工具使用效率**（工具是否以正确的次数和正确的参数调用？）。次要指标包括步骤计数、重试率、幻觉率和对检索上下文的忠实度。指标按任务计算，并在数据集中聚合。
+Kernmetriken für die Agenten-Evaluation umfassen: **Aufgabenabschlussrate** (hat der Agent die Aufgabe erfolgreich abgeschlossen?), **Genauigkeit** (ist die Endantwort korrekt?), **Latenz** (End-to-End-Wanduhrzeit), **Kosten** (Gesamttokens × Preis) und **Werkzeugnutzungseffizienz** (wurden Werkzeuge die richtige Anzahl von Malen mit korrekten Argumenten aufgerufen?). Sekundäre Metriken umfassen Schrittanzahl, Wiederholungsrate, Halluzinationsrate und Treue zum abgerufenen Kontext. Metriken werden pro Aufgabe berechnet und über den Datensatz aggregiert.
 
-### 评估和评分
+### Evaluation und Bewertung
 
-许多指标——尤其是开放式输出的正确性——需要评判者。LLM 评判者（例如 GPT-4 或 Claude）接收任务、代理的答案，以及可选的参考答案，并根据评分标准评估质量。这有时被称为"LLM 作为评判者"，是 Ragas 和 DeepEval 等框架的支柱。对于确定性任务（代码执行、SQL 查询、结构化提取），基于规则的检查更可靠且成本更低。应使用人工审查来校准 LLM 评判者并捕获系统性偏差。
+Viele Metriken – insbesondere Korrektheit für offene Ausgaben – erfordern einen Richter. Ein LLM-Richter (z. B. GPT-4 oder Claude) erhält die Aufgabe, die Antwort des Agenten und optional eine Referenzantwort und bewertet die Qualität auf einer Rubrik. Dies wird manchmal als „LLM-as-a-judge" bezeichnet und ist das Rückgrat von Frameworks wie Ragas und DeepEval. Für deterministische Aufgaben (Code-Ausführung, SQL-Abfragen, strukturierte Extraktion) sind regelbasierte Prüfungen zuverlässiger und günstiger. Menschliche Überprüfung sollte verwendet werden, um LLM-Richter zu kalibrieren und systematische Verzerrungen zu erkennen.
 
-### 报告和回归追踪
+### Berichterstattung und Regressionsverfolgung
 
-评估结果聚合成报告，并与代理版本、提示版本和模型版本一起存储。这使回归追踪成为可能：您可以将当前代理与基线进行比较，并在部署之前检测回归。LangSmith 等工具中的仪表板显示随时间变化的指标趋势，帮助团队在个别测试运行会遗漏的情况下捕捉细微的退化。
+Evaluierungsergebnisse werden in einem Bericht aggregiert und neben der Agenten-Version, Prompt-Version und Modell-Version gespeichert. Dies ermöglicht Regressionsverfolgung: Sie können den aktuellen Agenten mit einer Baseline vergleichen und Regressionen erkennen, bevor sie bereitgestellt werden. Dashboards in Tools wie LangSmith zeigen Metriktrends über die Zeit und helfen Teams, subtile Degradierungen zu erkennen, die einzelne Testläufe übersehen würden.
 
-## 适用场景 / 不适用场景
+## 何时使用 / 何时不使用
 
-| 适用场景 | 不适用场景 |
+| 使用场景 | 避免场景 |
 |---|---|
-| 在部署前比较两个代理版本或提示 | 因为任务在演示中"看起来正确"而跳过评估 |
-| 构建回归套件以捕捉破坏提示的变更 | 仅在项目启动时运行一次评估，之后不再评估 |
-| 测量成本和延迟以满足 SLA | 使用单一指标（例如只有准确性）来判断整体质量 |
-| 验证工具调用行为和参数正确性 | 使用只包含简单、干净任务而没有边缘案例的数据集 |
-| 引入新模型以检查能力转移 | 将 LLM 评判者分数视为无需人工校准的事实依据 |
+| Zwei Agenten-Versionen oder Prompts vor der Bereitstellung vergleichen | Evaluation überspringen, weil die Aufgabe in einer Demo „richtig aussieht" |
+| Eine Regressionssuite aufbauen, um Prompt-brechende Änderungen zu erkennen | Evaluation nur einmal zu Projektbeginn durchführen und nie wieder |
+| Kosten und Latenz messen, um SLAs zu erfüllen | Eine einzelne Metrik (z. B. nur Genauigkeit) zur Beurteilung der Gesamtqualität verwenden |
+| Werkzeugaufruf-Verhalten und Argumentkorrektheit validieren | Einen Datensatz mit nur einfachen, sauberen Aufgaben ohne Randfälle verwenden |
+| Ein neues Modell einbinden, um die Fähigkeitsübertragung zu prüfen | LLM-Richterbewertungen als absolute Wahrheit ohne menschliche Kalibrierung behandeln |
 
 ## 比较
 
-| 标准 | LangSmith | DeepEval | Ragas |
+| Kriterium | LangSmith | DeepEval | Ragas |
 |---|---|---|---|
-| **易用性** | 与 LangChain 紧密集成，LangChain 用户快速设置；对其他人较陡 | 干净的 Python API，最少的样板代码，易于添加到任何流水线 | 针对 RAG 流水线优化；对检索任务直接明了 |
-| **指标覆盖范围** | 追踪、自定义评估器、数据集管理；内置 LLM 指标较少 | 20+ 内置指标（幻觉、忠实度、工具正确性、毒性） | 以 RAG 为中心的指标（忠实度、答案相关性、上下文召回、精确度） |
-| **追踪集成** | 一等功能：完整追踪捕获、跨度可视化、运行比较 | 通过装饰器进行追踪捕获；本机可视化较少 | 无内置追踪；通过 LangSmith 或 W&B 集成 |
-| **定价** | 免费层 + 付费托管计划；可自托管 | 开源；云仪表板可用 | 开源；无托管仪表板 |
-| **自定义** | 通过 Python 或提示模板的自定义评估器 | 通过子类化指标类进行扩展 | 通过 Python 自定义指标；强大的 NLP 指标库支持 |
+| **Benutzerfreundlichkeit** | Enge LangChain-Integration, schnelle Einrichtung für LangChain-Benutzer; steiler für andere | Saubere Python-API, minimaler Boilerplate, einfach zu jeder Pipeline hinzuzufügen | Für RAG-Pipelines optimiert; unkompliziert für Abruf-Aufgaben |
+| **Metrikabdeckung** | Tracing, benutzerdefinierte Evaluatoren, Datensatz-Management; weniger integrierte LLM-Metriken | 20+ integrierte Metriken (Halluzination, Treue, Werkzeugkorrektheit, Toxizität) | RAG-fokussierte Metriken (Treue, Antwortrelevanz, Kontext-Recall, Präzision) |
+| **Tracing-Integration** | Erstklassig: vollständige Trace-Erfassung, Span-Visualisierung, Lauf-Vergleich | Trace-Erfassung über Dekoratoren; weniger native Visualisierung | Kein eingebautes Tracing; integriert über LangSmith oder W&B |
+| **Preisgestaltung** | Kostenloser Tarif + bezahlte gehostete Pläne; selbst-hostbar | Open Source; Cloud-Dashboard verfügbar | Open Source; kein gehostetes Dashboard |
+| **Anpassbarkeit** | Benutzerdefinierte Evaluatoren über Python oder Prompt-Vorlagen | Erweiterbar durch Unterklassen von Metrik-Klassen | Benutzerdefinierte Metriken über Python; starke NLP-Metrik-Bibliotheksunterstützung |
 
 ## 优缺点
 
 | 优点 | 缺点 |
 |---|---|
-| 在到达用户之前捕捉回归 | 构建良好的数据集耗时 |
-| 为提示/模型决策提供客观证据 | LLM 评判者可能有偏差或不一致 |
-| 实现成本和延迟预算 | 非确定性需要多次试验，增加成本 |
-| 通过自动化扩展到大型数据集 | 代理追踪可能很大且存储成本高 |
-| 集成到 CI/CD 以实现持续质量门控 | 指标选择困难且特定于领域 |
+| Erkennt Regressionen, bevor sie Benutzer erreichen | Das Aufbauen eines guten Datensatzes ist zeitaufwendig |
+| Liefert objektive Belege für Prompt-/Modellentscheidungen | LLM-Richter können voreingenommen oder inkonsistent sein |
+| Ermöglicht Kosten- und Latenzbudgetierung | Nicht-Determinismus erfordert mehrere Trials und erhöht die Kosten |
+| Skaliert auf große Datensätze mit Automatisierung | Agenten-Traces können groß und teuer zu speichern sein |
+| Integriert sich in CI/CD für kontinuierliche Qualitätsgates | Metrikauswahl ist schwierig und domänenspezifisch |
 
 ## 代码示例
 
@@ -190,15 +192,15 @@ for tc, result in zip(test_cases, results.test_results):
 
 ## 实用资源
 
-- [DeepEval 文档](https://docs.confident-ai.com/) — DeepEval 指标、测试用例和 LLM 及代理评估 CI/CD 集成的综合指南。
-- [Ragas 文档](https://docs.ragas.io/) — 用于评估 RAG 流水线和代理忠实度的 Ragas 框架，具有答案相关性和上下文召回等指标。
-- [LangSmith 文档](https://docs.smith.langchain.com/) — LangSmith 针对基于 LangChain 代理的评估、追踪和数据集管理功能。
-- [AgentBench 论文和排行榜](https://github.com/THUDM/AgentBench) — 在包括网页、编码和操作系统环境在内的各种真实世界任务中评估 LLM 代理的基准。
-- [SWE-bench](https://www.swebench.com/) — 测量代理解决软件工程存储库中真实 GitHub 问题的能力的基准。
+- [DeepEval documentation](https://docs.confident-ai.com/) — Umfassender Leitfaden zu DeepEval-Metriken, Testfällen und CI/CD-Integration für LLM- und Agenten-Evaluation.
+- [Ragas documentation](https://docs.ragas.io/) — Ragas-Framework für die Evaluierung von RAG-Pipelines und Agenten-Treue, mit Metriken wie Antwortrelevanz und Kontext-Recall.
+- [LangSmith documentation](https://docs.smith.langchain.com/) — LangSmith's Evaluierungs-, Tracing- und Datensatz-Management-Funktionen für LangChain-basierte Agenten.
+- [AgentBench paper and leaderboard](https://github.com/THUDM/AgentBench) — Benchmark für die Evaluierung von LLM-Agenten über verschiedene Aufgaben aus der realen Welt, einschließlich Web, Coding und OS-Umgebungen.
+- [SWE-bench](https://www.swebench.com/) — Benchmark, der die Fähigkeit von Agenten misst, echte GitHub-Issues in Software-Engineering-Repositories zu lösen.
 
-## 另请参阅
+## 另见
 
-- [代理](/docs/agents)
-- [代理调试与可观测性](/docs/agents/debugging)
-- [评估指标](/docs/evaluation-metrics)
-- [基准测试](/docs/benchmarks)
+- [Agents](/docs/agents)
+- [Agent debugging and observability](/docs/agents/debugging)
+- [Evaluation metrics](/docs/evaluation-metrics)
+- [Benchmarks](/docs/benchmarks)

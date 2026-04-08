@@ -2,6 +2,8 @@
 title: PyTorch Mobile
 description: 使用 TorchScript 和下一代 ExecuTorch 运行时在移动和边缘设备上部署 PyTorch 模型。
 keywords: [PyTorch Mobile, TorchScript, ExecuTorch, 移动推理, 边缘 AI, 量化, Android, iOS]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # PyTorch Mobile

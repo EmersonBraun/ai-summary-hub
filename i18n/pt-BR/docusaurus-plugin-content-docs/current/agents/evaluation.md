@@ -1,18 +1,20 @@
 ---
-title: Avaliação e testes de agentes
-description: Como medir, comparar e testar sistematicamente o desempenho de agentes de IA em produção e desenvolvimento.
-keywords: [avaliação de agentes, benchmarks, LangSmith, Ragas, DeepEval, AgentBench, SWE-bench, taxa de conclusão de tarefas, latência, acurácia]
+title: Agent evaluation and testing
+description: How to measure, benchmark, and systematically test AI agent performance in production and development.
+keywords: [agent evaluation, benchmarks, LangSmith, Ragas, DeepEval, AgentBench, SWE-bench, task completion rate, latency, accuracy]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Avaliação e testes de agentes
 
 ## Definição
 
-A avaliação de agentes é a prática de medir o quão bem um agente de IA conclui tarefas, usa ferramentas corretamente, permanece dentro dos orçamentos de custo e latência e produz saídas precisas. Ao contrário da avaliação estática de modelos — onde você compara uma saída fixa com uma referência — a avaliação de agentes deve levar em conta trajetórias de múltiplas etapas, caminhos não-determinísticos, chamadas intermediárias de ferramentas e o efeito composto de erros ao longo das etapas. Uma única tarefa pode ser concluída com sucesso por muitos caminhos de execução diferentes, tornando as pontuações de acurácia tradicionais insuficientes por si só.
+Agenten-Evaluation ist die Praxis, zu messen, wie gut ein KI-Agent Aufgaben erfüllt, Werkzeuge korrekt einsetzt, innerhalb von Kosten- und Latenzbudgets bleibt und genaue Ausgaben erzeugt. Anders als bei der statischen Modell-Evaluation – wo man eine feste Ausgabe mit einer Referenz vergleicht – muss die Agenten-Evaluation mehrstufige Trajektorien, nicht-deterministische Pfade, intermediäre Werkzeugaufrufe und den kumulativen Effekt von Fehlern über Schritte hinweg berücksichtigen. Eine einzelne Aufgabe kann durch viele verschiedene Ausführungspfade erfolgreich sein, was traditionelle Genauigkeitswerte allein unzureichend macht.
 
-A avaliação rigorosa é o que separa uma demo de um sistema de produção. Sem ela, você não pode saber se uma mudança de prompt melhorou ou regrediu o comportamento, se uma nova definição de ferramenta está sendo usada corretamente ou se a latência é aceitável sob carga real. A avaliação deve acontecer em múltiplos níveis: testes em nível unitário de ferramentas individuais, testes em nível de integração de execuções completas de agentes e testes de regressão contra um dataset dourado de tarefas representativas.
+Rigorose Evaluation ist das, was eine Demo von einem Produktionssystem unterscheidet. Ohne sie können Sie nicht wissen, ob eine Prompt-Änderung das Verhalten verbessert oder verschlechtert hat, ob eine neue Werkzeugdefinition korrekt verwendet wird oder ob die Latenz unter realer Last akzeptabel ist. Evaluation sollte auf mehreren Ebenen stattfinden: Unit-Level-Testing einzelner Werkzeuge, Integration-Level-Testing vollständiger Agenten-Läufe und Regressionstesting gegen einen goldenen Datensatz repräsentativer Aufgaben.
 
-Uma estratégia de avaliação madura combina métricas automatizadas (taxa de conclusão de tarefas, acurácia, latência, custo, eficiência de uso de ferramentas) com revisão humana para casos extremos e qualidade subjetiva. Benchmarks como AgentBench e SWE-bench fornecem conjuntos de tarefas padronizados para comparação entre modelos e frameworks, enquanto frameworks como LangSmith, Ragas e DeepEval fornecem infraestrutura para executar avaliações em escala e rastrear resultados ao longo do tempo.
+Eine ausgereifte Evaluierungsstrategie kombiniert automatisierte Metriken (Aufgabenabschlussrate, Genauigkeit, Latenz, Kosten, Werkzeugnutzungseffizienz) mit menschlicher Überprüfung für Randfälle und subjektive Qualität. Benchmarks wie AgentBench und SWE-bench bieten standardisierte Aufgabensets für den Vergleich über Modelle und Frameworks hinweg, während Frameworks wie LangSmith, Ragas und DeepEval Infrastruktur für das Ausführen von Evaluierungen im großen Maßstab und die Verfolgung von Ergebnissen im Laufe der Zeit bereitstellen.
 
 ## Como funciona
 
@@ -26,55 +28,55 @@ flowchart LR
   Evaluate -->|summarized in| Report[Evaluation Report]
 ```
 
-### Preparação de tarefas e datasets
+### Aufgaben- und Datensatz-Vorbereitung
 
-Um bom dataset de avaliação contém tarefas representativas extraídas de requisições reais ou realistas de usuários, cada uma com resultados esperados ou respostas de referência. As tarefas devem cobrir caminhos felizes, casos extremos, entradas adversariais e fluxos de trabalho de múltiplas etapas. Para avaliação de agentes especificamente, cada tarefa deve especificar a resposta final esperada e, opcionalmente, a sequência esperada de chamadas de ferramentas. A qualidade do dataset é o maior fator na qualidade da avaliação — lixo entra, lixo sai.
+Ein guter Evaluierungsdatensatz enthält repräsentative Aufgaben aus echten oder realistischen Benutzeranfragen, jeweils mit erwarteten Ergebnissen oder Referenzantworten. Aufgaben sollten Happy Paths, Randfälle, adversarielle Eingaben und mehrstufige Workflows abdecken. Für die Agenten-Evaluation sollte jede Aufgabe die erwartete Endantwort und optional die erwartete Sequenz von Werkzeugaufrufen spezifizieren. Die Datensatzqualität ist der größte Hebel für die Evaluierungsqualität – Müll rein, Müll raus.
 
-### Execução e coleta de traces
+### Ausführung und Trace-Sammlung
 
-O agente executa cada tarefa no dataset, e cada etapa — chamadas de LLM, invocações de ferramentas, leituras de memória e saídas — é capturada como um trace estruturado. Os traces registram entradas, saídas, timestamps, contagens de tokens e erros para cada span. Este é o material bruto para todas as métricas downstream e também é inestimável para depurar falhas. O determinismo pode ser melhorado fixando seeds aleatórias e temperatura, mas alguma variabilidade deve ser esperada e contabilizada executando múltiplos testes por tarefa.
+Der Agent führt jede Aufgabe im Datensatz aus, und jeder Schritt – LLM-Aufrufe, Werkzeugaufrufungen, Speicherlesungen und Ausgaben – wird als strukturierter Trace erfasst. Traces zeichnen Eingaben, Ausgaben, Zeitstempel, Token-Zählungen und Fehler für jeden Span auf. Dies ist das Rohmaterial für alle nachgelagerten Metriken und ist auch für das Debugging von Fehlern unschätzbar. Determinismus kann durch das Fixieren von Zufalls-Seeds und Temperatur verbessert werden, aber einige Variabilität ist zu erwarten und sollte durch das Ausführen mehrerer Trials pro Aufgabe berücksichtigt werden.
 
-### Coleta de métricas
+### Metrikerfassung
 
-As métricas principais para avaliação de agentes incluem: **taxa de conclusão de tarefas** (o agente concluiu a tarefa com sucesso?), **acurácia** (a resposta final está correta?), **latência** (tempo de relógio de ponta a ponta), **custo** (total de tokens × preço) e **eficiência de uso de ferramentas** (as ferramentas foram chamadas o número correto de vezes com argumentos corretos?). Métricas secundárias incluem contagem de etapas, taxa de repetição, taxa de alucinação e fidelidade ao contexto recuperado. As métricas são calculadas por tarefa e agregadas no dataset.
+Kernmetriken für die Agenten-Evaluation umfassen: **Aufgabenabschlussrate** (hat der Agent die Aufgabe erfolgreich abgeschlossen?), **Genauigkeit** (ist die Endantwort korrekt?), **Latenz** (End-to-End-Wanduhrzeit), **Kosten** (Gesamttokens × Preis) und **Werkzeugnutzungseffizienz** (wurden Werkzeuge die richtige Anzahl von Malen mit korrekten Argumenten aufgerufen?). Sekundäre Metriken umfassen Schrittanzahl, Wiederholungsrate, Halluzinationsrate und Treue zum abgerufenen Kontext. Metriken werden pro Aufgabe berechnet und über den Datensatz aggregiert.
 
-### Avaliação e pontuação
+### Evaluation und Bewertung
 
-Muitas métricas — especialmente corretude para saídas abertas — requerem um juiz. Um juiz LLM (por exemplo, GPT-4 ou Claude) recebe a tarefa, a resposta do agente e opcionalmente uma resposta de referência, e pontua a qualidade em uma rubrica. Isso às vezes é chamado de "LLM-como-juiz" e é a espinha dorsal de frameworks como Ragas e DeepEval. Para tarefas determinísticas (execução de código, consultas SQL, extração estruturada), verificações baseadas em regras são mais confiáveis e baratas. A revisão humana deve ser usada para calibrar juízes LLM e detectar vieses sistemáticos.
+Viele Metriken – insbesondere Korrektheit für offene Ausgaben – erfordern einen Richter. Ein LLM-Richter (z. B. GPT-4 oder Claude) erhält die Aufgabe, die Antwort des Agenten und optional eine Referenzantwort und bewertet die Qualität auf einer Rubrik. Dies wird manchmal als „LLM-as-a-judge" bezeichnet und ist das Rückgrat von Frameworks wie Ragas und DeepEval. Für deterministische Aufgaben (Code-Ausführung, SQL-Abfragen, strukturierte Extraktion) sind regelbasierte Prüfungen zuverlässiger und günstiger. Menschliche Überprüfung sollte verwendet werden, um LLM-Richter zu kalibrieren und systematische Verzerrungen zu erkennen.
 
-### Relatórios e rastreamento de regressão
+### Berichterstattung und Regressionsverfolgung
 
-Os resultados da avaliação são agregados em um relatório e armazenados junto com a versão do agente, versão do prompt e versão do modelo. Isso habilita o rastreamento de regressão: você pode comparar o agente atual com uma linha de base e detectar regressões antes de implantar. Painéis em ferramentas como LangSmith mostram tendências de métricas ao longo do tempo, ajudando as equipes a detectar degradações sutis que execuções de teste individuais perderiam.
+Evaluierungsergebnisse werden in einem Bericht aggregiert und neben der Agenten-Version, Prompt-Version und Modell-Version gespeichert. Dies ermöglicht Regressionsverfolgung: Sie können den aktuellen Agenten mit einer Baseline vergleichen und Regressionen erkennen, bevor sie bereitgestellt werden. Dashboards in Tools wie LangSmith zeigen Metriktrends über die Zeit und helfen Teams, subtile Degradierungen zu erkennen, die einzelne Testläufe übersehen würden.
 
 ## Quando usar / Quando NÃO usar
 
 | Usar quando | Evitar quando |
 |---|---|
-| Comparar duas versões de agente ou prompts antes de implantar | Pular a avaliação porque a tarefa "parece certa" em uma demo |
-| Construir uma suíte de regressão para detectar mudanças que quebram prompts | Executar avaliação apenas uma vez no início do projeto e nunca mais |
-| Medir custo e latência para atender SLAs | Usar uma única métrica (por exemplo, apenas acurácia) para julgar a qualidade geral |
-| Validar o comportamento de chamadas de ferramentas e a corretude de argumentos | Usar um dataset de apenas tarefas fáceis e limpas sem casos extremos |
-| Integrar um novo modelo para verificar transferência de capacidade | Tratar pontuações de juízes LLM como verdade absoluta sem calibração humana |
+| Zwei Agenten-Versionen oder Prompts vor der Bereitstellung vergleichen | Evaluation überspringen, weil die Aufgabe in einer Demo „richtig aussieht" |
+| Eine Regressionssuite aufbauen, um Prompt-brechende Änderungen zu erkennen | Evaluation nur einmal zu Projektbeginn durchführen und nie wieder |
+| Kosten und Latenz messen, um SLAs zu erfüllen | Eine einzelne Metrik (z. B. nur Genauigkeit) zur Beurteilung der Gesamtqualität verwenden |
+| Werkzeugaufruf-Verhalten und Argumentkorrektheit validieren | Einen Datensatz mit nur einfachen, sauberen Aufgaben ohne Randfälle verwenden |
+| Ein neues Modell einbinden, um die Fähigkeitsübertragung zu prüfen | LLM-Richterbewertungen als absolute Wahrheit ohne menschliche Kalibrierung behandeln |
 
 ## Comparações
 
-| Critério | LangSmith | DeepEval | Ragas |
+| Kriterium | LangSmith | DeepEval | Ragas |
 |---|---|---|---|
-| **Facilidade de uso** | Integração estreita com LangChain, configuração rápida para usuários LangChain; mais difícil para outros | API Python limpa, boilerplate mínimo, fácil de adicionar a qualquer pipeline | Otimizado para pipelines RAG; simples para tarefas de recuperação |
-| **Cobertura de métricas** | Rastreamento, avaliadores personalizados, gerenciamento de datasets; menos métricas LLM embutidas | 20+ métricas embutidas (alucinação, fidelidade, corretude de ferramentas, toxicidade) | Métricas focadas em RAG (fidelidade, relevância da resposta, recall de contexto, precisão) |
-| **Integração de rastreamento** | Primeira classe: captura completa de trace, visualização de span, comparação de execuções | Captura de trace via decoradores; menos visualização nativa | Sem rastreamento embutido; integra via LangSmith ou W&B |
-| **Preços** | Nível gratuito + planos pagos hospedados; auto-hospedável | Código aberto; painel em nuvem disponível | Código aberto; sem painel hospedado |
-| **Personalização** | Avaliadores personalizados via Python ou templates de prompt | Extensível subclassificando classes de métricas | Métricas personalizadas via Python; forte suporte a biblioteca de métricas NLP |
+| **Benutzerfreundlichkeit** | Enge LangChain-Integration, schnelle Einrichtung für LangChain-Benutzer; steiler für andere | Saubere Python-API, minimaler Boilerplate, einfach zu jeder Pipeline hinzuzufügen | Für RAG-Pipelines optimiert; unkompliziert für Abruf-Aufgaben |
+| **Metrikabdeckung** | Tracing, benutzerdefinierte Evaluatoren, Datensatz-Management; weniger integrierte LLM-Metriken | 20+ integrierte Metriken (Halluzination, Treue, Werkzeugkorrektheit, Toxizität) | RAG-fokussierte Metriken (Treue, Antwortrelevanz, Kontext-Recall, Präzision) |
+| **Tracing-Integration** | Erstklassig: vollständige Trace-Erfassung, Span-Visualisierung, Lauf-Vergleich | Trace-Erfassung über Dekoratoren; weniger native Visualisierung | Kein eingebautes Tracing; integriert über LangSmith oder W&B |
+| **Preisgestaltung** | Kostenloser Tarif + bezahlte gehostete Pläne; selbst-hostbar | Open Source; Cloud-Dashboard verfügbar | Open Source; kein gehostetes Dashboard |
+| **Anpassbarkeit** | Benutzerdefinierte Evaluatoren über Python oder Prompt-Vorlagen | Erweiterbar durch Unterklassen von Metrik-Klassen | Benutzerdefinierte Metriken über Python; starke NLP-Metrik-Bibliotheksunterstützung |
 
-## Prós e contras
+## Vantagens e desvantagens
 
-| Prós | Contras |
+| Vantagens | Desvantagens |
 |---|---|
-| Detecta regressões antes que cheguem aos usuários | Construir um bom dataset consome tempo |
-| Fornece evidências objetivas para decisões de prompt/modelo | Juízes LLM podem ser tendenciosos ou inconsistentes |
-| Habilita orçamentação de custo e latência | O não-determinismo requer múltiplos testes, aumentando o custo |
-| Escala para grandes datasets com automação | Traces de agentes podem ser grandes e caros de armazenar |
-| Integra-se ao CI/CD para portais de qualidade contínuos | A escolha de métricas é difícil e específica do domínio |
+| Erkennt Regressionen, bevor sie Benutzer erreichen | Das Aufbauen eines guten Datensatzes ist zeitaufwendig |
+| Liefert objektive Belege für Prompt-/Modellentscheidungen | LLM-Richter können voreingenommen oder inkonsistent sein |
+| Ermöglicht Kosten- und Latenzbudgetierung | Nicht-Determinismus erfordert mehrere Trials und erhöht die Kosten |
+| Skaliert auf große Datensätze mit Automatisierung | Agenten-Traces können groß und teuer zu speichern sein |
+| Integriert sich in CI/CD für kontinuierliche Qualitätsgates | Metrikauswahl ist schwierig und domänenspezifisch |
 
 ## Exemplos de código
 
@@ -190,15 +192,15 @@ for tc, result in zip(test_cases, results.test_results):
 
 ## Recursos práticos
 
-- [Documentação do DeepEval](https://docs.confident-ai.com/) — Guia abrangente para métricas DeepEval, casos de teste e integração CI/CD para avaliação de LLM e agentes.
-- [Documentação do Ragas](https://docs.ragas.io/) — Framework Ragas para avaliar pipelines RAG e fidelidade de agentes, com métricas como relevância de resposta e recall de contexto.
-- [Documentação do LangSmith](https://docs.smith.langchain.com/) — Recursos de avaliação, rastreamento e gerenciamento de datasets do LangSmith para agentes baseados em LangChain.
-- [Artigo e leaderboard do AgentBench](https://github.com/THUDM/AgentBench) — Benchmark para avaliar agentes LLM em diversas tarefas do mundo real incluindo web, codificação e ambientes de OS.
-- [SWE-bench](https://www.swebench.com/) — Benchmark medindo a capacidade dos agentes de resolver issues reais do GitHub em repositórios de engenharia de software.
+- [DeepEval documentation](https://docs.confident-ai.com/) — Umfassender Leitfaden zu DeepEval-Metriken, Testfällen und CI/CD-Integration für LLM- und Agenten-Evaluation.
+- [Ragas documentation](https://docs.ragas.io/) — Ragas-Framework für die Evaluierung von RAG-Pipelines und Agenten-Treue, mit Metriken wie Antwortrelevanz und Kontext-Recall.
+- [LangSmith documentation](https://docs.smith.langchain.com/) — LangSmith's Evaluierungs-, Tracing- und Datensatz-Management-Funktionen für LangChain-basierte Agenten.
+- [AgentBench paper and leaderboard](https://github.com/THUDM/AgentBench) — Benchmark für die Evaluierung von LLM-Agenten über verschiedene Aufgaben aus der realen Welt, einschließlich Web, Coding und OS-Umgebungen.
+- [SWE-bench](https://www.swebench.com/) — Benchmark, der die Fähigkeit von Agenten misst, echte GitHub-Issues in Software-Engineering-Repositories zu lösen.
 
 ## Veja também
 
-- [Agentes](/docs/agents)
-- [Depuração e observabilidade de agentes](/docs/agents/debugging)
-- [Métricas de avaliação](/docs/evaluation-metrics)
+- [Agents](/docs/agents)
+- [Agent debugging and observability](/docs/agents/debugging)
+- [Evaluation metrics](/docs/evaluation-metrics)
 - [Benchmarks](/docs/benchmarks)

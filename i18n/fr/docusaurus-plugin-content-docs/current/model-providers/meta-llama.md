@@ -1,222 +1,191 @@
 ---
 title: Meta Llama
 description: La famille de modèles Llama à poids ouverts de Meta — déploiement local, hébergement API tiers, fine-tuning et le débat entre modèles ouverts et fermés.
-keywords: [Meta Llama, Llama 3, poids ouverts, inférence locale, llama.cpp, vLLM, Together AI, Groq, Fireworks AI, fine-tuning, LLM open source]
+keywords: [Meta, Llama, open weights, fine-tuning, local inference, Ollama, Hugging Face, open source LLM]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Meta Llama
 
 ## Définition
 
-Llama (Large Language Model Meta AI) de Meta est une famille de grands modèles de langage à poids ouverts publiée par Meta AI Research. Contrairement aux modèles entièrement propriétaires distribués uniquement via une API payante, les modèles Llama sont publiés avec des poids que les développeurs peuvent télécharger, inspecter, modifier et redistribuer sous la licence communautaire personnalisée de Meta. Cela signifie que les organisations peuvent exécuter l'inférence entièrement au sein de leur propre infrastructure, sans acheminer les données via un service cloud tiers — un avantage significatif pour les charges de travail sensibles à la confidentialité. La série a commencé en 2023 avec Llama 1 et Llama 2, et a atteint une étape majeure avec la génération **Llama 3**.
+**Meta Llama** est la famille de modèles de langage à poids ouverts de Meta AI, publiée sous des licences qui permettent généralement une utilisation commerciale avec certaines restrictions. Contrairement aux modèles fermés d'Anthropic ou d'OpenAI, les modèles Llama sont disponibles sous forme de téléchargements de poids — vous pouvez les exécuter sur votre propre matériel, les affiner sur vos propres données, ou les déployer derrière votre propre API sans passer par un service tiers. Ce modèle de distribution "poids ouverts" (par opposition à "open-source" au sens plein, car les données d'entraînement ne sont généralement pas publiées) est devenu une alternative importante à l'IA générative fermée.
 
-La **famille Llama 3** couvre de multiples tailles et spécialisations. La version de base de Llama 3 incluait des variantes instruct et de base à 8B et 70B paramètres. Les versions ultérieures ont introduit **Llama 3.1** (avec 405B paramètres, une fenêtre de contexte étendue à 128k et des améliorations multilingues), **Llama 3.2** (modèles légers de 1B et 3B pour une utilisation sur appareil, plus des variantes vision multimodale de 11B et 90B) et **Llama 3.3** (un modèle 70B avec des performances multilingues et de raisonnement significativement améliorées). Ensemble, ceux-ci couvrent un large spectre allant du déploiement edge aux performances near-frontier.
-
-L'espace des modèles à poids ouverts se situe à l'intersection d'un débat philosophique et pratique : **ouvert vs fermé**. Les partisans des poids ouverts soutiennent que la transparence, l'auditabilité, l'innovation communautaire et le contrôle des coûts l'emportent sur la commodité d'une API gérée. Les critiques soulignent que les grands modèles à poids ouverts sont coûteux à servir à grande échelle, nécessitent une expertise en ingénierie pour déployer et sécuriser, et que "poids ouverts" n'est pas la même chose qu'"open source" — les données d'entraînement et la méthodologie complète restent propriétaires. En pratique, la plupart des organisations finissent dans une approche hybride : utilisant des modèles à poids ouverts pour les charges de travail sensibles ou coûteuses tout en s'appuyant encore sur des fournisseurs d'API fermés pour les capacités de pointe.
+La lignée Llama à partir de 2025 inclut : **Llama 2** (les modèles 7B, 13B, 70B originaux publiés en 2023 avec une licence commerciale), **Llama 3** (modèles 8B et 70B publiés en avril 2024 avec une fenêtre de contexte améliorée à 8K tokens et des jeux de données d'entraînement de meilleure qualité), **Llama 3.1** (modèles 8B, 70B et 405B avec des fenêtres de contexte de 128K), **Llama 3.2** (ajout de modèles vision et de petits modèles edge 1B/3B), et **Llama 3.3** (améliorations du 70B). Meta publie également des variantes spécialisées : **Code Llama** (optimisé pour la génération de code) et **Llama Guard** (classification de sécurité du contenu). Les modèles sont disponibles sur [Hugging Face](https://huggingface.co/meta-llama), [Meta AI](https://ai.meta.com/llama/) et via des fournisseurs de cloud comme AWS, Azure et Google Cloud.
 
 ## Comment ça fonctionne
 
-### Déploiement local — transformers, llama.cpp, vLLM
+### Poids ouverts et écosystème de déploiement
 
-La façon la plus directe d'exécuter les modèles Llama est en local en utilisant Hugging Face **Transformers**, qui fournit une interface Python unifiée sur des centaines d'architectures de modèles. Pour les modèles plus petits (7B–13B) sur du matériel grand public, **llama.cpp** est la référence : c'est un moteur d'inférence pur C/C++ avec support de quantification GGUF qui peut exécuter Llama 3 8B en quantification 4 bits sur un CPU de laptop ou un GPU modeste avec une latence acceptable. Pour un service en production à grande échelle, **vLLM** est la solution recommandée — il implémente PagedAttention pour une gestion efficace du cache KV, permet le batching continu et expose une API REST compatible OpenAI, facilitant le remplacement de Llama pour toute intégration GPT-4 avec des modifications de code minimales. Chaque option occupe un point différent sur la courbe de compromis latence/débit/matériel.
-
-### Fournisseurs API tiers — Together AI, Groq, Fireworks AI
-
-Pour les équipes qui souhaitent la flexibilité des modèles à poids ouverts sans la charge d'infrastructure, plusieurs fournisseurs spécialisés hébergent les modèles Llama via des API gérées. **Together AI** propose des modèles Llama 3.x avec une tarification par token compétitive et un SDK Python qui reproduit l'interface OpenAI. **Groq** exécute des modèles Llama sur du matériel LPU (Language Processing Unit) personnalisé, offrant une latence extrêmement basse (souvent en millisecondes à un chiffre par token) adaptée aux applications interactives. **Fireworks AI** se concentre sur les déploiements de modèles fine-tunés et serverless avec un fort accent sur l'expérience développeur. Ces fournisseurs sont particulièrement utiles pour le travail de preuve de concept, les charges de travail en rafale ou les équipes sans infrastructure GPU.
-
-### Fine-tuning des poids ouverts
-
-L'un des avantages les plus convaincants des modèles à poids ouverts est l'accès complet au fine-tuning. Les organisations peuvent adapter Llama aux tâches spécifiques au domaine, aux exigences de style ou aux profils de sécurité en utilisant le fine-tuning supervisé (SFT) et l'apprentissage par renforcement à partir des retours humains (RLHF). En pratique, la plupart des praticiens utilisent le fine-tuning à efficacité paramétrique via **LoRA** (Low-Rank Adaptation) ou **QLoRA** (LoRA sur poids quantifiés), ce qui réduit les besoins en mémoire GPU de 4 à 10x. Les poids de l'adaptateur fine-tuné sont minuscules comparés au modèle de base et peuvent être fusionnés ou chargés séparément. Des outils comme **Hugging Face TRL**, **Axolotl** et **LLaMA-Factory** fournissent des boucles d'entraînement de haut niveau pour le fine-tuning de Llama avec un minimum de boilerplate.
+Contrairement aux modèles d'API fermés, vous interagissez avec Llama en téléchargeant les poids du modèle et en exécutant l'inférence localement ou sur votre propre infrastructure. Il existe plusieurs voies :
 
 ```mermaid
 flowchart TD
-    Source["Meta model weights\n(Hugging Face Hub / Meta.ai)"] -->|"download weights"| Local
-
-    subgraph Local["Local / Self-hosted inference"]
-        direction LR
-        TF["Hugging Face Transformers\n(GPU server)"]
-        LCPP["llama.cpp\n(CPU or consumer GPU)"]
-        vLLM["vLLM\n(production serving, OpenAI-compatible API)"]
-    end
-
-    Source -->|"weights available for fine-tuning"| FT["Fine-tuning\n(LoRA / QLoRA / SFT)"]
-    FT -->|"merged or adapter weights"| Local
-
-    Source -->|"hosted by provider"| Providers
-
-    subgraph Providers["Third-party API providers"]
-        direction LR
-        Together["Together AI\n(Llama 3.x, competitive pricing)"]
-        Groq["Groq\n(LPU hardware, ultra-low latency)"]
-        Fireworks["Fireworks AI\n(serverless, fine-tuned models)"]
-    end
-
-    Local -->|"inference request"| App["Your Application"]
-    Providers -->|"REST API response"| App
+  WEIGHTS[Meta Llama weights\n— Hugging Face / Meta] --> LOCAL[Local inference\nOllama / llama.cpp]
+  WEIGHTS --> CLOUD[Cloud fine-tuning\nAWS SageMaker / Azure / GCP]
+  WEIGHTS --> HOSTED[Hosted API providers\nGroq / Together / Fireworks]
+  LOCAL --> APP[Your application]
+  CLOUD --> FINETUNE[Fine-tuned model\ndeployed as API]
+  HOSTED --> APP
+  FINETUNE --> APP
 ```
+
+**Inférence locale** : Des outils comme [Ollama](https://ollama.com/) et [llama.cpp](https://github.com/ggerganov/llama.cpp) permettent d'exécuter des modèles Llama sur un MacBook, un PC de bureau ou un serveur Linux avec un GPU NVIDIA. Ollama télécharge et gère les modèles quantifiés ; llama.cpp fournit une compilation C++ multiplateforme pour un déploiement bare-metal. Des modèles plus petits (8B quantifié) fonctionnent sur du matériel grand public ; des modèles plus grands nécessitent des GPU professionnels ou du multi-GPU.
+
+**Fournisseurs hébergés** : Groq, Together AI, Fireworks AI et d'autres proposent des points de terminaison d'inférence Llama qui imitent le format de l'API OpenAI, permettant une intégration par remplacement direct dans du code existant.
+
+**Fine-tuning** : Les poids ouverts permettent un fine-tuning complet ou basé sur LoRA (Low-Rank Adaptation) sur vos propres données en utilisant des frameworks comme Hugging Face TRL, Unsloth ou torchtune de Meta. Ceci est un avantage clé par rapport aux modèles fermés.
+
+### Quantification et déploiement edge
+
+Les modèles Llama peuvent être quantifiés pour réduire les exigences mémoire avec une dégradation de performance minimale. GGUF (format utilisé par llama.cpp) supporte 4-bit, 5-bit et 8-bit quantification. Un Llama 3.1 8B quantifié en 4-bit nécessite ~5 GB de RAM et peut s'exécuter sur un Apple Silicon M-series Mac.
 
 ## Quand utiliser / Quand NE PAS utiliser
 
-| Utiliser quand | Éviter quand |
-|----------|------------|
-| La confidentialité des données est primordiale — secteurs réglementés, données personnelles, propriété intellectuelle confidentielle ne pouvant pas quitter votre infrastructure | Vous avez besoin de capacités frontier de pointe (GPT-4o / Claude 3.5 surpassent encore Llama 3 sur de nombreux benchmarks de raisonnement complexe) |
-| Contrôle des coûts à fort volume — les coûts d'API par token s'accumulent rapidement ; l'auto-hébergement de grands modèles peut être significativement moins cher au-delà de certains seuils QPS | Vous manquez de la capacité d'ingénierie ML pour gérer l'infrastructure GPU, maintenir les modèles à jour et gérer les correctifs de sécurité |
-| Vous devez fine-tuner le modèle sur des données propriétaires pour personnaliser profondément le comportement ou le style | Vous avez besoin d'une API gérée prête pour la production avec des SLA, une mise à l'échelle automatique et zéro surcharge opérationnelle aujourd'hui |
-| Vous souhaitez une auditabilité complète et la capacité d'inspecter les poids du modèle pour la conformité ou le red-teaming | Votre charge de travail nécessite un ancrage web en temps réel ou un multimodal vidéo/audio natif (Llama 3.2 ajoute la vision mais n'est pas au niveau de Gemini 1.5) |
-| Vous voulez exécuter l'inférence sur appareil sans dépendance réseau (Llama 3.2 1B/3B, llama.cpp) | Votre équipe évalue les modèles rapidement et la vitesse d'itération compte plus que le contrôle des données |
+| Utiliser Llama quand | Éviter ou considérer des alternatives quand |
+|----------------------|---------------------------------------------|
+| La confidentialité des données est primordiale — les données ne quittent pas votre infrastructure | Vous avez besoin des meilleures performances absolues sur des tâches de raisonnement complexes — les modèles fermés de pointe surpassent encore Llama |
+| Vous avez besoin d'un fine-tuning sur un domaine propriétaire ou une voix de marque spécifique | Vous construisez un prototype rapide — les API fermées ont moins de friction opérationnelle |
+| Les coûts à grande échelle sont prohibitifs sur les API commerciales | Vous n'avez pas d'expertise en infrastructure pour déployer et maintenir des modèles |
+| Vous opérez dans des régions ou industries avec des exigences strictes de résidence des données | La latence est critique et vous ne pouvez pas vous permettre l'overhead d'inférence local |
+| Vous voulez inspecter, modifier ou redistribuer les poids du modèle | Votre cas d'utilisation nécessite des fonctionnalités multimodales avancées — Llama a un support limité comparé à GPT-4o |
 
 ## Comparaisons
 
-| Critère | Meta Llama 3.x | OpenAI GPT-4o | Mistral (poids ouverts) |
-|-----------|---------------|--------------|------------------------|
-| Disponibilité des poids | Téléchargement des poids ouverts (licence communautaire) | API fermée uniquement | Poids ouverts pour 7B / Mixtral ; fermé pour Mistral Large |
-| Taille maximale du modèle | 405B (Llama 3.1) | Non divulguée | ~141B effectifs (Mixtral 8x22B) |
-| Auto-hébergement | Entièrement pris en charge ; llama.cpp, vLLM, Transformers | Impossible | Entièrement pris en charge ; même toolchain que Llama |
-| Options API gérées | Together AI, Groq, Fireworks, AWS Bedrock, Azure AI | OpenAI direct, Azure OpenAI | La Plateforme (mistral.ai), Together AI |
-| Fine-tuning | Oui — LoRA, QLoRA, SFT sur les poids complets | API de fine-tuning pour GPT-3.5/4o-mini uniquement | Oui — même toolchain à poids ouverts |
-| Multimodal | Llama 3.2 (vision 11B/90B) | GPT-4o (texte + image, audio nativement) | Texte uniquement pour les modèles ouverts ; Pixtral via API |
-| Souveraineté des données européenne | Possible avec auto-hébergement en région UE | Limité (régions Azure UE uniquement) | Fournisseur natif UE (siège à Paris) |
+| Critères | Llama 3.1 70B | GPT-4o | Claude 3.7 Sonnet | Mistral Large |
+|----------|---------------|--------|-------------------|---------------|
+| Disponibilité des poids | Oui (licence commerciale) | Non | Non | Certains modèles (Mistral 7B) |
+| Fenêtre de contexte | 128K | 128K | 200K | 128K |
+| Meilleur pour | Fine-tuning, auto-hébergement | Multimodal, agents | Documents longs, sécurité | Efficacité, multilingue |
+| Prix (hébergé) | ~$0,9/1M tokens (Together) | ~$2,5/1M tokens | ~$3/1M tokens | ~$2/1M tokens |
+| Inférence locale | Oui | Non | Non | Oui (modèles open) |
+| Score MMLU | ~82% (70B) | ~88% | ~88% | ~83% |
 
 ## Exemples de code
 
+### Inférence locale avec Ollama
+
 ```python
-# meta_llama_examples.py
-# Demonstrates two deployment paths:
-#   1. Local inference with Hugging Face Transformers
-#   2. Third-party API via Together AI (OpenAI-compatible interface)
-#
-# pip install transformers accelerate torch together
+# Local inference with Ollama
+# Install Ollama from https://ollama.com, then: ollama pull llama3.1
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Path 1: Local inference with Hugging Face Transformers
-# Requires a GPU with enough VRAM (e.g. RTX 3090 for 8B in bfloat16,
-# or use load_in_4bit=True with bitsandbytes for lower VRAM).
-# ─────────────────────────────────────────────────────────────────────────────
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
+import requests
 
-
-def local_llama_inference(prompt: str, model_id: str = "meta-llama/Meta-Llama-3.1-8B-Instruct"):
-    """
-    Run Llama 3.1 8B Instruct locally.
-    Requires a Hugging Face token with access granted at meta-llama/Meta-Llama-3.1-8B-Instruct.
-    Set HF_TOKEN environment variable or pass token= to from_pretrained.
-    """
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
-    model = AutoModelForCausalLM.from_pretrained(
-        model_id,
-        torch_dtype=torch.bfloat16,
-        device_map="auto",          # automatically distribute across available GPUs
-        # load_in_4bit=True,        # uncomment for QLoRA / low VRAM inference
+def chat_ollama(prompt: str, model: str = "llama3.1") -> str:
+    response = requests.post(
+        "http://localhost:11434/api/generate",
+        json={
+            "model": model,
+            "prompt": prompt,
+            "stream": False,
+        },
     )
+    return response.json()["response"]
 
-    # Llama 3 instruct models use a chat template
-    messages = [
-        {"role": "system", "content": "You are a helpful data science assistant."},
-        {"role": "user", "content": prompt},
-    ]
-    input_ids = tokenizer.apply_chat_template(
-        messages,
-        add_generation_prompt=True,
-        return_tensors="pt",
-    ).to(model.device)
+if __name__ == "__main__":
+    answer = chat_ollama("Explain transformer attention in two sentences.")
+    print(answer)
+```
 
-    outputs = model.generate(
-        input_ids,
-        max_new_tokens=512,
-        temperature=0.6,
-        top_p=0.9,
-        do_sample=True,
-        eos_token_id=tokenizer.eos_token_id,
-    )
+### API Llama via Together AI (compatible OpenAI)
 
-    # Decode only the generated tokens (skip the input)
-    generated = outputs[0][input_ids.shape[-1]:]
-    return tokenizer.decode(generated, skip_special_tokens=True)
+```python
+# Llama via Together AI — OpenAI-compatible endpoint
+# pip install openai
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Path 2: Together AI — managed Llama API (OpenAI-compatible)
-# Requires a Together AI account: https://api.together.ai
-# pip install together
-# ─────────────────────────────────────────────────────────────────────────────
-from together import Together
-
-
-def together_ai_inference(prompt: str):
-    """
-    Call Llama 3.1 405B via Together AI's managed inference API.
-    Together AI uses an OpenAI-compatible interface, so the openai SDK
-    also works — just point base_url at https://api.together.xyz/v1.
-    """
-    client = Together(api_key="YOUR_TOGETHER_API_KEY")
-
-    response = client.chat.completions.create(
-        model="meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful data science assistant."},
-            {"role": "user", "content": prompt},
-        ],
-        max_tokens=512,
-        temperature=0.6,
-        top_p=0.9,
-    )
-
-    return response.choices[0].message.content
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Path 3: vLLM — production-grade OpenAI-compatible server (run separately)
-# Start server: vllm serve meta-llama/Meta-Llama-3.1-8B-Instruct --port 8000
-# Then query it as if it were the OpenAI API:
-# ─────────────────────────────────────────────────────────────────────────────
+import os
 from openai import OpenAI
 
+client = OpenAI(
+    api_key=os.environ["TOGETHER_API_KEY"],
+    base_url="https://api.together.xyz/v1",
+)
 
-def vllm_server_inference(prompt: str, base_url: str = "http://localhost:8000/v1"):
-    """
-    Query a locally running vLLM server.
-    vLLM exposes an OpenAI-compatible API at /v1/chat/completions.
-    """
-    client = OpenAI(api_key="not-needed-for-local", base_url=base_url)
+response = client.chat.completions.create(
+    model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+    messages=[
+        {"role": "system", "content": "You are a concise technical assistant."},
+        {"role": "user", "content": "What is LoRA fine-tuning and when should I use it?"},
+    ],
+    temperature=0.3,
+    max_tokens=256,
+)
+print(response.choices[0].message.content)
+```
 
-    response = client.chat.completions.create(
-        model="meta-llama/Meta-Llama-3.1-8B-Instruct",
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=256,
-        temperature=0.7,
-    )
-    return response.choices[0].message.content
+### Fine-tuning LoRA avec Hugging Face TRL
 
+```python
+# LoRA fine-tuning with Hugging Face TRL
+# pip install transformers trl peft datasets accelerate bitsandbytes
 
-# ─────────────────────────────────────────────────────────────────────────────
-if __name__ == "__main__":
-    test_prompt = "Explain the bias-variance tradeoff in machine learning."
+from datasets import load_dataset
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from peft import LoraConfig
+from trl import SFTTrainer, SFTConfig
+import torch
 
-    # Uncomment to run local inference (requires GPU + HF access)
-    # print("=== Local (Transformers) ===")
-    # print(local_llama_inference(test_prompt))
+model_name = "meta-llama/Meta-Llama-3.1-8B-Instruct"
 
-    print("=== Together AI ===")
-    print(together_ai_inference(test_prompt))
+# Load in 4-bit quantization
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16,
+)
+model = AutoModelForCausalLM.from_pretrained(
+    model_name, quantization_config=bnb_config, device_map="auto"
+)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer.pad_token = tokenizer.eos_token
 
-    # Uncomment if you have a vLLM server running
-    # print("=== vLLM Server ===")
-    # print(vllm_server_inference(test_prompt))
+# LoRA configuration
+lora_config = LoraConfig(
+    r=16,
+    lora_alpha=32,
+    target_modules=["q_proj", "v_proj"],
+    lora_dropout=0.05,
+    bias="none",
+    task_type="CAUSAL_LM",
+)
+
+# Small demo dataset
+dataset = load_dataset("json", data_files="train.jsonl", split="train")
+
+training_args = SFTConfig(
+    output_dir="./llama-finetuned",
+    num_train_epochs=1,
+    per_device_train_batch_size=2,
+    gradient_accumulation_steps=4,
+    learning_rate=2e-4,
+    fp16=True,
+    max_seq_length=512,
+)
+
+trainer = SFTTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=dataset,
+    peft_config=lora_config,
+)
+trainer.train()
+trainer.save_model()
 ```
 
 ## Ressources pratiques
 
-- [Dépôt GitHub Llama (Meta)](https://github.com/meta-llama/llama-models) — Fiches de modèles officielles, instructions de téléchargement et licence communautaire pour toute la famille Llama 3.
-- [Llama 3 sur Hugging Face](https://huggingface.co/meta-llama) — Poids des modèles, fichiers de tokenizer et fine-tunes communautaires ; nécessite un compte Hugging Face avec accès accordé.
-- [llama.cpp](https://github.com/ggerganov/llama.cpp) — Moteur d'inférence léger C/C++ avec quantification GGUF ; l'outil de référence pour le déploiement sur CPU et GPU grand public.
-- [Documentation Together AI](https://docs.together.ai/) — Référence API Llama gérée, tarification et guides de fine-tuning pour les modèles à poids ouverts hébergés.
-- [Documentation vLLM](https://docs.vllm.ai/) — Framework de service en production avec PagedAttention, batching continu et serveur compatible OpenAI.
+- [Site officiel Meta Llama](https://ai.meta.com/llama/) — Téléchargements de modèles officiels, documentation et accord de licence
+- [Modèles Llama sur Hugging Face](https://huggingface.co/meta-llama) — Hub pour les poids, les cartes de modèle et les intégrations de la communauté
+- [Ollama](https://ollama.com/) — Le moyen le plus simple d'exécuter Llama localement sur Mac, Windows ou Linux
+- [llama.cpp](https://github.com/ggerganov/llama.cpp) — Inférence C++ multiplateforme avec support de quantification pour le déploiement bare-metal
+- [Hugging Face TRL](https://huggingface.co/docs/trl/index) — Fine-tuning supervisé, RLHF et fine-tuning DPO pour les modèles Llama
 
 ## Voir aussi
 
 - [Fournisseurs de modèles](/docs/model-providers)
-- [Inférence locale](/docs/local-inference)
-- [Infrastructure](/docs/infrastructure)
-- [LLMs — Fine-tuning](/docs/llms/fine-tuning)
-- [Comparaison Meta Llama → Mistral](/docs/model-providers/mistral)
+- [OpenAI](/docs/model-providers/openai)
+- [Mistral AI](/docs/model-providers/mistral)
+- [Ingénierie des prompts](/docs/prompt-engineering)
+- [Ajustement fin](/docs/llms/fine-tuning)
+- [MLOps](/docs/mlops)

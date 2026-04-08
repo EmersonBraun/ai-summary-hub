@@ -1,36 +1,38 @@
 ---
 title: LangGraph
-description: Zustandsbehaftete Agenten-Graphen auf Basis von LangChain, bei denen Knoten Python-Funktionen sind, Kanten das Routing definieren und ein gemeinsamer TypedDict-Zustand Zyklen, bedingtes Branching, Persistenz und Human-in-the-Loop-Checkpoints ermöglicht.
-keywords: [LangGraph, zustandsbehaftete Agenten, Zustandsgraph, Knoten, Kanten, bedingtes Routing, Zyklen, Persistenz, Human-in-the-Loop, LangChain]
+description: Stateful agent graphs built on LangChain, where nodes are Python functions, edges define routing, and a shared TypedDict state enables cycles, conditional branching, persistence, and human-in-the-loop checkpoints.
+keywords: [LangGraph, stateful agents, state graph, nodes, edges, conditional routing, cycles, persistence, human-in-the-loop, LangChain]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # LangGraph
 
 ## Definition
 
-LangGraph ist eine Open-Source-Python-Bibliothek, die auf LangChain aufgebaut ist und dazu dient, **zustandsbehaftete Agenten-Workflows als explizite gerichtete Graphen** zu konstruieren. Während die meisten Agent-Frameworks die Ausführungsschleife hinter einem undurchsichtigen `run()`-Aufruf verstecken, stellt LangGraph sie als erstklassiges Graph-Objekt bereit, das man inspizieren, testen und modifizieren kann. Knoten sind gewöhnliche Python-Funktionen (jede kann ein LLM, ein Tool oder beliebige Logik aufrufen); Kanten sind Übergänge zwischen Knoten; und der gesamte Workflow teilt ein einziges **Zustandsobjekt** – ein typisiertes Dictionary, das jeder Knoten lesen und schreiben kann.
+LangGraph ist eine Open-Source-Python-Bibliothek, die auf LangChain aufbaut, zur Konstruktion **zustandsbehafteter Agenten-Workflows als explizite gerichtete Graphen**. Wo die meisten Agenten-Frameworks die Ausführungsschleife hinter einem undurchsichtigen `run()`-Aufruf verbergen, legt LangGraph sie als erstklassiges Graph-Objekt frei, das Sie inspizieren, testen und modifizieren können. Knoten sind normale Python-Funktionen (jede kann ein LLM, ein Werkzeug oder beliebige Logik aufrufen); Kanten sind Übergänge zwischen Knoten; und der gesamte Workflow teilt ein einziges **Zustands**-Objekt – ein typisiertes Dictionary, aus dem jeder Knoten lesen und in das schreiben kann.
 
-Die zentrale Erkenntnis in LangGraph ist, dass viele Agentenverhaltensweisen, die komplex erscheinen – Schleifen bis eine Bedingung erfüllt ist, Branching auf den Inhalt einer LLM-Antwort, Pause für menschliche Genehmigung, Wiederaufnahme von einem gespeicherten Checkpoint – sauber auf Graph-Primitive abbilden: Zyklen, bedingte Kanten, Interrupts und persistenter Zustand. Diese Explizitheit hat einen Preis (mehr Boilerplate als CrewAI oder AutoGen), zahlt sich aber in der Produktion aus: Man kann jeden Knoten isoliert unit-testen, genau verfolgen, welchen Pfad eine Ausführung nahm, und einen Workflow von jedem Checkpoint aus wiederholen.
+Die Schlüsselerkenntnis in LangGraph ist, dass viele Agenten-Verhaltensweisen, die komplex erscheinen – Loopen bis eine Bedingung erfüllt ist, Branching auf dem Inhalt einer LLM-Antwort, Pausieren für menschliche Genehmigung, Wiederaufnehmen von einem gespeicherten Checkpoint – sauber auf Graph-Primitive abbilden: Zyklen, bedingte Kanten, Interrupts und persistenter Zustand. Diese Explizitheit hat einen Preis (mehr Boilerplate als CrewAI oder AutoGen), zahlt sich aber in der Produktion aus: Sie können jeden Knoten isoliert unit-testen, genau verfolgen, welchen Pfad eine Ausführung genommen hat, und einen Workflow von jedem Checkpoint aus wiedergeben.
 
-LangGraph unterstützt sowohl **Single-Agent**-Muster (ein Graph mit einigen Knoten, der Tools in einer Schleife aufruft) als auch **Multi-Agenten**-Muster (mehrere Subgraphen, die zusammen komponiert werden, mit cross-graph Zustandsteilen). Es integriert sich nativ mit LangChains Tool-Ökosystem, Chat-Modellen und LangSmith für Beobachtbarkeit. Das Framework ist das Fundament von LangChains empfohlener Produktions-Agenten-Architektur ab 2024–2025.
+LangGraph unterstützt sowohl **Single-Agent**-Muster (ein Graph mit wenigen Knoten, der Werkzeuge in einer Schleife aufruft) als auch **Multi-Agent**-Muster (mehrere Subgraphen zusammengesetzt, mit Graph-übergreifender Zustandsteilung). Es integriert sich nativ in LangChains Werkzeug-Ökosystem, Chat-Modelle und LangSmith für Beobachtbarkeit. Das Framework ist die Grundlage der empfohlenen Produktions-Agenten-Architektur von LangChain ab 2024-2025.
 
 ## Funktionsweise
 
 ### Knoten: Python-Funktionen als Ausführungseinheiten
 
-Ein Knoten in LangGraph ist ein beliebiges Python-Callable, das den aktuellen Zustand akzeptiert und einen (partiellen) aktualisierten Zustand zurückgibt. Knoten werden dem Graphen mit `graph.add_node("name", function)` hinzugefügt. Die Funktionssignatur ist immer `(state: State) -> dict` – sie liest, was sie aus dem Zustand benötigt, erledigt ihre Arbeit (LLM-Aufruf, Tool-Ausführung, Datentransformation) und gibt nur die Schlüssel zurück, die aktualisiert werden sollen. Dies macht Knoten einfach unabhängig zu testen: Mock-Zustand hineingeben, die zurückgegebene Dict assertieren. LangChains `ToolNode` ist ein vorgefertigter Knoten, der Tool-Aufrufe aus der Antwort eines LLM ausführt, was das häufigste Agentenmuster von Haus aus abdeckt.
+Ein Knoten in LangGraph ist jedes Python-Callable, das den aktuellen Zustand akzeptiert und einen (teilweisen) aktualisierten Zustand zurückgibt. Knoten werden dem Graphen mit `graph.add_node("name", function)` hinzugefügt. Die Funktionssignatur ist immer `(state: State) -> dict` – sie liest, was sie braucht, aus dem Zustand, erledigt ihre Arbeit (LLM-Aufruf, Werkzeugausführung, Datentransformation) und gibt nur die Schlüssel zurück, die sie aktualisieren möchte. Das macht Knoten einfach unabhängig zu testen: Übergeben Sie einen Mock-Zustand, bestätigen Sie das zurückgegebene Dict. LangChains `ToolNode` ist ein vorgefertigter Knoten, der Werkzeugaufrufe aus einer LLM-Antwort ausführt und deckt das gängigste Agenten-Muster direkt ab.
 
 ### Kanten: Routing und bedingtes Branching
 
-Kanten verbinden Knoten und bestimmen die Ausführungsreihenfolge. Eine einfache Kante (`graph.add_edge("a", "b")`) geht immer von Knoten `a` zu Knoten `b` über. Eine bedingte Kante (`graph.add_conditional_edges`) ruft eine Routing-Funktion mit dem aktuellen Zustand auf und verwendet den zurückgegebenen String, um den nächsten Knoten zu entscheiden. Dies ist der Mechanismus für dynamischen Kontrollfluss: Nachdem ein LLM eine Antwort generiert hat, prüft ein Router, ob sie Tool-Aufrufe enthält (Route zu `tools`) oder eine endgültige Antwort (Route zu `END`). Bedingte Kanten machen LangGraph deutlich leistungsstärker als eine sequenzielle Pipeline – man kann komplexe Entscheidungsbäume, Retry-Logik und Eskalationspfade als lesbare Graph-Struktur ausdrücken.
+Kanten verbinden Knoten und bestimmen die Ausführungsreihenfolge. Eine einfache Kante (`graph.add_edge("a", "b")`) übergeht immer von Knoten `a` zu Knoten `b`. Eine bedingte Kante (`graph.add_conditional_edges`) ruft eine Routing-Funktion mit dem aktuellen Zustand auf und verwendet die zurückgegebene Zeichenfolge, um den nächsten Knoten zu bestimmen. Dies ist der Mechanismus für dynamischen Kontrollfluss: Nachdem ein LLM eine Antwort generiert hat, prüft ein Router, ob sie Werkzeugaufrufe enthält (Route zu `tools`) oder eine Endantwort (Route zu `END`). Bedingte Kanten machen LangGraph deutlich mächtiger als eine sequentielle Pipeline – Sie können komplexe Entscheidungsbäume, Wiederholungslogik und Eskalationspfade als lesbare Graphstruktur ausdrücken.
 
-### Zustand: gemeinsames TypedDict über alle Knoten
+### Zustand: geteiltes TypedDict über alle Knoten
 
-Zustand ist das Rückgrat einer LangGraph-Anwendung. Man definiert ein `TypedDict` (oder ein Pydantic-Modell) mit allen Feldern, die der Workflow benötigt: Nachrichten, Zwischenergebnisse, Flags, Zähler. Jeder Knoten empfängt den vollständigen Zustand und gibt nur die Felder zurück, die er modifiziert. LangGraph führt partielle Updates mit dem aktuellen Zustand über **Reducer** zusammen – standardmäßig überschreiben Zuweisungen; mit dem `add_messages`-Reducer wird die Nachrichtenliste angehängt statt ersetzt. Explizite Zustandstypisierung bedeutet, dass Typ-Checker Fehler vor der Laufzeit abfangen können, und der Zustand-Snapshot bei jedem Checkpoint ist ein vollständiger, inspizierbarer Datensatz darüber, was passiert ist.
+Zustand ist das Rückgrat einer LangGraph-Anwendung. Sie definieren ein `TypedDict` (oder ein Pydantic-Modell) mit allen Feldern, die Ihr Workflow benötigt: Nachrichten, Zwischenergebnisse, Flags, Zähler. Jeder Knoten erhält den vollständigen Zustand und gibt nur die Felder zurück, die er ändert. LangGraph fügt partielle Updates mit dem aktuellen Zustand mithilfe von **Reducern** zusammen – standardmäßig überschreiben Zuweisungen; mit dem `add_messages`-Reducer wird die Nachrichtenliste angefügt statt ersetzt. Explizite Zustandstypisierung bedeutet, dass Typprüfer Fehler vor der Laufzeit erkennen können, und der Zustands-Snapshot bei jedem Checkpoint ist ein vollständiges, inspizierbares Protokoll dessen, was passiert ist.
 
 ### Zyklen, Persistenz und Human-in-the-Loop
 
-LangGraph behandelt Zyklen nativ: Ein Knoten kann basierend auf einer Bedingung zu einem früheren Knoten (oder sich selbst) zurückkehren, was Agenten-Retry-Schleifen, Selbstkorrekturmuster und mehrstufige Tool-Nutzung ohne spezielle Behandlung ermöglicht. Persistenz wird durch **Checkpointer** bereitgestellt (SQLite, Postgres, Redis oder In-Memory): Der Graph speichert den vollständigen Zustand nach jeder Knotenausführung, so dass man nach einem Absturz oder einer Unterbrechung von jedem Punkt aus fortfahren kann. Human-in-the-Loop wird über `interrupt_before` und `interrupt_after` implementiert – der Graph hält am angegebenen Knoten an, stellt dem Aufrufer den aktuellen Zustand zur Verfügung, nimmt menschlichen Input an und setzt fort. Dies macht LangGraph zur stärksten Wahl, wenn überprüfbare, unterbrechbare, produktionsreife Agenten-Pipelines benötigt werden.
+LangGraph verarbeitet Zyklen nativ: Ein Knoten kann basierend auf einer Bedingung zu einem vorherigen Knoten (oder sich selbst) zurückkanten und ermöglicht so Agenten-Wiederholungsschleifen, Selbstkorrekturmuster und mehrstufige Werkzeug-Nutzung ohne spezielle Behandlung. Persistenz wird von **Checkpointern** (SQLite, Postgres, Redis oder In-Memory) bereitgestellt: Der Graph speichert den vollständigen Zustand nach jeder Knotenausführung, sodass Sie von jedem Punkt aus nach einem Absturz oder einer Unterbrechung fortsetzen können. Human-in-the-Loop wird über `interrupt_before` und `interrupt_after` implementiert – der Graph pausiert beim angegebenen Knoten, zeigt dem Aufrufer den aktuellen Zustand, akzeptiert menschliche Eingaben und setzt fort. Dies macht LangGraph zur stärksten Wahl, wenn Sie auditierbare, unterbrechbare, produktionsreife Agenten-Pipelines benötigen.
 
 ```mermaid
 flowchart TD
@@ -48,21 +50,21 @@ flowchart TD
 
 | Verwenden wenn | Vermeiden wenn |
 |---|---|
-| Feinkörnige Kontrolle über jeden Schritt der Agentenausführung benötigt wird | Eine deklarative High-Level-API gewünscht wird und keine Schritt-Level-Kontrolle benötigt wird |
-| Persistenz und die Möglichkeit zur Wiederaufnahme von Workflows mitten in der Ausführung erforderlich sind | Der Workflow einfach und linear ist – eine Kette oder Single-Agent-Schleife reicht aus |
-| Human-in-the-Loop-Genehmigungen an bestimmten Schritten erforderlich sind | Das Team mit Graphentheorie nicht vertraut ist und ein einfacheres mentales Modell bevorzugt |
-| Produktionssysteme aufgebaut werden, die vollständige Beobachtbarkeit und Replay benötigen | Agenten Forschungsprototypen sind, die keine produktionsreife Zuverlässigkeit benötigen |
-| Der Workflow komplexes bedingtes Branching oder Zyklen hat, die linear schwer ausgedrückt werden können | Multi-Agenten-Rollenkoordination der primäre Bedarf ist – CrewAI oder AutoGen sind einfacher |
+| Feingranulare Kontrolle über jeden Schritt der Agenten-Ausführung benötigt wird | Eine deklarative, hochrangige API gewünscht wird und keine Schritt-Level-Kontrolle benötigt wird |
+| Persistenz und die Möglichkeit, Workflows mitten in der Ausführung fortzusetzen, erforderlich sind | Der Workflow einfach und linear ist — eine Kette oder Single-Agent-Schleife ausreicht |
+| Human-in-the-Loop-Genehmigungen bei bestimmten Schritten erforderlich sind | Das Team nicht mit Graph-Theorie vertraut ist und ein einfacheres Denkmodell bevorzugt |
+| Produktionssysteme gebaut werden, die vollständige Beobachtbarkeit und Replay benötigen | Agenten Forschungsprototypen sind, die keine produktionsreife Zuverlässigkeit benötigen |
+| Der Workflow komplexes bedingtes Branching oder Zyklen hat, die sich linear schwer ausdrücken lassen | Multi-Agent-Rollenkoordination der primäre Bedarf ist — CrewAI oder AutoGen sind einfacher |
 
 ## Vergleiche
 
 | Kriterium | LangGraph | CrewAI | AutoGen |
 |---|---|---|---|
-| **Abstraktionsebene** | Niedrig: expliziter Graph, Knoten, Kanten und Zustand | Hoch: deklarative Rollen, Ziele, Aufgaben | Mittel: konversationale Agenten mit Nachrichtenhistorie |
-| **Kontrollfluss** | Explizite bedingte Kanten und Zyklen | Sequenzieller oder hierarchischer Prozess (undurchsichtig) | Nachrichtengesteuert, turn-basiert (undurchsichtig) |
+| **Abstraktionsebene** | Niedrig: expliziter Graph, Knoten, Kanten und Zustand | Hoch: deklarative Rollen, Ziele, Aufgaben | Mittel: konversationale Agenten mit Nachrichtenverlauf |
+| **Kontrollfluss** | Explizite bedingte Kanten und Zyklen | Sequentieller oder hierarchischer Prozess (undurchsichtig) | Nachrichtengesteuert, rundenbasiert (undurchsichtig) |
 | **Persistenz** | Erstklassig: Checkpointer für SQLite, Postgres, Redis | Nicht eingebaut | Nicht eingebaut |
 | **Human-in-the-Loop** | Erstklassig: `interrupt_before` / `interrupt_after` | Nur manuell | Erstklassig: `human_input_mode` pro Agent |
-| **Testbarkeit** | Hoch: Knoten sind reine Funktionen, leicht zu unit-testen | Mittel: Aufgaben können getestet werden, aber Crew-Ausführung ist undurchsichtig | Niedrig: Konversationsflows sind schwer deterministisch zu unit-testen |
+| **Testbarkeit** | Hoch: Knoten sind reine Funktionen, einfach unit-zu-testen | Mittel: Aufgaben können getestet werden, aber Crew-Ausführung ist undurchsichtig | Niedrig: Konversationsflows sind schwer deterministisch unit-zu-testen |
 
 ## Code-Beispiele
 
@@ -187,16 +189,16 @@ print("Total steps:", result["step_count"])
 
 ## Praktische Ressourcen
 
-- [LangGraph offizielle Dokumentation](https://langchain-ai.github.io/langgraph/) — Vollständige Referenz für Graph-Konstruktion, Zustandsverwaltung, Checkpointer und Human-in-the-Loop-Muster.
-- [LangGraph GitHub-Repository](https://github.com/langchain-ai/langgraph) — Quellcode, Issue-Tracker und Beispiel-Notebooks zu gängigen Mustern.
-- [LangGraph "How-to"-Leitfäden](https://langchain-ai.github.io/langgraph/how-tos/) — Praktische Rezepte für Persistenz, Streaming, Subgraphen, Multi-Agenten-Koordination und mehr.
-- [LangSmith Tracing für LangGraph](https://docs.smith.langchain.com/) — Beobachtbarkeitsplattform zum Tracing von LangGraph-Ausführungen, zur Inspektion des Zustands bei jedem Knoten und zum Debugging von Fehlern.
+- [LangGraph official documentation](https://langchain-ai.github.io/langgraph/) — Vollständige Referenz für Graph-Konstruktion, Zustandsverwaltung, Checkpointer und Human-in-the-Loop-Muster.
+- [LangGraph GitHub repository](https://github.com/langchain-ai/langgraph) — Quellcode, Issue-Tracker und Beispiel-Notebooks, die gängige Muster abdecken.
+- [LangGraph "How-to" guides](https://langchain-ai.github.io/langgraph/how-tos/) — Praktische Rezepte für Persistenz, Streaming, Subgraphen, Multi-Agent-Koordination und mehr.
+- [LangSmith tracing for LangGraph](https://docs.smith.langchain.com/) — Beobachtbarkeitsplattform zum Tracing von LangGraph-Ausführungen, Inspektion des Zustands bei jedem Knoten und Debugging von Fehlern.
 
 ## Siehe auch
 
-- [Überblick über Agent-Frameworks](/docs/agents/frameworks-overview)
+- [Agent frameworks overview](/docs/agents/frameworks-overview)
 - [CrewAI](/docs/agents/crewai)
 - [AutoGen](/docs/agents/autogen)
 - [LangChain](/docs/tools/langchain)
-- [Multi-Agenten-Systeme](/docs/agents/multi-agent-systems)
+- [Multi-agent systems](/docs/agents/multi-agent-systems)
 - [ReAct](/docs/reasoning-patterns/react)

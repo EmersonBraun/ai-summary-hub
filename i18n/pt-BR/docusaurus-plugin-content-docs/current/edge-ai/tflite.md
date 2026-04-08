@@ -2,6 +2,8 @@
 title: TensorFlow Lite
 description: Runtime leve para inferência de ML no dispositivo em Android, iOS, sistemas embarcados e microcontroladores.
 keywords: [TensorFlow Lite, TFLite, IA de borda, inferência no dispositivo, conversão de modelo, quantização, delegados, ML mobile]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # TensorFlow Lite

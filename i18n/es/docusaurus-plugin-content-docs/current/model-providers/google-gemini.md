@@ -2,35 +2,37 @@
 title: Google Gemini
 description: La plataforma de IA multimodal de Google — la familia de modelos Gemini, AI Studio e integración con Vertex AI para IA generativa de nivel empresarial.
 keywords: [Google Gemini, Vertex AI, AI Studio, IA multimodal, Gemini Pro, Gemini Flash, Gemini Ultra, IA generativa, Google AI]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Google Gemini
 
 ## Definición
 
-Google Gemini es la familia insignia de modelos de lenguaje grande multimodales de Google y la plataforma que los rodea. Anunciado a finales de 2023 y sucesor de la familia PaLM 2, Gemini fue diseñado desde cero para razonar sobre texto, imágenes, video, audio y código dentro de una única arquitectura de modelo unificada. A diferencia de los sistemas que agregan visión a través de pipelines separados, la multimodalidad nativa de Gemini significa que el modelo procesa todas las modalidades de forma conjunta durante el entrenamiento y la inferencia, permitiendo un razonamiento inter-modal más rico.
+Google Gemini es la familia insignia de modelos de lenguaje grande multimodales de Google y la plataforma que los rodea. Anunciada a finales de 2023 y sucediendo a la familia PaLM 2, Gemini fue diseñada desde cero para razonar sobre texto, imágenes, video, audio y código dentro de una única arquitectura de modelo unificada. A diferencia de los sistemas que añaden visión mediante pipelines separados, la multimodalidad nativa de Gemini significa que el modelo procesa todas las modalidades de forma conjunta durante el entrenamiento y la inferencia, lo que permite un razonamiento entre modalidades más rico.
 
-La familia Gemini abarca cuatro niveles ajustados para diferentes casos de uso: **Gemini Ultra** (el más capaz, orientado a tareas empresariales e investigación complejas), **Gemini Pro** (el motor equilibrado para uso comercial amplio), **Gemini Flash** (optimizado para aplicaciones de baja latencia y alto rendimiento a costo reducido) y **Gemini Nano** (inferencia en dispositivo para Android y hardware de borde). Cada nivel tiene versiones (por ejemplo, Gemini 1.5 Pro, Gemini 2.0 Flash), y Google lanza nuevas versiones de forma continua.
+La familia Gemini abarca cuatro niveles ajustados para diferentes casos de uso: **Gemini Ultra** (el más capaz, orientado a tareas empresariales e investigación complejas), **Gemini Pro** (el equilibrado para uso comercial amplio), **Gemini Flash** (optimizado para aplicaciones de baja latencia y alto rendimiento a costo reducido) y **Gemini Nano** (inferencia en dispositivo para Android y hardware de borde). Cada nivel tiene versión (p. ej., Gemini 1.5 Pro, Gemini 2.0 Flash) y Google publica nuevas versiones de forma continua.
 
-Los desarrolladores acceden a Gemini a través de dos superficies complementarias. **Google AI Studio** es un entorno de prototipado gratuito basado en navegador que proporciona claves de API y permite experimentar con prompts, instrucciones de sistema y entradas multimodales sin configuración de infraestructura. **Vertex AI** es la plataforma ML gestionada de Google Cloud y el camino recomendado para cargas de trabajo en producción — agrega controles empresariales como VPC Service Controls, IAM, registro de auditoría, pipelines de ajuste fino y endpoints con SLA respaldado. Ambas superficies consumen los mismos modelos Gemini subyacentes a través de la API de Lenguaje Generativo.
+Los desarrolladores acceden a Gemini a través de dos interfaces complementarias. **Google AI Studio** es un entorno de prototipado gratuito basado en navegador que proporciona claves de API y permite experimentar con prompts, instrucciones del sistema y entradas multimodales sin ninguna configuración de infraestructura. **Vertex AI** es la plataforma ML gestionada de Google Cloud y el camino recomendado para cargas de trabajo de producción — añade controles empresariales como VPC Service Controls, IAM, registro de auditoría, pipelines de ajuste fino y endpoints con SLA. Ambas interfaces consumen los mismos modelos Gemini subyacentes a través de la Generative Language API.
 
 ## Cómo funciona
 
-### API de Lenguaje Generativo
+### Generative Language API
 
-La API de Lenguaje Generativo (`generativelanguage.googleapis.com`) es la interfaz REST unificada para todos los modelos Gemini. Las solicitudes se estructuran como un array `contents` — cada elemento tiene un `role` (`user` o `model`) y una o más `parts` (texto, datos en línea o URIs de archivos). La API devuelve un array `candidates` con `content`, `finishReason` y `safetyRatings`. Los recuentos de tokens, los metadatos de fundamentación y las respuestas de llamadas a funciones se devuelven en el mismo envelope. Las claves de API de AI Studio funcionan para desarrollo; las cargas de trabajo en producción usan credenciales de cuenta de servicio a través de Vertex AI.
+La Generative Language API (`generativelanguage.googleapis.com`) es la interfaz REST unificada para todos los modelos Gemini. Las solicitudes se estructuran como un array `contents` — cada elemento tiene un `role` (`user` o `model`) y una o más `parts` (texto, datos en línea o URIs de archivo). La API devuelve un array `candidates` con `content`, `finishReason` y `safetyRatings`. Los recuentos de tokens, los metadatos de fundamentación y las respuestas de llamadas a funciones se devuelven en el mismo envelope. Las claves de API de AI Studio funcionan para el desarrollo; las cargas de trabajo de producción usan credenciales de cuenta de servicio a través de Vertex AI.
 
 ### Entradas multimodales — imagen, video y audio
 
-Gemini acepta imágenes (JPEG, PNG, WebP, HEIC), video (MP4, MOV, AVI de hasta varias horas) y audio (MP3, WAV, FLAC) directamente junto con texto en una sola solicitud. Las imágenes pueden enviarse como datos base64 en línea o a través de URIs de Cloud Storage. Para videos largos, la File API carga el activo de forma asíncrona y devuelve un URI de archivo que puede referenciarse en llamadas subsiguientes a `generateContent`. El modelo tokeniza internamente las modalidades no textuales, por lo que los mismos mecanismos de contabilidad de ventana de contexto y atención se aplican de manera uniforme, habilitando tareas como "resumir la pista de audio de este video e identificar cuándo el hablante cambia de tema".
+Gemini acepta imágenes (JPEG, PNG, WebP, HEIC), video (MP4, MOV, AVI hasta varias horas) y audio (MP3, WAV, FLAC) directamente junto con texto en una sola solicitud. Las imágenes pueden enviarse como datos base64 en línea o mediante URIs de Cloud Storage. Para videos largos, la File API sube el recurso de forma asíncrona y devuelve un URI de archivo que puede referenciarse en llamadas posteriores a `generateContent`. El modelo tokeniza las modalidades no textuales internamente, por lo que se aplica la misma contabilidad de ventana de contexto y los mismos mecanismos de atención de forma uniforme, lo que permite tareas como "resume la pista de audio de este video e identifica cuándo el hablante cambia de tema".
 
 ### Fundamentación con Google Search
 
-Gemini soporta generación fundamentada por recuperación a través de un parámetro `tools` opcional que habilita `google_search_retrieval`. Cuando esta herramienta está activa, el modelo puede emitir consultas de búsqueda durante la generación, recuperar resultados web en tiempo real y sintetizarlos en su respuesta — devolviendo citas junto con el texto generado. Esto es especialmente valioso para consultas factualmente densas o con sensibilidad temporal donde un modelo paramétrico estático alucinaria o devolvería información desactualizada. La fundamentación está disponible tanto en AI Studio como en Vertex AI y puede combinarse con otras herramientas.
+Gemini admite generación fundamentada mediante recuperación a través de un parámetro `tools` opcional que habilita `google_search_retrieval`. Cuando esta herramienta está activa, el modelo puede emitir consultas de búsqueda durante la generación, recuperar resultados web en tiempo real y sintetizarlos en su respuesta — devolviendo citas junto al texto generado. Esto es especialmente valioso para consultas densas en hechos o sensibles al tiempo donde un modelo paramétrico estático alucinería o devolvería información desactualizada. La fundamentación está disponible tanto en AI Studio como en Vertex AI y puede combinarse con otras herramientas.
 
 ### Integración con Vertex AI
 
-En Vertex AI, se accede a Gemini a través del SDK de Python `vertexai` (`aiplatform`). Vertex agrega ajuste fino (pipelines de ajuste fino supervisado y RLHF), conjuntos de datos de evaluación de modelos, jardines de modelos para comparar modelos, despliegue en endpoints dedicados con autoescalado y Vertex AI Pipelines para orquestar flujos de trabajo ML de extremo a extremo. Los clientes empresariales se benefician de garantías de residencia de datos, redes privadas a través de VPC Service Controls y Cloud Audit Logs para cada llamada a la API — características no disponibles en AI Studio.
+En Vertex AI, se accede a Gemini a través del SDK de Python `vertexai` (`aiplatform`). Vertex añade ajuste fino (pipelines de ajuste fino supervisado y RLHF), conjuntos de datos de evaluación de modelos, jardines de modelos para comparar modelos, despliegue en endpoints dedicados con escalado automático y Vertex AI Pipelines para orquestar flujos de trabajo ML de extremo a extremo. Los clientes empresariales se benefician de garantías de residencia de datos, redes privadas mediante VPC Service Controls y Cloud Audit Logs para cada llamada API — características no disponibles en AI Studio.
 
 ```mermaid
 flowchart LR
@@ -56,22 +58,22 @@ flowchart LR
 
 | Usar cuando | Evitar cuando |
 |----------|------------|
-| Necesitas razonamiento multimodal nativo sobre imágenes, video o audio junto con texto | Tu carga de trabajo es solo texto y prefieres un proveedor con un historial más largo de API pública |
-| Ya estás en Google Cloud y quieres una integración profunda con Vertex AI / GCP (IAM, VPC, Audit Logs) | Tienes estrictos requisitos de residencia de datos en regiones donde Vertex AI aún no está disponible |
-| Requieres fundamentación en tiempo real a través de Google Search | Tu aplicación necesita salidas deterministas y reproducibles (la fundamentación introduce variabilidad de la búsqueda en vivo) |
-| La eficiencia de costos a escala importa — Gemini Flash es muy competitivo en precio por token | Necesitas un modelo de pesos abiertos extensamente documentado que puedas ejecutar en las instalaciones |
-| Quieres un entorno de prototipado gratuito y sin fricción sin tarjeta de crédito (nivel gratuito de AI Studio) | Tu equipo ya está profundamente invertido en la superficie de la API de OpenAI y el costo de migración es alto |
+| Se necesita razonamiento multimodal nativo sobre imágenes, video o audio junto con texto | La carga de trabajo es solo texto y se prefiere un proveedor con un historial más largo de API pública |
+| Ya se trabaja en Google Cloud y se desea una integración profunda con Vertex AI / GCP (IAM, VPC, Audit Logs) | Existen requisitos estrictos de residencia de datos en regiones donde Vertex AI aún no está disponible |
+| Se requiere fundamentación en tiempo real mediante Google Search | La aplicación necesita salidas deterministas y reproducibles (la fundamentación introduce variabilidad por la búsqueda en vivo) |
+| La eficiencia de costos a escala importa — Gemini Flash es muy competitivo en precio por token | Se necesita un modelo de pesos abiertos ampliamente documentado para ejecutar en instalaciones propias |
+| Se desea un entorno de prototipado gratuito y sin fricción sin tarjeta de crédito (nivel gratuito de AI Studio) | El equipo ya está profundamente invertido en la superficie de la API de OpenAI y el costo de migración es alto |
 
 ## Comparaciones
 
 | Criterio | Google Gemini | OpenAI GPT-4o | Anthropic Claude 3.5 |
 |-----------|--------------|--------------|----------------------|
-| Capacidad multimodal | Nativa — texto, imagen, video, audio en un modelo | Texto + imagen (GPT-4V); audio a través de APIs separadas Whisper/TTS | Texto + imagen (Claude 3); sin video/audio nativo |
-| Integración empresarial / nube | Integración profunda con GCP a través de Vertex AI — IAM, VPC, Audit Logs, ajuste fino | Azure OpenAI Service para empresas; portabilidad de nube limitada fuera de Azure | AWS Bedrock y API directa; sin integración nativa con GCP |
-| Fundamentación / recuperación en tiempo real | Herramienta de fundamentación con Google Search integrada | Plugin de navegación web (ChatGPT); sin fundamentación nativa de API | Sin búsqueda integrada; depende del RAG proporcionado por el usuario |
+| Capacidad multimodal | Nativa — texto, imagen, video, audio en un modelo | Texto + imagen (GPT-4V); audio mediante APIs Whisper/TTS separadas | Texto + imagen (Claude 3); sin video/audio nativo |
+| Integración empresarial / nube | Integración profunda con GCP via Vertex AI — IAM, VPC, Audit Logs, ajuste fino | Azure OpenAI Service para empresas; portabilidad limitada fuera de Azure | AWS Bedrock y API directa; sin integración GCP nativa |
+| Fundamentación / recuperación en tiempo real | Herramienta de fundamentación Google Search integrada | Plugin de navegación web (ChatGPT); sin fundamentación de API nativa | Sin búsqueda integrada; depende del RAG proporcionado por el usuario |
 | Ventana de contexto | Hasta 1M tokens (Gemini 1.5 Pro) | 128k tokens (GPT-4o) | 200k tokens (Claude 3.5 Sonnet) |
 | Disponibilidad de pesos abiertos | Solo API cerrada | Solo API cerrada | Solo API cerrada |
-| Modelo de precios | Por token; nivel Flash muy competitivo | Por token; GPT-4o de rango medio | Por token; comparable a GPT-4o |
+| Modelo de precios | Por token; nivel Flash muy competitivo | Por token; GPT-4o rango medio | Por token; comparable a GPT-4o |
 | Ajuste fino | Ajuste fino supervisado en Vertex AI | API de ajuste fino para GPT-3.5/4o-mini | Sin API de ajuste fino pública |
 
 ## Ejemplos de código
@@ -192,10 +194,10 @@ if __name__ == "__main__":
 
 ## Recursos prácticos
 
-- [Google AI Studio](https://aistudio.google.com/) — Entorno gratuito basado en navegador para prototipado con Gemini; genera claves de API y permite ajustar prompts de forma interactiva sin infraestructura requerida.
-- [Documentación de la API de Gemini](https://ai.google.dev/gemini-api/docs) — Referencia oficial que cubre todos los modelos, endpoints, formatos de entrada multimodal, fundamentación, llamada a funciones y la File API.
+- [Google AI Studio](https://aistudio.google.com/) — Entorno gratuito basado en navegador para prototipar con Gemini; genera claves de API y permite ajustar prompts de forma interactiva sin infraestructura requerida.
+- [Documentación de la API de Gemini](https://ai.google.dev/gemini-api/docs) — Referencia oficial que cubre todos los modelos, endpoints, formatos de entrada multimodal, fundamentación, llamadas a funciones y la File API.
 - [Vertex AI — Documentación de IA generativa](https://cloud.google.com/vertex-ai/generative-ai/docs/overview) — Ruta empresarial: ajuste fino, evaluación de modelos, despliegue y controles de seguridad de GCP.
-- [SDK de Python google-generativeai en PyPI](https://pypi.org/project/google-generativeai/) — Fuente del SDK, registro de cambios y ejemplos de uso.
+- [google-generativeai Python SDK en PyPI](https://pypi.org/project/google-generativeai/) — Fuente del SDK, registro de cambios y ejemplos de uso.
 
 ## Ver también
 

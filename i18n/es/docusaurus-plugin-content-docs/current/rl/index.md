@@ -1,47 +1,49 @@
 ---
-title: Reinforcement learning (RL)
-description: Aprendizaje a partir de recompensas y toma de decisiónes secuenciales.
-keywords: [reinforcement learning, RL, rewards, MDP]
+title: Aprendizaje por refuerzo (RL)
+description: Aprendizaje a partir de recompensas y toma de decisiones secuenciales.
+keywords: [aprendizaje por refuerzo, RL, recompensas, MDP]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
-# Reinforcement learning (RL)
+# Aprendizaje por refuerzo (RL)
 
 ## Definición
 
-El aprendizaje por refuerzo entrena agentes para maximizar la recompensa acumulada in an environment. The agent takes actions, receives observations and rewards, and improves its policy (por ej. value-based, policy gradient, actor-critic).
+El aprendizaje por refuerzo entrena agentes para maximizar la recompensa acumulada en un entorno. El agente toma acciones, recibe observaciones y recompensas, y mejora su política (como basada en valor, gradiente de política, actor-crítico).
 
-Difiere de [supervised](/docs/fundamentals/machine-learning) and [unsupervised](/docs/fundamentals/machine-learning) learning porque la retroalimentación es sparse and delayed (rewards), and the agent must explore. Used in games, robotics, and [LLM](/docs/llms) alignment (RLHF). For high-dimensional states/actions, see [deep RL](/docs/drl).
+Difiere del aprendizaje [supervisado](/docs/fundamentals/machine-learning) y [no supervisado](/docs/fundamentals/machine-learning) porque la retroalimentación es escasa y retardada (recompensas), y el agente debe explorar. Se usa en juegos, robótica y alineación de [LLMs](/docs/llms) (RLHF). Para estados/acciones de alta dimensionalidad, ver [RL profundo](/docs/drl).
 
 ## Cómo funciona
 
-El escenario es generalmente un **MDP**: el **agente** ve un **estado**, elige una **acción**, y el **entorno** devuelves a **reward** and **next state**. The agent improves its policy (mapping from state to action) to maximize cumulative reward. **Value-based** methods (por ej. Q-learning, DQN) learn a value function and derive the policy; **policy gradient** methods (por ej. PPO, SAC) optimize the policy directly. Exploration (por ej. epsilon-greedy, entropy bonus) is needed because rewards are only observed for actions taken. Algorithms differ in how they handle off-policy data, continuous actions, and scaling to large state spaces.
+El escenario es generalmente un **MDP**: el **agente** ve un **estado**, elige una **acción**, y el **entorno** devuelve una **recompensa** y un **siguiente estado**. El agente mejora su política (mapeo del estado a la acción) para maximizar la recompensa acumulada. Los métodos **basados en valor** (como Q-learning, DQN) aprenden una función de valor y derivan la política; los métodos de **gradiente de política** (como PPO, SAC) optimizan la política directamente. La exploración (como epsilon-greedy, bono de entropía) es necesaria porque las recompensas solo se observan para las acciones tomadas. Los algoritmos difieren en cómo manejan los datos fuera de la política, las acciones continuas y el escalado a grandes espacios de estados.
 
 ```mermaid
 flowchart LR
-  S[State] --> A[Action]
-  A --> E[Environment]
-  E --> R[Reward]
-  E --> S2[Next state]
-  R --> Agent[Agent]
+  S[Estado] --> A[Acción]
+  A --> E[Entorno]
+  E --> R[Recompensa]
+  E --> S2[Siguiente estado]
+  R --> Agent[Agente]
   S2 --> Agent
   Agent --> A
 ```
 
 ## Casos de uso
 
-Reinforcement learning applies wherever an agent learns from rewards and sequential decisións (games, control, alignment).
+El aprendizaje por refuerzo aplica donde un agente aprende de recompensas y decisiones secuenciales (juegos, control, alineación).
 
-- Game playing (por ej. Atari, Go, poker) and simulation
-- Robotics control and continuous control (por ej. manipulation)
-- LLM alignment (por ej. RLHF) and sequential decisión systems
+- Juego de juegos (como Atari, Go, póker) y simulación
+- Control de robótica y control continuo (como manipulación)
+- Alineación de LLMs (como RLHF) y sistemas de decisión secuencial
 
-## Documentación externa
+## Recursos prácticos
 
-- [Reinforcement Learning (Sutton & Barto)](http://incompleteideas.net/book/the-book-2nd.html) — Free online book
+- [Reinforcement Learning (Sutton & Barto)](http://incompleteideas.net/book/the-book-2nd.html) — Libro gratuito en línea
 - [Spinning Up in Deep RL (OpenAI)](https://spinningup.openai.com/)
 
 ## Ver también
 
-- [Deep RL](/docs/drl)
-- [Machine learning](/docs/fundamentals/machine-learning)
-- [Agents](/docs/agents)
+- [RL profundo](/docs/drl)
+- [Aprendizaje automático](/docs/fundamentals/machine-learning)
+- [Agentes](/docs/agents)

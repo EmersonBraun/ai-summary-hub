@@ -1,36 +1,38 @@
 ---
 title: Anthropic Tool Use
-description: Mecanismo nativo de chamada de funções/ferramentas do Claude usando definições JSON Schema, tipos de mensagem tool_use e tool_result, com suporte a uso de ferramentas em múltiplos turnos, chamadas paralelas e streaming.
-keywords: [Anthropic, tool use, function calling, Claude, JSON schema, tool_use, tool_result, chamadas paralelas de ferramentas, streaming]
+description: Claude's native function/tool calling mechanism using JSON schema definitions, tool_use and tool_result message types, with support for multi-turn tool use, parallel calls, and streaming.
+keywords: [Anthropic, tool use, function calling, Claude, JSON schema, tool_use, tool_result, parallel tool calls, streaming]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Anthropic Tool Use
 
 ## Definição
 
-**Anthropic Tool Use** (às vezes chamado de "function calling") é o mecanismo nativo do Claude para interagir com sistemas externos de forma estruturada e confiável. Em vez de pedir ao Claude que produza texto que você então analisa para encontrar o nome de uma função e seus argumentos, você descreve suas ferramentas como JSON schemas na requisição da API e o Claude retorna um bloco estruturado `tool_use` com o nome exato da ferramenta e um objeto JSON de argumentos validados. Seu código executa a ferramenta, encapsula o resultado em um bloco `tool_result`, e o envia de volta ao Claude como o próximo turno na conversa — um loop que continua até que o Claude produza uma resposta de texto final.
+**Anthropic Tool Use** (às vezes chamado de "function calling") é o mecanismo nativo do Claude para interagir com sistemas externos de forma estruturada e confiável. Em vez de pedir ao Claude para produzir texto que você analisa para encontrar um nome de função e argumentos, você descreve suas ferramentas como esquemas JSON na requisição da API e o Claude retorna um bloco `tool_use` estruturado com o nome exato da ferramenta e um objeto JSON de argumentos validados. Seu código executa a ferramenta, envolve o resultado em um bloco `tool_result` e o envia de volta ao Claude como o próximo turno da conversa — um loop que continua até que o Claude produza uma resposta de texto final.
 
-A filosofia de design é de minimalismo intencional: Anthropic Tool Use é uma capacidade da API do modelo, não um framework. Não há camada de orquestração, memória embutida, nem loop de agente — você escreve isso por conta própria. Isso oferece controle máximo e sobrecarga mínima de abstração. Para casos de uso simples a médios de ferramentas, o resultado é limpo, legível e fácil de depurar. Para sistemas multi-agente complexos, você normalmente combinaria Anthropic Tool Use com um framework como LangGraph ou um orquestrador personalizado.
+A filosofia de design é um minimalismo intencional: Anthropic Tool Use é uma capacidade da API do modelo, não um framework. Não há camada de orquestração, sem memória embutida, sem loop de agente — você os escreve. Isso fornece controle máximo e overhead mínimo de abstração. Para casos de uso simples a médios, o resultado é limpo, legível e fácil de depurar. Para sistemas multi-agente complexos, você normalmente combinaria o Anthropic Tool Use com um framework como LangGraph ou um orquestrador personalizado.
 
-Os modelos Claude foram especificamente treinados para uso de ferramentas, o que significa que exibem forte desempenho ao decidir *quando* chamar uma ferramenta (sem chamar desnecessariamente), *como* preencher argumentos corretamente a partir da linguagem natural, e *como* lidar com requisições ambíguas ou subespecificadas de forma elegante, pedindo esclarecimentos em vez de alucinar argumentos. Chamadas paralelas de ferramentas (múltiplos blocos `tool_use` em uma única resposta) e uso de ferramentas em múltiplos turnos (várias rodadas de chamadas de ferramentas antes de uma resposta final) são ambos suportados nativamente.
+Os modelos Claude foram especificamente treinados no uso de ferramentas, o que significa que exibem forte desempenho para decidir *quando* chamar uma ferramenta (sem chamar desnecessariamente), *como* preencher argumentos corretamente a partir de linguagem natural, e *como* lidar com solicitações ambíguas ou subespecificadas pedindo esclarecimentos em vez de alucinar argumentos. Chamadas de ferramentas paralelas (múltiplos blocos `tool_use` em uma única resposta) e uso de ferramentas em múltiplos turnos (várias rodadas de chamadas de ferramentas antes de uma resposta final) são ambos suportados nativamente.
 
 ## Como funciona
 
-### Definições de ferramentas: JSON schema
+### Definições de ferramentas: JSON Schema
 
-Cada ferramenta é descrita como um objeto JSON com três campos obrigatórios: `name` (um identificador de string), `description` (uma explicação em linguagem natural do que a ferramenta faz e quando usá-la — este é o campo mais importante para orientar a decisão do Claude), e `input_schema` (um objeto JSON Schema definindo os argumentos esperados). O `input_schema` segue o draft padrão do JSON Schema, suportando tipos string, number, boolean, array, object, campos obrigatórios, valores enum e schemas aninhados. O Claude lê as descrições das ferramentas para decidir qual ferramenta chamar; descrições mais precisas levam a uma seleção de ferramentas mais precisa.
+Cada ferramenta é descrita como um objeto JSON com três campos obrigatórios: `name` (um identificador de string), `description` (uma explicação em linguagem natural do que a ferramenta faz e quando usá-la — este é o campo mais importante para orientar a decisão do Claude) e `input_schema` (um objeto JSON Schema definindo os argumentos esperados). O `input_schema` segue o rascunho padrão do JSON Schema, suportando tipos string, número, booleano, array e objeto, campos obrigatórios, valores enum e esquemas aninhados. O Claude lê as descrições das ferramentas para decidir qual ferramenta chamar; descrições mais precisas levam a uma seleção de ferramentas mais precisa.
 
 ### Tipos de mensagem tool_use e tool_result
 
-Quando o Claude decide usar uma ferramenta, ele retorna uma resposta com `stop_reason: "tool_use"` e um array `content` que contém um ou mais blocos `tool_use`. Cada bloco tem um `id` (uma string única como `"toulu_01abc..."`), um `name` (correspondendo a uma das suas definições de ferramentas) e um `input` (um objeto JSON com os argumentos validados). Sua aplicação extrai esses blocos, executa cada chamada de ferramenta e constrói uma nova mensagem com `role: "user"` cujo conteúdo é uma lista de blocos `tool_result` — um por chamada de ferramenta, correspondendo por `tool_use_id`. O bloco `tool_result` carrega a saída como uma string ou um array de conteúdo estruturado. Essa troca continua até que o Claude retorne `stop_reason: "end_turn"` com uma resposta de texto simples.
+Quando o Claude decide usar uma ferramenta, ele retorna uma resposta com `stop_reason: "tool_use"` e um array `content` contendo um ou mais blocos `tool_use`. Cada bloco tem um `id` (uma string única como `"toulu_01abc..."`), um `name` (correspondendo a uma das definições de ferramenta) e um `input` (um objeto JSON com os argumentos validados). Sua aplicação extrai esses blocos, executa cada chamada de ferramenta e constrói uma nova mensagem com `role: "user"` cujo conteúdo é uma lista de blocos `tool_result` — um por chamada de ferramenta, correspondendo por `tool_use_id`. Esse vai e vem continua até que o Claude retorne `stop_reason: "end_turn"` com uma resposta de texto simples.
 
-### Chamadas paralelas de ferramentas
+### Chamadas de ferramentas paralelas
 
-O Claude pode emitir múltiplos blocos `tool_use` em uma única resposta quando determina que várias ferramentas podem ser chamadas simultaneamente — por exemplo, pesquisar dois bancos de dados diferentes ou buscar o clima de três cidades ao mesmo tempo. Sua aplicação deve detectar múltiplos blocos `tool_use` e executá-los em paralelo (por exemplo, com `asyncio.gather` ou um pool de threads) antes de construir a resposta `tool_result`. As chamadas paralelas reduzem significativamente a latência total em comparação com rodadas sequenciais de chamada única, e o Claude foi treinado para usar essa capacidade quando faz sentido.
+O Claude pode emitir múltiplos blocos `tool_use` em uma única resposta quando determina que várias ferramentas podem ser chamadas simultaneamente — por exemplo, pesquisar em dois bancos de dados diferentes ou buscar o clima de três cidades de uma vez. Sua aplicação deve detectar múltiplos blocos `tool_use` e executá-los em paralelo (por exemplo, com `asyncio.gather` ou um pool de threads) antes de construir a resposta `tool_result`. Chamadas paralelas reduzem significativamente a latência total em comparação com rodadas sequenciais de chamada única.
 
 ### Uso de ferramentas em múltiplos turnos
 
-Tarefas complexas geralmente requerem várias rodadas de chamadas de ferramentas antes que o Claude possa produzir uma resposta final: pesquisar uma entidade, depois buscar detalhes sobre ela, depois calcular algo a partir desses detalhes. Cada rodada adiciona uma mensagem do assistente (com blocos `tool_use`) e uma mensagem do usuário (com blocos `tool_result`) ao histórico da conversa. O histórico da conversa é sempre enviado completo em cada chamada da API, dando ao Claude contexto completo sobre o que foi tentado e quais foram os resultados. Esse design sem estado significa que você é responsável por manter e reduzir a lista de mensagens — não há gerenciamento de memória ou estado embutido.
+Tarefas complexas frequentemente requerem várias rodadas de chamadas de ferramentas antes que o Claude possa produzir uma resposta final: buscar uma entidade, depois buscar detalhes sobre ela, depois calcular algo a partir desses detalhes. Cada rodada adiciona uma mensagem de assistente (com blocos `tool_use`) e uma mensagem de usuário (com blocos `tool_result`) ao histórico da conversa. O histórico da conversa é sempre enviado completo em cada chamada de API, dando ao Claude contexto completo sobre o que foi tentado e quais foram os resultados. Este design sem estado significa que você é responsável por manter e aparar a lista de mensagens — não há memória embutida ou gerenciamento de estado.
 
 ```mermaid
 flowchart LR
@@ -46,23 +48,23 @@ flowchart LR
 
 | Usar quando | Evitar quando |
 |---|---|
-| Você quer controle direto sobre o loop de chamada de ferramentas sem sobrecarga de framework | Você precisa de uma camada de coordenação multi-agente — Anthropic Tool Use é de agente único |
+| Você quer controle direto sobre o loop de chamadas de ferramentas sem overhead de framework | Você precisa de uma camada de coordenação multi-agente — Anthropic Tool Use é para agente único |
 | Você precisa da integração mais estreita com recursos específicos do Claude (streaming, extended thinking) | Você precisa de conveniências de framework como memória automática, bibliotecas de ferramentas embutidas ou gerenciamento de papéis |
-| Seu caso de uso tem 1-10 ferramentas e um fluxo de conversa bem definido | Seu conjunto de ferramentas é muito grande e você precisa de seleção semântica de ferramentas em escala |
-| Você está construindo um sistema de produção e quer dependências mínimas | Você quer prototipagem rápida com integrações pré-construídas (use LangChain ou CrewAI em vez disso) |
-| Você precisa de portabilidade máxima — apenas o SDK Anthropic e seu próprio código | Sua equipe prefere configuração declarativa de agentes em vez de escrever código de orquestração |
+| Seu caso de uso tem 1–10 ferramentas e um fluxo de conversa bem definido | Seu conjunto de ferramentas é muito grande e você precisa de seleção semântica de ferramentas em escala |
+| Você está construindo um sistema de produção e quer dependências mínimas | Você quer prototipagem rápida com integrações pré-construídas (use LangChain ou CrewAI) |
+| Você precisa de portabilidade máxima — apenas o SDK Anthropic e seu próprio código | Sua equipe prefere configuração declarativa de agentes a escrever código de orquestração |
 
 ## Comparações
 
 | Critério | Anthropic Tool Use | OpenAI Function Calling |
 |---|---|---|
-| **Formato do schema** | JSON Schema com campos `name`, `description`, `input_schema` | JSON Schema com campos `name`, `description`, `parameters` — estrutura quase idêntica |
+| **Formato de esquema** | JSON Schema com campos `name`, `description`, `input_schema` | JSON Schema com campos `name`, `description`, `parameters` — estrutura quase idêntica |
 | **Streaming de chamadas de ferramentas** | Suportado: eventos `input_json_delta` transmitem tokens de argumentos em tempo real | Suportado: streaming de argumentos `function_call` via eventos delta |
-| **Chamadas paralelas de ferramentas** | Suportado: múltiplos blocos `tool_use` em uma única resposta | Suportado: múltiplas entradas `tool_calls` em uma única resposta |
-| **Confiabilidade / precisão de argumentos** | Forte: modelos Claude são especificamente treinados para uso preciso de ferramentas | Forte: modelos de classe GPT-4 têm chamada de função robusta |
-| **Suporte a modelos** | Família Claude 3 e superiores (Haiku, Sonnet, Opus) | GPT-3.5-turbo, GPT-4, GPT-4o e superiores |
+| **Chamadas de ferramentas paralelas** | Suportado: múltiplos blocos `tool_use` em uma única resposta | Suportado: múltiplas entradas `tool_calls` em uma única resposta |
+| **Confiabilidade / precisão de argumentos** | Forte: modelos Claude são especificamente treinados para uso preciso de ferramentas | Forte: modelos classe GPT-4 têm chamada de função robusta |
+| **Suporte a modelos** | Família Claude 3 e superior (Haiku, Sonnet, Opus) | GPT-3.5-turbo, GPT-4, GPT-4o e superior |
 | **Formato do resultado da ferramenta** | Bloco de conteúdo `tool_result` com referência `tool_use_id` | Mensagem com papel `tool` com referência `tool_call_id` |
-| **Recursos estendidos** | Ferramentas de uso de computador (beta), ferramentas de documentos | Interpretador de código, pesquisa de arquivos (API de Assistentes) |
+| **Recursos estendidos** | Ferramentas de uso do computador (beta), ferramentas de documentos | Interpretador de código, busca de arquivos (Assistants API) |
 
 ## Exemplos de código
 
@@ -263,10 +265,10 @@ print("Answer:", answer)
 
 ## Recursos práticos
 
-- [Documentação do Anthropic Tool Use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Guia oficial cobrindo definições de ferramentas, fluxo de mensagens, chamadas paralelas e melhores práticas para descrições de ferramentas.
-- [Referência do SDK Python da Anthropic](https://github.com/anthropics/anthropic-sdk-python) — SDK completo com objetos de resposta tipados, suporte assíncrono e streaming para uso de ferramentas.
-- [Cookbook da Anthropic: exemplos de uso de ferramentas](https://github.com/anthropics/anthropic-cookbook/tree/main/tool_use) — Notebooks práticos demonstrando padrões de ferramenta única e múltiplas ferramentas, chamadas paralelas e uso de computador.
-- [Documentação do OpenAI Function Calling](https://platform.openai.com/docs/guides/function-calling) — Referência útil para comparar as duas abordagens; os conceitos se mapeiam bem apesar das diferenças de nomenclatura.
+- [Documentação Anthropic Tool Use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Guia oficial cobrindo definições de ferramentas, fluxo de mensagens, chamadas paralelas e melhores práticas para descrições de ferramentas.
+- [Referência do SDK Python Anthropic](https://github.com/anthropics/anthropic-sdk-python) — SDK completo com objetos de resposta tipados, suporte assíncrono e streaming para uso de ferramentas.
+- [Anthropic cookbook: exemplos de uso de ferramentas](https://github.com/anthropics/anthropic-cookbook/tree/main/tool_use) — Notebooks práticos demonstrando padrões de ferramenta única e múltipla, chamadas paralelas e uso do computador.
+- [Documentação OpenAI Function Calling](https://platform.openai.com/docs/guides/function-calling) — Referência útil para comparar as duas abordagens; conceitos se correspondem estreitamente apesar das diferenças de nomenclatura.
 
 ## Veja também
 

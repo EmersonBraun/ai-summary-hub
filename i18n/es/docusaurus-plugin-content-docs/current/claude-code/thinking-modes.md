@@ -2,39 +2,41 @@
 title: Modos de pensamiento y esfuerzo
 description: Pensamiento extendido en Claude Code — qué es, cómo los niveles de esfuerzo afectan la profundidad del razonamiento frente a la velocidad, y cómo configurar el comportamiento de pensamiento para diferentes tipos de tareas.
 keywords: [pensamiento extendido, modos de pensamiento, niveles de esfuerzo, razonamiento de Claude, tokens de presupuesto, tokens de pensamiento, razonamiento profundo, Claude Code]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Modos de pensamiento y esfuerzo
 
 ## Definición
 
-El pensamiento extendido es una característica de los modelos Claude que permite al modelo razonar paso a paso en un bloc de notas interno dedicado antes de producir su respuesta final. A diferencia de la salida visible, este proceso de razonamiento está diseñado para la deliberación interna del modelo — emerge conclusiones intermedias, evalúa alternativas, detecta sus propios errores y construye hacia una respuesta bien considerada. El resultado son respuestas más precisas en tareas complejas, mejor razonadas en problemas ambiguos y menos susceptibles a errores de coincidencia de patrones superficiales.
+El pensamiento extendido es una característica de los modelos Claude que permite al modelo razonar a través de un problema paso a paso en un bloc de notas interno dedicado antes de producir su respuesta final. A diferencia de la salida visible, este proceso de razonamiento está diseñado para la deliberación interna del modelo — saca conclusiones intermedias, evalúa alternativas, detecta sus propios errores y construye hacia una respuesta bien considerada. El resultado son respuestas más precisas en tareas complejas, mejor razonadas en problemas ambiguos y menos susceptibles a errores superficiales de coincidencia de patrones.
 
-En Claude Code, el pensamiento extendido se manifiesta como una configuración de **nivel de esfuerzo** que controla cuánto trabajo computacional realiza el modelo antes de responder. Las respuestas de bajo esfuerzo son rápidas y apropiadas para tareas simples e inequívocas (formatear código, explicar una función corta). Las respuestas de alto esfuerzo invierten más presupuesto de razonamiento y son más adecuadas para decisiones arquitectónicas complejas, sesiones de depuración difíciles o tareas donde los errores son costosos. El compromiso siempre es velocidad versus profundidad: más pensamiento requiere más tiempo y consume más tokens.
+En Claude Code, el pensamiento extendido se manifiesta como una configuración de **nivel de esfuerzo** que controla cuánto trabajo computacional realiza el modelo antes de responder. Las respuestas de bajo esfuerzo son rápidas y apropiadas para tareas simples e inequívocas (formatear código, explicar una función corta). Las respuestas de alto esfuerzo invierten más presupuesto de razonamiento y son más adecuadas para decisiones arquitectónicas complejas, sesiones de depuración difíciles, o tareas donde los errores son costosos. La compensación siempre es velocidad versus profundidad: más pensamiento toma más tiempo y consume más tokens.
 
-Es importante distinguir el pensamiento extendido del prompting de cadena de pensamiento. La cadena de pensamiento le pide al modelo que muestre su trabajo en la salida — el razonamiento es parte del texto de respuesta. El pensamiento extendido, por el contrario, ocurre en un bloque `thinking` separado que el modelo procesa internamente. En las sesiones de Claude Code, a veces puedes observar bloques `<thinking>` en la salida bruta de la API, aunque la interfaz de usuario de Claude Code típicamente muestra solo la respuesta final. El pensamiento interno no está sujeto a las mismas restricciones que la salida y está optimizado para la calidad del razonamiento en lugar de la legibilidad.
+Es importante distinguir el pensamiento extendido del prompting de cadena de pensamiento. La cadena de pensamiento le pide al modelo que muestre su trabajo en la salida — el razonamiento es parte del texto de respuesta. El pensamiento extendido, por el contrario, ocurre en un bloque `thinking` separado que el modelo procesa internamente. En las sesiones de Claude Code, a veces puedes observar bloques `<thinking>` en la salida raw de la API, aunque la UI de Claude Code normalmente solo muestra la respuesta final. El pensamiento interno no está sujeto a las mismas restricciones que la salida y está optimizado para la calidad del razonamiento en lugar de la legibilidad.
 
 ## Cómo funciona
 
 ### Bloques de pensamiento y tokens de presupuesto
 
-Cuando el pensamiento extendido está habilitado, el modelo recibe un parámetro adicional: `budget_tokens`. Este entero especifica el número máximo de tokens que el modelo puede usar para su razonamiento interno antes de producir la respuesta final. Un presupuesto de 1,000 tokens permite una breve deliberación; un presupuesto de 10,000 tokens habilita un análisis profundo de múltiples pasos. El modelo no siempre usa su presupuesto completo — deja de pensar cuando llega a una conclusión satisfactoria. Establecer el presupuesto más alto de lo necesario agrega latencia sin ganancias de calidad proporcionales; el presupuesto correcto depende de la complejidad de la tarea.
+Cuando el pensamiento extendido está habilitado, el modelo recibe un parámetro adicional: `budget_tokens`. Este entero especifica el número máximo de tokens que el modelo puede usar para su razonamiento interno antes de producir la respuesta final. Un presupuesto de 1.000 tokens permite una breve deliberación; un presupuesto de 10.000 tokens permite un análisis profundo y de múltiples pasos. El modelo no siempre usa su presupuesto completo — deja de pensar cuando llega a una conclusión satisfactoria. Establecer el presupuesto más alto de lo necesario agrega latencia sin ganancias de calidad proporcionales; el presupuesto correcto depende de la complejidad de la tarea.
 
 ### Niveles de esfuerzo en Claude Code
 
 Claude Code traduce el concepto abstracto de tokens de presupuesto en niveles de esfuerzo con nombre que son más fáciles de razonar:
 
-- **Bajo esfuerzo (predeterminado para tareas simples)**: presupuesto de pensamiento mínimo, respuestas rápidas, apropiado para formateo de código, explicaciones simples, ediciones de un solo archivo y operaciones de búsqueda.
-- **Esfuerzo medio**: presupuesto de pensamiento moderado, el predeterminado para la mayoría de las sesiones de codificación interactivas; equilibra velocidad y calidad para tareas de desarrollo típicas.
-- **Alto esfuerzo / máximo**: presupuesto de pensamiento grande, reservado para tareas complejas — depurar problemas difíciles de reproducir, diseñar sistemas, analizar implicaciones de seguridad o cualquier tarea donde una respuesta incorrecta sería costosa de corregir.
+- **Bajo esfuerzo (predeterminado para tareas simples)**: presupuesto mínimo de pensamiento, respuestas rápidas, apropiado para formateo de código, explicaciones simples, ediciones de un solo archivo y operaciones de búsqueda.
+- **Esfuerzo medio**: presupuesto de pensamiento moderado, el predeterminado para la mayoría de las sesiones de codificación interactivas; equilibra velocidad y calidad para las tareas de desarrollo típicas.
+- **Alto esfuerzo / máximo**: gran presupuesto de pensamiento, reservado para tareas complejas — depuración de problemas difíciles de reproducir, diseño de sistemas, análisis de implicaciones de seguridad, o cualquier tarea donde una respuesta incorrecta sería costosa de corregir.
 
-### Cuándo el modelo piensa
+### Cuándo piensa el modelo
 
-No todas las respuestas activan el pensamiento extendido. Claude Code usa heurísticas para determinar cuándo se justifica un razonamiento adicional basado en señales de complejidad de la tarea: la longitud y ambigüedad de la solicitud, el número de archivos involucrados, si la tarea implica hacer cambios irreversibles y si el usuario ha solicitado explícitamente un análisis cuidadoso. Los usuarios también pueden señalar el esfuerzo deseado explícitamente añadiendo frases como "piensa cuidadosamente sobre esto" o "tómate tu tiempo" en sus solicitudes — el modelo las reconoce como señales para invertir más presupuesto de razonamiento.
+No cada respuesta activa el pensamiento extendido. Claude Code usa heurísticas para determinar cuándo se justifica razonamiento adicional basado en señales de complejidad de la tarea: la longitud y ambigüedad de la solicitud, el número de archivos involucrados, si la tarea implica hacer cambios irreversibles, y si el usuario ha solicitado explícitamente un análisis cuidadoso. Los usuarios también pueden señalar el esfuerzo deseado explícitamente añadiendo frases como "piensa cuidadosamente en esto" o "tómate tu tiempo" en sus solicitudes — estas son reconocidas por el modelo como señales para invertir más presupuesto de razonamiento.
 
 ### Streaming y latencia
 
-El pensamiento extendido interactúa con el streaming de manera predecible: el modelo comienza a transmitir su salida visible solo después de completar su razonamiento interno. Esto significa que las solicitudes de alto esfuerzo tienen una pausa inicial más larga antes de que comience la salida, pero el primer token de contenido real llega completamente formado en lugar de incrementalmente incierto. En la CLI de Claude Code y las integraciones con IDEs, esto se muestra como un breve indicador de "pensando..." antes de que comience la respuesta. Para sesiones interactivas, este retraso generalmente vale la pena para tareas complejas; para ciclos de retroalimentación estrechos, mantener el esfuerzo bajo es preferible.
+El pensamiento extendido interactúa con el streaming de manera predecible: el modelo comienza a transmitir su salida visible solo después de completar su razonamiento interno. Esto significa que las solicitudes de alto esfuerzo tienen una pausa inicial más larga antes de que comience la salida, pero el primer token de contenido real llega completamente formado en lugar de incrementalmente incierto. En la CLI de Claude Code y las integraciones de IDE, esto aparece como un breve indicador "pensando..." antes de que comience la respuesta. Para las sesiones interactivas, este retraso generalmente vale la pena para tareas complejas; para bucles de retroalimentación ajustados, mantener el esfuerzo bajo es preferible.
 
 ```mermaid
 flowchart LR
@@ -49,19 +51,19 @@ flowchart LR
 
 | Usar cuando | Evitar cuando |
 |---|---|
-| Depurando un error complejo y difícil de reproducir con muchas causas raíz posibles | Pidiendo una sola línea o una corrección rápida de sintaxis — el bajo esfuerzo es más rápido y suficiente |
-| Diseñando o revisando una arquitectura de sistema con compromisos significativos | Sesiones de ida y vuelta interactivas donde cada turno es un pequeño paso — la latencia se acumula |
-| Analizando las implicaciones de seguridad de un cambio de código antes de fusionarlo | Generando código repetitivo o scaffolding que sigue patrones bien establecidos |
-| Tareas donde una respuesta incorrecta requeriría un trabajo significativo para corregir | Ejecutando en pipelines de CI donde el determinismo y la velocidad importan más que la profundidad del razonamiento |
-| Cualquier tarea que darías a un ingeniero senior conocido por "pensar antes de codificar" | Trabajas bajo restricciones de presupuesto de tokens ajustadas — los tokens de pensamiento cuentan para tu uso |
+| Depurando un error complejo y difícil de reproducir con muchas posibles causas raíz | Pediendo un simple one-liner o una corrección de sintaxis rápida — el bajo esfuerzo es más rápido y suficiente |
+| Diseñando o revisando una arquitectura de sistema con compensaciones significativas | Sesiones interactivas de ida y vuelta donde cada turno es un pequeño paso — la latencia se acumula |
+| Analizando las implicaciones de seguridad de un cambio de código antes de fusionarlo | Generando boilerplate o scaffolding que sigue patrones bien establecidos |
+| Tareas donde una respuesta incorrecta requeriría un retrabajo significativo | Ejecutando en pipelines de CI donde el determinismo y la velocidad importan más que la profundidad del razonamiento |
+| Cualquier tarea que le darías a un ingeniero senior conocido por "pensar antes de programar" | Estás trabajando bajo restricciones de presupuesto de tokens ajustadas — los tokens de pensamiento cuentan contra tu uso |
 
 ## Pros y contras
 
 | | Pros | Contras |
 |---|---|---|
-| **Alto esfuerzo** | Mayor precisión en tareas complejas; detecta casos límite; produce explicaciones bien razonadas | Mayor latencia; más tokens consumidos; pausa más larga antes del primer token de salida |
-| **Bajo esfuerzo** | Respuestas rápidas; bueno para ciclos interactivos estrechos; menor costo de tokens | Puede perderse casos límite en tareas complejas; puede producir un análisis superficial en problemas ambiguos |
-| **Esfuerzo automático** | Sin configuración necesaria; el modelo calibra según la complejidad de la tarea | Comportamiento menos predecible; puede sub-invertir en tareas genuinamente difíciles que parecen simples |
+| **Alto esfuerzo** | Mejor precisión en tareas complejas; detecta casos límite; produce explicaciones bien razonadas | Mayor latencia; más tokens consumidos; pausa más larga antes del primer token de salida |
+| **Bajo esfuerzo** | Respuestas rápidas; bueno para bucles interactivos ajustados; menor costo de tokens | Puede perder casos límite en tareas complejas; puede producir análisis superficial en problemas ambiguos |
+| **Esfuerzo automático** | No se necesita configuración; el modelo se calibra a la complejidad de la tarea | Comportamiento menos predecible; puede sub-invertir en tareas genuinamente difíciles que parecen simples |
 
 ## Ejemplos de código
 
@@ -151,9 +153,9 @@ print(quick_response.content[0].text)
 
 ## Recursos prácticos
 
-- [Documentación de pensamiento extendido — Anthropic](https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking) — Referencia completa sobre bloques de pensamiento, tokens de presupuesto, comportamiento de streaming y parámetros de API.
-- [Cookbook de pensamiento extendido](https://github.com/anthropics/anthropic-cookbook/tree/main/extended_thinking) — Notebooks prácticos que demuestran el pensamiento extendido para tareas de razonamiento complejo.
-- [Comparación de modelos Claude](https://docs.anthropic.com/en/docs/about-claude/models) — Detalles de las fichas de modelos incluyendo qué modelos soportan el pensamiento extendido y sus capacidades relativas.
+- [Documentación de pensamiento extendido — Anthropic](https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking) — Referencia completa sobre bloques de pensamiento, tokens de presupuesto, comportamiento de streaming y parámetros de la API.
+- [Cookbook de pensamiento extendido](https://github.com/anthropics/anthropic-cookbook/tree/main/extended_thinking) — Notebooks prácticos que demuestran el pensamiento extendido para tareas de razonamiento complejas.
+- [Comparación de modelos Claude](https://docs.anthropic.com/en/docs/about-claude/models) — Detalles de la tarjeta de modelo incluyendo qué modelos soportan el pensamiento extendido y sus capacidades relativas.
 - [Referencia de configuración de Claude Code](https://docs.anthropic.com/en/docs/claude-code/settings) — Dónde configurar los niveles de esfuerzo predeterminados y el comportamiento de pensamiento en Claude Code.
 
 ## Ver también

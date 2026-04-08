@@ -1,36 +1,38 @@
 ---
-title: 自我批评与反思
-description: 通过反思、评论代理和 Reflexion 框架迭代评估和改进自身输出的代理。
-keywords: [自我批评, 反思, 代理评估, 评论代理, Reflexion, 宪法 AI, 迭代优化, LLM 自我评估]
+title: "Self-critique and reflection"
+description: Agents that evaluate their own output and iteratively improve through reflection, critic agents, and the Reflexion framework.
+keywords: [self-critique, reflection, agent evaluation, critic agent, Reflexion, constitutional AI, iterative refinement, LLM self-evaluation]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # 自我批评与反思
 
 ## 定义
 
-自我批评与反思是 AI 代理评估自身输出质量并利用该评估迭代改进的能力。自我批评代理不是产生单一响应后停止，而是进入生成-评估-优化循环：生成初始答案，根据评分标准或一组原则对其进行评分或批评，并修改答案，直到达到质量阈值或最大迭代次数为止。
+Selbstkritik und Reflexion ist die Fähigkeit eines KI-Agenten, die Qualität seiner eigenen Ausgaben zu bewerten und diese Bewertung zu verwenden, um sie iterativ zu verbessern. Anstatt eine einzelne Antwort zu produzieren und zu stoppen, tritt ein selbstkritisierender Agent in eine Generieren-Evaluieren-Verfeinern-Schleife ein: Er generiert eine anfängliche Antwort, bewertet oder kritisiert sie anhand einer Rubrik oder eines Satzes von Prinzipien und überarbeitet die Antwort, bis sie einen Qualitätsschwellenwert erreicht oder eine maximale Iterationsanzahl erreicht wird.
 
-这种能力受到人类专家工作方式的启发：作家起草文章，用批判性眼光重读，识别弱点，然后修改。程序员编写代码，审查 bug 和风格，然后重构。自我批评将这一过程形式化为 LLM 代理，使输出质量大大优于单次生成——代价是额外的推理调用和延迟。
+Diese Fähigkeit ist inspiriert davon, wie menschliche Experten arbeiten: Ein Schriftsteller entwirft einen Aufsatz, liest ihn mit kritischen Augen, identifiziert Schwächen und überarbeitet. Ein Programmierer schreibt Code, überprüft ihn auf Fehler und Stil, dann refaktoriert. Selbstkritik formalisiert diesen Prozess für LLM-Agenten und ermöglicht Ausgaben, die erheblich besser sind als eine Single-Pass-Generierung – auf Kosten zusätzlicher Inferenzaufrufe und Latenz.
 
-这些技术跨越复杂性范围。最简单的形式是单个 LLM 在一次转中被提示评估并重写自己的输出。更复杂的方法使用专用的**评论代理**（带有专门评估提示的独立 LLM 调用）、集成批评（来自不同视角的多个批评者），或**宪法 AI（Constitutional AI）**——Anthropic 开发的一种方法，其中使用固定的原则集来指导批评。**Reflexion** 框架将自我批评扩展到多步骤代理，使用语言强化学习从跨轮次的失败尝试中积累教训。
+Die Techniken umfassen ein Spektrum der Komplexität. Die einfachste Form ist ein einzelnes LLM, das aufgefordert wird, seine eigene Ausgabe in einem Zug zu bewerten und umzuschreiben. Ausgefeiltere Ansätze verwenden einen dedizierten **Kritiker-Agenten** (ein separater LLM-Aufruf mit einem spezialisierten Evaluierungsprompt), Ensemble-Kritik (mehrere Kritiker mit unterschiedlichen Perspektiven) oder **Constitutional AI** – eine von Anthropic entwickelte Methode, bei der ein fester Satz von Prinzipien die Kritik leitet. Das **Reflexion**-Framework erweitert Selbstkritik auf mehrstufige Agenten und verwendet verbales Reinforcement Learning, um Lektionen aus gescheiterten Versuchen über Episoden hinweg zu akkumulieren.
 
 ## 工作原理
 
-### 生成阶段
+### Generierungsphase
 
-代理根据任务产生初始草稿或答案。这种首次生成使用标准系统提示，还不涉及任何批评逻辑。此阶段的输出质量取决于基础模型和提示，但预计是不完美的——后续批评循环的整个目的就是捕捉和纠正这些不完美。将生成和批评作为独立步骤保持，允许每个步骤独立地被提示和监控。
+Der Agent produziert einen anfänglichen Entwurf oder eine Antwort auf eine Aufgabe. Diese First-Pass-Generierung verwendet einen Standard-System-Prompt und umfasst noch keine Kritiklogik. Die Ausgabequalität in dieser Phase hängt vom Basismodell und Prompt ab, wird aber als unvollkommen erwartet – der gesamte Punkt der nachfolgenden Kritikschleife ist es, diese Unvollkommenheiten zu erkennen und zu korrigieren. Das Trennen von Generierung und Kritik als separate Schritte ermöglicht es, jeden unabhängig mit Prompts zu versehen und zu überwachen.
 
-### 评估阶段
+### Evaluierungsphase
 
-批评者——同一个 LLM 或另一个——根据评分标准评估草稿。评分标准可以是简单的指令（"从 1-10 评价这个答案的准确性、完整性和清晰度并解释每个分数"）、一组宪法原则（"这个答案是否尊重用户隐私？它是否有帮助？它是否无害？"），或基于参考的比较（"将此代码与预期输出进行比较，列出所有差异"）。批评者输出分数和弱点的结构化解释。使用结构化输出（JSON）进行批评使解析分数和以编程方式路由决策更容易。
+Ein Kritiker – entweder dasselbe LLM oder ein separates – bewertet den Entwurf anhand einer Rubrik. Die Rubrik kann eine einfache Anweisung sein („Bewerten Sie diese Antwort auf Genauigkeit, Vollständigkeit und Klarheit von 1-10 und erläutern Sie jede Bewertung"), ein Satz konstitutioneller Prinzipien („Respektiert diese Antwort die Privatsphäre des Benutzers? Ist sie hilfreich? Ist sie harmlos?") oder ein referenzbasierter Vergleich („Vergleichen Sie diesen Code mit der erwarteten Ausgabe und listen Sie alle Abweichungen auf"). Der Kritiker gibt sowohl eine Bewertung als auch eine strukturierte Erklärung von Schwächen aus. Die Verwendung strukturierter Ausgaben (JSON) für die Kritik erleichtert das programmatische Parsen von Bewertungen und Routing-Entscheidungen.
 
-### 批评和优化阶段
+### Kritik- und Verfeinerungsphase
 
-批评作为额外上下文反馈给代理，它生成修改后的输出。修订提示明确要求代理解决每个识别到的弱点。在实践中，两到三次修订通常就足够了；进一步的迭代产生收益递减，并可能通过过度编辑引入新错误。设计良好的循环包括提前退出条件：如果分数超过阈值，当前输出被接受，无需额外优化。
+Die Kritik wird als zusätzlicher Kontext an den Agenten zurückgefügt, und er generiert eine überarbeitete Ausgabe. Der Revisionsprompt bittet den Agenten explizit, jede identifizierte Schwäche zu beheben. In der Praxis sind zwei oder drei Revisionsdurchgänge normalerweise ausreichend; weitere Iterationen liefern abnehmende Erträge und können durch Überbearbeitung neue Fehler einführen. Eine gut gestaltete Schleife enthält eine Frühausstiegsbedingung: Wenn die Bewertung einen Schwellenwert überschreitet, wird die aktuelle Ausgabe ohne weitere Verfeinerung akzeptiert.
 
-### Reflexion 框架
+### Reflexion-Framework
 
-Reflexion（Shinn 等人，2023）在情节层面而不是输出层面应用反思。在每次任务失败尝试后，代理生成一个语言"反思"——对出错的自然语言诊断以及下次应该做什么不同的事情。这种反思存储在代理的记忆中，并在下一次尝试的上下文开头前置，有效地实现了语言强化学习，无需任何梯度更新。Reflexion 对于编码挑战和顺序决策等可以多次尝试同一任务的场景特别强大。
+Reflexion (Shinn et al., 2023) wendet Reflexion auf Episode-Ebene statt auf Ausgabe-Ebene an. Nach jedem gescheiterten Versuch an einer Aufgabe generiert der Agent eine verbale „Reflexion" – eine natürlichsprachliche Diagnose, was schief gelaufen ist und was er beim nächsten Mal anders tun sollte. Diese Reflexion wird im Gedächtnis des Agenten gespeichert und dem Kontext des nächsten Versuchs vorangestellt, was effektiv verbales Reinforcement Learning ohne Gradientenaktualisierungen implementiert. Reflexion ist besonders leistungsstark für Aufgaben wie Coding-Challenges und sequentielle Entscheidungsfindung, bei denen dieselbe Aufgabe mehrmals versucht werden kann.
 
 ```mermaid
 flowchart TD
@@ -44,25 +46,25 @@ flowchart TD
   Refine -->|"max iterations reached"| Accept
 ```
 
-## 适用场景 / 不适用场景
+## 何时使用 / 何时不使用
 
-| 适用场景 | 不适用场景 |
+| 使用场景 | 避免场景 |
 |---|---|
-| 输出质量至关重要，单次生成不够 | 延迟是主要约束，额外的推理调用不可接受 |
-| 任务有清晰、可验证的质量评分标准（准确性、安全性、风格） | 没有可靠的方法自动评估输出质量 |
-| 预期迭代优化（创意写作、代码生成、报告） | 任务规范非常明确，第一次生成已经接近完美 |
-| 安全或对齐要求需要宪法审查 | 额外 LLM 调用的成本超过质量改进 |
-| 代理需要从跨多个情节的失败中学习（Reflexion） | 任务不能重试（例如，发送电子邮件等不可逆副作用） |
+| Ausgabequalität kritisch ist und ein einzelner Durchgang nicht ausreicht | Latenz die primäre Einschränkung ist und zusätzliche Inferenzaufrufe inakzeptabel sind |
+| Die Aufgabe eine klare, verifizierbare Qualitätsrubrik hat (Genauigkeit, Sicherheit, Stil) | Es keine zuverlässige Möglichkeit gibt, Ausgabequalität automatisch zu bewerten |
+| Iterative Verfeinerung erwartet wird (kreatives Schreiben, Code-Generierung, Berichte) | Die Aufgabe so gut spezifiziert ist, dass der erste Durchgang bereits nahezu perfekt ist |
+| Sicherheits- oder Alignment-Anforderungen konstitutionelle Überprüfung verlangen | Die Kosten zusätzlicher LLM-Aufrufe die Qualitätsverbesserung überwiegen |
+| Der Agent aus Fehlern über mehrere Episoden lernen muss (Reflexion) | Die Aufgabe nicht wiederholt werden kann (z. B. irreversible Nebenwirkungen wie E-Mails senden) |
 
 ## 优缺点
 
 | 优点 | 缺点 |
 |---|---|
-| 大幅提高复杂任务的输出质量 | 增加多个 LLM 调用，提高成本和延迟 |
-| 可以在不微调（fine-tuning）的情况下强制执行安全和对齐原则 | 模型同意自己批评的"谄媚优化"风险 |
-| Reflexion 无需基于梯度的训练即可实现改进 | 需要最大迭代护栏以防止无限循环 |
-| 模块化——批评者可以是不同的专业模型 | 批评者质量决定了改进的上限 |
-| 开箱即用，适用于任何 LLM，无需训练 | 不适合循环中途的不可逆行动（工具调用） |
+| Verbessert die Ausgabequalität bei komplexen Aufgaben erheblich | Fügt mehrere LLM-Aufrufe hinzu, was Kosten und Latenz erhöht |
+| Kann Sicherheits- und Alignment-Prinzipien ohne Fine-Tuning durchsetzen | Risiko von „sycophantischer Verfeinerung", wo das Modell seiner eigenen Kritik zustimmt |
+| Reflexion ermöglicht Verbesserung ohne gradientenbasiertes Training | Maximale Iterations-Guardrails sind erforderlich, um Endlosschleifen zu verhindern |
+| Modular — Kritiker kann ein anderes, spezialisiertes Modell sein | Kritikerqualität bestimmt die Obergrenze der Verbesserung |
+| Funktioniert sofort mit jedem LLM, kein Training erforderlich | Nicht geeignet für irreversible Aktionen (Werkzeugaufrufe) mitten in der Schleife |
 
 ## 代码示例
 
@@ -250,13 +252,13 @@ if __name__ == "__main__":
 
 ## 实用资源
 
-- [Reflexion：带语言强化学习的语言代理（Shinn 等人，2023）](https://arxiv.org/abs/2303.11366) — 介绍情节级自我反思 Reflexion 框架的基础论文。
-- [宪法 AI：来自 AI 反馈的无害性（Anthropic，2022）](https://arxiv.org/abs/2212.08073) — Anthropic 关于如何使用固定的原则集指导批评和修订而无需人工标注的论文。
-- [Self-Refine：带自我反馈的迭代优化（Madaan 等人，2023）](https://arxiv.org/abs/2303.17651) — 展示使用迭代自我反馈在无需额外训练的情况下跨任务实现一致质量改进的论文。
-- [LangGraph——反思代理教程](https://langchain-ai.github.io/langgraph/tutorials/reflection/reflection/) — 使用 LangGraph 实现反思代理的实践。
+- [Reflexion: Language Agents with Verbal Reinforcement Learning (Shinn et al., 2023)](https://arxiv.org/abs/2303.11366) — Grundlegendes Paper, das das Reflexion-Framework für episodische Selbstreflexion einführt.
+- [Constitutional AI: Harmlessness from AI Feedback (Anthropic, 2022)](https://arxiv.org/abs/2212.08073) — Anthropics Paper, das beschreibt, wie ein fester Satz von Prinzipien Kritik und Revision ohne menschliche Kennzeichnung leiten kann.
+- [Self-Refine: Iterative Refinement with Self-Feedback (Madaan et al., 2023)](https://arxiv.org/abs/2303.17651) — Paper, das konsistente Qualitätsverbesserungen über Aufgaben hinweg mit iterativem Selbst-Feedback ohne zusätzliches Training zeigt.
+- [LangGraph — Reflection Agent Tutorial](https://langchain-ai.github.io/langgraph/tutorials/reflection/reflection/) — Praktische Implementierung eines Reflexions-Agenten mit LangGraph.
 
-## 另请参阅
+## 另见
 
-- [AI 代理](/docs/agents)
-- [思维链推理](/docs/reasoning-patterns/cot)
-- [代理评估](/docs/agents/evaluation)
+- [AI agents](/docs/agents)
+- [Chain-of-thought reasoning](/docs/reasoning-patterns/cot)
+- [Agent evaluation](/docs/agents/evaluation)

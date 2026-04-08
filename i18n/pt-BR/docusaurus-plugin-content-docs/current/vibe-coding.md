@@ -1,55 +1,110 @@
 ---
-title: Vibe Coding
+title: Vibe coding
 description: Iterative, AI-assisted coding driven by intent and quick feedback.
 keywords: [vibe coding, AI-assisted coding, iterative development]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Vibe Coding
 
 ## Definição
 
-Vibe coding é um estilo de desenvolvimento de software em que se trabalha **iterativamente com assistência de IA**: você descreve a intenção em linguagem natural, get code or edits from an [LLM](/docs/llms) or coding tool, then refine by feedback and context rather than writing every line from scratch. The “vibe” is the loose, exploratory flow—you steer by intent and feel, and the model fills in implementation details.
+Vibe coding é um estilo de desenvolvimento de software onde se trabalha **iterativamente com assistência de IA**: você descreve a intenção em linguagem natural, obtém código ou edições de um [LLM](/docs/llms) ou ferramenta de codificação, e então refina por feedback e contexto em vez de escrever cada linha do zero. O "vibe" é o fluxo solto e exploratório — você dirige por intenção e intuição, e o modelo preenche os detalhes de implementação. O foco é reduzir a fricção: ideias vão do pensamento ao código funcional em minutos em vez de horas, com o desenvolvedor agindo como diretor e revisor em vez de digitador.
 
-It contrasts with fully spec-first or plan-then-code approaches (por ex. [spec-driven development](/docs/spec-driven-development)): you often start with a rough idea and let [prompt engineering](/docs/prompt-engineering), [agents](/docs/agents), and tools (por ex. [Cursor](/docs/tools/cursor), [Claude Code](/docs/tools/claude-code)) suggest and edit code. Useful for prototypes, scripting, and tasks where speed and iteration matter more than upfront projeto.
+Vibe coding contrasta com abordagens totalmente spec-first ou plan-then-code (p. ex. [desenvolvimento guiado por especificação](/docs/spec-driven-development)): você frequentemente começa com uma ideia aproximada e deixa a [engenharia de prompts](/docs/prompt-engineering), os [agentes](/docs/agents) e ferramentas (p. ex. [Cursor](/docs/tools/cursor), [Claude Code](/docs/tools/claude-code)) sugerir e editar código. O papel do desenvolvedor muda de escrever sintaxe para descrever objetivos, avaliar saídas e direcionar para a correção. É mais produtivo quando o desenvolvedor mantém compreensão suficiente do codebase para detectar erros — vibe coding não elimina a necessidade de julgamento de engenharia, apenas muda onde esse julgamento é aplicado.
+
+A prática é possibilitada por uma nova geração de ferramentas de codificação de IA que fornecem contexto em nível de projeto: codebases indexadas, edições de múltiplos arquivos, acesso ao terminal e loops agênticos que podem escrever, executar e corrigir código autonomamente. Ferramentas como Cursor, Windsurf e Claude Code vão além do autocomplete para agir como agentes colaborativos que entendem o projeto completo. A recuperação no estilo [RAG](/docs/rag) mantém as sugestões ancoradas no seu codebase real em vez de exemplos genéricos. O resultado é particularmente útil para protótipos, scripts, boilerplate, testes e refatorações — tarefas onde a intenção é fácil de declarar, mas a implementação é tediosa de escrever.
 
 ## Como funciona
 
+### O loop de intenção-feedback
+
+O núcleo do vibe coding é um loop rápido: declarar uma intenção, revisar a saída, fornecer feedback, repetir. Ao contrário do desenvolvimento em cascata, não há requisito de especificar completamente os requisitos antes de começar. Você pode explorar pedindo ao modelo para "tentar algumas abordagens" e escolhendo a que parece certa. As sugestões do modelo se tornam andaimes que você refina, em vez de um artefato completo que você aceita integralmente.
+
+### Contexto e ferramentas
+
 ```mermaid
 flowchart LR
-  Intent[Intent / prompt] --> AI[AI suggests code]
-  AI --> Review[Review and edit]
-  Review --> Feedback[Feedback]
-  Feedback --> Intent
+  Intent[Intenção do desenvolvedor / prompt] -->|descrição em linguagem natural| AITool[Ferramenta de codificação IA: Cursor / Claude Code]
+  AITool -->|indexar codebase| Context[Contexto do projeto: RAG sobre arquivos]
+  Context -->|código relevante| AITool
+  AITool -->|código sugerido ou diff| Review[Desenvolvedor revisa a saída]
+  Review -->|aceitar| Codebase[Codebase atualizado]
+  Review -->|rejeitar + feedback| Intent
+  Codebase -->|executar testes ou app| Result[Resultado de execução / erro]
+  Result -->|colar erro como feedback| Intent
 ```
 
-You give the **model** (or IDE tool) **context**: open files, cursor position, or a short prompt (“add a test for this”, “refactor to use async”). O **modelo** retorna código sugerido ou diffs; você **accept, edit, or reject** and optionally add **feedback** (“use a different library”, “make it shorter”). The loop repeats until the result matches what you want. Tools often provide project-aware context (indexed codebase, [RAG](/docs/rag)-style recuperação) so suggestions stay relevant. Success depends on clear intent, good tooling, and knowing when to take over or refine the output.
+### Modos agênticos e autônomos
 
-## Casos de uso
+Ferramentas modernas suportam vibe coding agêntico: a IA pode executar comandos de terminal, ler a saída de erros e se autocorrigir em múltiplas iterações sem intervenção do desenvolvedor. Isso é útil para tarefas repetitivas (gerar suites de teste, migrar APIs), mas requer que o desenvolvedor estabeleça limites claros e revise o diff final — loops agênticos podem fazer mudanças em cascata difíceis de desfazer.
 
-Vibe coding funciona quando você quer avançar rápido com assistência de IA e está disposto a iterar no ciclo em vez de definir a especificação primeiro.
+## Quando usar / Quando NÃO usar
 
-- Prototyping and scripting (por ex. one-off scripts, small tools)
-- Boilerplate, tests, and refactors where the intent is easy to state
-- Learning or exploring a codebase by asking the AI to implement or explain
-- Combinação com [agentes](/docs/agents) ou [agentes autônomos](/docs/autonomous-agents) que escrevem e editam código a partir de descriptions
+| Usar quando | Evitar quando |
+|-------------|--------------|
+| Prototipagem ou scripting onde velocidade importa mais que arquitetura | Sistemas críticos para segurança ou altamente regulados onde código não revisado é inaceitável |
+| Gerar boilerplate, testes ou migrações onde a intenção é fácil de declarar | O codebase é tão complexo que o modelo carece de contexto suficiente para evitar bugs sutis |
+| Aprender ou explorar um codebase ou biblioteca desconhecida | É necessário entender completamente cada linha de código produzida (p. ex. para revisão de segurança) |
+| Iterar rapidamente em design de UI ou API para validar ideias | Manutenibilidade de longo prazo requer padrões consistentes e decisões de arquitetura deliberadas |
 
-## Vantagens e desvantagens
+## Comparações
 
-| Pros | Cons |
-|------|------|
-| Fast iteration and less typing | Can obscure understanding if you never read the code |
-| Good for exploration and learning | May produce brittle or overfitted code without review |
-| Low friction for small tasks | Hard to scale to large, consistent systems without specs |
-| Works well with [agents](/docs/agents) and IDEs | Depends on model quality and context |
+| Abordagem | Ponto de partida | Especificação necessária | Melhor para |
+|-----------|-----------------|--------------------------|------------|
+| Vibe coding | Intenção aproximada | Não | Protótipos, scripts, exploração |
+| Desenvolvimento guiado por especificação | Especificação explícita | Sim | Sistemas regulados, agentes, conformidade |
+| TDD (test-first) | Casos de teste | Parcialmente | Funcionalidades de produção com critérios de aceitação claros |
+| Programação em par (humano + humano) | Contexto compartilhado | Varia | Problemas complexos que requerem raciocínio profundo |
 
-## Documentação externa
+## Prós e contras
 
-- [Antigravity – Vibe coding](https://www.antigravityai.io/) — Agent-first IDE that emphasizes vibe coding
-- [Kiro – Spec-driven and Autopilot](https://kiro.dev/) — Balancing structure with AI-driven flow
+| Prós | Contras |
+|------|---------|
+| Iteração rápida e menos digitação | Pode obscurecer a compreensão se você nunca ler o código |
+| Bom para exploração e aprendizado | Pode produzir código frágil ou sobreajustado sem revisão |
+| Baixa fricção para tarefas pequenas e protótipos | Difícil de escalar para sistemas grandes e consistentes sem especificações |
+| Funciona bem com [agentes](/docs/agents) e integrações de IDE | Depende fortemente da qualidade do modelo, janela de contexto e integração de ferramentas |
+| Reduz a energia de ativação para começar uma nova tarefa | Loops agênticos podem fazer mudanças em cascata indesejadas |
+
+## Exemplos de código
+
+### Sessão de exemplo de vibe coding com Claude Code (shell)
+
+```bash
+# Iniciar Claude Code no diretório do seu projeto
+claude
+
+# Descrever o que você quer — sem necessidade de especificar a implementação exata
+> Adicione um middleware de rate limiting ao aplicativo Express.
+>  Use uma janela deslizante de 100 requisições por minuto por IP.
+>  Retorne 429 com um cabeçalho Retry-After quando o limite for excedido.
+
+# Claude Code vai:
+# 1. Ler a configuração Express existente
+# 2. Instalar a biblioteca apropriada (p. ex. express-rate-limit)
+# 3. Escrever e inserir o middleware
+# 4. Atualizar os imports
+
+# Revisar o diff e então iterar
+> Na verdade use Redis para o armazenamento do rate limit para que funcione em múltiplas instâncias.
+
+# Aceitar o diff final e executar os testes
+> Execute a suite de testes existente e corrija quaisquer falhas.
+```
+
+## Recursos práticos
+
+- [Documentação do Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) — Agente de codificação IA baseado em terminal da Anthropic
+- [Documentação do Cursor](https://docs.cursor.com/) — IDE IA-first com sugestões contextuais do codebase e edição agêntica
+- [Kiro – Spec-driven e Autopilot](https://kiro.dev/) — Ferramenta que equilibra especificações estruturadas com fluxo de desenvolvimento guiado por IA
+- [Andrej Karpathy – Vibe coding (Twitter/X)](https://x.com/karpathy/status/1886192184808149165) — Cunhagem e descrição do termo por seu criador
+- [Windsurf (Codeium)](https://codeium.com/windsurf) — IDE agêntico com Cascade, um fluxo de codificação agêntico multiarquivo
 
 ## Veja também
 
-- [Spec-driven development](/docs/spec-driven-development) — More structured, spec-first approach
-- [Agents](/docs/agents) — AI that can write and edit code
-- [Cursor](/docs/tools/cursor) — IDE built for AI-assisted coding
-- [Prompt engineering](/docs/prompt-engineering)
+- [Desenvolvimento guiado por especificação](/docs/spec-driven-development) — Abordagem mais estruturada, especificação primeiro
+- [Agentes](/docs/agents) — IA que pode escrever e editar código
+- [Cursor](/docs/tools/cursor) — IDE construído para codificação assistida por IA
+- [Engenharia de prompts](/docs/prompt-engineering)

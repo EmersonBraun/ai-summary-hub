@@ -1,244 +1,219 @@
 ---
 title: Sorties structurées
-description: Techniques pour obtenir des LLM qu'ils produisent des données structurées lisibles par machine — mode JSON, schémas d'appel de fonctions et extraction basée sur Pydantic — permettant une intégration fiable dans les API et les pipelines automatisés.
-keywords: [sorties structurées, mode JSON, appel de fonctions, utilisation d'outils, Pydantic, schéma, extraction, format de réponse, OpenAI, Anthropic, analyse de sortie]
+description: Comment guider les LLM pour produire des sorties dans des formats structurés comme JSON, XML, Markdown et du code, en assurant la fiabilité pour les systèmes en aval.
+keywords: [structured outputs, JSON mode, function calling, output format, schema, LLM, parsing]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Sorties structurées
 
 ## Définition
 
-Les sorties structurées désignent la pratique de contraindre ou guider un LLM pour produire des données lisibles par machine — le plus souvent du JSON — plutôt que de la prose libre. Dans un pipeline de production, le fossé entre un LLM qui retourne une réponse correcte et celui qui retourne une réponse correcte dans un format analysable est le fossé entre une démo jouet et un système déployable. Un service en aval qui doit extraire un nom de produit, une étiquette de sentiment ou une liste d'éléments d'action ne peut pas fonctionner de manière fiable sur du texte non structuré ; il a besoin d'une forme garantie qu'il peut désérialiser, valider et router.
+Les sorties structurées désignent les techniques qui contraignent ou guident un LLM à produire du texte dans un format prévisible et lisible par machine — le plus souvent JSON, XML, CSV, Markdown ou du code — plutôt que du texte libre. Les systèmes de production qui alimentent les sorties LLM directement dans des bases de données, des interfaces utilisateur ou des pipelines en aval ont besoin d'un format fiable ; des sorties imprévisibles ou mal formées provoquent des pannes d'analyse, une dégradation silencieuse ou des interruptions de service.
 
-L'évolution des techniques de sortie structurée suit la maturation des API LLM. Les premiers systèmes s'appuyaient sur des instructions de prompt fragiles (« répondez uniquement avec du JSON valide ») combinées à l'analyse par regex et des boucles de réessai. Cette approche se brisait chaque fois que le modèle ajoutait un préambule explicatif, encadrait le JSON dans un bloc de code markdown, ou violait subtilement le schéma dans des cas limites. La génération suivante a introduit l'appel de fonctions (OpenAI, mi-2023) et l'utilisation d'outils (Anthropic), qui déplacent la définition du schéma hors du prompt et dans un paramètre API de premier ordre, permettant au modèle d'être explicitement entraîné et contraint sur le contrat de sortie. Plus récemment, les fournisseurs ont introduit le décodage contraint par grammaire stricte qui fait de la conformité au schéma une garantie forte au niveau des tokens, pas une instruction de prompt souple.
+Les approches pour obtenir des sorties structurées forment un spectre d'effort et de fiabilité. Au niveau le plus simple, l'**instruction de prompt** demande au modèle de "répondre en JSON" ou de "remplir ce template" — facile à implémenter mais sujet à des violations de format sous les cas limites. Le **mode JSON** (OpenAI) et les **sorties structurées** (OpenAI, Anthropic) contraignent le décodage au niveau de la tokenisation pour garantir la conformité JSON. La **définition de schéma** (via les outils/fonctions d'OpenAI ou le `tool_choice` d'Anthropic) lie le modèle à un schéma JSON spécifique, permettant une intégration de type sécurisé. Enfin, des bibliothèques comme **Instructor** et **Outlines** fournissent des interfaces Python idiomatiques sur ces fonctionnalités, s'intégrant avec Pydantic pour la validation du schéma.
 
-Comprendre quelle technique appliquer — et pourquoi — importe pour quiconque construit des pipelines qui dépendent des sorties LLM. Le mode JSON est le point d'entrée le plus simple mais ne fournit aucune validation de schéma. L'appel de fonctions / l'utilisation d'outils fournit un schéma typé et une analyse structurée dans la réponse API, mais nécessite de définir les schémas d'outils à l'avance. Les bibliothèques d'extraction basées sur Pydantic (Instructor, analyseurs de sortie LangChain) se situent au-dessus de la couche API et ajoutent la validation au niveau Python, la réessai automatique sur les violations de schéma et la définition ergonomique de modèles. Le bon choix dépend de la complexité du schéma cible, de la criticité de la validation et de la quantité de logique de réessai/correction que vous souhaitez que la bibliothèque gère pour vous.
-
-## Fonctionnement
+## Comment ça fonctionne
 
 ```mermaid
-flowchart LR
-  Prompt[Prompt + schema] -->|"structured request"| LLM[LLM]
-  LLM -->|"raw structured response"| Validation{Schema\nvalidation}
-  Validation -->|"valid"| Downstream[Downstream system\nor application]
-  Validation -->|"invalid"| Retry[Retry / correction\nloop]
-  Retry -->|"reprompt with error"| LLM
+flowchart TD
+  PROMPT[Prompt with schema/format instruction] --> LLM[LLM]
+  LLM --> STRATEGY{Output strategy}
+  STRATEGY -->|instruction only| RAW[Raw text — parse manually]
+  STRATEGY -->|JSON mode| JRAW[Guaranteed valid JSON\n— parse with json.loads]
+  STRATEGY -->|tool/function call| SCHEMA[Schema-validated JSON\n— typed object]
+  STRATEGY -->|Instructor/Outlines| PYDANTIC[Pydantic model instance\n— fully validated]
+  RAW --> PARSE[Parse + validate]
+  JRAW --> PARSE
+  SCHEMA --> PARSE
+  PYDANTIC --> USE[Use directly in code]
+  PARSE --> USE
 ```
 
-### Mode JSON
+### Instruction de format dans le prompt
 
-Le mode JSON est le mécanisme de sortie structurée le plus basique. Quand il est activé, le modèle est contraint à produire uniquement du JSON valide comme sortie de niveau supérieur. Dans l'API d'OpenAI cela est activé en définissant `response_format={"type": "json_object"}` sur la requête ; dans l'API d'Anthropic un effet similaire peut être obtenu en préremplissant le tour assistant avec `{`. Le mode JSON garantit la validité syntaxique (la sortie peut toujours être analysée par `json.loads`), mais il ne valide pas contre un schéma — le modèle pourrait retourner `{"result": "yes"}` quand vous attendiez `{"score": 0.87, "label": "positive", "confidence": 0.92}`. Vous devez ajouter la validation de schéma (par ex. avec Pydantic ou `jsonschema`) comme étape séparée, et implémenter la logique de réessai pour les non-conformités de schéma. Le mode JSON est le mieux adapté aux structures simples et plates où le risque de dérive de schéma est faible.
+La manière la plus directe de guider le format est de l'instruire dans le prompt. Inclure un exemple du format souhaité, spécifier le schéma en prose ou fournir un template à remplir. Ajouter une séquence d'arrêt sur le délimiteur de fermeture (ex. `</json>`) pour éviter le texte supplémentaire après l'objet. Cette approche fonctionne sur n'importe quel modèle mais échoue parfois sur des cas d'entrée complexes ou inattendus.
 
-### Appel de fonctions et utilisation d'outils
+### Mode JSON et sorties structurées
 
-L'appel de fonctions (OpenAI) et l'utilisation d'outils (Anthropic) représentent un pas qualitatif en avant. Au lieu d'intégrer le schéma de sortie dans le system prompt, vous le déclarez comme définition d'outil ou de fonction avec un objet JSON Schema. L'API retourne la sortie du modèle comme un bloc `tool_use` structuré avec un dict `input` analysé, séparé de tout contenu textuel. Ce découplage est significatif : le texte et les données structurées vivent dans différentes parties de la réponse, et l'API elle-même gère l'analyse JSON. Vous obtenez des annotations de type pour chaque champ, la sémantique des champs requis vs optionnels, les contraintes d'enum et la prise en charge des objets imbriqués — tous appliqués par le schéma au niveau API. Le mode strict d'OpenAI (2024) va plus loin en activant le décodage contraint, faisant de la conformité au schéma une garantie forte. L'utilisation d'outils est le bon choix pour extraire des données structurées de documents, remplir des enregistrements de base de données ou piloter des appels API en aval avec des arguments typés.
+OpenAI's `response_format={"type": "json_object"}` garantit que chaque token généré continue un JSON valide — le modèle ne peut pas produire de JSON mal formé. `response_format={"type": "json_schema", "json_schema": {...}}` va plus loin en appliquant un schéma spécifique. Anthropic prend en charge une fonctionnalité similaire via `tool_use` : définir un outil avec un schéma JSON et le forcer avec `tool_choice`, ce qui oblige le modèle à remplir les arguments de l'outil conformément au schéma.
 
-### Extraction basée sur schéma avec Pydantic
+### Instructor et Pydantic
 
-Des bibliothèques comme [Instructor](https://github.com/jxnl/instructor) et les analyseurs de sortie LangChain enveloppent l'API d'appel de fonctions / utilisation d'outils avec une interface Pydantic-first. Vous définissez votre schéma de sortie comme une sous-classe `pydantic.BaseModel` et passez la classe de modèle à la bibliothèque ; elle génère automatiquement le JSON Schema pour la définition d'outil, appelle l'API, valide la réponse contre votre modèle, et réessaie avec le retour d'erreur de validation si le schéma est violé. Cette approche est la plus ergonomique pour les praticiens Python car la sortie est un objet Python entièrement typé — pas un dict brut — avec validation de champs, valeurs par défaut et prise en charge de modèles imbriqués. Le réessai automatique avec contexte d'erreur réduit drastiquement le taux de violations de schéma silencieuses. Le coût est une dépendance de bibliothèque supplémentaire et une utilisation de tokens légèrement plus élevée quand les erreurs de validation déclenchent des messages de réessai.
+**Instructor** est une bibliothèque Python qui enveloppe les SDK OpenAI et Anthropic, vous permettant de définir le format de sortie comme un modèle Pydantic et d'obtenir en retour une instance entièrement validée. Elle gère les retries, la validation et la correction d'erreurs automatiquement. C'est actuellement l'une des approches les plus ergonomiques pour les sorties structurées dans du code Python de production.
 
 ## Quand utiliser / Quand NE PAS utiliser
 
-| Utiliser quand | Éviter quand |
-|----------------|--------------|
-| La sortie LLM doit être consommée programmatiquement (réponse API, insertion en base de données, déclencheur de workflow) | La sortie est lue uniquement par des humains et aucune analyse en aval n'est nécessaire |
-| Vous avez besoin d'un objet Python typé et validé plutôt qu'une chaîne brute | Le schéma est si simple (chaîne ou nombre unique) que le texte brut est plus facile à analyser |
-| Construire des pipelines où les violations de schéma causeraient une corruption silencieuse des données | La latence est extrêmement serrée et vous ne pouvez pas vous permettre la surcharge des boucles de réessai |
-| L'extraction implique des structures imbriquées, des tableaux ou des champs contraints par enum | Vous êtes en prototypage précoce et le schéma de sortie n'est pas encore stable |
-| Vous avez besoin d'un comportement d'extraction reproductible et testable selon les versions du modèle | Le modèle que vous utilisez a une prise en charge médiocre de l'utilisation d'outils / appel de fonctions |
+| Scénario | Approche recommandée | Éviter |
+|----------|----------------------|--------|
+| Extraction de données pour ingestion dans base de données | Sorties structurées / mode JSON + Pydantic | Analyse de texte libre — fragile et non maintenable |
+| Remplissage de formulaire UI alimenté par LLM | Définition de schéma via appel de fonction/outil | Confiance dans l'instruction seule pour des entrées utilisateur arbitraires |
+| Génération de code | Séquences d'arrêt sur des délimiteurs de code ; extraire le contenu entre balises | Obtenir toute la réponse — le prose avant/après le code gêne l'exécution |
+| Pipelines d'agents avec raisonnement structuré | Sorties structurées pour les actions ; texte libre pour le raisonnement | Forcer la structure pour les sorties de raisonnement intermédiaire — dégrade les CoT |
+| Prototypage rapide | Instruction de prompt avec séquences d'arrêt | Ingénierie excessive avec des schémas complets pour une expérimentation à usage unique |
 
 ## Exemples de code
 
-### OpenAI — Mode JSON avec validation Pydantic
+### Mode JSON OpenAI et sorties structurées
 
 ```python
-# Structured extraction with OpenAI JSON mode + Pydantic validation
+# OpenAI JSON mode and structured outputs
 # pip install openai pydantic
-
-import json, os
-from pydantic import BaseModel, ValidationError
-from openai import OpenAI
-
-client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-
-
-class SentimentResult(BaseModel):
-    label: str       # "positive" | "negative" | "neutral"
-    score: float     # 0.0 - 1.0
-    key_phrases: list[str]
-
-
-def extract_sentiment(text: str, max_retries: int = 3) -> SentimentResult:
-    system = (
-        "You are a sentiment analysis engine. Respond ONLY with valid JSON: "
-        '{"label": "positive"|"negative"|"neutral", "score": <float>, "key_phrases": [...]}'
-    )
-    for attempt in range(max_retries):
-        resp = client.chat.completions.create(
-            model="gpt-4o-mini",
-            response_format={"type": "json_object"},
-            messages=[{"role": "system", "content": system},
-                      {"role": "user", "content": f"Analyze: {text}"}],
-            temperature=0,
-        )
-        try:
-            return SentimentResult(**json.loads(resp.choices[0].message.content))
-        except (json.JSONDecodeError, ValidationError) as e:
-            if attempt == max_retries - 1:
-                raise RuntimeError(f"Validation failed: {e}") from e
-    raise RuntimeError("Unreachable")
-
-
-if __name__ == "__main__":
-    r = extract_sentiment("The model is fast, but docs leave much to be desired.")
-    print(r.label, r.score, r.key_phrases)
-```
-
-### OpenAI — Appel de fonctions avec schéma strict
-
-```python
-# Structured extraction with OpenAI function calling (strict mode)
-# pip install openai
 
 import os, json
 from openai import OpenAI
+from pydantic import BaseModel
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-TOOL = {
-    "type": "function",
-    "function": {
-        "name": "extract_product_info",
-        "description": "Extract structured product info from a description.",
-        "strict": True,
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "product_name": {"type": "string"},
-                "price_usd":    {"type": "number"},
-                "features":     {"type": "array", "items": {"type": "string"}},
-                "in_stock":     {"type": "boolean"},
-            },
-            "required": ["product_name", "price_usd", "features", "in_stock"],
-            "additionalProperties": False,
+# --- Approach 1: JSON mode (valid JSON guaranteed, no schema enforcement) ---
+resp = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {
+            "role": "system",
+            "content": "Extract information and return as JSON with keys: name, date, location.",
         },
-    },
-}
+        {
+            "role": "user",
+            "content": "The React Summit conference will be held in Amsterdam on June 13, 2025.",
+        },
+    ],
+    response_format={"type": "json_object"},
+    temperature=0,
+)
+data = json.loads(resp.choices[0].message.content)
+print(data)  # {'name': 'React Summit', 'date': 'June 13, 2025', 'location': 'Amsterdam'}
 
 
-def extract_product(description: str) -> dict:
-    resp = client.chat.completions.create(
-        model="gpt-4o",
-        tools=[TOOL],
-        tool_choice={"type": "function", "function": {"name": "extract_product_info"}},
-        messages=[{"role": "system", "content": "Extract product information."},
-                  {"role": "user", "content": description}],
-        temperature=0,
-    )
-    return json.loads(resp.choices[0].message.tool_calls[0].function.arguments)
+# --- Approach 2: Structured outputs with Pydantic schema ---
+class EventExtraction(BaseModel):
+    name: str
+    date: str
+    location: str
+    is_virtual: bool
 
 
-if __name__ == "__main__":
-    desc = ("AcmePro X200 headphones — ships now at $149.99. "
-            "Features: 40-hour battery, ANC, USB-C charging.")
-    print(json.dumps(extract_product(desc), indent=2))
+completion = client.beta.chat.completions.parse(
+    model="gpt-4o",
+    messages=[
+        {"role": "system", "content": "Extract event information from the text."},
+        {
+            "role": "user",
+            "content": "PyCon US will be in Pittsburgh, PA on May 14-22, 2025. It is in-person.",
+        },
+    ],
+    response_format=EventExtraction,
+)
+event = completion.choices[0].message.parsed
+print(event.name, event.location, event.is_virtual)
 ```
 
-### Anthropic — Utilisation d'outils pour l'extraction structurée
+### Sorties structurées Anthropic via appel d'outil
 
 ```python
-# Structured extraction with Anthropic tool use
-# pip install anthropic pydantic
+# Anthropic structured outputs via tool_use
+# pip install anthropic
 
-import os
-from pydantic import BaseModel
+import os, json
 import anthropic
 
 client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
-TOOL = {
-    "name": "extract_meeting_notes",
-    "description": "Extract structured meeting notes. Always call this tool.",
+extract_tool = {
+    "name": "extract_product_info",
+    "description": "Extract structured product information from text",
     "input_schema": {
         "type": "object",
         "properties": {
-            "summary": {"type": "string"},
-            "action_items": {
+            "product_name": {"type": "string"},
+            "price_usd": {"type": "number"},
+            "in_stock": {"type": "boolean"},
+            "categories": {
                 "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "owner":    {"type": "string"},
-                        "task":     {"type": "string"},
-                        "due_date": {"type": "string"},
-                    },
-                    "required": ["owner", "task", "due_date"],
-                },
+                "items": {"type": "string"},
             },
-            "decisions": {"type": "array", "items": {"type": "string"}},
         },
-        "required": ["summary", "action_items", "decisions"],
+        "required": ["product_name", "price_usd", "in_stock", "categories"],
     },
 }
 
+resp = client.messages.create(
+    model="claude-opus-4-5",
+    max_tokens=512,
+    tools=[extract_tool],
+    tool_choice={"type": "tool", "name": "extract_product_info"},
+    messages=[
+        {
+            "role": "user",
+            "content": (
+                "The UltraBook Pro 15 laptop is priced at $1,299.99. "
+                "It is currently available. Categories: electronics, laptops, productivity."
+            ),
+        }
+    ],
+)
 
-class ActionItem(BaseModel):
-    owner: str
-    task: str
-    due_date: str | None
-
-
-class MeetingNotes(BaseModel):
-    summary: str
-    action_items: list[ActionItem]
-    decisions: list[str]
-
-
-def extract_meeting_notes(transcript: str) -> MeetingNotes:
-    resp = client.messages.create(
-        model="claude-opus-4-5",
-        max_tokens=1024,
-        tools=[TOOL],
-        tool_choice={"type": "tool", "name": "extract_meeting_notes"},
-        messages=[{"role": "user", "content": f"Extract notes:\n\n{transcript}"}],
-    )
-    for block in resp.content:
-        if block.type == "tool_use":
-            return MeetingNotes(**block.input)
-    raise RuntimeError("No tool_use block")
-
-
-if __name__ == "__main__":
-    notes = extract_meeting_notes("""
-        Alice: New pricing model starts Q3. Bob: I'll update the pricing page by June 15.
-        Carol: I'll brief legal by end of week. Alice: We dropped the free tier.
-    """)
-    print("Summary:", notes.summary)
-    print("Decisions:", notes.decisions)
-    for item in notes.action_items:
-        print(f"  [{item.owner}] {item.task} — due {item.due_date}")
+tool_use_block = next(b for b in resp.content if b.type == "tool_use")
+product = tool_use_block.input
+print(json.dumps(product, indent=2))
 ```
 
-## Comparaisons
+### Instructor avec Pydantic
 
-| Critère | Mode JSON | Appel de fonctions / Utilisation d'outils | Basé sur Pydantic (Instructor) |
-|---------|-----------|------------------------------------------|--------------------------------|
-| Application du schéma | Syntaxique uniquement (JSON valide, pas de schéma) | Structurel (champs, types, requis) | Structurel + sémantique (validateurs, contraintes de champs) |
-| Surface API | Paramètre `response_format` | Paramètres `tools` + `tool_choice` | Enveloppeur de bibliothèque sur les outils |
-| Type de sortie | Chaîne brute nécessitant `json.loads` | Dict analysé dans les arguments d'appel d'outil | Instance de modèle Pydantic typée |
-| Réessai en cas d'échec | Manuel — doit implémenter soi-même | Manuel | Automatique — la bibliothèque gère le réessai avec contexte d'erreur |
-| Schémas imbriqués | Possible mais sujet aux erreurs | Bien pris en charge via JSON Schema | Premier ordre via BaseModel imbriqué |
-| Idéal pour | Structures simples et plates ; prototypage rapide | Extraction de production et dispatch API typé | Schémas complexes avec besoins de validation au niveau Python |
+```python
+# Instructor library for ergonomic structured outputs
+# pip install instructor openai pydantic
+
+import os
+import instructor
+from openai import OpenAI
+from pydantic import BaseModel, Field
+
+client = instructor.from_openai(OpenAI(api_key=os.environ["OPENAI_API_KEY"]))
+
+
+class Person(BaseModel):
+    name: str
+    age: int = Field(ge=0, le=150)
+    occupation: str
+    city: str
+
+
+class PeopleList(BaseModel):
+    people: list[Person]
+
+
+text = (
+    "Dr. Sarah Chen, 34, is a neurologist based in Boston. "
+    "Her colleague James O'Brien, 41, is a radiologist in the same hospital."
+)
+
+result = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "user", "content": f"Extract all people from: {text}"},
+    ],
+    response_model=PeopleList,
+)
+
+for person in result.people:
+    print(f"{person.name}, {person.age}, {person.occupation}, {person.city}")
+```
 
 ## Ressources pratiques
 
-- [OpenAI — Guide des sorties structurées](https://platform.openai.com/docs/guides/structured-outputs) — Guide officiel couvrant le mode JSON, l'appel de fonctions et le mode strict avec décodage contraint.
-- [Anthropic — Documentation sur l'utilisation d'outils](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Référence complète pour définir les schémas d'outils et gérer les blocs tool_use dans les réponses Claude.
-- [Bibliothèque Instructor (jxnl/instructor)](https://github.com/jxnl/instructor) — La bibliothèque la plus largement utilisée pour l'extraction structurée Pydantic-first ; prend en charge OpenAI, Anthropic et d'autres backends.
-- [Documentation Pydantic](https://docs.pydantic.dev/) — Référence essentielle pour définir les schémas, validateurs et modèles imbriqués utilisés dans les pipelines d'extraction.
+- [Documentation OpenAI — Sorties structurées](https://platform.openai.com/docs/guides/structured-outputs) — Guide officiel pour le mode JSON, les sorties structurées basées sur le schéma et les appels de fonctions
+- [Documentation Anthropic — Utilisation d'outils](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Référence pour utiliser `tool_use` d'Anthropic pour extraire des sorties structurées avec des schémas
+- [Bibliothèque Instructor](https://python.useinstructor.com/) — Bibliothèque Python qui encapsule les SDK LLM populaires pour les sorties Pydantic ; inclut retries, streaming et correction d'erreurs
+- [Outlines](https://github.com/outlines-dev/outlines) — Génération de texte structurée via contraintes de FSM et guidage au niveau des logits ; supporte JSON, regex et grammaires personnalisées
+- [LangChain — Parseurs de sortie](https://python.langchain.com/docs/concepts/output_parsers/) — Abstraction pour analyser les sorties LLM en types Python, incluant les parseurs Pydantic, JSON et CSV
 
 ## Voir aussi
 
-- [Prompt engineering](/docs/prompt-engineering)
+- [Ingénierie des prompts](/docs/prompt-engineering)
+- [Nombre maximal de tokens et séquences d'arrêt](/docs/prompt-engineering/max-tokens-stop-sequences)
+- [Prompts système, de rôle et contextuels](/docs/prompt-engineering/system-role-contextual-prompting)
+- [Agents IA](/docs/agents)
 - [LLMs](/docs/llms)
-- [Agents](/docs/agents)

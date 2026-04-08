@@ -2,35 +2,37 @@
 title: Case study — Claude
 description: LLM da Anthropic que segue instruções com contexto longo e segurança.
 keywords: [Claude, Anthropic, constitutional AI, long context]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Case study: Claude
 
 ## Definição
 
-Claude is Anthropic’s família de modelos conversacionais [LLMs](/docs/llms). Os modelos são construídos para instruction-following, long context, and safety, using techniques such as constitutional AI and RLHF-style alignment.
+Claude é a família de [LLMs](/docs/llms) conversacionais da Anthropic. Os modelos são construídos para seguimento de instruções, contexto longo e segurança, usando técnicas como IA constitucional e alinhamento no estilo RLHF.
 
-They share the same broad stack as [ChatGPT](/docs/case-studies/chatgpt): pretrained base, ajuste de instruções, and preference-based alignment. Claude emphasizes long-context windows, [prompt engineering](/docs/prompt-engineering)-friendly behavior, and safety constraints. Use case: chat, long-document analysis, coding, and [agent](/docs/agents)-style workflows via API and products like [Claude Code](/docs/tools/claude-code).
+Eles compartilham a mesma pilha ampla que [ChatGPT](/docs/case-studies/chatgpt): base pré-treinada, ajuste de instruções e alinhamento baseado em preferências. Claude enfatiza janelas de contexto longo, comportamento amigável à [engenharia de prompts](/docs/prompt-engineering) e restrições de segurança. Caso de uso: chat, análise de documentos longos, programação e fluxos de trabalho no estilo [agente](/docs/agents) via API e produtos como [Claude Code](/docs/tools/claude-code).
 
 ## Como funciona
 
-Um **modelo base** ([transformer](/docs/transformers) apenas decodificador) é pré-treinado em grandes corpus de texto. **Ajuste de instruções**ing** trains the model on (instruction, response) pairs. **Constitutional AI** and **RLHF** (reward model + policy optimization) shape helpfulness, honesty, and refusals. O resultado é um model with long context support (por ex. 100K+ tokens), suitable for documents and extended conversations. **Safety and guardrails** (content policy, refusals) are applied in the product. [RAG](/docs/rag) and tools extend Claude for specific applications.
+Um **modelo base** ([transformer](/docs/transformers) apenas decodificador) é pré-treinado em grandes corpus de texto. O **ajuste de instruções** treina o modelo com pares (instrução, resposta). A **IA constitucional** e o **RLHF** (modelo de recompensa + otimização de política) moldam utilidade, honestidade e recusas. O resultado é um modelo com suporte a contexto longo (p. ex., mais de 100.000 tokens), adequado para documentos e conversas extensas. **Segurança e salvaguardas** (política de conteúdo, recusas) são aplicadas no produto. [RAG](/docs/rag) e ferramentas estendem o Claude para aplicações específicas.
 
 ## Casos de uso
 
-Claude fits applications that need long context, careful instruction-following, and strong safety defaults.
+Claude é adequado para aplicações que precisam de contexto longo, seguimento cuidadoso de instruções e padrões de segurança sólidos.
 
-- Long-document Q&A, summarization, and analysis
-- Coding assistance and code generation with large codebase context
-- Chat and task automation with explicit safety and refusal behavior
+- Perguntas e respostas, resumo e análise de documentos longos
+- Assistência de programação e geração de código com contexto de base de código grande
+- Chat e automação de tarefas com comportamento explícito de segurança e recusa
 
 ## Documentação externa
 
-- [Anthropic – Claude](https://www.anthropic.com/product) — Models and product
-- [Anthropic – Model documentation](https://docs.anthropic.com/) — API and guides
+- [Anthropic – Claude](https://www.anthropic.com/product) — Modelos e produto
+- [Anthropic – Model documentation](https://docs.anthropic.com/) — API e guias
 
 ## Veja também
 
 - [LLMs](/docs/llms)
-- [Prompt engineering](/docs/prompt-engineering)
+- [Engenharia de prompts](/docs/prompt-engineering)
 - [Claude Code](/docs/tools/claude-code)

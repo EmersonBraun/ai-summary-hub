@@ -1,242 +1,186 @@
 ---
-title: Prompt ensembling
-description: Une technique qui exécute plusieurs variations de prompts structurellement différentes sur le même LLM et agrège leurs sorties, échangeant le coût d'inférence contre une précision plus élevée et une variance plus faible que tout prompt unique ne peut atteindre.
-keywords: [prompt ensembling, ensemble de prompts, variation de prompt, agrégation, vote majoritaire, moyenne, fiabilité LLM, prompt engineering, self-consistency]
+title: Assemblage de prompts
+description: Comment l'assemblage de prompts agrège plusieurs réponses LLM pour améliorer la précision, réduire la variance et produire des sorties plus fiables.
+keywords: [prompt ensembling, ensemble methods, majority voting, LLM reliability, output aggregation]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
-# Prompt ensembling
+# Assemblage de prompts
 
 ## Définition
 
-Le prompt ensembling est une technique de prompting qui génère plusieurs formulations structurellement différentes de la même question ou tâche, les soumet toutes à un modèle de langage, puis combine les sorties résultantes en une seule réponse finale. L'intuition centrale est empruntée aux ensembles classiques de machine learning (bagging, boosting, stacking) : aucun prédicteur unique n'est parfait, mais un comité diversifié de prédicteurs imparfaits tend à être plus fiable que tout membre individuel, car leurs erreurs sont partiellement non corrélées et s'annulent donc dans l'agrégation.
+L'assemblage de prompts est la pratique d'exécuter plusieurs versions d'un prompt — variant la formulation, les exemples few-shot, les paramètres d'échantillonnage ou même les modèles sous-jacents — puis d'agréger leurs sorties pour produire une réponse finale plus fiable. Tout comme les méthodes d'ensemble dans l'apprentissage automatique traditionnel (forêts aléatoires, boosting) réduisent la variance en combinant des prédicteurs faibles, l'assemblage de prompts exploite la diversité des sorties LLM pour atténuer les erreurs systématiques, les biais de position et la variance d'échantillonnage.
 
-La distinction critique entre le prompt ensembling et la self-consistency est la source de diversité. Dans la self-consistency, vous exécutez le *même* prompt N fois à température > 0 et vous vous appuyez sur l'échantillonnage stochastique pour produire des chemins de raisonnement diversifiés. Dans le prompt ensembling, vous concevez délibérément des prompts *différents* — variant le cadrage, l'assignation de rôle, la formulation des instructions, les exemples few-shot ou le format de sortie — et exécutez chacun (typiquement à température 0 ou basse) pour produire des sorties diversifiées mais déterministes. La self-consistency exploite la variance introduite par l'échantillonnage ; le prompt ensembling exploite la variance introduite par la conception du prompt. En pratique, les deux approches sont complémentaires et peuvent être combinées.
+La stratégie d'agrégation la plus simple est le vote majoritaire : poser la même question de plusieurs manières et prendre la réponse la plus fréquente. Pour les tâches de génération de texte libre, des stratégies plus sophistiquées incluent la sélection du meilleur résultat par un modèle vérificateur, la fusion de réponses (demander à un LLM de synthétiser les N meilleures réponses en une seule) et la pondération basée sur la confiance (pondérer les réponses selon les probabilités log ou les scores de confiance auto-rapportés).
 
-Le prompt ensembling est particulièrement précieux dans deux scénarios. Premièrement, lorsque vous n'êtes pas certain de quelle formulation de prompt est optimale pour une tâche et ne pouvez pas évaluer les alternatives à grande échelle — exécuter plusieurs candidats et voter sur leurs sorties vous donne le bénéfice du meilleur prompt sans avoir à l'identifier à l'avance. Deuxièmement, lorsqu'une tâche est à enjeux élevés et que le mode de défaillance d'un seul prompt est inacceptable — un ensemble fournit une piste d'audit douce, car la dispersion des votes entre différentes réponses est un signal direct d'incertitude du modèle. Le coût principal est la latence et les tokens : K variantes de prompt nécessitent K appels d'inférence, qui peuvent être parallélisés mais pas éliminés.
+L'assemblage de prompts est étroitement lié à l'autocohérence (qui est un type d'ensemble pour les tâches de raisonnement) mais est plus général : il s'applique à la classification, à la QR factuelle, à la génération de résumés, à la traduction, à l'annotation de données et à n'importe quel scénario où vous pouvez définir une procédure d'agrégation et vous pouvez vous permettre d'exécuter le pipeline N fois.
 
-## Fonctionnement
+## Comment ça fonctionne
 
 ```mermaid
 flowchart TD
-  Input[Input question / task] -->|"variant 1: direct instruction"| P1[Prompt variant 1]
-  Input -->|"variant 2: role-play framing"| P2[Prompt variant 2]
-  Input -->|"variant 3: few-shot examples"| P3[Prompt variant 3]
-  Input -->|"variant K: chain-of-thought"| PK[Prompt variant K]
-  P1 -->|"LLM call → output"| O1[Output 1]
-  P2 -->|"LLM call → output"| O2[Output 2]
-  P3 -->|"LLM call → output"| O3[Output 3]
-  PK -->|"LLM call → output"| OK[Output K]
-  O1 -->|"extract answer"| Agg{Aggregation\nstrategy}
-  O2 -->|"extract answer"| Agg
-  O3 -->|"extract answer"| Agg
-  OK -->|"extract answer"| Agg
-  Agg -->|"majority vote / avg / meta-prompt"| Final[Final answer]
+  INPUT[Input query] --> P1[Prompt variant 1]
+  INPUT --> P2[Prompt variant 2]
+  INPUT --> PN[Prompt variant N]
+  P1 --> R1[Response 1]
+  P2 --> R2[Response 2]
+  PN --> RN[Response N]
+  R1 --> AGG{Aggregation strategy}
+  R2 --> AGG
+  RN --> AGG
+  AGG -->|majority vote| MV[Most frequent answer]
+  AGG -->|verifier model| VM[Best-of-N selection]
+  AGG -->|LLM fusion| FU[Synthesized response]
+  MV --> OUT[Final output]
+  VM --> OUT
+  FU --> OUT
 ```
 
-### Stratégies de variation de prompt
+### Variants de prompts
 
-La qualité d'un ensemble dépend fortement de la *diversité* des variantes de prompt. Si toutes les variantes sont superficiellement différentes mais structurellement identiques, l'ensemble dégénère vers un échantillonnage répété. Les stratégies de variation efficaces incluent :
+La diversité est le moteur de l'assemblage. Les types courants de variation incluent : reformulation des instructions (formelle vs. informelle, directe vs. guidée), différentes sélections d'exemples few-shot (ensembles différents ou aléatoires d'exemples), variation du rôle ou du persona dans le prompt système, différents paramètres de température ou d'ordre de génération, et différents modèles sous-jacents entièrement.
 
-**Variation de rôle et de persona.** Assigner différents personas d'expert (par ex., « Vous êtes un médecin prudent », « Vous êtes un data scientist », « Vous êtes un ingénieur pragmatique ») déplace le prior du modèle sur les réponses plausibles et active différents registres de connaissance. La variation de rôle est particulièrement efficace pour les tâches avec plusieurs cadrages valides.
+### Stratégies d'agrégation
 
-**Variation de formulation des instructions.** La même tâche peut être formulée comme une question (« Quel est le niveau de risque de... ? »), une commande (« Évaluez le niveau de risque de... »), ou une complétion (« Le niveau de risque de ... est »), et ces différences de surface modifient mesurably la distribution de sortie du modèle. Paraphraser l'instruction centrale est la forme de variation à moindre effort.
+**Vote majoritaire** : Compter les réponses distinctes et prendre la plus fréquente. Fonctionne bien pour la classification et les QR à réponse courte. Pour les réponses longues, vous devez d'abord normaliser ou résumer avant de voter.
 
-**Variation d'exemples few-shot.** Utiliser différents ensembles d'exemples en contexte change quelle partie de la connaissance du modèle le contexte few-shot active. La rotation à travers des ensembles d'exemples tirés de différents sous-domaines de la distribution d'entraînement augmente substantiellement la diversité de l'ensemble, en particulier pour les tâches de classification.
+**Meilleur de N (vérificateur)** : Générer N réponses candidates et utiliser un modèle séparé (ou le même modèle avec un prompt différent) pour les évaluer et sélectionner la meilleure. Plus coûteux mais plus précis qu'un vote aveugle lorsqu'un bon signal de vérification est disponible.
 
-**Variation chaîne de pensée vs réponse directe.** Inclure une ou plusieurs variantes CoT aux côtés de variantes à réponse directe combine les bénéfices de qualité de raisonnement du CoT avec les bénéfices de vitesse du prompting direct. Les variantes CoT reçoivent généralement plus de poids dans l'agrégation car elles sont plus fiables, mais les variantes directes peuvent l'emporter dans les cas où le CoT amène le modèle à sur-réfléchir des questions simples.
-
-**Variation du format de sortie.** Demander la réponse sous forme d'objet JSON, de liste numérotée, ou de phrase en texte libre peut susciter différents niveaux de précision. Les variantes de sortie structurée sont plus faciles à analyser et agréger programmatiquement.
-
-### Méthodes d'agrégation
-
-Une fois que vous avez K sorties, vous devez les réduire à une seule réponse. Le choix de la méthode d'agrégation doit correspondre au type de sortie :
-
-**Le vote majoritaire** fonctionne mieux pour les sorties discrètes (étiquettes de classification, réponses factuelles courtes, sélections à choix multiples). Il est robuste aux variantes adversariales ou confuses, ne nécessite pas d'appels de modèle supplémentaires, et imite directement le fonctionnement de la self-consistency. Les égalités peuvent être résolues par log-probabilité ou en déférant à une variante « de confiance » désignée.
-
-**La moyenne des scores** est appropriée quand chaque variante retourne un score numérique ou une probabilité plutôt qu'une étiquette. La moyenne est sensible aux valeurs aberrantes ; l'agrégation par médiane est plus robuste quand les variantes individuelles peuvent produire des valeurs extrêmes.
-
-**L'agrégation par méta-prompt (LLM-as-judge)** envoie toutes les K sorties à un second appel LLM instruit de synthétiser ou sélectionner la meilleure réponse. C'est la méthode la plus puissante mais la plus coûteuse, et elle introduit un second point de défaillance LLM. Elle est plus utile quand la tâche nécessite une génération ouverte (résumés, code, essais) où le vote majoritaire n'est pas applicable.
-
-**Le vote pondéré** assigne différents poids à différentes variantes basés sur leur précision historique sur un ensemble de validation retenu. Si vous avez des données étiquetées et pouvez mesurer quelles variantes performent le mieux, la pondération surpasse significativement le vote uniforme — mais elle nécessite un effort de calibration au préalable.
+**Fusion par LLM** : Fournir toutes les réponses N à un LLM et lui demander de les synthétiser en une seule réponse cohérente. Utile quand les réponses sont partiellement correctes et se complètent.
 
 ## Quand utiliser / Quand NE PAS utiliser
 
-| Utiliser quand | Éviter quand |
-|----------------|--------------|
-| Vous n'êtes pas certain de quelle formulation de prompt fonctionne le mieux et ne pouvez pas les évaluer individuellement à grande échelle | La latence est une contrainte forte — K appels parallèles ont encore la latence de l'appel le plus lent |
-| La tâche est à enjeux élevés et le mode de défaillance d'un seul prompt est inacceptable | Le budget de tokens est sévèrement limité et vous ne pouvez pas vous permettre K complétions |
-| Les sorties de différents cadrages de prompt fournissent des perspectives complémentaires (par ex., diagnostic médical depuis plusieurs angles de spécialistes) | Le modèle atteint déjà la précision plafond avec un seul prompt bien affiné — rendements décroissants |
-| Vous voulez un signal d'incertitude intégré (dispersion des votes = désaccord du modèle) | L'espace de sortie est continu ou ouvert d'une manière qui rend le vote ou la moyenne sans sens |
-| Vous construisez un pipeline de production où la sensibilité au prompt doit être amortie | Vous manquez de l'infrastructure d'ingénierie pour exécuter et agréger des appels LLM parallèles |
-
-## Comparaisons
-
-| Critère | Prompt ensembling | Self-consistency | Prompt unique |
-|---------|------------------|-----------------|---------------|
-| Source de diversité | Différentes conceptions de prompt | Échantillonnage stochastique d'un prompt | Aucune |
-| Nombre d'appels LLM | K (nombre de variantes, typiquement 3–10) | N (typiquement 10–40) | 1 |
-| Température | Basse (0–0.3) par variante | Haute (0.5–0.8) | Dépend de la tâche |
-| Amélioration de la précision | Haute pour les tâches sensibles à la formulation du prompt | Haute pour le raisonnement multi-étapes | Référence |
-| Nécessite un effort d'ingénierie de prompt | Oui — concevoir des variantes diversifiées | Non — un seul prompt nécessaire | Modéré |
-| Gère les sorties ouvertes | Oui, via l'agrégation par méta-prompt | Non — le vote majoritaire nécessite des réponses discrètes | Oui |
-| Meilleur cas d'utilisation | Tâches avec sensibilité au prompt ou plusieurs cadrages valides | Math, raisonnement symbolique, QA factuel | Tâches simples et bien définies avec un bon prompt connu |
+| Scénario | Assemblage recommandé | Éviter |
+|----------|-----------------------|--------|
+| Tâches de classification à enjeux élevés | Vote majoritaire sur \>= 5 variants | Réponse unique — la variance d'un seul essai dégrade les métriques |
+| QR factuelle avec ambiguïté connue | Meilleur de N avec vérificateur | Quand la précision ne peut pas être évaluée programmatiquement |
+| Génération de résumés | Fusion par LLM des meilleures N sorties | Contenu créatif — l'assemblage homogénéise le style |
+| Annotation de données pour l'entraînement | Vote majoritaire + filtre désaccord | Latence temps-réel critique — N appels = N× la latence |
+| Contraintes de coût strictes | Non recommandé | — |
 
 ## Exemples de code
 
-### Prompt ensembling avec plusieurs templates via OpenAI
+### Vote majoritaire sur des variants de prompts
 
 ```python
-# Prompt ensembling: run K prompt variants and aggregate by majority vote
+# Prompt ensembling with majority vote
 # pip install openai
 
-import os
-from collections import Counter
+import os, collections
 from openai import OpenAI
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-# Five structurally different prompt variants for the same classification task
+QUESTION = "What is the boiling point of water at sea level in Celsius?"
+
 PROMPT_VARIANTS = [
-    # 1. Direct instruction
-    "Is the following customer review positive, negative, or neutral? "
-    "Reply with exactly one word.\n\nReview: {review}",
-
-    # 2. Role-play framing
-    "You are a sentiment analysis expert. Classify the sentiment of the "
-    "review below as positive, negative, or neutral. Output only the label.\n\nReview: {review}",
-
-    # 3. Few-shot examples
-    "Review: 'The product broke in two days.' → negative\n"
-    "Review: 'Decent quality for the price.' → neutral\n"
-    "Review: 'Absolutely love it, will buy again!' → positive\n"
-    "Review: '{review}' →",
-
-    # 4. Chain-of-thought variant
-    "Analyze the sentiment of this review step by step, then state the "
-    "final label (positive / negative / neutral) on the last line.\n\nReview: {review}",
-
-    # 5. Completion framing
-    "The overall sentiment expressed in the review '{review}' is",
+    "Answer in one word or number: {question}",
+    "Give only the numeric answer: {question}",
+    "You are a science tutor. {question} Reply with just the number.",
+    "Fact: {question} Answer concisely.",
+    "In exactly one number, answer: {question}",
 ]
 
 
-def call_variant(prompt: str, model: str = "gpt-4o-mini") -> str:
-    """Call the LLM with a single prompt variant and return the raw response."""
+def ask(prompt_template: str, question: str) -> str:
+    prompt = prompt_template.format(question=question)
     resp = client.chat.completions.create(
-        model=model,
+        model="gpt-4o",
         messages=[{"role": "user", "content": prompt}],
-        temperature=0.0,
-        max_tokens=80,
+        temperature=0.3,
+        max_tokens=20,
     )
     return resp.choices[0].message.content.strip()
 
 
-def extract_label(text: str) -> str | None:
-    """Extract a sentiment label from raw model output."""
-    text_lower = text.lower()
-    for label in ("positive", "negative", "neutral"):
-        if label in text_lower:
-            return label
-    return None
-
-
-def ensemble_sentiment(review: str) -> dict:
-    """Run all prompt variants and aggregate by majority vote."""
-    raw_outputs, labels = [], []
-
-    for i, template in enumerate(PROMPT_VARIANTS):
-        prompt = template.format(review=review)
-        raw = call_variant(prompt)
-        label = extract_label(raw)
-        raw_outputs.append(raw)
-        if label:
-            labels.append(label)
-        print(f"  Variant {i + 1}: {label!r}  (raw: {raw[:60]!r})")
-
-    if not labels:
-        return {"answer": None, "votes": {}}
-
-    counts = Counter(labels)
-    winner, top_votes = counts.most_common(1)[0]
-    return {
-        "answer": winner,
-        "confidence": top_votes / len(labels),
-        "votes": dict(counts),
-        "raw_outputs": raw_outputs,
-    }
+def majority_vote(answers: list[str]) -> str:
+    # Normalize: extract first numeric token if present
+    normalized = []
+    for a in answers:
+        tokens = a.split()
+        num = next((t.strip("°C.") for t in tokens if t.strip("°C.").lstrip("-").isdigit()), a)
+        normalized.append(num)
+    counter = collections.Counter(normalized)
+    return counter.most_common(1)[0][0]
 
 
 if __name__ == "__main__":
-    review = (
-        "The delivery was fast but the item looks nothing like the photos. "
-        "I'm disappointed and won't order again."
-    )
-    result = ensemble_sentiment(review)
-    print(f"\nFinal answer : {result['answer']}")
-    print(f"Confidence   : {result['confidence']:.0%}")
-    print(f"Vote counts  : {result['votes']}")
+    answers = [ask(v, QUESTION) for v in PROMPT_VARIANTS]
+    for variant, ans in zip(PROMPT_VARIANTS, answers):
+        print(f"  [{ans:>5}]  {variant[:50]}")
+
+    final = majority_vote(answers)
+    print(f"\nEnsemble answer: {final}")   # expected: 100
 ```
 
-### Ensemble pondéré avec un ensemble de validation retenu
+### Meilleur de N avec un LLM vérificateur
 
 ```python
-# Weighted prompt ensembling: calibrate variant weights from a validation set
-# pip install openai scikit-learn
+# Best-of-N ensembling with a verifier
+# pip install anthropic
 
 import os
-from collections import defaultdict
-from openai import OpenAI
-from sklearn.metrics import accuracy_score
+import anthropic
 
-client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
-
-def evaluate_variant(template: str, examples: list[dict]) -> float:
-    """Return accuracy of a single prompt variant on a labeled dataset."""
-    preds = []
-    for ex in examples:
-        prompt = template.format(review=ex["text"])
-        raw = call_variant(prompt)   # reuse function from above
-        preds.append(extract_label(raw) or "neutral")
-    return accuracy_score([ex["label"] for ex in examples], preds)
+TASK = (
+    "Write a one-paragraph explanation of gradient descent "
+    "suitable for a high-school student."
+)
 
 
-def weighted_ensemble(review: str, templates: list[str], weights: list[float]) -> str:
-    """Aggregate variant outputs with per-variant weights."""
-    scores: dict[str, float] = defaultdict(float)
-    for template, weight in zip(templates, weights):
-        raw = call_variant(template.format(review=review))
-        label = extract_label(raw)
-        if label:
-            scores[label] += weight
-    return max(scores, key=scores.__getitem__) if scores else "neutral"
+def generate_candidates(task: str, n: int = 4) -> list[str]:
+    candidates = []
+    for _ in range(n):
+        resp = client.messages.create(
+            model="claude-opus-4-5",
+            max_tokens=200,
+            messages=[{"role": "user", "content": task}],
+            temperature=0.8,
+        )
+        candidates.append(resp.content[0].text.strip())
+    return candidates
+
+
+def select_best(task: str, candidates: list[str]) -> str:
+    numbered = "\n\n".join(f"[{i+1}] {c}" for i, c in enumerate(candidates))
+    verifier_prompt = (
+        f"Task: {task}\n\nCandidates:\n{numbered}\n\n"
+        "Which candidate best fulfills the task? "
+        "Reply with ONLY the number (e.g. '2')."
+    )
+    resp = client.messages.create(
+        model="claude-opus-4-5",
+        max_tokens=5,
+        messages=[{"role": "user", "content": verifier_prompt}],
+        temperature=0,
+    )
+    idx_str = resp.content[0].text.strip()
+    idx = int(idx_str) - 1
+    return candidates[idx]
 
 
 if __name__ == "__main__":
-    # Dummy validation set — replace with real labeled examples
-    val_set = [
-        {"text": "Great product!", "label": "positive"},
-        {"text": "Terrible quality.", "label": "negative"},
-        {"text": "It's okay I guess.", "label": "neutral"},
-    ]
-    # Calibrate weights (accuracy on val set)
-    weights = [evaluate_variant(t, val_set) for t in PROMPT_VARIANTS]
-    print("Variant weights:", [f"{w:.2f}" for w in weights])
-
-    review = "Arrived on time but packaging was damaged."
-    answer = weighted_ensemble(review, PROMPT_VARIANTS, weights)
-    print("Weighted ensemble answer:", answer)
+    candidates = generate_candidates(TASK, n=4)
+    best = select_best(TASK, candidates)
+    print("Selected best candidate:\n")
+    print(best)
 ```
 
 ## Ressources pratiques
 
-- [Diverse Demonstrations Improve In-context Compositional Generalization (Levy et al., 2022)](https://arxiv.org/abs/2212.06800) — Montre que des exemples few-shot diversifiés, la colonne vertébrale de la variation de prompt, améliorent significativement la généralisation par rapport aux démonstrations échantillonnées aléatoirement.
-- [Self-Consistency Improves Chain of Thought Reasoning in Language Models (Wang et al., 2022)](https://arxiv.org/abs/2203.11171) — Le parent le plus proche du prompt ensembling ; contexte essentiel pour comprendre l'agrégation sur plusieurs sorties LLM.
-- [Prompt Sensitivity and Prompt Ensembling for LLMs (Mizrahi et al., 2024)](https://arxiv.org/abs/2401.00595) — Étudie directement dans quelle mesure la précision des LLM varie selon les prompts paraphrasés et démontre que l'ensembling sur les paraphrases comble la majeure partie de l'écart.
-- [Universal Self-Consistency for Large Language Model Generation (Chen et al., 2023)](https://arxiv.org/abs/2311.17311) — Étend la self-consistency à la génération ouverte via l'agrégation par méta-prompt, comblant le fossé entre l'ensembling par vote majoritaire et les sorties en forme libre.
+- [Wang et al., 2022 — Self-Consistency improves Chain-of-Thought](https://arxiv.org/abs/2203.11171) — Introduit l'autocohérence comme une forme d'assemblage pour le raisonnement ; vote majoritaire sur des chemins de pensée diversifiés
+- [Cobbe et al., 2021 — Training Verifiers to Solve Math Word Problems](https://arxiv.org/abs/2110.14168) — Sélection meilleur de N guidée par un vérificateur appris ; montre comment les vérificateurs peuvent améliorer la sélection de l'assemblage
+- [Li et al., 2022 — Competition-Level Code Generation](https://arxiv.org/abs/2203.07814) — AlphaCode génère des centaines de milliers de programmes et filtre/cluster pour trouver les meilleurs — assemblage à l'extrême pour la génération de code
+- [Liang et al., 2022 — Holistic Evaluation of Language Models](https://arxiv.org/abs/2211.09110) — HELM fournit des benchmarks qui révèlent la variance entre les runs, motivant les approches d'assemblage
 
 ## Voir aussi
 
-- [Prompt engineering](/docs/prompt-engineering)
-- [Self-consistency](/docs/prompt-engineering/self-consistency)
-- [Automatic prompt engineering](/docs/prompt-engineering/automatic-prompt-engineering)
+- [Ingénierie des prompts](/docs/prompt-engineering)
+- [Autocohérence](/docs/prompt-engineering/self-consistency)
+- [Techniques de désensibilisation](/docs/prompt-engineering/debiasing-techniques)
+- [Auto-évaluation et calibration](/docs/prompt-engineering/self-evaluation-calibration)
+- [Ingénierie automatique des prompts](/docs/prompt-engineering/automatic-prompt-engineering)
+- [LLMs](/docs/llms)

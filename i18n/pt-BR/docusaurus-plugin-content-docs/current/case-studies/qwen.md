@@ -1,36 +1,38 @@
 ---
 title: Case study — Qwen
-description: Alibaba's LLM family; multilingual, coding, and long-context support.
+description: Família de LLMs da Alibaba; suporte multilíngue, de programação e de contexto longo.
 keywords: [Qwen, Alibaba, multilingual, coding, long context]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Case study: Qwen
 
 ## Definição
 
-Qwen is Alibaba’s família de [LLMs](/docs/llms). Os modelos são construídos para **multilingual** use (including Chinese and English), **coding** (Qwen-Coder), and **long context**, and are available as open weights and via API.
+Qwen é a família de [LLMs](/docs/llms) da Alibaba. Os modelos são construídos para uso **multilíngue** (incluindo chinês e inglês), **programação** (Qwen-Coder) e **contexto longo**, e estão disponíveis como pesos abertos e via API.
 
-Like [DeepSeek](/docs/case-studies/deepseek) and [Claude](/docs/case-studies/claude), Qwen uses pretraining, ajuste de instruções, and alignment; differentiation includes strong multilingual and coding variants and long-context support. Use case: chat, code assistance, [RAG](/docs/rag) over long documents, and [fine-tuning](/docs/llms/fine-tuning) for domain-specific applications.
+Assim como [DeepSeek](/docs/case-studies/deepseek) e [Claude](/docs/case-studies/claude), Qwen usa pré-treinamento, ajuste de instruções e alinhamento; a diferenciação inclui variantes multilíngues e de programação sólidas e suporte a contexto longo. Caso de uso: chat, assistência de código, [RAG](/docs/rag) sobre documentos longos e [ajuste fino](/docs/llms/fine-tuning) para aplicações específicas de domínio.
 
 ## Como funciona
 
-**Modelos base** são pré-treinados em grandes corpus multilíngues e de código. **Ajuste de instruções** e **alinhamento** (por ex. DPO, estilo RLHF) produzem modelos de chat and tool-use variants. **Specialized versions**: Qwen-Coder for code, Qwen-VL for vision-language. **Long context** is supported via extended context windows and optional [RAG](/docs/rag). Weights are published for [local inference](/docs/local-inference) and [fine-tuning](/docs/llms/fine-tuning); API access is also offered. [Prompt engineering](/docs/prompt-engineering) and [agents](/docs/agents) extend the system for applications.
+Os **modelos base** são pré-treinados em grandes corpus multilíngues e de código. O **ajuste de instruções** e o **alinhamento** (p. ex., DPO, estilo RLHF) produzem variantes de chat e uso de ferramentas. **Versões especializadas**: Qwen-Coder para código, Qwen-VL para visão-linguagem. O **contexto longo** é suportado via janelas de contexto estendidas e [RAG](/docs/rag) opcional. Os pesos são publicados para [inferência local](/docs/local-inference) e [ajuste fino](/docs/llms/fine-tuning); o acesso via API também é oferecido. [Engenharia de prompts](/docs/prompt-engineering) e [agentes](/docs/agents) estendem o sistema para aplicações.
 
 ## Casos de uso
 
-Qwen fits multilingual and coding applications and long-context workflows with open or API access.
+Qwen é adequado para aplicações multilíngues e de programação e fluxos de trabalho de contexto longo com acesso aberto ou via API.
 
-- Multilingual chat, translation, and content generation
-- Code generation and code-focused [agents](/docs/agents)
-- Long-document Q&A and [RAG](/docs/rag) with large context windows
+- Chat multilíngue, tradução e geração de conteúdo
+- Geração de código e [agentes](/docs/agents) focados em código
+- Perguntas e respostas em documentos longos e [RAG](/docs/rag) com grandes janelas de contexto
 
 ## Documentação externa
 
-- [Qwen – Official site](https://qwenlm.github.io/) — Models and docs
-- [Qwen – Hugging Face](https://huggingface.co/Qwen2) — Weights and model cards
+- [Qwen – Official site](https://qwenlm.github.io/) — Modelos e documentação
+- [Qwen – Hugging Face](https://huggingface.co/Qwen2) — Pesos e cartões de modelo
 
 ## Veja também
 
 - [LLMs](/docs/llms)
-- [Fine-tuning](/docs/llms/fine-tuning)
-- [Local inference](/docs/local-inference)
+- [Ajuste fino](/docs/llms/fine-tuning)
+- [Inferência local](/docs/local-inference)

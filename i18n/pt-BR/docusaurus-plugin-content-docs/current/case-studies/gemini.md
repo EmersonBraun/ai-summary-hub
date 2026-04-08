@@ -2,15 +2,17 @@
 title: Case study — Gemini
 description: Família de LLMs multimodais do Google com multimodalidade nativa e níveis de escala.
 keywords: [Gemini, Google, multimodal, VLM]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Case study: Gemini
 
 ## Definição
 
-Gemini is Google’s família de [LLMs](/docs/llms) with **native multimodal** support: text, image, audio, and video in one model. It succeeds earlier Google models (por ex. [BART](/docs/case-studies/bart) in the encoder-decoder line) and is offered in multiple scale tiers (Nano, Pro, Ultra) for different latency and capability trade-offs.
+Gemini é a família de [LLMs](/docs/llms) do Google com suporte **multimodal nativo**: texto, imagem, áudio e vídeo em um único modelo. Sucede modelos anteriores do Google (p. ex., [BART](/docs/case-studies/bart) na linha codificador-decodificador) e é oferecido em múltiplos níveis de escala (Nano, Pro, Ultra) para diferentes compensações de latência e capacidade.
 
-Gemini is trained and deployed across Google products (Search, Workspace, Vertex AI, Android). Use case: chat, [multimodal](/docs/multimodal-ai) understanding and generation, coding, and [agent](/docs/agents)-style tool use.
+Gemini é treinado e implantado nos produtos do Google (Search, Workspace, Vertex AI, Android). Caso de uso: chat, compreensão e geração [multimodal](/docs/multimodal-ai), programação e uso de ferramentas no estilo [agente](/docs/agents).
 
 ## Como funciona
 
@@ -23,23 +25,23 @@ flowchart LR
   Decoder --> Output[Output]
 ```
 
-**Entradas multimodais** (texto, imagem, áudio, vídeo) são codificadas e fundidas em um [transformer](/docs/transformers) unificadotack. The **decoder** generates text (or structured output) conditioned on all modalities. **Scale tiers**: smaller models (por ex. Nano) for [edge](/docs/edge-reasoning) and on-device; larger (Pro, Ultra) for maximum capability in the cloud. **Integration**: same models power Gemini in Search, Workspace, and Vertex AI APIs. [Prompt engineering](/docs/prompt-engineering) and [RAG](/docs/rag) or tools extend use in applications.
+As **entradas multimodais** (texto, imagem, áudio, vídeo) são codificadas e fundidas em uma pilha [transformer](/docs/transformers) unificada. O **decodificador** gera texto (ou saída estruturada) condicionado em todas as modalidades. **Níveis de escala**: modelos menores (p. ex., Nano) para [edge](/docs/edge-reasoning) e no dispositivo; maiores (Pro, Ultra) para máxima capacidade na nuvem. **Integração**: os mesmos modelos alimentam Gemini no Search, Workspace e nas APIs do Vertex AI. [Engenharia de prompts](/docs/prompt-engineering) e [RAG](/docs/rag) ou ferramentas estendem o uso em aplicações.
 
 ## Casos de uso
 
-Gemini fits when you need multimodal understanding or generation and optional integration with Google’s stack.
+Gemini é adequado quando se precisa de compreensão ou geração multimodal e integração opcional com a pilha do Google.
 
-- Chat and assistants with image, document, or video understanding
-- Multimodal search, summarization, and content generation
-- Coding and raciocínio via API or Google products
+- Chat e assistentes com compreensão de imagens, documentos ou vídeos
+- Pesquisa multimodal, resumo e geração de conteúdo
+- Programação e raciocínio via API ou produtos do Google
 
 ## Documentação externa
 
-- [Google AI – Gemini](https://ai.google.dev/gemini-api) — API and overview
-- [Google – Gemini models](https://deepmind.google/technologies/gemini/) — Model tiers and capabilities
+- [Google AI – Gemini](https://ai.google.dev/gemini-api) — API e visão geral
+- [Google – Gemini models](https://deepmind.google/technologies/gemini/) — Níveis do modelo e capacidades
 
 ## Veja também
 
 - [LLMs](/docs/llms)
-- [Multimodal AI](/docs/multimodal-ai)
-- [BART](/docs/case-studies/bart) — Predecessor in the encoder-decoder line
+- [IA multimodal](/docs/multimodal-ai)
+- [BART](/docs/case-studies/bart) — Predecessor na linha codificador-decodificador

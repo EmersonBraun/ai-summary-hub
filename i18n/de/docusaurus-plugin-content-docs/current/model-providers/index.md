@@ -1,24 +1,26 @@
 ---
-title: Modellanbieter
-description: Überblick über KI-Modellanbieter — API-basierte, Open-Weights- und hybride Ansätze.
-keywords: [Modellanbieter, OpenAI, Anthropic, Google, Meta, Mistral, Cohere, DeepSeek, API]
+title: Model providers
+description: Overview of AI model providers — API-based, open-weights, and hybrid approaches.
+keywords: [model providers, OpenAI, Anthropic, Google, Meta, Mistral, Cohere, DeepSeek, API]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Modellanbieter
 
 ## Definition
 
-Ein Modellanbieter ist eine Organisation, die Zugang zu großen Sprachmodellen bietet – entweder über gehostete APIs, herunterladbare offene Gewichte oder beides. Die Wahl des Anbieters beeinflusst die Fähigkeiten Ihrer Anwendung, die Kostenstruktur, den Datenschutz und die Flexibilität bei der Bereitstellung. Das Verständnis der Anbieterlandschaft ist eine Voraussetzung für jedes produktive KI-System.
+Ein Modellanbieter ist eine Organisation, die Zugang zu großen Sprachmodellen anbietet – entweder über gehostete APIs, herunterladbare offene Gewichte oder beides. Die Wahl des Anbieters beeinflusst die Fähigkeiten Ihrer Anwendung, die Kostenstruktur, die Datenschutzhaltung und die Flexibilität bei der Bereitstellung. Das Verständnis der Anbieterlandschaft ist eine Voraussetzung für jedes produktive KI-System.
 
 Der Markt gliedert sich in drei Kategorien. **API-basierte Anbieter** wie OpenAI, Anthropic und Google bieten Modelle ausschließlich über verwaltete APIs an – Sie senden Anfragen, sie kümmern sich um die Inferenzinfrastruktur. **Open-Weights-Anbieter** wie Meta und Mistral veröffentlichen Modellgewichte, die Sie herunterladen und auf Ihrer eigenen Hardware oder über Drittanbieter-Hosting betreiben können. **Hybride Anbieter** wie Mistral und DeepSeek bieten sowohl Open-Weights-Modelle als auch kommerziellen API-Zugang, was Entwicklern die Flexibilität gibt, je nach Bedarf zu wählen.
 
-Die Wahl eines Anbieters beinhaltet Kompromisse über mehrere Dimensionen hinweg: Modellqualität, Preis, Kontextfenstergröße, multimodale Fähigkeiten, Datenschutz, Unterstützung für Feinabstimmung und Reife des Ökosystems. Kein einzelner Anbieter dominiert in allen Kriterien, weshalb die meisten Produktionssysteme mehrere Optionen evaluieren und manchmal verschiedene Anbieter für unterschiedliche Aufgaben innerhalb derselben Anwendung nutzen.
+Die Wahl eines Anbieters beinhaltet Kompromisse über mehrere Dimensionen hinweg: Modellqualität, Preisgestaltung, Kontextfenstergröße, multimodale Fähigkeiten, Datenschutz, Unterstützung für Feinabstimmung und Reife des Ökosystems. Kein einzelner Anbieter dominiert in allen Kriterien, weshalb die meisten Produktionssysteme mehrere Optionen evaluieren und manchmal verschiedene Anbieter für unterschiedliche Aufgaben innerhalb derselben Anwendung nutzen.
 
 ## Funktionsweise
 
 ### API-basierte Anbieter
 
-API-Anbieter hosten Modelle auf ihrer Infrastruktur und stellen sie über REST-APIs bereit. Sie authentifizieren sich mit einem API-Schlüssel, senden eine Anfrage mit Ihrem Prompt und Konfigurationsparametern und erhalten eine Antwort. Der Anbieter kümmert sich um Skalierung, GPU-Zuweisung, Modell-Updates und Verfügbarkeit. Dies ist der einfachste Weg zur Produktion – keine Infrastruktur zu verwalten – aber Sie senden Ihre Daten an Dritte und zahlen pro Token.
+API-Anbieter hosten Modelle auf ihrer eigenen Infrastruktur und machen sie über REST-APIs zugänglich. Sie authentifizieren sich mit einem API-Schlüssel, senden eine Anfrage mit Ihrem Prompt und Konfigurationsparametern und erhalten eine Antwort. Der Anbieter übernimmt Skalierung, GPU-Zuweisung, Modell-Updates und Betriebszeit. Dies ist der einfachste Weg in die Produktion – keine Infrastruktur zu verwalten – aber Sie senden Ihre Daten an einen Dritten und bezahlen pro Token.
 
 ```mermaid
 flowchart LR
@@ -31,7 +33,7 @@ flowchart LR
 
 ### Open-Weights-Anbieter
 
-Open-Weights-Anbieter veröffentlichen Modelldateien (typischerweise auf Hugging Face), die Sie herunterladen und lokal oder auf Ihrer Cloud-Infrastruktur betreiben. Sie kontrollieren den gesamten Stack: Hardware-Auswahl, Quantisierung, Serving-Framework (vLLM, TGI, llama.cpp) und Skalierung. Dies bietet maximale Privatsphäre und Anpassungsmöglichkeiten, erfordert aber ML-Infrastruktur-Expertise. Drittanbieter-Inferenzanbieter (Together AI, Groq, Fireworks) bieten einen Mittelweg – sie hosten offene Modelle mit einer API-Schnittstelle.
+Open-Weights-Anbieter veröffentlichen Modelldateien (typischerweise auf Hugging Face), die Sie herunterladen und lokal oder auf Ihrer Cloud-Infrastruktur betreiben können. Sie kontrollieren den gesamten Stack: Hardwareauswahl, Quantisierung, Serving-Framework (vLLM, TGI, llama.cpp) und Skalierung. Dies bietet maximale Privatsphäre und Anpassungsmöglichkeiten, erfordert aber ML-Infrastruktur-Expertise. Drittanbieter-Inferenzanbieter (Together AI, Groq, Fireworks) bieten einen Mittelweg – sie hosten offene Modelle mit einer API-Schnittstelle.
 
 ```mermaid
 flowchart LR
@@ -45,32 +47,32 @@ flowchart LR
 
 ### Anbieter auswählen
 
-Der Entscheidungsbaum hängt von Ihren Einschränkungen ab. Beginnen Sie mit Ihren Anforderungen – Datenschutz, Budget, Latenz, Modellqualität – und grenzen Sie von dort aus ein. Viele Teams beginnen mit API-Anbietern für Prototypen und evaluieren Open-Weights-Alternativen für die Produktionskostenoptimierung oder Anforderungen an die Datensouveränität.
+Der Entscheidungsbaum hängt von Ihren Einschränkungen ab. Beginnen Sie mit Ihren Anforderungen – Datenschutz, Budget, Latenz, Modellqualität – und schränken Sie von dort ein. Viele Teams beginnen mit API-Anbietern für Prototypen und evaluieren Open-Weights-Alternativen für die Kostenoptimierung in der Produktion oder Anforderungen an die Datensouveränität.
 
 ## Wann verwenden / Wann NICHT verwenden
 
 | Verwenden wenn | Vermeiden wenn |
-|----------|------------|
-| **API-Anbieter**: schnelles Prototyping, kein ML-Infra-Team, sofort Zugang zu modernsten Modellen benötigt | Daten dürfen Ihre Infrastruktur nicht verlassen (regulierte Branchen, personenbezogene Daten) |
-| **Open-Weights**: Datenschutzanforderungen, Kontrolle über Feinabstimmung, Kostenoptimierung bei hohem Volumen | Ihnen fehlt GPU-Infrastruktur und ML-Ops-Expertise |
-| **Drittanbieter-gehostete offene Modelle**: Open-Model-Flexibilität ohne Infrastrukturverwaltung | Sie benötigen garantierte SLAs und Enterprise-Support (verwenden Sie erstklassige APIs) |
+|----------------|----------------|
+| **API-Anbieter**: schnelles Prototyping, kein ML-Infra-Team, sofortiger Zugang zu modernsten Modellen benötigt | Daten können Ihre Infrastruktur nicht verlassen (regulierte Branchen, personenbezogene Daten) |
+| **Open-Weights**: Datenschutzanforderungen, Kontrolle über Feinabstimmung benötigt, Kostenoptimierung bei hohem Volumen | Fehlende GPU-Infrastruktur und ML-Ops-Expertise |
+| **Drittanbieter-gehostete offene Modelle**: Open-Model-Flexibilität ohne Infrastrukturverwaltung | Garantierte SLAs und Enterprise-Support benötigt (Erstanbieter-APIs verwenden) |
 | **Mehrere Anbieter**: verschiedene Aufgaben haben unterschiedliche Qualitäts-/Kostenanforderungen | Ihr Anwendungsfall ist einfach genug, dass ein Anbieter alles abdeckt |
 
 ## Vergleiche
 
 | Kriterium | OpenAI | Anthropic | Google Gemini | Meta Llama | Mistral | Cohere | DeepSeek |
-|----------|--------|-----------|---------------|------------|---------|--------|----------|
+|-----------|--------|-----------|---------------|------------|---------|--------|----------|
 | Modellzugang | Nur API | Nur API | API + Vertex AI | Offene Gewichte | Offen + API | Nur API | Offen + API |
-| Oberste Modellstufe | GPT-4o, o3 | Claude Opus/Sonnet | Gemini Ultra/Pro | Llama 3.1 405B | Mistral Large | Command R+ | DeepSeek-V3 |
+| Spitzenmodell | GPT-4o, o3 | Claude Opus/Sonnet | Gemini Ultra/Pro | Llama 3.1 405B | Mistral Large | Command R+ | DeepSeek-V3 |
 | Kontextfenster | 128K | 200K | 1M+ | 128K | 128K | 128K | 128K |
 | Multimodal | Vision, Audio, Bildgenerierung | Vision | Vision, Audio, Video | Vision (3.2) | Vision | Textfokussiert | Textfokussiert |
-| Stärke | Allgemein, Ökosystem | Sicherheit, langer Kontext | Multimodal, Suchverankerung | Offene Gewichte, Anpassung | Effizienz, mehrsprachig | Einbettungen, RAG, Reranking | Schlussfolgern, Kosteneffizienz |
-| Feinabstimmung | API-Feinabstimmung | Nicht verfügbar | Vertex AI-Abstimmung | Voller Gewichtszugang | API-Feinabstimmung | Nicht verfügbar | Voller Gewichtszugang |
+| Spezialgebiet | Allgemein, Ökosystem | Sicherheit, langer Kontext | Multimodal, Suchverankerung | Offene Gewichte, Anpassung | Effizienz, mehrsprachig | Einbettungen, RAG, Reranking | Reasoning, Kosteneffizienz |
+| Feinabstimmung | API-Feinabstimmung | Nicht verfügbar | Vertex AI-Feinabstimmung | Vollständiger Gewichtszugang | API-Feinabstimmung | Nicht verfügbar | Vollständiger Gewichtszugang |
 | Preismodell | Pro Token | Pro Token | Pro Token + kostenlose Stufe | Kostenlos (selbst gehostet) oder Drittanbieter | Pro Token + kostenlose Modelle | Pro Token | Pro Token (sehr niedrige Kosten) |
 
 ## Codebeispiele
 
-### Nebeneinander API-Aufrufe (Python)
+### Nebeneinander-API-Aufrufe (Python)
 
 ```python
 # OpenAI
@@ -129,7 +131,7 @@ for name, model in providers.items():
 ## Praktische Ressourcen
 
 - [Artificial Analysis](https://artificialanalysis.ai/) — Unabhängige LLM-Benchmarks und Preisvergleich
-- [LiteLLM](https://docs.litellm.ai/) — Einheitliche API für über 100 LLM-Anbieter
+- [LiteLLM](https://docs.litellm.ai/) — Einheitliche API für 100+ LLM-Anbieter
 - [OpenRouter](https://openrouter.ai/) — Einzelnes API-Gateway zu mehreren Anbietern
 - [Hugging Face Open LLM Leaderboard](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard) — Benchmarks für offene Modelle
 - [LMSYS Chatbot Arena](https://chat.lmsys.org/) — Crowdsourced LLM-Rankings durch blinde menschliche Bewertung
@@ -144,5 +146,5 @@ for name, model in providers.items():
 - [Cohere](/docs/model-providers/cohere)
 - [DeepSeek](/docs/model-providers/deepseek)
 - [LLMs](/docs/llms)
-- [Infrastruktur](/docs/infrastructure)
-- [Lokale Inferenz](/docs/local-inference)
+- [Infrastructure](/docs/infrastructure)
+- [Local inference](/docs/local-inference)

@@ -1,42 +1,44 @@
 ---
 title: Poda (Pruning)
-description: Removing weights or structures to shrink models.
-keywords: [pruning, sparsity, structured pruning]
+description: Eliminación de pesos o estructuras para reducir los modelos.
+keywords: [poda, dispersidad, poda estructurada]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Poda (Pruning)
 
 ## Definición
 
-La poda elimina pesos redundantes o de bajo impacto (or neurons/heads) from a model. Unstructured pruning drops individual weights; structured pruning removes entire channels or layers for efficient execution.
+La poda elimina pesos redundantes o de bajo impacto (o neuronas/cabezas) de un modelo. La poda no estructurada elimina pesos individuales; la poda estructurada elimina canales o capas completos para una ejecución eficiente.
 
-Es part of [model compression](/docs/model-compression); often used with [quantization](/docs/quantization) or [knowledge distillation](/docs/knowledge-distillation) for smaller, faster models. Unstructured pruning saves parameters but may not speed up much on standard hardware; structured pruning (por ej. channels) yields real speedups.
+Es parte de la [compresión de modelos](/docs/model-compression); a menudo se usa con [cuantización](/docs/quantization) o [destilación de conocimiento](/docs/knowledge-distillation) para modelos más pequeños y rápidos. La poda no estructurada ahorra parámetros pero puede no acelerar mucho en hardware estándar; la poda estructurada (como canales) produce aceleraciones reales.
 
 ## Cómo funciona
 
 ```mermaid
 flowchart LR
-  Model[Model] --> Score[Score weights]
-  Score --> Prune[Prune]
-  Prune --> FineTune[Fine-tune]
+  Model[Modelo] --> Score[Puntuar pesos]
+  Score --> Prune[Podar]
+  Prune --> FineTune[Ajustar finamente]
 ```
 
-Start from a trained **model**. **Score** weights (or channels/heads) by importance (por ej. magnitude, gradient, or learned mask). **Prune**: zero out or remove the lowest-scoring parameters (unstructured) or entire channels/layers (structured). **Fine-tune** the pruned model to recover accuracy. Pruning can be one-shot (after training) or iterative (train → prune → fine-tune, repeat). Sparsity is often enforced with L1 or other regularizers during training so the model adapts to pruning. The final model has fewer non-zero weights and, with structured pruning, faster inference.
+Comience desde un **modelo** entrenado. **Puntúe** los pesos (o canales/cabezas) por importancia (como magnitud, gradiente o máscara aprendida). **Pode**: ponga a cero o elimine los parámetros con menor puntuación (no estructurado) o canales/capas completos (estructurado). **Ajuste finamente** el modelo podado para recuperar la precisión. La poda puede ser de una sola pasada (después del entrenamiento) o iterativa (entrenar → podar → ajustar finamente, repetir). La dispersidad a menudo se aplica con regularizadores L1 u otros durante el entrenamiento para que el modelo se adapte a la poda. El modelo final tiene menos pesos distintos de cero y, con la poda estructurada, inferencia más rápida.
 
 ## Casos de uso
 
-Pruning helps when you want a smaller or faster model by removing low-importance weights or structures.
+La poda ayuda cuando se desea un modelo más pequeño o rápido eliminando pesos o estructuras de baja importancia.
 
-- Shrinking models for edge or mobile deployment
-- Reducing compute and memory with structured pruning (por ej. channels)
-- Combining with quantization for smaller, faster models
+- Reducir modelos para el despliegue en el borde o móvil
+- Reducir el cómputo y la memoria con poda estructurada (como canales)
+- Combinar con cuantización para modelos más pequeños y rápidos
 
-## Documentación externa
+## Recursos prácticos
 
-- [TensorFlow – Pruning](https://www.tensorflow.org/model_optimization/guide/pruning)
-- [PyTorch – Pruning tutorial](https://pytorch.org/tutorials/intermediate/pruning_tutorial.html)
+- [TensorFlow – Poda](https://www.tensorflow.org/model_optimization/guide/pruning)
+- [PyTorch – Tutorial de poda](https://pytorch.org/tutorials/intermediate/pruning_tutorial.html)
 
 ## Ver también
 
-- [Model compression](/docs/model-compression)
-- [Knowledge distillation](/docs/knowledge-distillation)
+- [Compresión de modelos](/docs/model-compression)
+- [Destilación de conocimiento](/docs/knowledge-distillation)

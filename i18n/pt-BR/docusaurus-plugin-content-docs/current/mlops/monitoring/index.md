@@ -1,40 +1,42 @@
 ---
 title: Monitoramento de ML
 description: Guia abrangente para monitorar modelos de aprendizado de máquina em produção, cobrindo concept drift, data drift, degradação de modelos, métricas, estratégias de alertas e ferramentas.
-keywords: [monitoramento de ML, concept drift, data drift, degradação de modelos, Evidently AI, WhyLabs, alertas, ML em produção]
+keywords: [monitoramento de ML, concept drift, data drift, degradação de modelo, Evidently AI, WhyLabs, alertas, ML em produção]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Monitoramento de ML
 
 ## Definição
 
-O monitoramento de ML é a prática de observar continuamente modelos de aprendizado de máquina e os dados que eles operam após a implantação. Ao contrário do software tradicional, que ou funciona ou lança um erro, um modelo pode se degradar silenciosamente: ele ainda produz saídas, mas essas saídas ficam cada vez mais erradas à medida que o mundo muda. O monitoramento de ML fornece os sistemas de alerta precoce que detectam essa degradação antes que cause danos ao negócio.
+O monitoramento de ML é a prática de observar continuamente modelos de machine learning e os dados em que eles operam após a implantação. Ao contrário do software tradicional, que ou funciona ou gera um erro, um modelo pode degradar silenciosamente: ainda produz saídas, mas essas saídas ficam cada vez mais erradas à medida que o mundo muda. O monitoramento de ML fornece os sistemas de alerta precoce que detectam essa degradação antes que cause danos ao negócio.
 
-Três fenômenos impulsionam a maior parte da degradação de modelos em produção. **Concept drift** ocorre quando a relação estatística entre as features de entrada e a variável alvo muda — por exemplo, um modelo de detecção de fraude treinado antes de um novo vetor de ataque aparecer sistematicamente perderá o novo padrão. **Data drift** (também chamado de covariate shift) ocorre quando a distribuição das features de entrada muda sem uma mudança correspondente na relação alvo — padrões sazonais, mudanças demográficas e mudanças no pipeline de dados upstream causam data drift. **Degradação de modelos** é a perda cumulativa de desempenho que resulta de um ou ambos os desvios; se não tratada, manifesta-se como taxas de erro crescentes, receita decrescente e experiências de usuário degradadas.
+Três fenômenos impulsionam a maior parte da degradação de modelos em produção. O **concept drift** ocorre quando a relação estatística entre as features de entrada e a variável alvo muda — por exemplo, um modelo de detecção de fraude treinado antes de um novo vetor de ataque aparecer sistematicamente perderá o novo padrão. O **data drift** (também chamado de mudança de covariável) ocorre quando a distribuição das features de entrada muda sem uma mudança correspondente na relação alvo — padrões sazonais, mudanças demográficas e alterações de pipelines de dados upstream causam data drift. A **degradação do modelo** é a perda de desempenho cumulativa que resulta de um ou ambos esses drifts; se não for verificada, manifesta-se como taxas de erro crescentes, queda de receita e experiências de usuário degradadas.
 
-O monitoramento eficaz de ML abrange três camadas: **monitoramento de qualidade de dados** (esquema, taxas de nulos, intervalos de valores), **monitoramento de distribuição** (testes estatísticos para desvio em features e predições) e **monitoramento de desempenho de modelos** (métricas de negócios e de ML calculadas contra a verdade fundamental quando os rótulos estão disponíveis). A combinação de todas as três camadas fornece defesa em profundidade — detectando problemas cedo, em sua fonte e em seu efeito downstream.
+O monitoramento eficaz de ML abrange três camadas: **monitoramento de qualidade de dados** (esquema, taxas de nulos, faixas de valores), **monitoramento de distribuição** (testes estatísticos para drift em features e previsões) e **monitoramento de desempenho do modelo** (métricas de negócios e ML calculadas contra verdade fundamental quando os rótulos estão disponíveis). A combinação das três camadas fornece defesa em profundidade — detectando problemas cedo, em sua origem e em seu efeito downstream.
 
 ## Como funciona
 
-### Coleta de dados e predições
+### Coleta de dados e previsões
 
-Cada requisição de predição passa por uma camada de servição instrumentada que registra entradas, saídas, timestamps e metadados em um armazenamento centralizado (armazenamento de objetos, um data warehouse ou uma plataforma de streaming como Kafka). Datasets de referência — tipicamente o dataset de treinamento ou validação — são armazenados junto com os logs de produção para servir como linha de base estatística para cálculos de desvio. Pipelines de rótulos ingerem a verdade fundamental atrasada (os rótulos frequentemente chegam horas ou semanas após a predição) e os unem de volta às predições registradas.
+Cada solicitação de previsão passa por uma camada de serviço instrumentada que registra entradas, saídas, timestamps e metadados em um armazenamento centralizado (armazenamento de objetos, um data warehouse ou uma plataforma de streaming como Kafka). Conjuntos de dados de referência — tipicamente o conjunto de dados de treinamento ou validação — são armazenados ao lado dos logs de produção para servir como linha de base estatística para cálculos de drift. Pipelines de rótulos ingerem verdade fundamental com atraso (os rótulos frequentemente chegam horas ou semanas após a previsão) e os juntam de volta às previsões registradas.
 
-### Detecção de desvio
+### Detecção de drift
 
-Os detectores de desvio comparam a distribuição de produção atual com a linha de base de referência usando testes estatísticos. Para features contínuas, o Population Stability Index (PSI), o teste Kolmogorov-Smirnov ou a distância de Wasserstein medem a mudança distribucional. Para features categóricas, testes qui-quadrado ou divergência Jensen-Shannon são comuns. As predições em si são tratadas como uma feature: uma mudança na distribuição de predições (por exemplo, um classificador de repente emitindo "positivo" 80% do tempo quando a linha de base era 30%) é um poderoso sinal precoce antes que os rótulos de verdade fundamental cheguem.
+Os detectores de drift comparam a distribuição de produção atual contra a linha de base de referência usando testes estatísticos. Para features contínuas, o Índice de Estabilidade da População (PSI), o teste de Kolmogorov-Smirnov ou a distância de Wasserstein medem mudanças de distribuição. Para features categóricas, testes qui-quadrado ou divergência de Jensen-Shannon são comuns. As próprias previsões são tratadas como uma feature: uma mudança na distribuição de previsões (por exemplo, um classificador subitamente gerando "positivo" 80% do tempo quando a linha de base era 30%) é um sinal precoce poderoso antes que os rótulos de verdade fundamental cheguem.
 
 ### Computação de métricas de desempenho
 
-Quando os rótulos de verdade fundamental estão disponíveis, as métricas de desempenho são calculadas em janelas deslizantes ou coortes baseadas em tempo. Acurácia, precisão, recall, F1, RMSE e AUC-ROC são métricas comuns de ML. Métricas de negócios — receita atribuída a decisões orientadas por modelos, taxa de deflexão de chamadas, taxa de cliques em recomendações — são frequentemente mais acionáveis. Latência, throughput e taxas de erro são métricas de infraestrutura que indicam a saúde da servição e devem ser monitoradas junto com a qualidade do modelo.
+Quando os rótulos de verdade fundamental estão disponíveis, as métricas de desempenho são calculadas sobre janelas deslizantes ou coortes baseadas em tempo. Acurácia, precisão, recall, F1, RMSE e AUC-ROC são métricas de ML comuns. As métricas de negócios — receita atribuída a decisões impulsionadas pelo modelo, taxa de deflexão de chamadas, taxa de cliques em recomendações — frequentemente são mais acionáveis. Latência, throughput e taxas de erro são métricas de infraestrutura que indicam a saúde do serviço e devem ser monitoradas junto com a qualidade do modelo.
 
 ### Alertas e escalonamento
 
-Limiares e regras de detecção de anomalias disparam alertas quando uma métrica cruza um limite. Limiares estáticos são simples, mas frágeis; controle estatístico de processos (por exemplo, gráficos de controle) e detecção de anomalias baseada em ML se adaptam à sazonalidade. Os alertas roteiam para PagerDuty, Slack ou e-mail dependendo da severidade. Hierarquias de alertas bem projetadas distinguem entre eventos informativos (apenas registrar), avisos (notificar a equipe de ML) e eventos críticos (chamar plantão, acionar rollback automatizado ou re-treinamento).
+Limiares e regras de detecção de anomalias disparam alertas quando uma métrica cruza um limite. Limiares estáticos são simples, mas frágeis; controle estatístico de processos (por exemplo, gráficos de controle) e detecção de anomalias baseada em ML se adaptam à sazonalidade. Os alertas são roteados para PagerDuty, Slack ou email dependendo da gravidade. Hierarquias de alerta bem projetadas distinguem entre eventos informativos (apenas log), avisos (notificar a equipe de ML) e eventos críticos (acionar plantão, desencadear rollback automático ou retreinamento).
 
-### Loop de feedback de re-treinamento
+### Loop de feedback de retreinamento
 
-O monitoramento é a entrada para o loop de re-treinamento. Quando o desvio é detectado ou o desempenho degrada abaixo de um limiar, um pipeline automatizado (ou decisão humana) aciona um job de re-treinamento com dados frescos. Após o re-treinamento, o novo candidato a modelo passa por gates de avaliação antes da promoção, fechando o loop.
+O monitoramento é a entrada para o loop de retreinamento. Quando o drift é detectado ou o desempenho se degrada além de um limiar, um pipeline automatizado (ou decisão humana) aciona um trabalho de retreinamento em dados frescos. Após o retreinamento, o novo candidato a modelo passa por portais de avaliação antes da promoção, fechando o loop.
 
 ```mermaid
 flowchart LR
@@ -49,33 +51,33 @@ flowchart LR
 ## Quando usar / Quando NÃO usar
 
 | Usar quando | Evitar quando |
-|-------------|---------------|
-| Um modelo está implantado em produção e serve usuários reais | O modelo é uma análise pontual que nunca será usada novamente |
-| As decisões do modelo têm impacto mensurável nos negócios | O volume de predições é tão baixo que os testes estatísticos carecem de poder |
-| Os rótulos de verdade fundamental estão eventualmente disponíveis | Você não tem mecanismo de feedback para coletar rótulos ou resultados de negócios |
-| Os requisitos regulatórios exigem desempenho de modelos auditável | O custo das ferramentas de monitoramento excede o valor esperado do modelo implantado |
-| O processo de geração de dados é conhecido por mudar ao longo do tempo | O modelo é re-treinado continuamente de qualquer forma e o desvio é implicitamente tratado |
-| Múltiplos modelos estão em produção simultaneamente | Um humano revisa cada predição individualmente, tornando o monitoramento automatizado redundante |
+|----------|------------|
+| Um modelo é implantado em produção e serve usuários reais | O modelo é uma análise pontual que nunca será usada novamente |
+| As decisões do modelo têm impacto comercial mensurável | O volume de previsões é tão baixo que os testes estatísticos carecem de poder |
+| Os rótulos de verdade fundamental ficam eventualmente disponíveis | Você não tem mecanismo de feedback para coletar rótulos ou resultados de negócios |
+| Os requisitos regulatórios exigem desempenho de modelo auditável | O custo das ferramentas de monitoramento supera o valor esperado do modelo implantado |
+| O processo de geração de dados é conhecido por mudar ao longo do tempo | O modelo é retreinado continuamente de qualquer forma e o drift é implicitamente tratado |
+| Múltiplos modelos estão em produção simultaneamente | Um humano revisa cada previsão individualmente, tornando o monitoramento automatizado redundante |
 
 ## Comparações
 
-| Ferramenta | Foco principal | Detecção de desvio | Rastreamento de desempenho | Hospedagem |
-|------------|---------------|---------------------|---------------------------|------------|
-| Evidently AI | Relatórios de qualidade de dados e modelos | Sim (30+ testes) | Sim | Self-hosted / Cloud |
+| Ferramenta | Foco principal | Detecção de drift | Rastreamento de desempenho | Hospedagem |
+|------|--------------|-----------------|---------------------|---------|
+| Evidently AI | Relatórios de qualidade de dados e modelos | Sim (30+ testes) | Sim | Auto-hospedado / Nuvem |
 | WhyLabs | Observabilidade de LLM e ML | Sim (estatístico) | Sim | SaaS |
 | Arize AI | Plataforma de observabilidade de ML | Sim | Sim | SaaS |
-| Dashboards personalizados | Totalmente personalizado | Implementação manual | Implementação manual | Self-hosted |
-| MLflow | Rastreamento de experimentos + monitoramento básico | Limitado | Sim (offline) | Self-hosted / Cloud |
+| Dashboards customizados | Totalmente personalizado | Implementação manual | Implementação manual | Auto-hospedado |
+| MLflow | Rastreamento de experimentos + monitoramento básico | Limitado | Sim (offline) | Auto-hospedado / Nuvem |
 
-## Prós e contras
+## Vantagens e desvantagens
 
-| Aspecto | Prós | Contras |
-|---------|------|---------|
-| Detecção de concept drift | Detecta degradação do modelo antes do impacto nos negócios | Requer rótulos de verdade fundamental, que chegam com atraso |
-| Detecção de data drift | Funciona sem rótulos — detecta problemas cedo | Pode produzir falsos positivos em mudanças distribucionais benignas |
+| Aspecto | Vantagens | Desvantagens |
+|--------|------|------|
+| Detecção de concept drift | Detecta a degradação do modelo antes do impacto comercial | Requer rótulos de verdade fundamental, que chegam com atraso |
+| Detecção de data drift | Funciona sem rótulos — detecta problemas cedo | Pode produzir falsos positivos em mudanças de distribuição benignas |
 | Alertas automatizados | Reduz o tempo de detecção de semanas para minutos | Limiares mal ajustados causam fadiga de alertas |
-| Ecossistema de ferramentas | Opções ricas de open-source e SaaS | Adiciona complexidade de infraestrutura e carga de manutenção |
-| Gatilhos de re-treinamento | Fecha o loop automaticamente | Risco de instabilidade no treinamento se o re-treinamento for acionado com muita frequência |
+| Ecossistema de ferramentas | Ricas opções open source e SaaS | Adiciona complexidade de infraestrutura e carga de manutenção |
+| Gatilhos de retreinamento | Fecha o loop automaticamente | Risco de instabilidade de treinamento se o retreinamento disparar com muita frequência |
 
 ## Exemplos de código
 
@@ -168,14 +170,14 @@ else:
 
 ## Recursos práticos
 
-- [Evidently AI documentation](https://docs.evidentlyai.com/) — Documentação oficial da principal biblioteca de monitoramento de ML open-source, cobrindo testes de desvio, relatórios e monitoramento em tempo real.
-- [WhyLabs ML observability platform](https://whylabs.ai/docs) — Documentação da plataforma SaaS para monitoramento de modelos LLM e ML com perfilamento estatístico e alertas.
-- [Chip Huyen — Monitoring ML models in production](https://huyenchip.com/2022/02/07/data-distribution-shifts-and-monitoring.html) — Post de blog detalhado cobrindo mudanças de distribuição de dados, estratégias de monitoramento e trade-offs práticos.
-- [Google — Rules of Machine Learning: monitoring section](https://developers.google.com/machine-learning/guides/rules-of-ml#monitoring) — Orientação de engenharia do Google sobre o que monitorar e como configurar alertas para ML em produção.
-- [Arize AI — ML observability guide](https://arize.com/ml-observability/) — Guia para profissionais cobrindo desvio, monitoramento de embeddings e a pilha de observabilidade para ML.
+- [Documentação do Evidently AI](https://docs.evidentlyai.com/) — Documentação oficial para a principal biblioteca de monitoramento de ML open source, cobrindo testes de drift, relatórios e monitoramento em tempo real.
+- [Plataforma de observabilidade de ML WhyLabs](https://whylabs.ai/docs) — Documentação da plataforma SaaS para monitoramento de modelos LLM e ML com perfilamento estatístico e alertas.
+- [Chip Huyen — Monitoramento de modelos de ML em produção](https://huyenchip.com/2022/02/07/data-distribution-shifts-and-monitoring.html) — Post de blog aprofundado cobrindo mudanças de distribuição de dados, estratégias de monitoramento e trade-offs práticos.
+- [Google — Regras de Machine Learning: seção de monitoramento](https://developers.google.com/machine-learning/guides/rules-of-ml#monitoring) — Orientação de engenharia do Google sobre o que monitorar e como configurar alertas para ML em produção.
+- [Arize AI — Guia de observabilidade de ML](https://arize.com/ml-observability/) — Guia do praticante cobrindo drift, monitoramento de embeddings e a stack de observabilidade para ML.
 
 ## Veja também
 
 - [Prometheus](/docs/mlops/monitoring/prometheus)
 - [Grafana](/docs/mlops/monitoring/grafana)
-- [Servição de modelos](/docs/mlops/deployment/model-serving)
+- [Serviço de modelos](/docs/mlops/deployment/model-serving)

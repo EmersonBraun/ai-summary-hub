@@ -1,36 +1,38 @@
 ---
 title: CrewAI
-description: Framework multi-agente basado en roles donde los agentes tienen roles, objetivos y trasfondos explícitos, colaborando a través de tareas estructuradas y procesos de tripulación.
-keywords: [CrewAI, multi-agente, agentes basados en roles, tareas, tripulación, proceso secuencial, proceso jerárquico]
+description: Role-based multi-agent framework where agents have explicit roles, goals, and backstories, collaborating through structured tasks and crew processes.
+keywords: [CrewAI, multi-agent, role-based agents, tasks, crew, sequential process, hierarchical process]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # CrewAI
 
 ## Definición
 
-CrewAI es un framework Python de código abierto para orquestar **sistemas multi-agente basados en roles**. Cada agente en una tripulación se define por tres cosas: un **rol** (lo que hace el agente, por ejemplo "Investigador Senior"), un **objetivo** (lo que el agente intenta lograr, por ejemplo "Encontrar información precisa y actualizada") y un **trasfondo** (una descripción de persona que moldea el comportamiento y tono del agente). Esta estructura hace que el comportamiento del agente sea intuitivo de especificar y fácil de entender — refleja cómo incorporarías a un miembro humano del equipo.
+CrewAI es un framework Python de código abierto para orquestar **sistemas multi-agente basados en roles**. Cada agente en una crew se define por tres cosas: un **rol** (qué hace el agente, p.ej. "Senior Researcher"), un **objetivo** (qué intenta lograr el agente, p.ej. "Encontrar información precisa y actualizada") y una **historia de fondo** (una descripción de persona que da forma al comportamiento y tono del agente). Esta estructura hace que el comportamiento del agente sea intuitivo de especificar y fácil de entender — refleja cómo incorporarías a un miembro humano del equipo.
 
-Las tareas en CrewAI son unidades de trabajo discretas asignadas a los agentes. Una tarea tiene una descripción, una salida esperada y opcionalmente contexto de tareas anteriores. Las tareas se agrupan en una **Tripulación** (Crew), que define el proceso de ejecución: **secuencial** (las tareas se ejecutan una tras otra, con la salida de cada una alimentando a la siguiente) o **jerárquico** (un agente gestor delega y coordina tareas entre los trabajadores). Este modelo declarativo abstrae el bucle de paso de mensajes, permitiendo a los desarrolladores centrarse en *qué* debe hacerse en lugar de *cómo* los agentes se comunican entre sí.
+Las tareas en CrewAI son unidades discretas de trabajo asignadas a agentes. Una tarea tiene una descripción, una salida esperada y opcionalmente contexto de tareas anteriores. Las tareas se agrupan en una **Crew**, que define el proceso de ejecución: **secuencial** (las tareas se ejecutan una tras otra, con la salida de cada una fluyendo hacia la siguiente) o **jerárquico** (un agente administrador delega y coordina tareas entre trabajadores). Este modelo declarativo abstrae el bucle de paso de mensajes, permitiendo a los desarrolladores centrarse en *qué* debe hacerse en lugar de *cómo* los agentes hablan entre sí.
 
-CrewAI tiene integración de herramientas incorporada, compatible con herramientas de LangChain, funciones Python personalizadas decoradas con `@tool` y una biblioteca creciente de herramientas integradas (búsqueda web, E/S de archivos, ejecución de código). Los agentes también pueden recibir memoria (a corto plazo, a largo plazo, memoria de entidades) para mantener el contexto a través de ejecuciones de tareas y ejecuciones de la tripulación.
+CrewAI tiene integración de herramientas incorporada, con soporte para herramientas de LangChain, funciones Python personalizadas decoradas con `@tool`, y una biblioteca creciente de herramientas incorporadas (búsqueda web, E/S de archivos, ejecución de código). Los agentes también pueden recibir memoria (corto plazo, largo plazo, memoria de entidades) para mantener contexto a través de las ejecuciones de tareas y las corridas de la crew.
 
 ## Cómo funciona
 
-### Agentes: roles, objetivos y trasfondos
+### Agentes: roles, objetivos e historias de fondo
 
-Un agente es la unidad fundamental de trabajo en CrewAI. Se instancia un `Agent` con un rol, objetivo y trasfondo, más herramientas opcionales y un override de LLM. El trasfondo inicializa el prompt de sistema del agente, dándole una persona consistente en todas las interacciones de tareas. Los agentes pueden configurarse con `verbose=True` para exponer sus pasos de razonamiento internos. Cada agente opera de forma independiente dentro de la capa de orquestación de la tripulación, recibiendo tareas del gestor del proceso y devolviendo salidas estructuradas. La memoria del agente (cuando está habilitada) persiste las observaciones entre tareas, lo que es crítico para flujos de trabajo de investigación o análisis de larga duración.
+Un agente es la unidad fundamental de trabajo en CrewAI. Instancias un `Agent` con un rol, objetivo e historia de fondo, más herramientas opcionales y una anulación de LLM. La historia de fondo prepara el prompt del sistema del agente, dándole una persona consistente a través de todas las interacciones de tareas. Los agentes pueden configurarse con `verbose=True` para exponer sus pasos de razonamiento interno. Cada agente opera independientemente dentro de la capa de orquestación de la crew.
 
 ### Tareas: descripciones, salidas esperadas y contexto
 
-Un objeto `Task` describe lo que un agente debe hacer, cómo se ve una buena salida y qué agente debe ejecutarla. Las tareas pueden declarar dependencias de `context` en otras tareas, haciendo que sus salidas se inyecten automáticamente como contexto. Las descripciones de salidas esperadas guían al LLM para producir resultados estructurados y utilizables. Las tareas admiten formatos de salida: texto plano, JSON mediante modelos Pydantic o salidas de archivo. Al usar un proceso jerárquico, el agente gestor utiliza las descripciones de tareas para decidir la asignación y secuenciación de forma dinámica, sin requerir que el desarrollador codifique las dependencias.
+Un objeto `Task` describe qué debe hacer un agente, cómo luce una buena salida y qué agente debe ejecutarla. Las tareas pueden declarar dependencias de `context` en otras tareas, haciendo que sus salidas se inyecten automáticamente como contexto. Las descripciones de salida esperada guían al LLM para producir resultados estructurados y utilizables. Las tareas admiten formatos de salida: texto plano, JSON vía modelos Pydantic, o salidas de archivos.
 
 ### Procesos: secuencial y jerárquico
 
-El objeto `Crew` une agentes y tareas y especifica un `Process`. En `Process.sequential`, las tareas se ejecutan en orden de lista, pasando la salida de cada tarea a la siguiente. En `Process.hierarchical`, un LLM gestor se instancia automáticamente para descomponer objetivos, asignar trabajo y revisar resultados — permitiendo una coordinación emergente sin cableado explícito. El modo secuencial es predecible y fácil de probar; el jerárquico es más flexible pero menos determinista. Elegir entre ellos depende de si tu flujo de trabajo tiene un DAG fijo (secuencial) o necesita asignación de tareas dinámica (jerárquico).
+El objeto `Crew` une agentes y tareas y especifica un `Process`. En `Process.sequential`, las tareas se ejecutan en orden de lista, pasando cada salida de tarea como contexto. En `Process.hierarchical`, se instancia automáticamente un LLM administrador para descomponer objetivos, asignar trabajo y revisar resultados — permitiendo coordinación emergente sin cableado explícito. Secuencial es predecible y fácil de probar; jerárquico es más flexible pero menos determinista.
 
 ### Integración de herramientas incorporada
 
-CrewAI incluye un decorador `@tool` compatible con las herramientas de LangChain, lo que facilita equipar a los agentes con búsqueda web (SerperDev, DuckDuckGo), ejecución de código, lectura/escritura de archivos y llamadas a APIs personalizadas. Las herramientas se registran por agente, por lo que el agente investigador puede tener herramientas de búsqueda mientras el agente escritor tiene herramientas de archivos. Las descripciones de herramientas se incluyen en el prompt del agente, y el framework maneja el bucle de llamada a herramientas de forma transparente. Para uso en producción, el paquete `CrewAI Tools` proporciona un conjunto curado de integraciones preconstruidas.
+CrewAI incluye un decorador `@tool` compatible con herramientas de LangChain, facilitando equipar agentes con búsqueda web (SerperDev, DuckDuckGo), ejecución de código, lectura/escritura de archivos y llamadas de API personalizadas. Las herramientas se registran por agente, por lo que el agente investigador puede tener herramientas de búsqueda mientras el agente escritor tiene herramientas de archivos.
 
 ```mermaid
 flowchart TD
@@ -50,21 +52,21 @@ flowchart TD
 
 | Usar cuando | Evitar cuando |
 |---|---|
-| Tu problema se mapea naturalmente a roles humanos distintos (investigador, escritor, revisor) | Necesitas un solo agente con herramientas — la sobrecarga de CrewAI es innecesaria |
+| Tu problema se mapea naturalmente a roles similares a los humanos (investigador, escritor, revisor) | Necesitas un solo agente con herramientas — el overhead de CrewAI es innecesario |
 | Quieres una API declarativa de alto nivel que oculte la complejidad del paso de mensajes | Necesitas control preciso sobre cada mensaje intercambiado entre agentes |
-| Estás construyendo canalizaciones de contenido, flujos de trabajo de investigación o sistemas de análisis | Tu flujo de trabajo requiere ramificación condicional compleja o ciclos no admitidos por secuencial/jerárquico |
-| Quieres memoria e integración de herramientas incorporadas con configuración mínima | La latencia en tiempo real es crítica — las ejecuciones secuenciales multi-agente añaden sobrecarga |
+| Estás construyendo pipelines de contenido, flujos de trabajo de investigación o sistemas de análisis | Tu flujo de trabajo requiere ramificación condicional compleja o ciclos no soportados por secuencial/jerárquico |
+| Quieres memoria e integración de herramientas incorporadas con configuración mínima | La latencia en tiempo real es crítica — las corridas secuenciales multi-agente añaden overhead |
 | Tu equipo no es experto en frameworks de agentes y necesita una API intuitiva | Necesitas observabilidad detallada de cada interacción de agente a nivel de grafo |
 
 ## Comparaciones
 
 | Criterio | CrewAI | AutoGen | LangGraph |
 |---|---|---|---|
-| **Nivel de abstracción** | Alto: roles, objetivos, tareas declarativos | Medio: agentes conversacionales con API basada en mensajes | Bajo: nodos y aristas explícitos del grafo |
-| **Modelo multi-agente** | Tripulación basada en roles con procesos secuenciales o jerárquicos | Pares de agentes conducidos por conversación o chats grupales | Subgrafos; grafo único con estado con múltiples nodos por agente |
-| **Gestión de estado** | Implícita: pasada mediante contexto de tarea y memoria de la tripulación | Implícita: historial de mensajes | Explícita: estado TypedDict compartido entre todos los nodos |
-| **Facilidad de configuración** | Muy fácil: 10-20 líneas para una tripulación multi-agente funcional | Moderada: requiere comprender tipos de agentes y patrones de iniciación | Más difícil: requiere un modelo mental de construcción de grafos |
-| **Flujos condicionales/cíclicos** | Limitado: el secuencial es lineal, el jerárquico es opaco | Limitado: depende de las respuestas del agente | Primera clase: las aristas condicionales y los ciclos son la característica central |
+| **Nivel de abstracción** | Alto: roles declarativos, objetivos, tareas | Medio: agentes conversacionales con API basada en mensajes | Bajo: nodos y aristas de grafo explícitos |
+| **Modelo multi-agente** | Crew basada en roles con procesos secuenciales o jerárquicos | Pares de agentes impulsados por conversación o chats grupales | Subgrafos; grafo único con estado con múltiples nodos por agente |
+| **Gestión de estado** | Implícita: pasada vía contexto de tarea y memoria de crew | Implícita: historial de mensajes | Explícita: estado TypedDict compartido entre todos los nodos |
+| **Facilidad de configuración** | Muy fácil: 10–20 líneas para una crew multi-agente funcional | Moderado: requiere entender tipos de agentes y patrones de iniciación | Más difícil: requiere modelo mental de construcción de grafos |
+| **Flujos condicionales/cíclicos** | Limitado: secuencial es lineal, jerárquico es opaco | Limitado: depende de las respuestas de los agentes | Primera clase: las aristas condicionales y los ciclos son la característica central |
 
 ## Ejemplos de código
 
@@ -179,8 +181,8 @@ print(result.raw)
 
 ## Recursos prácticos
 
-- [Documentación oficial de CrewAI](https://docs.crewai.com/) — Referencia completa que cubre agentes, tareas, tripulaciones, procesos, herramientas y configuración de memoria.
-- [Repositorio de CrewAI en GitHub](https://github.com/crewAIInc/crewAI) — Código fuente, ejemplos y rastreador de problemas del framework de código abierto.
+- [Documentación oficial de CrewAI](https://docs.crewai.com/) — Referencia completa que cubre agentes, tareas, crews, procesos, herramientas y configuración de memoria.
+- [Repositorio GitHub de CrewAI](https://github.com/crewAIInc/crewAI) — Código fuente, ejemplos y rastreador de problemas para el framework de código abierto.
 - [Documentación de CrewAI Tools](https://docs.crewai.com/concepts/tools) — Integraciones de herramientas preconstruidas: búsqueda web, E/S de archivos, ejecución de código y creación de herramientas personalizadas.
 - [Guía de integración CrewAI + LangChain](https://docs.crewai.com/how-to/llm-connections) — Cómo configurar diferentes proveedores de LLM incluyendo OpenAI, Anthropic y modelos locales.
 

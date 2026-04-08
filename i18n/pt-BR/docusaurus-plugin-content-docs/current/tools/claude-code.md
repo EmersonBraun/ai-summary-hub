@@ -1,37 +1,71 @@
 ---
 title: Claude Code
 description: Agente de codificação IA da Anthropic para terminal, IDE e web.
-keywords: [Claude Code, Anthropic, coding agent, IDE]
+keywords: [Claude Code, Anthropic, agente de codificação, terminal]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Claude Code
 
 ## Definição
 
-Claude Code is Anthropic’s assistente de codificação impulsionado por IA. It brings [Claude](/docs/case-studies/claude) into the development workflow via **terminal**, **IDE** (VS Code, JetBrains), **web**, **iOS**, and **Slack**, with inline editing, diffs, and command-line tools.
+Claude Code é o agente de codificação oficial da Anthropic. Ele roda no terminal, integra com IDEs (VS Code, JetBrains) via extensão e tem uma interface web. Você descreve uma tarefa em linguagem natural e o Claude lê arquivos, edita código, executa comandos de shell e faz commit de alterações para completar a tarefa.
 
-É similar to [Cursor](/docs/tools/cursor) and [GitHub Copilot](/docs/tools/github-copilot) in offering code generation and editing with [LLM](/docs/llms) context; differentiation includes native terminal and multi-environment support (desktop, browser, IDE). Useful for [agent](/docs/agents)-like workflows: explore codebases, apply changes, and get answers from the terminal or editor.
+O Claude Code usa o modelo Claude da Anthropic e pode operar de forma totalmente autônoma em tarefas longas (modo "sem supervisão") ou em loop com você para revisão de cada alteração. Ele tem suporte de primeira classe para [MCP (Model Context Protocol)](/docs/mcp) — você pode conectar servidores MCP para dar ao Claude acesso a ferramentas externas como bancos de dados, APIs ou ferramentas personalizadas. Arquivos `CLAUDE.md` na raiz do repositório fornecem instruções persistentes específicas do projeto.
 
-## Como funciona
+## Funcionamento
 
-Você executa o **Claude Code** a partir do terminal (CLI), dentro de uma **IDE** (extensão VS Code ou JetBrains), ou no **navegador/iOS**. O **modelo** (Claude) tem acesso ao seu projeto, arquivos abertoses, and terminal; you ask in natural language for edits, explanations, or refactors. **Terminal**: run commands to explore repos, generate code, or apply changes. **IDE**: use inline edits and visual diffs, then accept or reject. **Context** is managed by the tool (file selection, project scope). A Claude subscription (Pro, Teams, Enterprise) or access via Amazon Bedrock or Vertex AI is required.
+```mermaid
+flowchart LR
+  User["Usuário (prompt)"] -->|"tarefa de linguagem natural"| Agent["Agente Claude Code"]
+  Agent -->|"lê"| FS["Sistema de arquivos"]
+  Agent -->|"executa"| Shell["Shell / terminal"]
+  Agent -->|"consulta"| MCP["Servidores MCP (opcional)"]
+  FS & Shell & MCP -->|"resultados"| Agent
+  Agent -->|"aplica edições, commits"| Output["Base de código atualizada"]
+```
 
-## Casos de uso
+### CLAUDE.md
 
-Claude Code fits developers who want Claude in the terminal and IDE with a single, multi-environment tool.
+Coloque um arquivo `CLAUDE.md` na raiz do seu repositório para fornecer ao Claude instruções persistentes: stack preferida, convenções de código, quais arquivos nunca tocar, como executar testes. O Claude lê isso no início de cada sessão.
 
-- Exploring codebases and answering questions from the command line
-- In-IDE code generation, refactoring, and edits with visual diffs
-- Cross-platform use (terminal, VS Code, JetBrains, web, mobile)
+### Servidores MCP
 
-## Documentação externa
+Conecte servidores MCP para estender as ferramentas do Claude: banco de dados PostgreSQL, GitHub API, Sentry, ferramentas internas. O Claude pode então consultar esses serviços diretamente durante uma tarefa sem que você precise copiar/colar saída.
 
-- [Anthropic – Claude Code](https://www.anthropic.com/claude-code) — Product overview
-- [Claude Code – Quickstart and IDE integrations](https://docs.anthropic.com/en/docs/claude-code/quickstart) — Setup and usage
+### Modos de operação
+
+**Modo interativo** — Claude sugere cada alteração, você aprova. **Modo autônomo** — Claude completa toda a tarefa e você revisa o diff. **Modo headless** — Claude é invocado via script para automação de CI.
+
+## Quando usar / Quando NÃO usar
+
+| Cenário | Usar Claude Code | NÃO usar Claude Code |
+|---------|-----------------|---------------------|
+| Implementação de um recurso abrangendo múltiplos arquivos | Sim — o agente gerencia o contexto entre arquivos | |
+| Refatoração de código legado com testes | Sim — executa testes em loop até ficarem verdes | |
+| Configuração de um novo projeto com boilerplate | Sim — escreve arquivos, instala dependências | |
+| Completação inline rápida ao digitar | | Prefira GitHub Copilot / Cursor para sugestões em linha |
+| Revisão de segurança de código crítico | | A revisão humana permanece essencial |
+
+## Vantagens e desvantagens
+
+| Vantagens | Desvantagens |
+|---------|------------|
+| Acesso profundo ao sistema de arquivos e shell | Pode fazer alterações destrutivas se não supervisionado |
+| Suporte MCP para ferramentas externas ricas | Requer revisão cuidadosa de diffs |
+| CLAUDE.md para contexto persistente de projeto | Custo mais alto por tarefa do que modelos menores |
+| Operação autônoma para tarefas longas | A velocidade de iteração depende da velocidade da API |
+
+## Recursos práticos
+
+- [Documentação do Claude Code](https://docs.anthropic.com/claude-code) — Guias de início, referência de comandos e integração MCP
+- [Extensão VS Code do Claude Code](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code) — Integração IDE para completação inline e painel de agente
 
 ## Veja também
 
-- [Claude](/docs/case-studies/claude)
+- [MCP](/docs/mcp)
 - [Cursor](/docs/tools/cursor)
 - [GitHub Copilot](/docs/tools/github-copilot)
-- [LLMs](/docs/llms)
+- [Kiro](/docs/tools/kiro)
+- [Antigravity](/docs/tools/antigravity)

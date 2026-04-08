@@ -1,38 +1,40 @@
 ---
 title: Reconocimiento de voz
-description: Converting speech to text and related audio tasks.
-keywords: [speech recognition, ASR, audio]
+description: Conversión de voz a texto y tareas de audio relacionadas.
+keywords: [reconocimiento de voz, ASR, audio]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Reconocimiento de voz
 
 ## Definición
 
-El reconocimiento de voz (ASR) transcribe audio a texto. Related areas include speaker identification, speech synthesis (TTS), and spoken language understanding.
+El reconocimiento de voz (ASR) transcribe audio a texto. Las áreas relacionadas incluyen identificación del hablante, síntesis de voz (TTS) y comprensión del lenguaje hablado.
 
-Sirve de puente entre [multimodal](/docs/multimodal-ai) (audio as one modality) and [NLP](/docs/nlp) (output is text). Modern ASR is mostly end-to-end neural; self-supervised pretraining (por ej. wav2vec 2.0) reduces the need for huge labeled datasets. Deployed in voice assistants, captions, and meeting tools.
+Sirve de puente entre [multimodal](/docs/multimodal-ai) (audio como una modalidad) y [NLP](/docs/nlp) (la salida es texto). El ASR moderno es mayormente de extremo a extremo neuronal; el preentrenamiento autosupervisado (como wav2vec 2.0) reduce la necesidad de grandes conjuntos de datos etiquetados. Se despliega en asistentes de voz, subtítulos y herramientas de reuniones.
 
 ## Cómo funciona
 
 ```mermaid
 flowchart LR
-  Audio[Audio] --> Features[Features]
-  Features --> AcousticModel[Acoustic model]
-  AcousticModel --> Decoder[Decoder]
-  Decoder --> Text[Text]
+  Audio[Audio] --> Features[Características]
+  Features --> AcousticModel[Modelo acústico]
+  AcousticModel --> Decoder[Decodificador]
+  Decoder --> Text[Texto]
 ```
 
-**Audio** (waveform or mel spectrogram) is converted to **features** (por ej. filter banks, learned representations). An **acoustic model** (por ej. conformer, wav2vec 2.0 encoder) maps features to frame- or segment-level representations. A **decoder** (CTC, RNN-T, or attention-based) produce **text** (characters or subwords). Modern systems are often end-to-end (waveform or features → text in one model). Self-supervised pretraining on unlabeled audio (por ej. wav2vec) then fine-tuning on labeled ASR data improves robustness and reduces labeled data needs.
+El **audio** (forma de onda o espectrograma mel) se convierte en **características** (como bancos de filtros, representaciones aprendidas). Un **modelo acústico** (como conformer, codificador wav2vec 2.0) mapea las características a representaciones a nivel de fotograma o segmento. Un **decodificador** (CTC, RNN-T o basado en atención) produce **texto** (caracteres o subpalabras). Los sistemas modernos a menudo son de extremo a extremo (forma de onda o características → texto en un modelo). El preentrenamiento autosupervisado en audio no etiquetado (como wav2vec) seguido de ajuste fino en datos ASR etiquetados mejora la robustez y reduce las necesidades de datos etiquetados.
 
 ## Casos de uso
 
-Speech technologies apply when the input or output is audio: transcription, assistants, and speaker or synthesis systems.
+Las tecnologías de voz aplican cuando la entrada o salida es audio: transcripción, asistentes y sistemas de hablante o síntesis.
 
-- Automatic speech recognition (ASR) for transcription and captions
-- Voice assistants and spoken dialogue systems
-- Speaker identification and speech synthesis (TTS)
+- Reconocimiento automático de voz (ASR) para transcripción y subtítulos
+- Asistentes de voz y sistemas de diálogo hablado
+- Identificación del hablante y síntesis de voz (TTS)
 
-## Documentación externa
+## Recursos prácticos
 
 - [wav2vec 2.0 (Baevski et al.)](https://arxiv.org/abs/2006.11477)
 - [Hugging Face – Audio](https://huggingface.co/docs/transformers/tasks/speech_recognition)
@@ -40,4 +42,4 @@ Speech technologies apply when the input or output is audio: transcription, assi
 ## Ver también
 
 - [NLP](/docs/nlp)
-- [Multimodal AI](/docs/multimodal-ai)
+- [IA multimodal](/docs/multimodal-ai)

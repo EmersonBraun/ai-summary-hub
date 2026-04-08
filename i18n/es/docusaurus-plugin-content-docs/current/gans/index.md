@@ -1,44 +1,46 @@
 ---
 title: Redes generativas adversarias (GANs)
-description: Adversarial training for generative models.
-keywords: [GAN, generative, discriminator, generator]
+description: Entrenamiento adversarial para modelos generativos.
+keywords: [GAN, generativo, discriminador, generador]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Redes generativas adversarias (GANs)
 
 ## Definición
 
-Las GANs entrenan un generador y un discriminador en un juego: el generador produce muestras; el discriminador intenta distinguirlas de datos reales. Training pushes the generator toward realistic outputs.
+Las GANs entrenan un generador y un discriminador en un juego: el generador produce muestras; el discriminador intenta distinguirlas de datos reales. El entrenamiento empuja al generador hacia salidas realistas.
 
-They fueron el enfoque generativo dominante antes de [diffusion models](/docs/diffusion-models). En comparación con [VAEs](/docs/vaes), GANs often produce sharper images but training can be unstable (mode collapse, discriminator/generator balance). Still used for style transfer, data augmentation, and some image editing.
+Fueron el enfoque generativo dominante antes de los [modelos de difusión](/docs/diffusion-models). En comparación con los [VAEs](/docs/vaes), las GANs a menudo producen imágenes más nítidas pero el entrenamiento puede ser inestable (colapso de modo, equilibrio discriminador/generador). Todavía se usan para transferencia de estilo, aumento de datos y algunas ediciones de imágenes.
 
 ## Cómo funciona
 
-**Generator:** Takes **noise** (vector aleatorio) and outputs a **fake sample** (por ej. image). **Discriminator:** Receives **real data** and **fake sample**, outputs **real or fake** (or a score). Training is a **min-max game**: the generator tries to maximize the discriminator’s loss (fool it), the discriminator tries to minimize it (tell real from fake). In practice you alternate gradient steps. Variants (DCGAN, StyleGAN, etc.) use better architectures and training tricks (por ej. spectral norm, progressive growing) for stability and quality.
+**Generador:** Toma **ruido** (vector aleatorio) y produce una **muestra falsa** (como una imagen). **Discriminador:** Recibe **datos reales** y **muestra falsa**, produce **real o falso** (o una puntuación). El entrenamiento es un **juego min-max**: el generador intenta maximizar la pérdida del discriminador (engañarlo), el discriminador intenta minimizarla (distinguir lo real de lo falso). En la práctica se alternan pasos de gradiente. Las variantes (DCGAN, StyleGAN, etc.) usan mejores arquitecturas y trucos de entrenamiento (como norma espectral, crecimiento progresivo) para la estabilidad y la calidad.
 
 ```mermaid
 flowchart LR
-  Z[Noise] --> G[Generator]
-  G --> Fake[Fake sample]
-  Real[Real data] --> D[Discriminator]
+  Z[Ruido] --> G[Generador]
+  G --> Fake[Muestra falsa]
+  Real[Datos reales] --> D[Discriminador]
   Fake --> D
-  D --> Out[Real or fake]
+  D --> Out[Real o falso]
 ```
 
 ## Casos de uso
 
-GANs are used for generative and discriminative tasks when you want adversarial training and sharp samples (images, audio, data aug).
+Las GANs se usan para tareas generativas y discriminativas cuando se desea entrenamiento adversarial y muestras nítidas (imágenes, audio, aumento de datos).
 
-- Image generation and editing (por ej. StyleGAN, face synthesis)
-- Data augmentation and synthetic data for training
-- Domain adaptation and style transfer
+- Generación y edición de imágenes (como StyleGAN, síntesis de rostros)
+- Aumento de datos y datos sintéticos para entrenamiento
+- Adaptación de dominio y transferencia de estilo
 
-## Documentación externa
+## Recursos prácticos
 
 - [Generative Adversarial Networks (Goodfellow et al.)](https://arxiv.org/abs/1406.2661)
-- [PyTorch – DCGAN tutorial](https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html)
+- [PyTorch – Tutorial DCGAN](https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html)
 
 ## Ver también
 
-- [Diffusion models](/docs/diffusion-models)
+- [Modelos de difusión](/docs/diffusion-models)
 - [VAEs](/docs/vaes)

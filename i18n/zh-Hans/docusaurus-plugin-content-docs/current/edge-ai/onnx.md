@@ -2,17 +2,19 @@
 title: ONNX Runtime
 description: 跨平台、高性能的 ONNX 模型推理引擎，支持 CPU、GPU 和 NPU 执行提供程序。
 keywords: [ONNX Runtime, ONNX, 跨平台推理, 执行提供程序, TensorRT, DirectML, CoreML, 模型互操作性]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # ONNX Runtime
 
 ## 定义
 
-ONNX Runtime（ORT）是由 Microsoft 开发的开源跨平台推理和训练加速库。其主要目的是以高性能在各种硬件目标和操作系统上执行 **Open Neural Network Exchange（ONNX）**格式的模型——这是机器学习模型与框架无关的中间表示。ORT 不与任何单一训练框架绑定：来自 PyTorch、TensorFlow、scikit-learn、LightGBM、XGBoost 等的模型都可以导出为 ONNX 并通过相同的运行时 API 执行，使其成为最具互操作性的推理解决方案之一。
+ONNX Runtime（ORT）是由 Microsoft 开发的开源、跨平台推理和训练加速库。其主要目的是以高性能在各种硬件目标和操作系统上执行 **Open Neural Network Exchange（ONNX）** 格式的模型——一种与框架无关的机器学习模型中间表示。ORT 不与任何单一训练框架绑定：来自 PyTorch、TensorFlow、scikit-learn、LightGBM、XGBoost 等的模型都可以导出为 ONNX，并通过相同的 runtime API 执行，使其成为最具互操作性的推理解决方案之一。
 
-ORT 的核心加载 ONNX 图，应用广泛的图级优化（常量折叠、节点融合、布局转换），并将操作分发到当前硬件的最佳可用执行提供程序。**执行提供程序（EP）**抽象允许 ORT 将子图路由到 CPU、通过 CUDA 或 TensorRT 的 NVIDIA GPU、通过 ROCm 的 AMD GPU、通过 OpenVINO 的 Intel 硬件、通过 CoreML 的 Apple Silicon、通过 NNAPI 的 Android 以及通过 DirectML 的 Windows——所有这些都通过统一的 API 接口。这使 ORT 适合从云服务器到 Windows 笔记本电脑再到移动设备的部署范围。
+在其核心，ORT 加载 ONNX 图，应用一系列广泛的图级优化（常量折叠、节点融合、布局转换），并将操作分发到当前硬件的最佳执行提供程序。**执行提供程序（EP）**抽象允许 ORT 将子图路由到 CPU、通过 CUDA 或 TensorRT 的 NVIDIA GPU、通过 ROCm 的 AMD GPU、通过 OpenVINO 的 Intel 硬件、通过 CoreML 的 Apple Silicon、通过 NNAPI 的 Android 以及通过 DirectML 的 Windows——所有这些都通过统一的 API 表面。这使 ORT 适合从云服务器到 Windows 笔记本电脑再到移动设备的部署范围。
 
-ONNX Runtime 在企业和生产环境中特别有价值，这些环境中单个部署管道必须服务于在不同框架中训练的模型。它是 Azure ML 端点、Hugging Face 的 Optimum 库、Windows ML 以及许多生产推荐和排名系统的推理后端。其训练扩展（ORT Training）还支持大型变换器模型的加速微调，但推理是其主要用例。
+ONNX Runtime 在企业和生产环境中尤其有价值，在那里单个部署管道必须服务于在不同框架中训练的模型。它是驱动 Azure ML 端点、Hugging Face Optimum 库、Windows ML 以及许多生产推荐和排名系统的推理后端。
 
 ## 工作原理
 
@@ -29,55 +31,55 @@ flowchart LR
 
 ### ONNX 格式和模型互操作性
 
-ONNX 将模型表示为有向无环计算图，其中节点是 ONNX 操作符规范中定义的标准化运算符（如 `Conv`、`MatMul`、`LayerNormalization`），边承载类型化张量。该格式是版本化的：每个 ONNX opset 版本（目前是 21）定义了完整的支持运算符集及其语义。来自每个框架的导出器将框架特定的运算符映射到其 ONNX 等效项；当不存在直接映射时，可以注册 `custom_op` 扩展。Protobuf 序列化的 `.onnx` 文件包含图拓扑、运算符名称、张量形状和常量权重值，使格式自包含且可移植。
+ONNX 将模型表示为有向无环计算图，其中节点是在 ONNX 算子规范中定义的标准化算子（例如 `Conv`、`MatMul`、`LayerNormalization`），边携带类型化张量。该格式是版本化的：每个 ONNX opset 版本（目前为 21）定义了支持的算子及其语义的完整集合。protobuf 序列化的 `.onnx` 文件包含图拓扑、算子名称、张量形状和常量权重值，使该格式自包含且可移植。
 
 ### 图优化
 
-当创建 `InferenceSession` 时，ORT 应用由 `GraphOptimizationLevel` 设置控制的三级图优化。级别 1（基本）执行安全重写：常量折叠、冗余节点消除、形状推断和恒等删除。级别 2（扩展）增加操作融合：`Conv + BatchNorm`、`Conv + Relu`、`Transpose + MatMul` 等类似模式被融合成单个内核以消除中间内存分配和内核启动开销。级别 3（布局优化）重构张量内存布局以匹配执行提供程序的偏好（如 GPU 卷积的 NHWC）。优化后的图可以序列化回 `.onnx` 以供检查或跳过后续加载时的重新优化。
+创建 `InferenceSession` 时，ORT 应用由 `GraphOptimizationLevel` 设置控制的三个级别的图优化。级别 1（基本）执行安全重写：常量折叠、冗余节点消除、形状推断和标识移除。级别 2（扩展）添加操作融合：`Conv + BatchNorm`、`Conv + Relu`、`Transpose + MatMul` 等模式被融合成单个内核以消除中间内存分配和内核启动开销。级别 3（布局优化）重构张量内存布局以匹配执行提供程序的偏好。
 
 ### 执行提供程序
 
-执行提供程序机制是 ORT 的主要可扩展性和性能杠杆。当使用特定 EP 创建会话时，ORT 查询 EP 可以处理哪些节点，对图进行分区，并将声明的子图替换为 EP 特定的 `ComputeKernel` 实现。**CPU EP** 使用 MLAS（Microsoft 线性代数子程序），这是一个具有 AVX-512 和 NEON 支持的手工向量化 BLAS 实现。**CUDA EP** 将卷积和 GEMM 卸载到 cuDNN 和 cuBLAS。**TensorRT EP** 应用 TensorRT 的层融合和 FP16 与 INT8 的精度校准，在 NVIDIA GPU 上产生最高吞吐量。**CoreML EP** 在 macOS 和 iOS 上委托给 Apple 的 Neural Engine。**DirectML EP** 在 Windows 上支持任何支持 DirectX 12 的 GPU 的硬件加速推理，包括 AMD 和 Intel 集成显卡。
+执行提供程序机制是 ORT 的主要可扩展性和性能杠杆。**CPU EP** 使用 MLAS（Microsoft 线性代数子程序），这是一个手工向量化的 BLAS 实现，支持 AVX-512 和 NEON。**CUDA EP** 将卷积和 GEMM 卸载到 cuDNN 和 cuBLAS。**TensorRT EP** 为 NVIDIA GPU 应用 TensorRT 的层融合和 FP16、INT8 精度校准。**CoreML EP** 在 macOS 和 iOS 上委托给 Apple 的 Neural Engine。**DirectML EP** 支持在 Windows 上任何兼容 DirectX 12 的 GPU 上进行硬件加速推理。
 
 ### ONNX Runtime 中的量化
 
-ORT 通过 **QDQ（量化-去量化）**节点模式支持 INT8 推理：ONNX 图包含表示精度边界的显式 `QuantizeLinear` 和 `DequantizeLinear` 节点。静态量化需要校准数据集来计算输入/输出缩放；`onnxruntime.quantization` Python 包提供 `quantize_static` 和 `quantize_dynamic` 函数。ORT 还接受在训练期间插入了 Q/DQ 节点的 QAT 导出模型。硬件 INT8 加速仅在执行提供程序支持时激活（CUDA EP 需要 CUDA 11+，TensorRT EP 通过校准表原生处理 INT8）。Hugging Face Optimum 中的 `ORTQuantizer` 为端到端量化变换器模型提供了高级接口。
+ORT 通过 **QDQ（Quantize-Dequantize）** 节点模式支持 INT8 推理：ONNX 图包含表示精度边界的显式 `QuantizeLinear` 和 `DequantizeLinear` 节点。静态量化需要校准数据集来计算输入/输出缩放；`onnxruntime.quantization` Python 包提供 `quantize_static` 和 `quantize_dynamic` 函数。
 
 ### 移动和边缘部署
 
-ORT Mobile 是为 Android 和 iOS 构建的精简版 ONNX Runtime，删除了未使用的运算符和 EP 库，将二进制大小减少到约 1-3 MB（压缩后）。`onnxruntime-mobile` Python 包通过预打包权重和剥离训练时元数据来为移动设备准备模型。在 Android 上，NNAPI EP 委托给硬件加速器。在 iOS 和 macOS 上，CoreML EP 使用 Apple Neural Engine。ORT 还通过 CPU EP 在树莓派（ARM Linux）上运行，并且存在对 WebAssembly 目标的实验性支持。`ort` npm 包通过 WASM 在 Node.js 和浏览器上下文中启用 ORT。
+ORT Mobile 是 ONNX Runtime 的精简版本，用于 Android 和 iOS，移除了未使用的算子和 EP 库，将二进制大小压缩到约 1-3 MB。在 Android 上，NNAPI EP 委托给硬件加速器。在 iOS 和 macOS 上，CoreML EP 使用 Apple Neural Engine。
 
 ## 何时使用 / 何时不使用
 
 | 使用场景 | 避免场景 |
 |---|---|
-| 需要框架无关的推理——通过单一运行时服务来自 PyTorch、TF 和 scikit-learn 的模型 | 部署目标是 RAM \<256 KB 的微控制器（TFLM 更好地覆盖此场景） |
-| 在 Windows/Azure 上构建企业 ML 管道，其中 Microsoft 工具已在使用中 | 需要目前具有成熟工具的深度 Android 硬件委托（TFLite 对 Android 更成熟） |
-| 需要 NVIDIA TensorRT 加速而不直接管理 TensorRT API | 模型使用没有 ONNX 等效项且不切实际注册的自定义运算符 |
-| 希望对服务器端运行的同一模型进行浏览器/WASM 推理 | 团队以 PyTorch 为主，希望从训练到移动端有最紧密的循环（PyTorch Mobile/ExecuTorch 可能更简单） |
-| 跨平台可移植性是一级关注点（相同模型在 Windows、Linux、macOS、Android、iOS 上） | 需要在边缘进行实时训练或在线学习（ORT Training 存在但增加了大量复杂性） |
+| 您需要与框架无关的推理——通过一个运行时服务来自 PyTorch、TF 和 scikit-learn 的模型 | 您的部署目标是 RAM \<256 KB 的微控制器（TFLM 更适合这种情况） |
+| 您正在 Windows/Azure 上构建企业 ML 管道，其中 Microsoft 工具已经就位 | 您今天需要具有成熟工具的深度 Android 硬件委托（TFLite 对 Android 更经过实战检验） |
+| 您需要 NVIDIA TensorRT 加速而无需直接管理 TensorRT API | 您的模型使用没有 ONNX 等效项且难以注册的自定义算子 |
+| 您希望为在服务器端运行的相同模型进行浏览器/WASM 推理 | 您的团队是 PyTorch 原生的，想要从训练到移动端最紧密的循环 |
+| 跨平台可移植性是头等关注点（相同模型在 Windows、Linux、macOS、Android、iOS 上运行） | 您需要在边缘进行实时训练或在线学习 |
 
 ## 比较
 
-ONNX Runtime 与 TFLite 和 PyTorch Mobile 的边缘和跨平台部署比较。
+ONNX Runtime 与 TFLite 和 PyTorch Mobile 在边缘和跨平台部署方面的比较。
 
 | 标准 | ONNX Runtime | TensorFlow Lite | PyTorch Mobile |
 |---|---|---|---|
-| 平台支持 | Windows、Linux、macOS、Android、iOS、WASM、云——覆盖最广 | Android、iOS、嵌入式 Linux、微控制器（TFLM） | Android、iOS；ExecuTorch 扩展到嵌入式和裸机 |
-| 模型转换 | 任何框架 → ONNX 导出（最具互操作性，多个转换器） | TF/Keras → TFLite Converter（成熟，仅 TF 生态系统） | PyTorch → TorchScript 或 ExecuTorch（PyTorch 原生，对 PT 用户摩擦更低） |
-| 设备端性能 | 具有 MLAS 的 CPU EP 有竞争力；TensorRT/CUDA EP 在 GPU 上领先；CoreML/NNAPI EP 用于移动端 | 通过 NNAPI/GPU 委托在 Android 上出色；微控制器上最优 | ARM CPU 上的 XNNPACK；Vulkan GPU；ExecuTorch NPU 委托 |
-| 生态系统 | 框架无关；Hugging Face Optimum；Windows ML；Azure ML；强大的企业采用 | 成熟：MediaPipe、TF Hub、Model Garden；最大的移动 ML 社区 | 研究中强大；Hugging Face；不断增长的 ExecuTorch 社区 |
-| 量化支持 | 通过 QDQ 节点的 INT8；动态和静态 PTQ；QAT；通过 EP 的硬件 INT8 | 全面：动态范围、INT8、FP16、具有完整 INT8 路径的 QAT | 通过 torch.ao.quantization 的 PTQ（动态 + 静态 INT8）和 QAT |
+| 平台支持 | Windows、Linux、macOS、Android、iOS、WASM、云——最广泛的覆盖 | Android、iOS、嵌入式 Linux、微控制器（TFLM） | Android、iOS；ExecuTorch 增加嵌入式和裸机 |
+| 模型转换 | 任何框架 → ONNX 导出（最具互操作性的路径，多个转换器） | TF/Keras → TFLite Converter（成熟，仅 TF 生态系统） | PyTorch → TorchScript 或 ExecuTorch（PyTorch 原生，PT 用户摩擦更少） |
+| 设备上性能 | 带 MLAS 的 CPU EP 具有竞争力；TensorRT/CUDA EP 在 GPU 上领先；CoreML/NNAPI EP 用于移动端 | 在 Android 上通过 NNAPI/GPU 委托表现出色；微控制器类别中最佳 | ARM CPU 上的 XNNPACK；Vulkan GPU；ExecuTorch NPU 委托 |
+| 生态系统 | 框架无关；Hugging Face Optimum；Windows ML；Azure ML；强大的企业采用 | 成熟：MediaPipe、TF Hub、Model Garden；最大的移动 ML 社区 | 研究中强大；Hugging Face；ExecuTorch 社区增长中 |
+| 量化支持 | 通过 QDQ 节点的 INT8；动态和静态 PTQ；QAT；通过 EP 的硬件 INT8 | 全面：动态范围、INT8、FP16、QAT 与完整 INT8 路径 | 通过 torch.ao.quantization 的 PTQ（动态 + 静态 INT8）和 QAT |
 
 ## 优缺点
 
 | 优点 | 缺点 |
-|------|------|
-| 框架无关：任何可 ONNX 导出的模型都与相同运行时配合 | ONNX 导出对于不支持或自定义运算符的模型可能失败 |
-| 最广泛的执行提供程序覆盖：CPU、CUDA、TensorRT、DirectML、CoreML、NNAPI、OpenVINO | 调试 ONNX 图比原生框架调试更难 |
-| 强大的 Windows 和 Azure 集成；Microsoft ML 技术栈的一等公民 | 对于纯 Android/iOS 场景，比 TFLite 具有更多的运营复杂性 |
-| Hugging Face Optimum 为变换器提供了高级量化和优化 | ONNX opset 版本控制可能在导出器和 ORT 版本之间产生兼容性摩擦 |
-| 通过 AVX-512 和 NEON 向量化的 MLAS 具有竞争力的 CPU 性能 | 包含所有 EP 时，移动二进制大小比 TFLite 更大 |
+|---|---|
+| 框架无关：任何可导出 ONNX 的模型都可以与同一运行时配合使用 | 对于具有不支持或自定义算子的模型，ONNX 导出可能会失败 |
+| 最广泛的执行提供程序覆盖：CPU、CUDA、TensorRT、DirectML、CoreML、NNAPI、OpenVINO | 调试 ONNX 图比原生框架调试更困难 |
+| 强大的 Windows 和 Azure 集成；Microsoft ML 堆栈中的一等公民 | 对于纯 Android/iOS 场景，操作复杂度比 TFLite 更高 |
+| Hugging Face Optimum 为 transformer 提供高级量化和优化 | ONNX opset 版本控制可能在导出器和 ORT 版本之间造成兼容性摩擦 |
+| 通过 MLAS 的具有 AVX-512 和 NEON 向量化的竞争性 CPU 性能 | 当包含所有 EP 时，移动端二进制大小比 TFLite 大 |
 
 ## 代码示例
 
@@ -161,11 +163,11 @@ print(f"Batch predictions: {predicted_classes}")
 
 ## 实用资源
 
-- [ONNX Runtime 文档](https://onnxruntime.ai/docs/) — 涵盖安装、执行提供程序、图优化、量化以及所有支持平台的移动部署的官方参考。
+- [ONNX Runtime 文档](https://onnxruntime.ai/docs/) — 官方参考，涵盖安装、执行提供程序、图优化、量化以及所有支持平台的移动部署。
 - [ONNX Runtime Python API 参考](https://onnxruntime.ai/docs/api/python/api_summary.html) — `InferenceSession`、`SessionOptions`、执行提供程序和量化子包的详细 API 文档。
-- [Hugging Face Optimum](https://huggingface.co/docs/optimum/onnxruntime/overview) — 为变换器模型优化包装 ORT 的高级库，提供 `ORTModelForXxx` 类和 `ORTQuantizer` 用于一步模型导出和 INT8 量化。
-- [ONNX Model Zoo](https://github.com/onnx/models) — 涵盖计算机视觉、NLP、语音和经典 ML 的预训练 ONNX 模型的精选仓库；对于基准测试 ORT 性能和作为部署模板很有用。
-- [ONNX Runtime 移动部署指南](https://onnxruntime.ai/docs/tutorials/mobile/) — 构建最小 ORT Android 或 iOS 应用程序的分步教程，包括模型准备和 NNAPI/CoreML EP 配置。
+- [Hugging Face Optimum](https://huggingface.co/docs/optimum/onnxruntime/overview) — 为 transformer 模型优化包装 ORT 的高级库，提供 `ORTModelForXxx` 类和 `ORTQuantizer`。
+- [ONNX Model Zoo](https://github.com/onnx/models) — 涵盖计算机视觉、NLP、语音和经典 ML 的预训练 ONNX 模型精心策划存储库。
+- [ONNX Runtime 移动部署指南](https://onnxruntime.ai/docs/tutorials/mobile/) — 构建最小 ORT Android 或 iOS 应用的分步教程。
 
 ## 另请参阅
 

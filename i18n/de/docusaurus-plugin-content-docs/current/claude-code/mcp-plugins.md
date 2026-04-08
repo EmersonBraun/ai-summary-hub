@@ -1,67 +1,69 @@
 ---
-title: MCP-Plugins und Integrationen
-description: Model Context Protocol (MCP) in Claude Code — was MCP-Server sind, wie sie Claudes Fähigkeiten erweitern, wie man sie installiert und konfiguriert und wie man benutzerdefinierte MCP-Server erstellt.
-keywords: [MCP, Model Context Protocol, MCP-Server, MCP-Client, Claude-Code-Plugins, benutzerdefinierte Tools, externe Integrationen, MCP-Konfiguration, stdio-Transport, SSE-Transport]
+title: MCP plugins and integrations
+description: Model Context Protocol (MCP) in Claude Code — what MCP servers are, how they extend Claude's capabilities, how to install and configure them, and how to build custom MCP servers.
+keywords: [MCP, Model Context Protocol, MCP server, MCP client, Claude Code plugins, custom tools, external integrations, MCP configuration, stdio transport, SSE transport]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # MCP-Plugins und Integrationen
 
 ## Definition
 
-Das Model Context Protocol (MCP) ist ein offener Standard, der von Anthropic entwickelt wurde und definiert, wie KI-Modelle mit externen Datenquellen und Tools kommunizieren. Im Kontext von Claude Code sind MCP-Server Plugins, die den Satz verfügbarer Tools für Claude über seine eingebauten Fähigkeiten (Dateisystemzugang, Shell-Befehle, Git) hinaus erweitern. Mit MCP kann Claude Datenbanken abfragen, externe APIs aufrufen, im Web surfen, Jira-Tickets lesen, Grafana-Dashboards abfragen, mit GitHub interagieren und alles andere tun, was ein MCP-Server implementiert – alles über dieselbe natürlichsprachige Schnittstelle wie eingebaute Tools.
+Das Model Context Protocol (MCP) ist ein offener Standard, der von Anthropic entwickelt wurde und definiert, wie KI-Modelle mit externen Datenquellen und Tools kommunizieren. Im Kontext von Claude Code sind MCP-Server Plugins, die den Satz der für Claude verfügbaren Tools über seine integrierten Fähigkeiten hinaus erweitern (Dateisystemzugriff, Shell-Befehle, Git). Mit MCP kann Claude Datenbanken abfragen, externe APIs aufrufen, im Web surfen, Jira-Tickets lesen, Grafana-Dashboards abfragen, mit GitHub interagieren und alles andere tun, was ein MCP-Server implementiert – alles über dieselbe natürliche Sprachschnittstelle wie integrierte Tools.
 
-MCP folgt einer Client-Server-Architektur. Claude Code fungiert als **MCP-Client**: Es entdeckt verfügbare MCP-Server aus der Konfiguration, verbindet sich beim Sitzungsstart mit ihnen und fragt sie nach der Liste der bereitgestellten Tools. Jeder MCP-Server stellt einen Satz von **Tools** bereit (Funktionen mit JSON-Schema-Eingabedefinitionen, identisch in der Struktur mit eingebauten Tools), optionale **Ressourcen** (schreibgeschützte Datenquellen wie Dokumentation oder Datenbankschemata) und optionale **Prompts** (wiederverwendbare Prompt-Vorlagen). Wenn Claude entscheidet, ein MCP-Tool aufzurufen, leitet Claude Code den Aufruf an den entsprechenden Server weiter, führt die Operation aus und gibt das Ergebnis als Tool-Ergebnis an das Modell zurück.
+MCP folgt einer Client-Server-Architektur. Claude Code fungiert als **MCP-Client**: Es erkennt verfügbare MCP-Server aus der Konfiguration, stellt beim Sitzungsstart Verbindungen zu ihnen her und fragt die Liste der Tools ab, die sie bereitstellen. Jeder MCP-Server stellt einen Satz von **Tools** (Funktionen mit JSON-Schema-Eingabedefinitionen, strukturell identisch mit integrierten Tools), optionale **Ressourcen** (schreibgeschützte Datenquellen wie Dokumentation oder Datenbankschemata) und optionale **Prompts** (wiederverwendbare Prompt-Vorlagen) bereit. Wenn Claude entscheidet, ein MCP-Tool aufzurufen, leitet Claude Code den Aufruf an den entsprechenden Server weiter, führt die Operation aus und gibt das Ergebnis als Tool-Ergebnis an das Modell zurück.
 
-Der Hauptvorteil von MCP gegenüber Ad-hoc-Tool-Integrationen ist die Standardisierung. Vor MCP hatte jeder KI-Assistent sein eigenes proprietäres Plugin-Format. MCP definiert ein universelles Protokoll, sodass ein einmal geschriebener MCP-Server mit jedem MCP-kompatiblen Client funktioniert – Claude Code, Claude Desktop oder einem anderen MCP-Client. Das bedeutet, dass das Ökosystem verfügbarer Integrationen schnell wächst und das Aufbauen einer neuen Integration kein Verständnis der Claude-spezifischen Interna erfordert.
+Der Hauptvorteil von MCP gegenüber Ad-hoc-Tool-Integrationen ist die Standardisierung. Vor MCP hatte jeder KI-Assistent sein eigenes proprietäres Plugin-Format. MCP definiert ein universelles Protokoll, sodass ein einmal geschriebener MCP-Server mit jedem MCP-kompatiblen Client funktioniert – Claude Code, Claude Desktop oder jedem anderen MCP-Client. Das bedeutet, dass das Ökosystem der verfügbaren Integrationen schnell wächst, und der Aufbau einer neuen Integration erfordert kein Verständnis der Claude-spezifischen Interna.
 
 ## Funktionsweise
 
 ### MCP-Server-Typen und Transporte
 
-MCP-Server gibt es in zwei Transport-Varianten. **stdio-Server** laufen als lokale Unterprozesse: Claude Code startet den Serverprozess beim Sitzungsbeginn und kommuniziert über stdin/stdout mittels JSON-RPC. stdio-Server sind der häufigste Typ für lokale Tools (Datenbank-Clients, Dateiprozessoren, spezialisierte Code-Analyse). **SSE-(Server-Sent-Events-)Server** laufen als persistente HTTP-Server und kommunizieren über eine Netzwerkverbindung. SSE-Server eignen sich besser für Remote-Dienste, gemeinsam genutzte Team-Infrastruktur oder Server, die Zustände über mehrere Client-Verbindungen hinweg aufrechterhalten müssen.
+MCP-Server gibt es in zwei Transport-Varianten. **Stdio-Server** laufen als lokale Subprozesse: Claude Code startet den Serverprozess beim Sitzungsstart und kommuniziert über stdin/stdout mit JSON-RPC. Stdio-Server sind der häufigste Typ für lokale Tools (Datenbankclients, Dateiprozessoren, spezialisierte Code-Analyse). **SSE (Server-Sent Events) Server** laufen als persistente HTTP-Server und kommunizieren über eine Netzwerkverbindung. SSE-Server sind besser für Remote-Dienste, gemeinsam genutzte Team-Infrastruktur oder Server geeignet, die den Zustand über mehrere Client-Verbindungen hinweg aufrechterhalten müssen.
 
-### Konfiguration und Entdeckung
+### Konfiguration und Erkennung
 
-MCP-Server werden in Claude Codes Einstellungsdatei konfiguriert, typischerweise unter `~/.claude/settings.json` für die globale Konfiguration oder `.claude/settings.json` für projektspezifische Server. Jeder Server-Eintrag gibt einen Namen, den Transport-Typ und den Befehl (für stdio) oder die URL (für SSE) an, die zum Starten oder Verbinden mit dem Server benötigt wird. Claude Code liest diese Konfiguration beim Sitzungsstart, initialisiert Verbindungen zu allen konfigurierten Servern und ruft ihre Tool-Manifeste ab. Die Tools aller verbundenen MCP-Server erscheinen in der Tool-Liste des Modells neben eingebauten Tools – aus der Perspektive des Modells gibt es keinen Unterschied.
+MCP-Server werden in Claude Codes Einstellungsdatei konfiguriert, typischerweise unter `~/.claude/settings.json` für globale Konfiguration oder `.claude/settings.json` für projektspezifische Server. Jeder Server-Eintrag gibt einen Namen, Transporttyp und den Befehl (für stdio) oder die URL (für SSE) an, die benötigt wird, um den Server zu starten oder sich mit ihm zu verbinden. Claude Code liest diese Konfiguration beim Sitzungsstart, initialisiert Verbindungen zu allen konfigurierten Servern und ruft ihre Tool-Manifeste ab. Die Tools aller verbundenen MCP-Server erscheinen in der Tool-Liste des Modells neben integrierten Tools – aus der Perspektive des Modells gibt es keinen Unterschied.
 
-### Tool-Aufruf-Ablauf
+### Tool-Aufruf-Flow
 
-Wenn Claude entscheidet, ein MCP-Tool aufzurufen, fungiert Claude Code als Vermittler: Es serialisiert die Tool-Aufruf-Argumente zu JSON, sendet eine `tools/call`-Anfrage an den MCP-Server über den konfigurierten Transport, wartet auf die Antwort, deserialisiert das Ergebnis und gibt es als `tool_result`-Block an das Modell zurück. Der gesamte Umlauf ist für das Modell transparent – es sieht einfach ein Tool-Ergebnis, genau wie bei einem eingebauten Tool-Aufruf. MCP-Server können Text, Bilder oder strukturierte Daten zurückgeben, die Claude Code alle entsprechend an das Modell weiterleitet.
+Wenn Claude entscheidet, ein MCP-Tool aufzurufen, fungiert Claude Code als Vermittler: Es serialisiert die Tool-Aufruf-Argumente zu JSON, sendet eine `tools/call`-Anfrage an den MCP-Server über den konfigurierten Transport, wartet auf die Antwort, deserialisiert das Ergebnis und gibt es als `tool_result`-Block an das Modell zurück. Der gesamte Roundtrip ist für das Modell transparent – es sieht einfach ein Tool-Ergebnis, genau wie bei einem integrierten Tool-Aufruf. MCP-Server können Text, Bilder oder strukturierte Daten zurückgeben, die Claude Code alle entsprechend an das Modell weiterleitet.
 
 ### Authentifizierung und Sicherheit
 
-MCP-Server verwalten ihre eigene Authentifizierung. Ein GitHub-MCP-Server liest beispielsweise ein persönliches GitHub-Zugriffstoken aus einer Umgebungsvariablen, die im `env`-Feld des Server-Eintrags konfiguriert ist. Claude Code übergibt die konfigurierte Umgebung an den Unterprozess, verwaltet Geheimnisse selbst jedoch nicht – es ist die Verantwortung des MCP-Servers, sich bei externen Diensten zu authentifizieren. Da MCP-Server Code mit den Berechtigungen des lokalen Benutzers ausführen, sollte bei der Verwendung von Drittanbieter-MCP-Servern Vorsicht walten: Überprüfen Sie den Code des Servers oder vertrauen Sie dem Herausgeber, bevor Sie ihn zu Ihrer Konfiguration hinzufügen.
+MCP-Server handhaben ihre eigene Authentifizierung. Ein GitHub MCP-Server zum Beispiel liest ein GitHub Personal Access Token aus einer Umgebungsvariable, die im `env`-Feld des Server-Eintrags konfiguriert ist. Claude Code übergibt die konfigurierte Umgebung an den Subprozess, verwaltet aber keine Geheimnisse selbst – es liegt in der Verantwortung des MCP-Servers, sich bei externen Diensten zu authentifizieren. Da MCP-Server Code mit den Berechtigungen des lokalen Benutzers ausführen, sollte Sorgfalt walten, wenn Drittanbieter-MCP-Server verwendet werden: Überprüfen Sie den Code des Servers oder vertrauen Sie dem Herausgeber, bevor Sie ihn Ihrer Konfiguration hinzufügen.
 
 ```mermaid
 flowchart LR
-  Dev[Developer request] -->|natural language| ClaudeCode[Claude Code\nMCP client]
-  ClaudeCode -->|initialize + list tools| MCPServer[MCP Server]
-  MCPServer -->|tool manifest| ClaudeCode
-  ClaudeCode -->|tool call request| MCPServer
-  MCPServer -->|calls external service| External[External Service\ne.g. GitHub, DB, Jira]
-  External -->|response| MCPServer
-  MCPServer -->|tool result| ClaudeCode
-  ClaudeCode -->|result injected into context| Model[Claude model]
-  Model -->|final response| Dev
+  Dev[Entwickleranfrage] -->|natürliche Sprache| ClaudeCode[Claude Code\nMCP-Client]
+  ClaudeCode -->|initialisieren + Tools auflisten| MCPServer[MCP-Server]
+  MCPServer -->|Tool-Manifest| ClaudeCode
+  ClaudeCode -->|Tool-Aufruf-Anfrage| MCPServer
+  MCPServer -->|ruft externen Dienst auf| External[Externer Dienst\nz.B. GitHub, DB, Jira]
+  External -->|Antwort| MCPServer
+  MCPServer -->|Tool-Ergebnis| ClaudeCode
+  ClaudeCode -->|Ergebnis in Kontext eingefügt| Model[Claude Modell]
+  Model -->|endgültige Antwort| Dev
 ```
 
 ## Wann verwenden / Wann NICHT verwenden
 
 | Verwenden wenn | Vermeiden wenn |
 |---|---|
-| Claude mit einem externen Dienst interagieren soll (GitHub, Jira, Slack, Datenbanken) | Die Aufgabe mit eingebauten Tools (Dateisystem, Shell) erledigt werden kann — fügen Sie keine unnötige Komplexität hinzu |
-| Ihr Team einen gemeinsamen Satz von Tools hat und Sie eine standardisierte Integrationsschicht wollen | Sie sich in einer sicherheitssensiblen Umgebung befinden, in der externer Tool-Zugang streng kontrolliert werden muss |
-| Sie Claude Zugang zu privaten Datenquellen geben wollen (interne APIs, proprietäre Datenbanken) | Sie eine schnelle einmalige Integration benötigen — ein Shell-Skript, das über das Bash-Tool aufgerufen wird, ist einfacher |
-| Sie ein wiederverwendbares Tool aufbauen, das über mehrere KI-Clients hinweg funktionieren soll | Der MCP-Server, den Sie verwenden möchten, aus einer nicht vertrauenswürdigen Quelle stammt — überprüfen Sie zuerst seinen Code |
-| Sie möchten, dass Claude Live-Zugang zum Systemzustand hat (Metriken, Logs, Fehlerverfolgung) | Der externe Dienst Ratenlimits hat, die durch Claudes autonome Tool-Aufrufe überschritten werden könnten |
+| Sie Claude mit einem externen Dienst interagieren lassen möchten (GitHub, Jira, Slack, Datenbanken) | Die Aufgabe mit integrierten Tools erledigt werden kann (Dateisystem, Shell) – keine Notwendigkeit, Komplexität hinzuzufügen |
+| Ihr Team einen gemeinsamen Satz von Tools hat und eine standardisierte Integrationsschicht möchte | Sie sich in einer sicherheitssensiblen Umgebung befinden, in der externer Tool-Zugriff streng kontrolliert werden muss |
+| Sie Claude Zugriff auf private Datenquellen geben möchten (interne APIs, proprietäre Datenbanken) | Sie eine schnelle einmalige Integration benötigen – ein Shell-Skript, das über das Bash-Tool aufgerufen wird, ist einfacher |
+| Sie ein wiederverwendbares Tool erstellen, das über mehrere KI-Clients hinweg funktionieren soll | Der MCP-Server, den Sie verwenden möchten, aus einer nicht vertrauenswürdigen Quelle stammt – überprüfen Sie zuerst den Code |
+| Sie möchten, dass Claude Live-Zugriff auf den Systemzustand hat (Metriken, Logs, Error-Tracking) | Der externe Dienst Rate-Limits hat, die durch Claudes autonome Tool-Aufrufe überschritten werden könnten |
 
-## Codebeispiele
+## Code-Beispiele
 
 ```json
-// ~/.claude/settings.json — MCP server configuration
+// ~/.claude/settings.json — MCP-Server-Konfiguration
 {
   "mcpServers": {
-    // GitHub MCP server — gives Claude access to repos, issues, PRs
+    // GitHub MCP-Server — gibt Claude Zugriff auf Repos, Issues, PRs
     "github": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
@@ -70,7 +72,7 @@ flowchart LR
       }
     },
 
-    // PostgreSQL MCP server — gives Claude read access to your database schema and query capability
+    // PostgreSQL MCP-Server — gibt Claude Lesezugriff auf Ihr Datenbankschema und Abfragefähigkeit
     "postgres": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/mydb"],
@@ -79,7 +81,7 @@ flowchart LR
       }
     },
 
-    // Filesystem MCP server (extended) — gives Claude access to directories beyond the project root
+    // Filesystem MCP-Server (erweitert) — gibt Claude Zugriff auf Verzeichnisse außerhalb des Projektstamms
     "filesystem": {
       "command": "npx",
       "args": [
@@ -90,7 +92,7 @@ flowchart LR
       ]
     },
 
-    // Custom internal MCP server (stdio, local binary)
+    // Benutzerdefinierter interner MCP-Server (stdio, lokale Binärdatei)
     "internal-tools": {
       "command": "/usr/local/bin/my-mcp-server",
       "args": ["--config", "/etc/my-mcp/config.json"],
@@ -99,7 +101,7 @@ flowchart LR
       }
     },
 
-    // Remote SSE server — shared team infrastructure
+    // Remote SSE-Server — gemeinsam genutzte Team-Infrastruktur
     "team-server": {
       "url": "https://mcp.internal.mycompany.com/sse",
       "headers": {
@@ -111,33 +113,33 @@ flowchart LR
 ```
 
 ```typescript
-// Custom MCP server — TypeScript implementation using the official MCP SDK
-// This example creates an MCP server that wraps an internal metrics API
+// Benutzerdefinierter MCP-Server — TypeScript-Implementierung mit dem offiziellen MCP SDK
+// Dieses Beispiel erstellt einen MCP-Server, der eine interne Metriken-API umhüllt
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
-// Initialize the MCP server with a name and version
+// Den MCP-Server mit einem Namen und einer Version initialisieren
 const server = new McpServer({
   name: "metrics-server",
   version: "1.0.0",
 });
 
-// Define a tool: get_error_rate
-// The description is critical — Claude uses it to decide when to call this tool
+// Ein Tool definieren: get_error_rate
+// Die Beschreibung ist entscheidend — Claude verwendet sie, um zu entscheiden, wann dieses Tool aufgerufen werden soll
 server.tool(
   "get_error_rate",
   "Get the error rate for a service over a specified time window. Use this when the user asks about errors, reliability, or service health.",
   {
-    // Zod schema — the SDK converts this to JSON Schema automatically
+    // Zod-Schema — das SDK konvertiert dies automatisch in JSON-Schema
     service: z.string().describe("The service name, e.g. 'api', 'frontend', 'worker'"),
     window: z
       .enum(["1h", "6h", "24h", "7d"])
       .describe("Time window for the metric. Defaults to 1h."),
   },
   async ({ service, window }) => {
-    // In production, this would call your metrics API (Prometheus, Datadog, etc.)
+    // In der Produktion würde dies Ihre Metriken-API aufrufen (Prometheus, Datadog usw.)
     const response = await fetch(
       `https://metrics.internal.mycompany.com/api/error-rate?service=${service}&window=${window}`,
       { headers: { Authorization: `Bearer ${process.env.METRICS_API_KEY}` } }
@@ -169,7 +171,7 @@ server.tool(
   }
 );
 
-// Define a tool: list_services
+// Ein Tool definieren: list_services
 server.tool(
   "list_services",
   "List all services that have metrics available for monitoring.",
@@ -185,21 +187,21 @@ server.tool(
   }
 );
 
-// Start the server with stdio transport (for local subprocess use)
+// Den Server mit stdio-Transport starten (für lokale Subprozess-Nutzung)
 const transport = new StdioServerTransport();
 await server.connect(transport);
 ```
 
 ```bash
-# Install the MCP SDK for building custom servers
+# Das MCP SDK zum Erstellen benutzerdefinierter Server installieren
 npm install @modelcontextprotocol/sdk zod
 
-# Compile and run the custom server locally for testing
+# Den benutzerdefinierten Server lokal für Tests kompilieren und ausführen
 npx ts-node metrics-server.ts
 
-# Add the custom server to your Claude Code configuration
+# Den benutzerdefinierten Server zur Claude Code-Konfiguration hinzufügen
 cat >> ~/.claude/settings.json << 'EOF'
-# (add to the mcpServers object in your existing settings.json)
+# (zum mcpServers-Objekt in Ihrer bestehenden settings.json hinzufügen)
 "metrics": {
   "command": "node",
   "args": ["/path/to/metrics-server.js"],
@@ -209,7 +211,7 @@ cat >> ~/.claude/settings.json << 'EOF'
 }
 EOF
 
-# Inside a Claude Code session, use the MCP tools naturally:
+# Innerhalb einer Claude Code-Sitzung die MCP-Tools natürlich verwenden:
 claude
 > What is the current error rate for the api service?
 > List all services and show me the error rates for any that exceed 1% in the last hour
@@ -220,12 +222,12 @@ claude
 
 - [MCP-Dokumentation — Anthropic](https://docs.anthropic.com/en/docs/mcp) — Offizielle MCP-Spezifikation, Protokollübersicht und Client/Server-Architektur.
 - [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk) — Offizielles SDK zum Erstellen von MCP-Servern und -Clients in TypeScript/JavaScript.
-- [MCP-Server-Repository](https://github.com/modelcontextprotocol/servers) — Offizielle Sammlung von Referenz-MCP-Server-Implementierungen: Dateisystem, GitHub, PostgreSQL, Google Drive, Slack und mehr.
-- [Claude-Code-MCP-Integrationsleitfaden](https://docs.anthropic.com/en/docs/claude-code/mcp) — Claude-Code-spezifischer Leitfaden für die Konfiguration und Verwendung von MCP-Servern in Sitzungen.
-- [MCP-Spezifikation](https://spec.modelcontextprotocol.io) — Vollständige Protokollspezifikation für die Implementierung benutzerdefinierter Clients oder Server.
+- [MCP-Server-Repository](https://github.com/modelcontextprotocol/servers) — Offizielle Sammlung von Referenz-MCP-Servern: Dateisystem, GitHub, PostgreSQL, Google Drive, Slack und mehr.
+- [Claude Code MCP-Integrationsleitfaden](https://docs.anthropic.com/en/docs/claude-code/mcp) — Claude Code-spezifischer Leitfaden zur Konfiguration und Verwendung von MCP-Servern in Sitzungen.
+- [MCP-Spezifikation](https://spec.modelcontextprotocol.io) — Vollständige Protokollspezifikation zur Implementierung benutzerdefinierter Clients oder Server.
 
 ## Siehe auch
 
-- [Claude-Code-Übersicht](/docs/claude-code)
-- [Claude-Code-Skills](/docs/claude-code/skills)
+- [Claude Code Übersicht](/docs/claude-code)
+- [Claude Code Skills](/docs/claude-code/skills)
 - [Anthropic Tool Use](/docs/agents/anthropic-tool-use)

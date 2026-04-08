@@ -1,45 +1,47 @@
 ---
 title: Desarrollo orientado a especificaciones
-description: Building AI systems a partir de especificaciones explícitas.
-keywords: [spec-driven, specification, requirements, RDD]
+description: Construcción de sistemas de IA a partir de especificaciones explícitas.
+keywords: [orientado a especificaciones, especificación, requisitos, RDD]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Desarrollo orientado a especificaciones
 
 ## Definición
 
-El desarrollo basado en especificaciones construye sistemas de IA (agentes, pipelines, herramientas) a partir de especificaciones explícitas: requirements, output formats, allowed actions, and constraints. Specs are retrieved and used at runtime (por ej. in RDD) so behavior stays aligned with intent.
+El desarrollo orientado a especificaciones construye sistemas de IA (agentes, pipelines, herramientas) a partir de especificaciones explícitas: requisitos, formatos de salida, acciones permitidas y restricciones. Las especificaciones se recuperan y usan en tiempo de ejecución (como en RDD) para que el comportamiento permanezca alineado con la intención.
 
-Es especially useful for [agents](/docs/agents) and [RDD](/docs/reasoning-patterns/rdd): instead of encodificación all rules in weights or prompts, you maintain specs (por ej. in docs or a knowledge base) and retrieve them at runtime. Fits regulated domains and teams that want behavior to be auditable and updatable sin reentrenar.
+Es especialmente útil para [agentes](/docs/agents) y [RDD](/docs/reasoning-patterns/rdd): en lugar de codificar todas las reglas en pesos o indicaciones, se mantienen especificaciones (como en documentos o una base de conocimiento) y se recuperan en tiempo de ejecución. Es adecuado para dominios regulados y equipos que desean que el comportamiento sea auditable y actualizable sin reentrenamiento.
 
 ## Cómo funciona
 
 ```mermaid
 flowchart LR
-  Spec[Spec] --> Retrieve[Retrieve spec]
-  Task[Task] --> Retrieve
-  Retrieve --> Decide[Decide]
-  Decide --> Generate[Generate]
-  Generate --> Validate[Validate]
+  Spec[Especificación] --> Retrieve[Recuperar especificación]
+  Task[Tarea] --> Retrieve
+  Retrieve --> Decide[Decidir]
+  Decide --> Generate[Generar]
+  Generate --> Validate[Validar]
 ```
 
-You **write specs** (natural language, schemas, or structured rules) and index them for recuperación (por ej. in a vector store or structured repo). At runtime, the **task** (and optionally the current state) is used to **retrieve** relevant spec fragments. The model or agent **decides** (por ej. next step, allowed actions) and **generates** (output, tool call) with the spec in context. **Validate** checks the output against the spec (por ej. schema, rules); if validation fails, you can retry or surface an error. This keeps generation and decisións aligned with the spec without baking everything into [prompt engineering](/docs/prompt-engineering) or [fine-tuning](/docs/llms/fine-tuning).
+Se **escriben especificaciones** (lenguaje natural, esquemas o reglas estructuradas) y se indexan para recuperación (como en un almacén vectorial o repositorio estructurado). En tiempo de ejecución, la **tarea** (y opcionalmente el estado actual) se usa para **recuperar** fragmentos de especificación relevantes. El modelo o agente **decide** (como el siguiente paso, acciones permitidas) y **genera** (salida, llamada a herramienta) con la especificación en contexto. **Valida** comprueba la salida contra la especificación (como esquema, reglas); si la validación falla, se puede reintentar o mostrar un error. Esto mantiene la generación y las decisiones alineadas con la especificación sin introducir todo en la [ingeniería de indicaciones](/docs/prompt-engineering) o el [ajuste fino](/docs/llms/fine-tuning).
 
 ## Casos de uso
 
-Spec-driven development fits when behavior must stay aligned with retrievable requirements (RDD, compliance, or safety).
+El desarrollo orientado a especificaciones es adecuado cuando el comportamiento debe permanecer alineado con requisitos recuperables (RDD, cumplimiento o seguridad).
 
-- Building agents that retrieve and follow specs (por ej. RDD pattern)
-- Enforcing output format and constraints (JSON, allowed actions)
-- Regulated or safety-critical flows where behavior must igualar requirements
+- Construir agentes que recuperan y siguen especificaciones (como el patrón RDD)
+- Aplicar formato de salida y restricciones (JSON, acciones permitidas)
+- Flujos regulados o críticos para la seguridad donde el comportamiento debe coincidir con los requisitos
 
-## Documentación externa
+## Recursos prácticos
 
-- [LangChain – Structured output](https://python.langchain.com/docs/concepts/output_parsers/) — Enforcing output format from LLMs
-- [OpenAI – Structured outputs](https://platform.openai.com/docs/guides/structured-outputs)
+- [LangChain – Salida estructurada](https://python.langchain.com/docs/concepts/output_parsers/) — Aplicar formato de salida desde LLMs
+- [OpenAI – Salidas estructuradas](https://platform.openai.com/docs/guides/structured-outputs)
 
 ## Ver también
 
 - [RDD](/docs/reasoning-patterns/rdd)
-- [Agents](/docs/agents)
-- [Prompt engineering](/docs/prompt-engineering)
+- [Agentes](/docs/agents)
+- [Ingeniería de indicaciones](/docs/prompt-engineering)

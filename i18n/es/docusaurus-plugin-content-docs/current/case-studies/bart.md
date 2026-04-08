@@ -1,28 +1,30 @@
 ---
 title: Case study — BART
 description: Predecesor codificador-decodificador de Gemini; preentrenamiento con eliminación de ruido para resumen y generación.
-keywords: [BART, encoder-decoder, eliminación de ruido, summarization]
+keywords: [BART, encoder-decoder, denoising, summarization]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Case study: BART
 
 ## Definición
 
-BART (Bidirectional and Auto-Regressive Transformers) es un modelo **codificador-decodificador** [transformer](/docs/transformers) de Meta (Facebook AI). Es pretrained with eliminación de ruido objectives (por ej. token deletion, masking, sentence permutation) and fine-tuned for summarization, translation, and conditional generation.
+BART (Bidirectional and Auto-Regressive Transformers) es un modelo **codificador-decodificador** [transformer](/docs/transformers) de Meta (Facebook AI). Se preentrena con objetivos de eliminación de ruido (p. ej., eliminación de tokens, enmascaramiento, permutación de oraciones) y se ajusta para resumen, traducción y generación condicional.
 
-BART represents an earlier generation of large sequence-to-sequence models; Google’s [Gemini](/docs/case-studies/gemini) and other modern [LLMs](/docs/llms) build on different architectures (decoder-only, multimodal) but share the goal of strong text understanding and generation. Use case: summarization, question answering, and conditional text generation where encoder-decoder structure is beneficial.
+BART representa una generación anterior de grandes modelos secuencia a secuencia; [Gemini](/docs/case-studies/gemini) de Google y otros [LLMs](/docs/llms) modernos se basan en arquitecturas diferentes (solo decodificador, multimodal) pero comparten el objetivo de un sólido entendimiento y generación de texto. Caso de uso: resumen, respuesta a preguntas y generación de texto condicional donde la estructura codificador-decodificador es beneficiosa.
 
 ## Cómo funciona
 
-**Codificador**: un codificador bidireccional similar a [BERT](/docs/transformers/bert) procesa la secuencia de entrada. **Decodificador**: un decodificador causal (autorregresivo)er attends to the encoder output and previous decoder positions to generate the target. **Pretraining**: corrupt the input (mask, delete, permute) and train the model to reconstruct the original—this eliminación de ruido objective learns robust representations. **Fine-tuning**: add a task-specific head or use the sequence output for summarization (por ej. CNN/DailyMail), translation, or QA. Inference: encode source, then decode token by token.
+**Codificador**: un codificador bidireccional similar a [BERT](/docs/transformers/bert) procesa la secuencia de origen. **Decodificador**: un decodificador causal (autorregresivo) atiende la salida del codificador y las posiciones anteriores del decodificador para generar el destino. **Preentrenamiento**: se corrompe la entrada (se enmascara, elimina, permuta) y se entrena al modelo para reconstruir el original — este objetivo de eliminación de ruido aprende representaciones robustas. **Ajuste fino**: se añade una cabeza específica de tarea o se utiliza la salida de secuencia para resumen (p. ej., CNN/DailyMail), traducción o respuesta a preguntas. Inferencia: codificar el origen y luego decodificar token por token.
 
 ## Casos de uso
 
-BART-style encoder-decoder models fit conditional generation and understanding tasks with a clear source and target.
+Los modelos codificador-decodificador de estilo BART son adecuados para tareas de generación condicional y comprensión con un origen y un destino claros.
 
-- Document and dialogue summarization
-- Conditional generation (por ej. sentence completion, data-to-text)
-- Fine-tuning for domain-specific NLU and generation
+- Resumen de documentos y diálogos
+- Generación condicional (p. ej., completar oraciones, datos a texto)
+- Ajuste fino para NLU y generación específicos de dominio
 
 ## Documentación externa
 

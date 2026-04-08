@@ -1,18 +1,20 @@
 ---
-title: Técnicas de debiasing
-description: Las técnicas de debiasing son estrategias a nivel de prompt y de evaluación para identificar y reducir sesgos sistemáticos en las salidas de los LLMs — cubriendo sesgos sociales, sycophancy, efectos posicionales y distorsiones de evaluación — para producir respuestas más justas y fiables.
-keywords: [debiasing, sesgo en LLM, ingeniería de prompts, equidad, sycophancy, sesgo posicional, sesgo social, calibración, benchmarks de sesgo, ética en IA, estereotipo, prompting contrafactual]
+title: Técnicas de eliminación de sesgos
+description: Las técnicas de eliminación de sesgos son estrategias a nivel de prompt y de evaluación para identificar y reducir el sesgo sistemático en los resultados de los LLM — cubriendo sesgos sociales, servilismo, efectos posicionales y distorsiones de evaluación — para producir respuestas más justas y fiables.
+keywords: [debiasing, LLM bias, prompt engineering, fairness, sycophancy, positional bias, social bias, calibration, bias benchmarks, AI ethics, stereotype, counterfactual prompting]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
-# Técnicas de debiasing
+# Técnicas de eliminación de sesgos
 
 ## Definición
 
-El sesgo en las salidas de los LLMs es cualquier tendencia sistemática a producir respuestas que son sesgadas, injustas o distorsionadas de maneras que no reflejan un razonamiento neutral, preciso o equitativo. Es una propiedad de las salidas, no solo de los datos de entrenamiento: incluso un modelo entrenado con datos balanceados puede exhibir sesgo debido a sus mecanismos de atención, el modelado de recompensa RLHF, o las regularidades estadísticas en cómo el lenguaje codifica las relaciones sociales. Para los profesionales que construyen sistemas de producción, el sesgo es tanto una preocupación ética — las salidas pueden reforzar estereotipos, excluir grupos o producir decisiones injustas — como una preocupación de fiabilidad — un modelo sesgado da respuestas inconsistentes dependiendo de características superficiales irrelevantes de la entrada.
+El sesgo en los resultados de los LLM es cualquier tendencia sistemática a producir respuestas que están sesgadas, son injustas o están distorsionadas de maneras que no reflejan un razonamiento neutral, preciso o equitativo. Es una propiedad de los resultados, no solo de los datos de entrenamiento: incluso un modelo entrenado con datos equilibrados puede exhibir sesgo debido a sus mecanismos de atención, el modelado de recompensas RLHF, o las regularidades estadísticas en cómo el lenguaje codifica las relaciones sociales. Para los profesionales que construyen sistemas de producción, el sesgo es tanto una preocupación ética —los resultados pueden reforzar estereotipos, excluir grupos o producir decisiones injustas— como una preocupación de fiabilidad —un modelo sesgado da respuestas inconsistentes dependiendo de características superficiales irrelevantes de la entrada.
 
-Existen varias categorías distintas de sesgo que requieren diferentes estrategias de mitigación. El **sesgo social y demográfico** es la tendencia a asociar grupos (definidos por género, raza, nacionalidad, religión, edad, etc.) con atributos, competencias o roles particulares. La **sycophancy** es la tendencia a estar de acuerdo con la posición declarada o implícita del usuario independientemente de la corrección, un sesgo introducido por el entrenamiento RLHF donde los evaluadores humanos prefirieron respuestas complacientes. El **sesgo posicional** afecta a los LLMs usados como jueces: tienden a calificar la primera o última opción de manera más favorable que las opciones del medio, independientemente de la calidad del contenido. El **sesgo de verbosidad** hace que los jueces LLM prefieran respuestas más largas y elaboradas sobre respuestas correctas más cortas. El **sesgo de confirmación en la generación** ocurre cuando el modelo genera razonamiento que apoya una conclusión a la que llegó primero, descartando evidencia contraria. Entender qué sesgo está presente en tu caso de uso específico determina qué técnica de debiasing es más aplicable.
+Existen varias categorías distintas de sesgo que requieren diferentes estrategias de mitigación. El **sesgo social y demográfico** es la tendencia a asociar grupos (definidos por género, raza, nacionalidad, religión, edad, etc.) con atributos, competencias o roles particulares. El **servilismo** es la tendencia a estar de acuerdo con la posición declarada o implícita del usuario independientemente de la corrección, un sesgo introducido por el entrenamiento RLHF donde los evaluadores humanos preferían las respuestas complacientes. El **sesgo posicional** afecta a los LLM utilizados como jueces: tienden a valorar más favorablemente la primera o última opción que las opciones en el medio, independientemente de la calidad del contenido. El **sesgo de verbosidad** hace que los jueces LLM prefieran respuestas más largas y elaboradas sobre respuestas más cortas y correctas. El **sesgo de confirmación en la generación** ocurre cuando el modelo genera razonamiento que apoya una conclusión a la que llegó primero, descartando evidencia contraria. Comprender qué sesgo está presente en su caso de uso específico determina qué técnica de eliminación de sesgo es más aplicable.
 
-El debiasing a nivel de prompt es una de varias intervenciones disponibles. Las alternativas incluyen alineación post-entrenamiento (RLHF, IA constitucional), balanceo de datos, ingeniería de representaciones y filtrado de salidas. Las técnicas a nivel de prompt son valiosas porque no requieren reentrenamiento del modelo, son transparentes y auditables, y pueden aplicarse selectivamente a tareas o poblaciones de usuarios específicas. Sin embargo, no son un sustituto del trabajo de alineación — un modelo fuertemente sesgado puede resistir el debiasing a nivel de prompt en ciertos temas, y las instrucciones del prompt pueden ser socavadas por entradas adversariales. El objetivo realista del debiasing a nivel de prompt es reducir los sesgos más comunes y sistemáticos a un nivel aceptable para la aplicación objetivo, no eliminar el sesgo por completo.
+La eliminación de sesgo a nivel de prompt es una de varias intervenciones disponibles. Las alternativas incluyen alineación post-entrenamiento (RLHF, IA constitucional), equilibrio de datos, ingeniería de representaciones y filtrado de salida. Las técnicas a nivel de prompt son valiosas porque no requieren reentrenamiento del modelo, son transparentes y auditables, y pueden aplicarse selectivamente a tareas o poblaciones de usuarios específicas. Sin embargo, no son un sustituto del trabajo de alineación —un modelo fuertemente sesgado puede resistir la eliminación de sesgo a nivel de prompt en ciertos temas, y las instrucciones del prompt pueden ser socavadas por entradas adversariales. El objetivo realista de la eliminación de sesgo a nivel de prompt es reducir los sesgos más comunes y sistemáticos a un nivel aceptable para la aplicación objetivo, no eliminar el sesgo por completo.
 
 ## Cómo funciona
 
@@ -34,50 +36,50 @@ flowchart TD
 
 ### Tipos de sesgo
 
-Entender el tipo específico de sesgo presente en tu sistema es el primer paso esencial. Aplicar la técnica de debiasing incorrecta desperdicia esfuerzo y puede introducir nuevos problemas.
+Comprender el tipo específico de sesgo presente en su sistema es el primer paso esencial. Aplicar la técnica de eliminación de sesgo incorrecta desperdicia esfuerzo y puede introducir nuevos problemas.
 
-El **sesgo social y demográfico** se manifiesta cuando la respuesta del modelo cambia en función de las características demográficas del sujeto o del usuario, incluso cuando esas características son irrelevantes para la tarea. Ejemplos clásicos: describir a un médico como hombre de forma predeterminada, asociar ciertas nacionalidades con comportamientos particulares, o calificar el mismo currículum de manera diferente dependiendo del nombre del solicitante.
+El **sesgo social y demográfico** se manifiesta cuando la respuesta del modelo cambia según las características demográficas del sujeto o del usuario, incluso cuando esas características son irrelevantes para la tarea. Ejemplos clásicos: describir a un médico como masculino por defecto, asociar ciertas nacionalidades con comportamientos particulares, o evaluar el mismo currículum de manera diferente dependiendo del nombre del solicitante.
 
-La **sycophancy** es particularmente insidiosa porque parece ser útil. El modelo afirma la creencia incorrecta del usuario, ajusta su confianza declarada para que coincida con la confianza aparente del usuario, o revierte su posición cuando el usuario presiona — incluso sin nueva evidencia. Esto fue identificado como un modo de fallo clave en los modelos entrenados con RLHF (Perez et al., 2022; Sharma et al., 2023).
+El **servilismo** es particularmente insidioso porque parece útil. El modelo afirma la creencia incorrecta del usuario, ajusta su confianza declarada para que coincida con la confianza aparente del usuario, o revierte su posición cuando el usuario contraargumenta —incluso sin nueva evidencia. Esto fue identificado como un modo de falla clave de los modelos entrenados con RLHF (Perez et al., 2022; Sharma et al., 2023).
 
-Los **sesgos posicional y de verbosidad** afectan predominantemente a las aplicaciones donde se usa un LLM como evaluador o clasificador. Cuando se le pide elegir entre la Opción A y la Opción B, los modelos prefieren sistemáticamente la que aparece primero (o en algunos contextos, la última). Cuando se les pide calificar respuestas, los modelos favorecen respuestas más largas incluso cuando una respuesta más corta es más precisa.
+Los **sesgos posicionales y de verbosidad** afectan predominantemente a las aplicaciones donde un LLM se utiliza como evaluador o clasificador. Cuando se le pide elegir entre la Opción A y la Opción B, los modelos sistemáticamente prefieren la que aparece primero (o en algunos contextos, la última). Cuando se les pide calificar respuestas, los modelos favorecen las respuestas más largas incluso cuando una respuesta más corta es más precisa.
 
-El **sesgo de encuadre** ocurre cuando preguntas lógicamente equivalentes producen respuestas diferentes basadas en la formulación. "¿Es seguro este medicamento?" y "¿Tiene riesgos este medicamento?" son semánticamente equivalentes pero pueden producir respuestas con tendencias opuestas.
+El **sesgo de encuadre** ocurre cuando preguntas lógicamente equivalentes generan respuestas diferentes basadas en la formulación. "¿Es seguro este medicamento?" y "¿Tiene riesgos este medicamento?" son semánticamente equivalentes pero pueden producir respuestas con tendencias opuestas.
 
-### Estrategias de debiasing a nivel de prompt
+### Estrategias de eliminación de sesgo a nivel de prompt
 
-**Inyección de instrucción neutral**: Instruir explícitamente al modelo para que ignore los atributos demográficos irrelevantes y evalúe solo los criterios relevantes para la tarea. Agregar instrucciones como: "Tu evaluación no debe estar influenciada por el género, la nacionalidad, la edad o el nombre de ninguna persona mencionada. Céntrate únicamente en [criterios específicos de la tarea]."
+**Inyección de instrucciones neutrales**: Instruir explícitamente al modelo para que ignore los atributos demográficos irrelevantes y evalúe solo los criterios relevantes para la tarea. Agregar instrucciones como: "Tu evaluación no debe verse influenciada por el género, la nacionalidad, la edad o el nombre de ninguna persona mencionada. Enfócate solo en [criterios específicos de la tarea]."
 
-**Prompting contrafactual**: Generar múltiples versiones del prompt con atributos demográficos clave intercambiados (masculino/femenino, Grupo A/Grupo B), ejecutar cada una a través del modelo y comparar las salidas. Si las salidas difieren significativamente en atributos que deberían ser irrelevantes, el modelo está exhibiendo sesgo demográfico. Esta técnica es principalmente diagnóstica, pero también puede usarse como restricción de consistencia: incluir ambas versiones en el mismo prompt y pedirle al modelo que produzca una respuesta coherente entre ambos encuadres.
+**Prompting contrafactual**: Generar múltiples versiones del prompt con atributos demográficos clave intercambiados (masculino/femenino, Grupo A/Grupo B), ejecutar cada uno a través del modelo y comparar los resultados. Si los resultados difieren significativamente en atributos que deberían ser irrelevantes, el modelo está exhibiendo sesgo demográfico. Esta técnica es principalmente diagnóstica, pero también puede usarse como restricción de consistencia: incluir ambas versiones en el mismo prompt y pedir al modelo que produzca una respuesta consistente entre ambos encuadres.
 
-**Prompting steelman y basado en evidencia**: Para contrarrestar la sycophancy, instruir al modelo para que articule la versión más sólida de la posición contraria antes de dar su evaluación. Alternativamente, usar una estructura de evidencia primero: "Lista la evidencia a favor y en contra de [afirmación], luego proporciona tu evaluación." Esto fuerza al modelo a procesar la evidencia contraria antes de llegar a una conclusión.
+**Prompting de refuerzo del argumento contrario y evidencia primero**: Para contrarrestar el servilismo, instruir al modelo para que articule la versión más sólida de la posición opuesta antes de dar su evaluación. Alternativamente, usar una estructura de evidencia primero: "Enumera la evidencia a favor y en contra de [afirmación], luego proporciona tu evaluación." Esto obliga al modelo a procesar evidencia contraria antes de llegar a una conclusión.
 
-**Ordenación aleatorizada para tareas de evaluación**: Cuando se usa un LLM para comparar o clasificar múltiples opciones, aleatorizar el orden en múltiples llamadas y agregar las puntuaciones. La clasificación de consenso es más fiable que cualquier ordenación individual. Alternativamente, pedir al modelo que puntúe cada opción de forma independiente y absoluta (por ejemplo, puntuaciones del 1 al 10) antes de hacer cualquier comparación.
+**Ordenación aleatoria para tareas de evaluación**: Cuando se usa un LLM para comparar o clasificar múltiples opciones, aleatorizar el orden en múltiples llamadas y agregar las puntuaciones. La clasificación por consenso es más fiable que cualquier ordenación única. Alternativamente, pedir al modelo que puntúe cada opción de forma independiente y absoluta (p. ej., puntuaciones de 1 a 10) antes de hacer cualquier comparación.
 
-**Instrucciones de calibración explícita**: Para tareas de evaluación, añadir instrucciones que contrarresten directamente los sesgos conocidos: "No dejes que la longitud de la respuesta influya en tu calificación. Una respuesta concisa y precisa debe recibir la misma puntuación que una respuesta precisa pero verbosa. Califica basándote solo en la corrección y la utilidad."
+**Instrucciones de calibración explícitas**: Para tareas de evaluación, agregar instrucciones que contrarresten directamente los sesgos conocidos: "No dejes que la longitud de la respuesta influya en tu calificación. Una respuesta concisa y precisa debe recibir la misma puntuación que una respuesta verbosa y precisa. Califica basándote solo en la corrección y la utilidad."
 
 ### Evaluación y medición
 
-El sesgo no puede gestionarse sin medirse. Enfoques clave de evaluación para el trabajo de debiasing a nivel de prompt:
+El sesgo no puede gestionarse sin medirse. Enfoques clave de evaluación para el trabajo de eliminación de sesgo a nivel de prompt:
 
-- **Consistencia contrafactual**: Ejecutar la misma consulta con atributos demográficos variados; medir la varianza en las salidas. Menor varianza = menos sesgo demográfico.
+- **Consistencia contrafactual**: Ejecutar la misma consulta con atributos demográficos variados; medir la varianza en los resultados. Menor varianza = menos sesgo demográfico.
 - **Benchmarks de sesgo**: BBQ (Bias Benchmark for QA), WinoBias, StereoSet y HolisticBias proporcionan conjuntos de datos estructurados para medir el sesgo social en muchos ejes demográficos.
-- **Pruebas de sycophancy**: Presentar al modelo afirmaciones factualmente incorrectas enmarcadas como creencias del usuario y medir con qué frecuencia está de acuerdo frente a cuándo corrige. El benchmark SimpleQA incluye pruebas de sycophancy adversariales.
-- **Pruebas de sesgo posicional**: Ejecutar la misma tarea de clasificación con las ordenaciones de opciones permutadas; medir la correlación de clasificación entre ordenaciones. Un evaluador perfectamente imparcial debería producir la misma clasificación independientemente de la posición.
+- **Pruebas de servilismo**: Presentar al modelo afirmaciones factualmente incorrectas enmarcadas como creencias del usuario y medir con qué frecuencia está de acuerdo vs. corrige. El benchmark SimpleQA incluye pruebas de servilismo adversarial.
+- **Pruebas de sesgo posicional**: Ejecutar la misma tarea de clasificación con ordenaciones de opciones permutadas; medir la correlación de rango entre ordenaciones. Un evaluador perfectamente imparcial debería producir la misma clasificación independientemente de la posición.
 
 ## Cuándo usar / Cuándo NO usar
 
 | Usar cuando | Evitar cuando |
 |-------------|---------------|
-| Tu aplicación toma decisiones que afectan a individuos (contratación, préstamos, triaje médico) | El sesgo en tu aplicación específica no se ha medido — aplica la medición primero, luego selecciona técnicas específicas |
-| Observas inconsistencias demográficas en las salidas durante las pruebas | Estás usando técnicas a nivel de prompt como sustituto de la alineación — reducen pero no eliminan los sesgos profundos del modelo |
-| Estás usando un LLM como juez o clasificador y necesitas comparaciones fiables | Añadir instrucciones de debiasing aumenta significativamente la longitud del prompt y los costes son una restricción dura |
-| Quieres auditar el comportamiento del modelo en grupos demográficos sin reentrenar | La tarea genuinamente requiere un tratamiento diferente de los grupos (por ejemplo, dosificación médica por peso corporal) — distinguir el sesgo irrelevante de la diferenciación legítima relevante para la tarea |
-| Necesitas un registro de debiasing transparente e inspeccionable para el cumplimiento normativo | Tus técnicas de debiasing introducen sus propios sesgos — por ejemplo, forzar el equilibrio en preguntas genuinamente asimétricas distorsiona la precisión |
+| Tu aplicación toma decisiones que afectan a individuos (contratación, préstamos, triaje médico) | El sesgo en tu aplicación específica no ha sido medido — aplica la medición primero, luego selecciona técnicas específicas |
+| Observas inconsistencia demográfica en los resultados durante las pruebas | Estás usando técnicas a nivel de prompt como sustituto de la alineación — reducen pero no eliminan los sesgos profundos del modelo |
+| Estás usando un LLM como juez o clasificador y necesitas comparaciones fiables | Agregar instrucciones de eliminación de sesgo aumenta significativamente la longitud del prompt y los costos son una restricción estricta |
+| Quieres auditar el comportamiento del modelo en grupos demográficos sin reentrenamiento | La tarea requiere genuinamente un tratamiento diferente de los grupos (p. ej., dosificación médica por peso corporal) — distinguir el sesgo irrelevante de la diferenciación legítima relevante para la tarea |
+| Necesitas un registro de eliminación de sesgo transparente e inspeccionable para el cumplimiento regulatorio | Tus técnicas de eliminación de sesgo introducen sus propios sesgos — p. ej., forzar el equilibrio en preguntas genuinamente asimétricas distorsiona la precisión |
 
 ## Ejemplos de código
 
-### Verificación de consistencia contrafactual
+### Comprobación de consistencia contrafactual
 
 ```python
 # Measure demographic bias by comparing outputs on counterfactual prompt pairs
@@ -149,7 +151,7 @@ if __name__ == "__main__":
     # the degree of difference across responses
 ```
 
-### Mitigación de sycophancy con prompting basado en evidencia
+### Mitigación del servilismo con prompting de evidencia primero
 
 ```python
 # Counter sycophancy by forcing evidence-before-conclusion structure
@@ -196,7 +198,7 @@ if __name__ == "__main__":
     print(run_completion(DEBIASED_PROMPT))
 ```
 
-### Mitigación de sesgo posicional para LLM-como-juez
+### Mitigación del sesgo posicional para LLM como juez
 
 ```python
 # Mitigate positional bias in LLM scoring by randomizing option order
@@ -294,7 +296,7 @@ if __name__ == "__main__":
         print(f"  {rid}: {score:.2f}")
 ```
 
-### Inyección de instrucción neutral para equidad demográfica
+### Inyección de instrucciones neutrales para equidad demográfica
 
 ```python
 # Inject explicit neutrality instructions to reduce demographic bias
@@ -375,15 +377,15 @@ if __name__ == "__main__":
 
 ## Recursos prácticos
 
-- [BBQ: A Hand-Built Bias Benchmark for Question Answering (Parrish et al., 2022)](https://arxiv.org/abs/2110.08193) — Un conjunto de datos de 58.000 ejemplos de QA diseñado para medir el sesgo social en nueve ejes demográficos; ampliamente utilizado para medir la equidad de los LLMs.
-- [Sycophancy to Subterfuge: Investigating Reward Tampering in Language Models (Sharma et al., 2023)](https://arxiv.org/abs/2310.13548) — Estudio empírico de la sycophancy en modelos entrenados con RLHF con análisis de qué estrategias de prompting reducen el comportamiento sycophantic.
-- [Large Language Models Are Not Robust Multiple Choice Selectors (Pezeshkpour & Hruschka, 2023)](https://arxiv.org/abs/2309.03882) — Demuestra el sesgo posicional en las salidas de los LLMs y propone estrategias de calibración.
-- [Judging the Judges: A Systematic Investigation of Position Bias in Pairwise Comparative Assessments by LLMs (Wang et al., 2023)](https://arxiv.org/abs/2406.07791) — Estudio exhaustivo de los sesgos posicional y de verbosidad en entornos de LLM-como-juez con recomendaciones de mitigación.
+- [BBQ: A Hand-Built Bias Benchmark for Question Answering (Parrish et al., 2022)](https://arxiv.org/abs/2110.08193) — Un conjunto de datos de 58,000 ejemplos de QA diseñado para medir el sesgo social en nueve ejes demográficos; ampliamente utilizado para medir la equidad de los LLM.
+- [Sycophancy to Subterfuge: Investigating Reward Tampering in Language Models (Sharma et al., 2023)](https://arxiv.org/abs/2310.13548) — Estudio empírico del servilismo en modelos entrenados con RLHF con análisis de qué estrategias de prompting reducen el comportamiento servil.
+- [Large Language Models Are Not Robust Multiple Choice Selectors (Pezeshkpour & Hruschka, 2023)](https://arxiv.org/abs/2309.03882) — Demuestra el sesgo posicional en los resultados de los LLM y propone estrategias de calibración.
+- [Judging the Judges: A Systematic Investigation of Position Bias in Pairwise Comparative Assessments by LLMs (Wang et al., 2023)](https://arxiv.org/abs/2406.07791) — Estudio completo de los sesgos posicionales y de verbosidad en entornos de LLM como juez con recomendaciones de mitigación.
 - [HolisticBias: A large-scale text corpus for measuring bias](https://github.com/facebookresearch/ResponsibleNLP/tree/main/holistic_bias) — El benchmark de Meta que cubre más de 600 términos descriptores demográficos en 13 ejes demográficos para la medición sistemática del sesgo.
 
 ## Ver también
 
 - [Ingeniería de prompts](/docs/prompt-engineering)
-- [Sesgo en IA](/docs/bias-in-ai)
-- [Ética en IA](/docs/ai-ethics)
-- [Auto-evaluación y calibración](/docs/prompt-engineering/self-evaluation-calibration)
+- [Sesgo en la IA](/docs/bias-in-ai)
+- [Ética de la IA](/docs/ai-ethics)
+- [Autoevaluación y calibración](/docs/prompt-engineering/self-evaluation-calibration)

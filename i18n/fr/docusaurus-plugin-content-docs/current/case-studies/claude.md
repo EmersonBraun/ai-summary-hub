@@ -2,35 +2,37 @@
 title: Case study — Claude
 description: LLM d'Anthropic suivant les instructions avec contexte long et sécurité.
 keywords: [Claude, Anthropic, constitutional AI, long context]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Case study: Claude
 
 ## Définition
 
-Claude is Anthropic’s famille de modèles conversationnels [LLMs](/docs/llms). Les modèles sont conçus pour instruction-following, long context, and safety, using techniques such as constitutional AI and RLHF-style alignment.
+Claude est la famille de [LLMs](/docs/llms) conversationnels d'Anthropic. Les modèles sont conçus pour le suivi d'instructions, le contexte long et la sécurité, en utilisant des techniques telles que l'IA constitutionnelle et l'alignement de style RLHF.
 
-They share the same broad stack as [ChatGPT](/docs/case-studies/chatgpt): pretrained base, ajustement d'instructions, and preference-based alignment. Claude emphasizes long-context windows, [prompt engineering](/docs/prompt-engineering)-friendly behavior, and safety constraints. Use case: chat, long-document analysis, coding, and [agent](/docs/agents)-style workflows via API and products like [Claude Code](/docs/tools/claude-code).
+Ils partagent la même pile générale que [ChatGPT](/docs/case-studies/chatgpt) : base pré-entraînée, ajustement d'instructions et alignement basé sur les préférences. Claude met l'accent sur les fenêtres de contexte long, le comportement favorable à l'[ingénierie de prompts](/docs/prompt-engineering) et les contraintes de sécurité. Cas d'utilisation : chat, analyse de longs documents, programmation et flux de travail de style [agent](/docs/agents) via l'API et des produits comme [Claude Code](/docs/tools/claude-code).
 
 ## Comment ça fonctionne
 
-Un **modèle de base** ([transformer](/docs/transformers) décodeur seul) est pré-entraîné sur de grands corpus de texte. **L'ajustement d'instructions**ing** trains the model on (instruction, response) pairs. **Constitutional AI** and **RLHF** (reward model + policy optimization) shape helpfulness, honesty, and refusals. Le résultat est un model with long context support (par ex. 100K+ tokens), suitable for documents and extended conversations. **Safety and guardrails** (content policy, refusals) are applied in the product. [RAG](/docs/rag) and tools extend Claude for specific applications.
+Un **modèle de base** ([transformer](/docs/transformers) décodeur uniquement) est pré-entraîné sur de grands corpus de texte. **L'ajustement d'instructions** entraîne le modèle sur des paires (instruction, réponse). **L'IA constitutionnelle** et le **RLHF** (modèle de récompense + optimisation de politique) façonnent l'utilité, l'honnêteté et les refus. Le résultat est un modèle avec un support de contexte long (p. ex., plus de 100 000 tokens), adapté aux documents et aux conversations étendues. La **sécurité et les garde-fous** (politique de contenu, refus) sont appliqués dans le produit. [RAG](/docs/rag) et les outils étendent Claude pour des applications spécifiques.
 
 ## Cas d'utilisation
 
-Claude fits applications that need long context, careful instruction-following, and strong safety defaults.
+Claude convient aux applications qui ont besoin d'un contexte long, d'un suivi attentif des instructions et de valeurs par défaut de sécurité solides.
 
-- Long-document Q&A, summarization, and analysis
-- Coding assistance and code generation with large codebase context
-- Chat and task automation with explicit safety and refusal behavior
+- Questions-réponses, résumé et analyse de longs documents
+- Assistance à la programmation et génération de code avec un contexte de grande base de code
+- Chat et automatisation des tâches avec un comportement de sécurité et de refus explicite
 
 ## Documentation externe
 
-- [Anthropic – Claude](https://www.anthropic.com/product) — Models and product
-- [Anthropic – Model documentation](https://docs.anthropic.com/) — API and guides
+- [Anthropic – Claude](https://www.anthropic.com/product) — Modèles et produit
+- [Anthropic – Model documentation](https://docs.anthropic.com/) — API et guides
 
 ## Voir aussi
 
 - [LLMs](/docs/llms)
-- [Prompt engineering](/docs/prompt-engineering)
+- [Ingénierie de prompts](/docs/prompt-engineering)
 - [Claude Code](/docs/tools/claude-code)

@@ -2,35 +2,37 @@
 title: Claude Code 技能
 description: 扩展 Claude Code 能力的可复用、可调用的提示模板——技能是什么、如何编写、存放在哪里以及如何使用 /skill-name 调用它们。
 keywords: [Claude Code 技能, 斜杠命令, 自定义技能, 可复用提示, 技能目录, 技能 frontmatter, Claude Code 扩展]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Claude Code 技能
 
 ## 定义
 
-技能是可复用的、可调用的提示文件，扩展了 Claude Code 的默认行为。技能是一个带有 YAML frontmatter 的 Markdown 文件，定义了一个命名命令：当开发者在 Claude Code 会话中键入 `/skill-name` 时，该技能的内容被注入为指令——有效地将常见的、复杂的或团队特定的工作流程转变为单个斜杠命令。
+技能是可复用、可调用的提示文件，可扩展 Claude Code 的行为超越其默认行为。技能是带有 YAML frontmatter 的 Markdown 文件，定义一个命名命令：当开发者在 Claude Code 会话中输入 `/skill-name` 时，技能的内容作为指令注入——有效地将常见的、复杂的或团队特定的工作流转变为单个斜杠命令。
 
-这个思维模型类似于 shell 别名或 Makefile 目标，但用于 AI 辅助工作流。与其每次想让 Claude 遵循特定流程（代码审查清单、发布说明生成、架构文档、安全审计）时重复一个精心构造的长提示，不如将其写成一个技能，提交到代码库，然后用短命令调用它。技能是版本控制的、可共享的，并且可以与 CLAUDE.md 指令组合使用。
+其心智模型类似于 shell 别名或 Makefile 目标，但用于 AI 辅助的工作流。不必每次想让 Claude 遵循特定流程（代码审查清单、发布说明生成、架构文档、安全审计）时都重复冗长、精心制作的提示，你只需将其编写一次作为技能，提交到仓库，然后用简短命令调用。技能是版本控制的、可共享的，并且可以与 CLAUDE.md 指令组合使用。
 
-技能与 CLAUDE.md 指令有一个重要区别：CLAUDE.md 始终处于活跃状态，适用于每次交互，而技能是选择性加入的，需要明确调用。这使技能适合于不应在每个请求上运行的重型或特定上下文的工作流，而 CLAUDE.md 更适合应该始终有效的轻量级规范和约束。
+技能与 CLAUDE.md 指令的重要区别在于：CLAUDE.md 始终处于活跃状态并应用于每次交互，而技能是可选的，需要显式调用。这使技能适合那些不应该在每次请求时运行的繁重或上下文特定的工作流，而 CLAUDE.md 更适合应始终生效的轻量级约定和限制。
 
 ## 工作原理
 
 ### 技能文件格式
 
-技能文件是带有 YAML frontmatter 的 `.md` 文件。frontmatter 至少必须包含一个 `description` 字段，告诉 Claude 该技能的作用。文件正文是调用技能时将被注入的提示。文件名（不含 `.md`）成为斜杠命令名：名为 `code-review.md` 的文件以 `/code-review` 调用。技能名称可以包含连字符但不能包含空格。
+技能文件是带有 YAML frontmatter 的 `.md` 文件。frontmatter 必须至少包含一个 `description` 字段，告诉 Claude 技能的功能。文件正文是调用技能时将注入的提示。文件名（不含 `.md`）成为斜杠命令名：名为 `code-review.md` 的文件以 `/code-review` 调用。技能名可以包含连字符但不能包含空格。
 
 ### 技能目录
 
-Claude Code 在两个位置查找技能。**项目技能**位于相对于项目根目录的 `.claude/skills/`，仅在处理该项目时可用。**全局技能**位于 `~/.claude/skills/`，在每个 Claude Code 会话中都可用。具有相同名称的项目技能优先于全局技能，允许团队用项目特定版本覆盖个人技能。您也可以通过配置将 Claude Code 指向自定义技能目录。
+Claude Code 在两个位置查找技能。**项目技能**位于相对于项目根目录的 `.claude/skills/`，仅在该项目中工作时可用。**全局技能**位于 `~/.claude/skills/`，在每个 Claude Code 会话中都可用。项目技能优先于同名的全局技能，允许团队用项目特定版本覆盖个人技能。你也可以通过配置将 Claude Code 指向自定义技能目录。
 
 ### 技能调用
 
-在 Claude Code 会话中，键入 `/skill-name` 会触发该技能。Claude Code 找到对应的技能文件，读取其正文，并将内容作为用户指令注入到对话的那个位置。技能可以引用会话中已存在的上下文（之前读取的文件、早期工具输出），并可以发出自己的工具调用（读取文件、运行命令）在产生输出之前收集额外信息。技能可以在命令名称后接受内联参数：`/generate-test src/utils/format.ts` 将文件路径作为上下文传递。
+在 Claude Code 会话中，输入 `/skill-name` 触发技能。Claude Code 找到对应的技能文件，读取其正文，并将内容作为用户指令注入到对话的那个时间点。技能可以引用会话中已存在的上下文（之前读取的文件、工具的早期输出），并可以发出自己的工具调用（读取文件、运行命令）以在生成输出之前收集额外信息。技能可以在命令名后接受内联参数：`/generate-test src/utils/format.ts` 将文件路径作为上下文传递。
 
 ### 将技能与 CLAUDE.md 组合
 
-技能和 CLAUDE.md 协同工作。CLAUDE.md 建立项目基准（规范、禁止模式、技术栈），技能在该基准之上提供可调用的工作流。例如，`code-review` 技能可以指示 Claude "检查所有更改是否符合 CLAUDE.md 中的规范"——它不需要重复那些规范，因为它们已经在系统提示中了。这种关注点分离使每个文件保持专注，并避免重复。
+技能和 CLAUDE.md 协同工作。CLAUDE.md 建立项目基线（约定、禁止模式、技术栈），技能在该基线之上提供可调用的工作流。例如，`code-review` 技能可以指示 Claude "检查所有更改是否符合 CLAUDE.md 中的约定"——它不需要重复这些约定，因为它们已在系统提示中。这种关注点分离使每个文件保持专注并避免重复。
 
 ```mermaid
 flowchart LR
@@ -46,11 +48,11 @@ flowchart LR
 
 | 使用场景 | 避免场景 |
 |---|---|
-| 有定期重复的多步骤工作流（如编写变更日志、运行审查清单） | 任务是真正的一次性任务，不会重复——直接键入提示 |
-| 希望在团队中标准化复杂流程（如安全审查、PR 摘要格式） | 指令属于 CLAUDE.md，因为它们适用于每次会话，而不仅仅是按需 |
-| 工作流依赖于上下文，且受益于接受参数（如 `/document src/api/users.ts`） | 技能会重复已在 CLAUDE.md 中存在的文档 |
-| 希望通过全局技能目录跨项目共享提示最佳实践 | 工作流需要 Claude 内置工具之外的外部工具集成 |
-| 正在为团队构建技能库，希望版本控制、可审查的提示文件 | 需要自动触发技能——技能是手动调用的，不是事件驱动的 |
+| 您有定期重复的多步骤工作流（例如，编写变更日志、运行审查清单） | 任务是真正一次性的且不会重复——直接输入提示即可 |
+| 您想要在团队中标准化复杂流程（例如，安全审查、PR 摘要格式） | 指令属于 CLAUDE.md，因为它们应用于每个会话，而不仅仅按需 |
+| 工作流依赖上下文并从接受参数中受益（例如，`/document src/api/users.ts`） | 技能会重复 CLAUDE.md 中已存在的文档 |
+| 您想通过全局技能目录跨项目共享提示最佳实践 | 工作流需要 Claude 内置工具之外的外部工具集成 |
+| 您正在为团队构建技能库，并希望有版本控制、可审查的提示文件 | 您需要自动触发技能——技能是手动调用的，不是事件驱动的 |
 
 ## 代码示例
 
@@ -167,10 +169,10 @@ If the error references a file path, read that file to provide more specific adv
 ## 实用资源
 
 - [Claude Code 内存和技能文档](https://docs.anthropic.com/en/docs/claude-code/memory) — 技能文件格式、目录和调用的官方参考。
-- [Claude Code 设置](https://docs.anthropic.com/en/docs/claude-code/settings) — 包括自定义技能目录路径的配置选项。
-- [Anthropic Claude Code GitHub](https://github.com/anthropics/claude-code) — 源码和社区贡献的示例。
-- [Claude Code 斜杠命令参考](https://docs.anthropic.com/en/docs/claude-code/cli-reference) — 内置斜杠命令与自定义技能系统的完整列表。
-- [技能仓库](https://github.com/EmersonBraun/skills) — Claude Code 和其他 AI 编码助手的可复用 AI 技能精选集合
+- [Claude Code 设置](https://docs.anthropic.com/en/docs/claude-code/settings) — 配置选项，包括自定义技能目录路径。
+- [Anthropic Claude Code GitHub](https://github.com/anthropics/claude-code) — 源代码和社区贡献的示例。
+- [Claude Code 斜杠命令参考](https://docs.anthropic.com/en/docs/claude-code/cli-reference) — 内置斜杠命令和自定义技能系统的完整列表。
+- [技能仓库](https://github.com/EmersonBraun/skills) — 为 Claude Code 和其他 AI 编码助手精心策划的可复用 AI 技能集合
 
 ## 另请参阅
 

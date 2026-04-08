@@ -2,6 +2,8 @@
 title: Configuração CLAUDE.md
 description: Arquivos de instrução no nível do projeto e global que personalizam o comportamento do Claude Code — o que são, onde ficam, como são carregados e como escrever bons exemplos.
 keywords: [CLAUDE.md, configuração do Claude Code, instruções do projeto, prompt de sistema, padrões de codificação, .claude, configuração global]
+tags: [beginner]
+authors: [EmersonBraun]
 ---
 
 # Configuração CLAUDE.md

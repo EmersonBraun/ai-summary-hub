@@ -1,83 +1,85 @@
 ---
-title: MCP-Server erstellen
-description: Wie man MCP-Server erstellt, die Tools, Ressourcen und Prompts für jede MCP-kompatible KI-Anwendung bereitstellen — Server-Setup, Fähigkeitsregistrierung, Transport-Konfiguration und der vollständige Server-Lebenszyklus.
-keywords: [MCP-Server, Model Context Protocol, MCP-Server erstellen, Tools, Ressourcen, Prompts, TypeScript, MCP-SDK, Tool-Schema, stdio-Transport, HTTP SSE]
+title: Building MCP servers
+description: How to build MCP servers that expose tools, resources, and prompts to any MCP-compatible AI application — covering server setup, capability registration, transport configuration, and the full server lifecycle.
+keywords: [MCP server, Model Context Protocol, build MCP server, tools, resources, prompts, TypeScript, MCP SDK, tool schema, stdio transport, HTTP SSE]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # MCP-Server erstellen
 
 ## Definition
 
-Ein **MCP-Server** ist ein Prozess, der Fähigkeiten für MCP-kompatible KI-Anwendungen über das Model Context Protocol bereitstellt. Er fungiert als Brücke zwischen einem KI-Modell und einem externen System – einem Dateisystem, einer REST-API, einer Datenbank, einem Code-Runner – indem er die Funktionalität dieses Systems in einer gut definierten, entdeckbaren Schnittstelle verpackt. Der Server besitzt die Implementierungsdetails; der Client muss nur das Protokoll kennen. Jeder MCP-konforme Client kann sich mit jedem MCP-Server verbinden und sofort seine Fähigkeiten entdecken und nutzen, ohne individuelle Integrationsarbeit.
+Ein **MCP-Server** ist ein Prozess, der Fähigkeiten für MCP-kompatible KI-Anwendungen über das Model Context Protocol bereitstellt. Er fungiert als Brücke zwischen einem KI-Modell und einem externen System – einem Dateisystem, einer REST-API, einer Datenbank, einem Code-Runner – indem er die Funktionalität dieses Systems in eine klar definierte, auffindbare Schnittstelle verpackt. Der Server besitzt die Implementierungsdetails; der Client muss nur das Protokoll kennen. Jeder MCP-konforme Client kann sich mit jedem MCP-Server verbinden und sofort seine Fähigkeiten entdecken und nutzen, ohne benutzerdefinierte Integrationsarbeit.
 
-Ein MCP-Server kann drei Kategorien von Fähigkeiten bereitstellen. **Tools** sind aufrufbare Funktionen, die strukturierte Eingaben akzeptieren und Ausgaben zurückgeben – die KI ruft sie auf, um Aktionen auszuführen oder dynamische Informationen abzurufen. **Ressourcen** sind schreibgeschützte, URI-adressierte Datenquellen, die die KI für Kontext lesen kann – Dateien, Datenbankdatensätze, API-Snapshots. **Prompts** sind wiederverwendbare, parametrisierte Prompt-Vorlagen, die auf dem Server gespeichert sind und die Clients an Benutzer weitergeben oder in Gespräche einfügen können. Ein einzelner Server kann jede Kombination dieser Typen anbieten; viele Server stellen nur Tools bereit.
+Ein MCP-Server kann drei Kategorien von Fähigkeiten bereitstellen. **Tools** sind aufrufbare Funktionen, die strukturierte Eingaben akzeptieren und Ausgaben zurückgeben – die KI ruft sie auf, um Aktionen durchzuführen oder dynamische Informationen abzurufen. **Ressourcen** sind schreibgeschützte, URI-adressierte Datenquellen, die die KI für den Kontext lesen kann – Dateien, Datenbankdatensätze, API-Schnappschüsse. **Prompts** sind wiederverwendbare, parametrisierte Prompt-Vorlagen, die auf dem Server gespeichert sind und die Clients Benutzern zugänglich machen oder in Gespräche einfügen können. Ein einzelner Server kann jede Kombination dieser Fähigkeiten anbieten; viele Server stellen nur Tools bereit.
 
-Der **Server-Lebenszyklus** folgt einem vorhersehbaren Muster: Der Server startet und bindet sich an einen Transport (stdio oder HTTP/SSE), wartet darauf, dass sich ein Client verbindet, schließt den `initialize`-Handshake ab, um Protokollversionen und Fähigkeiten zu verhandeln, und tritt dann in seine Hauptschleife ein, die auf Anfragen antwortet. Wenn der Client die Verbindung trennt oder ein Shutdown-Signal sendet, führt der Server eine Bereinigung durch und beendet sich. Da das Protokoll innerhalb einer Sitzung zustandsbehaftet ist, kann der Server einen pro-Verbindungs-Zustand aufrechterhalten – zum Beispiel das Caching teurer API-Antworten für die Dauer einer Sitzung.
+Der **Server-Lebenszyklus** folgt einem vorhersehbaren Muster: Der Server startet und bindet sich an einen Transport (stdio oder HTTP/SSE), wartet auf einen Client, der sich verbindet, schließt den `initialize`-Handshake ab, um Protokollversionen und Fähigkeiten auszuhandeln, und tritt dann in seine Hauptschleife ein, die auf Anfragen antwortet. Wenn der Client die Verbindung trennt oder ein Shutdown-Signal sendet, führt der Server eine Bereinigung durch und beendet sich. Da das Protokoll innerhalb einer Sitzung zustandsbehaftet ist, kann der Server einen Verbindungszustand aufrechterhalten – zum Beispiel teure API-Antworten für die Dauer einer Sitzung cachen.
 
 ## Funktionsweise
 
 ### Server-Setup und Initialisierung
 
-Das Einrichten eines MCP-Servers beginnt mit dem Erstellen einer `McpServer`-Instanz (aus dem hochstufigen SDK) oder einer `Server`-Instanz (aus dem niederstufigen SDK) mit einem Namen und einer Version. Name und Version werden während des `initialize`-Handshakes an den Client gesendet und helfen beim Debugging und Logging. Nach dem Erstellen des Servers registrieren Sie Fähigkeiten – Tools, Ressourcen, Prompts – bevor Sie sich mit einem Transport verbinden. Die hochstufige `McpServer`-Klasse des SDKs bietet ergonomische `server.tool()`-, `server.resource()`- und `server.prompt()`-Methoden, die Anfrage-Routing und Schema-Validierung intern übernehmen. Der Verbindungsschritt (`server.connect(transport)`) startet die Ereignisschleife und blockiert bis zum Ende der Sitzung.
+Das Einrichten eines MCP-Servers beginnt mit der Erstellung einer `McpServer`-Instanz (aus dem High-Level-SDK) oder einer `Server`-Instanz (aus dem Low-Level-SDK) mit einem Namen und einer Version. Name und Version werden dem Client während des `initialize`-Handshakes gesendet und helfen beim Debugging und Logging. Nach der Erstellung des Servers registrieren Sie Fähigkeiten – Tools, Ressourcen, Prompts – bevor Sie sich mit einem Transport verbinden. Die High-Level `McpServer`-Klasse des SDKs bietet ergonomische `server.tool()`-, `server.resource()`- und `server.prompt()`-Methoden, die Anfrage-Routing und Schema-Validierung intern handhaben. Der Verbindungsschritt (`server.connect(transport)`) startet die Ereignisschleife und blockiert, bis die Sitzung endet.
 
 ### Tools definieren
 
-Tools sind die am häufigsten verwendete MCP-Fähigkeit. Jedes Tool hat drei erforderliche Elemente: einen **Namen** (einen kurzen, kleingeschriebenen Identifier, der in `tools/call`-Anfragen verwendet wird), eine **Beschreibung** (eine natürlichsprachige Erklärung, die die KI verwendet, um zu entscheiden, wann und wie das Tool aufzurufen ist), und ein **Eingabeschema** (ein Zod-Schema im TypeScript-SDK, das für das Protokoll in JSON-Schema konvertiert wird). Wenn ein Client ein Tool aufruft, validiert das SDK die eingehenden Argumente gegen das Schema, bevor Ihre Handler-Funktion aufgerufen wird, sodass Sie typsichere, validierte Eingaben erhalten. Der Handler gibt ein `content`-Array von Inhaltsblöcken zurück – Text, Bilder oder eingebettete Ressourcen – das der Client an das KI-Modell zurückgibt. Tools können auch `isError: true` in ihrer Antwort setzen, um einen behebbaren Fehler zu signalisieren, was der KI ermöglicht, Wiederholungen durchzuführen oder ordnungsgemäß zurückzufallen.
+Tools sind die am häufigsten verwendete MCP-Fähigkeit. Jedes Tool hat drei erforderliche Elemente: einen **Namen** (ein kurzer, kleingeschriebener Bezeichner, der in `tools/call`-Anfragen verwendet wird), eine **Beschreibung** (eine natürlichsprachliche Erklärung, die die KI verwendet, um zu entscheiden, wann und wie das Tool aufgerufen werden soll) und ein **Eingabe-Schema** (ein Zod-Schema im TypeScript SDK, das in JSON-Schema für das Protokoll konvertiert wird). Wenn ein Client ein Tool aufruft, validiert das SDK die eingehenden Argumente gegen das Schema, bevor Ihre Handler-Funktion aufgerufen wird, sodass Sie typsichere, validierte Eingaben erhalten. Der Handler gibt ein `content`-Array von Content-Blöcken zurück – Text, Bilder oder eingebettete Ressourcen –, das der Client an das KI-Modell zurückgibt. Tools können auch `isError: true` in ihrer Antwort setzen, um einen behebbaren Fehler zu signalisieren, was es der KI ermöglicht, es erneut zu versuchen oder elegant zurückzufallen.
 
 ### Ressourcen definieren
 
-Ressourcen stellen dateiähnliche Daten bereit, die die KI für Kontext lesen kann. Eine Ressource wird durch einen URI identifiziert (z. B. `file:///path/to/data.json` oder `postgres://mydb/users/123`) und hat einen MIME-Typ, der dem Client mitteilt, wie der Inhalt zu behandeln ist. Ressourcen werden über `resources/list` entdeckt und über `resources/read` gelesen. Das SDK unterstützt sowohl **statische Ressourcen** (mit einem festen URI und Inhalt registriert) als auch **dynamische Ressourcen** (mit einem URI-Vorlagenmuster registriert, zur Lesezeit aufgelöst). Ressourcenvorlagen verwenden die URI-Vorlagensyntax nach RFC 6570 – zum Beispiel entspricht `file:///{path}` jedem Dateipfad. Wenn der Client eine Ressource-URI liest, die einer Vorlage entspricht, erhält Ihr Handler die extrahierten Vorlagenvariablen und gibt den Inhalt zurück. Ressourcen sollten für Daten verwendet werden, die die KI lesen, aber nicht ändern muss; für Schreiboperationen verwenden Sie ein Tool.
+Ressourcen stellen dateiähnliche Daten bereit, die die KI für den Kontext lesen kann. Eine Ressource wird durch eine URI identifiziert (z. B. `file:///path/to/data.json` oder `postgres://mydb/users/123`) und hat einen MIME-Typ, der dem Client mitteilt, wie der Inhalt zu behandeln ist. Ressourcen werden über `resources/list` entdeckt und über `resources/read` gelesen. Das SDK unterstützt sowohl **statische Ressourcen** (mit einer festen URI und Inhalt registriert) als auch **dynamische Ressourcen** (mit einem URI-Vorlagenmuster registriert, zur Lesezeit aufgelöst). Ressourcenvorlagen verwenden RFC 6570 URI-Vorlagensyntax – zum Beispiel entspricht `file:///{path}` jedem Dateipfad. Wenn der Client eine Ressourcen-URI liest, die einer Vorlage entspricht, empfängt Ihr Handler die extrahierten Vorlagenvariablen und gibt den Inhalt zurück. Ressourcen sollten für Daten verwendet werden, die die KI lesen, aber nicht ändern muss; für Schreiboperationen verwenden Sie ein Tool.
 
 ### Prompts definieren
 
-Prompts sind wiederverwendbare Interaktionsvorlagen. Ein Prompt hat einen Namen, eine Beschreibung und eine optionale Liste von Argumenten (Name, Beschreibung, erforderliches Flag). Wenn ein Client einen Prompt über `prompts/get` anfordert, erhält Ihr Handler die Argumentwerte und gibt eine Liste von Nachrichten zurück – typischerweise eine Mischung aus `user`- und `assistant`-Rollennachrichten – die der Client in das Gespräch einfügt. Prompts ermöglichen es Server-Autoren, Domänenwissen darüber zu kodieren, wie mit den Fähigkeiten des Servers interagiert werden soll. Zum Beispiel könnte ein Datenbankserver einen `query_builder`-Prompt bereitstellen, der eine natürlichsprachige Beschreibung einer Abfrage akzeptiert und einen strukturierten Prompt zurückgibt, der die KI dazu leitet, sicheres, parametrisiertes SQL zu produzieren.
+Prompts sind wiederverwendbare Interaktionsvorlagen. Ein Prompt hat einen Namen, eine Beschreibung und eine optionale Liste von Argumenten (Name, Beschreibung, Pflichtfeld). Wenn ein Client einen Prompt über `prompts/get` anfordert, empfängt Ihr Handler die Argumentwerte und gibt eine Liste von Nachrichten zurück – typischerweise eine Mischung aus `user`- und `assistant`-Rollennachrichten –, die der Client in das Gespräch einfügt. Prompts ermöglichen es Server-Autoren, Domänenwissen darüber zu kodieren, wie mit den Fähigkeiten des Servers interagiert werden soll. Zum Beispiel könnte ein Datenbankserver einen `query_builder`-Prompt bereitstellen, der eine natürlichsprachliche Beschreibung einer Abfrage akzeptiert und einen strukturierten Prompt zurückgibt, der die KI dazu führt, sichere, parametrisierte SQL zu produzieren.
 
 ### Transport-Konfiguration
 
-Die Transport-Schicht bestimmt, wie der Server mit Clients kommuniziert. Der **stdio-Transport** (`StdioServerTransport`) liest von `process.stdin` und schreibt nach `process.stdout`. Dies ist der Standard für lokale Tool-Server – die Host-Anwendung erzeugt den Server als Child-Prozess und kommuniziert über die Prozessströme. Es ist keine Netzwerkkonfiguration erforderlich, und das stderr des Servers ist für Logging verfügbar, ohne das Protokoll zu stören. Der **HTTP-mit-SSE-Transport** (`SSEServerTransport`) akzeptiert HTTP-POST-Anfragen für Client-zu-Server-Nachrichten und streamt Server-zu-Client-Nachrichten über einen `/sse`-Server-Sent-Events-Endpunkt. Dies ist geeignet für gemeinsam genutzte Server, mit denen sich mehrere Clients gleichzeitig verbinden können, oder für Server, die als langlebige Dienste statt als On-Demand-Prozesse laufen müssen.
+Die Transport-Schicht bestimmt, wie der Server mit Clients kommuniziert. **stdio-Transport** (`StdioServerTransport`) liest aus `process.stdin` und schreibt nach `process.stdout`. Er ist der Standard für lokale Tool-Server – die Host-Anwendung startet den Server als Kindprozess und kommuniziert über die Prozess-Streams. Es ist keine Netzwerkkonfiguration erforderlich, und der stderr des Servers ist für das Logging verfügbar, ohne das Protokoll zu stören. **HTTP mit SSE-Transport** (`SSEServerTransport`) akzeptiert HTTP-POST-Anfragen für Client-zu-Server-Nachrichten und streamt Server-zu-Client-Nachrichten über einen `/sse` Server-Sent Events-Endpunkt. Dies ist geeignet für gemeinsam genutzte Server, zu denen mehrere Clients gleichzeitig eine Verbindung herstellen können, oder für Server, die als langlebige Dienste statt als On-Demand-Prozesse laufen müssen.
 
 ```mermaid
 flowchart TB
-  Client["MCP Client"]
-  Server["MCP Server Process"]
-  ToolReg["Tool Registry\n(get_forecast, read_file, ...)"]
-  ResourceReg["Resource Registry\n(file:///, db:///...)"]
-  PromptReg["Prompt Registry\n(query_builder, summarize, ...)"]
-  External["External Systems\n(APIs, DBs, File System)"]
+  Client["MCP-Client"]
+  Server["MCP-Server-Prozess"]
+  ToolReg["Tool-Registry\n(get_forecast, read_file, ...)"]
+  ResourceReg["Ressourcen-Registry\n(file:///, db:///...)"]
+  PromptReg["Prompt-Registry\n(query_builder, summarize, ...)"]
+  External["Externe Systeme\n(APIs, DBs, Dateisystem)"]
 
-  Client -->|"initialize handshake"| Server
-  Server -->|"capabilities response"| Client
-  Client -->|"tools/list request"| Server
-  Server -->|"tool schemas"| Client
-  Client -->|"tools/call request"| Server
-  Server -->|"routes call"| ToolReg
-  ToolReg -->|"invokes"| External
-  External -->|"raw result"| ToolReg
-  ToolReg -->|"content response"| Server
-  Server -->|"tool result"| Client
+  Client -->|"initialize Handshake"| Server
+  Server -->|"Fähigkeitsantwort"| Client
+  Client -->|"tools/list Anfrage"| Server
+  Server -->|"Tool-Schemas"| Client
+  Client -->|"tools/call Anfrage"| Server
+  Server -->|"leitet Aufruf weiter"| ToolReg
+  ToolReg -->|"ruft auf"| External
+  External -->|"Rohergebnis"| ToolReg
+  ToolReg -->|"Inhaltsantwort"| Server
+  Server -->|"Tool-Ergebnis"| Client
 
-  Client -->|"resources/read request"| Server
-  Server -->|"routes read"| ResourceReg
-  ResourceReg -->|"fetches data"| External
-  ResourceReg -->|"resource content"| Server
+  Client -->|"resources/read Anfrage"| Server
+  Server -->|"leitet Lesen weiter"| ResourceReg
+  ResourceReg -->|"ruft Daten ab"| External
+  ResourceReg -->|"Ressourceninhalt"| Server
 
-  Client -->|"prompts/get request"| Server
-  Server -->|"routes get"| PromptReg
-  PromptReg -->|"rendered messages"| Server
+  Client -->|"prompts/get Anfrage"| Server
+  Server -->|"leitet get weiter"| PromptReg
+  PromptReg -->|"gerenderte Nachrichten"| Server
 ```
 
 ## Wann verwenden / Wann NICHT verwenden
 
-| Szenario | MCP-Server erstellen | Alternativen in Betracht ziehen |
+| Szenario | MCP-Server erstellen | Alternativen erwägen |
 |---|---|---|
-| Bereitstellen einer vorhandenen API oder eines Dienstes für mehrere KI-Anwendungen | Beste Wahl — ein Server, jeder Client kann ihn nutzen | Direkter Funktionsaufruf, wenn nur ein Anbieter und eine App wichtig sind |
-| Verpacken eines Dateisystems, einer Datenbank oder einer internen Datenquelle für KI-Kontext | Beste Wahl — Ressourcen und Tools entsprechen natürlich | Benutzerdefinierte RAG-Pipeline, wenn semantischer Abruf der primäre Bedarf ist |
-| Bereitstellen domänenspezifischer Prompt-Vorlagen für KI-Benutzer | Prompts-Fähigkeit ist speziell dafür konzipiert | System-Prompt-Einspeisung, wenn Vorlagen einfach und statisch sind |
-| Aufbau von Tooling für eine einzelne interne KI-Anwendung mit einem Anbieter | MCP fügt nützliche Struktur hinzu, kann aber überdimensioniert sein | In-Prozess-Tool-Funktionen sind einfacher |
-| Bereitstellen von Tools, die Echtzeit-Streaming-Ergebnisse erfordern | Unterstützt über SSE-Transport | WebSockets oder benutzerdefiniertes Streaming, wenn Protokollaufwand wichtig ist |
-| Tools, die pro-Benutzer langlebigen Zustand über Sitzungen hinweg aufrechterhalten müssen | Erfordert sorgfältiges Server-Design — Sitzungen sind 1:1 | Zustandsbehafteter Backend-Dienst mit einem dünnen MCP-Wrapper |
+| Eine bestehende API oder einen Dienst für mehrere KI-Anwendungen bereitstellen | Beste Wahl — ein Server, jeder Client kann ihn verwenden | Direkter Funktionsaufruf, wenn nur ein Anbieter und eine App wichtig sind |
+| Ein Dateisystem, eine Datenbank oder eine interne Datenquelle für KI-Kontext verpacken | Beste Wahl — Ressourcen und Tools passen natürlich | Benutzerdefinierte RAG-Pipeline, wenn semantischer Abruf der primäre Bedarf ist |
+| Domänenspezifische Prompt-Vorlagen für KI-Benutzer bereitstellen | Prompts-Fähigkeit ist dafür konzipiert | System-Prompt-Injektion, wenn Vorlagen einfach und statisch sind |
+| Tooling für eine einzelne, interne KI-Anwendung mit einem Anbieter erstellen | MCP fügt nützliche Struktur hinzu, kann aber überdimensioniert sein | In-Prozess-Tool-Funktionen sind einfacher |
+| Tools bereitstellen, die Echtzeit-Streaming-Ergebnisse benötigen | Über SSE-Transport unterstützt | WebSockets oder benutzerdefiniertes Streaming, wenn Protokoll-Overhead wichtig ist |
+| Tools, die langlebigen Zustand pro Benutzer über Sitzungen hinweg aufrechterhalten müssen | Erfordert sorgfältiges Server-Design – Sitzungen sind 1:1 | Zustandsbehafteter Backend-Dienst mit einem dünnen MCP-Wrapper |
 
-## Codebeispiele
+## Code-Beispiele
 
 ### Vollständiger MCP-Server mit Tools, Ressourcen und einem Prompt
 
@@ -94,7 +96,7 @@ const server = new McpServer({
 });
 
 // -----------------------------------------------------------------------
-// Tool 1: Get weather forecast (mock — replace with a real weather API)
+// Tool 1: Wettervorhersage abrufen (Mock — durch eine echte Wetter-API ersetzen)
 // -----------------------------------------------------------------------
 server.tool(
   "get_weather",
@@ -107,7 +109,7 @@ server.tool(
       .describe("Temperature units"),
   },
   async ({ city, units }) => {
-    // In production, call a real weather API here (e.g. Open-Meteo, WeatherAPI)
+    // In der Produktion hier eine echte Wetter-API aufrufen (z.B. Open-Meteo, WeatherAPI)
     const mockData = {
       city,
       temperature: units === "celsius" ? 18 : 64,
@@ -129,7 +131,7 @@ server.tool(
 );
 
 // -----------------------------------------------------------------------
-// Tool 2: List directory contents
+// Tool 2: Verzeichnisinhalte auflisten
 // -----------------------------------------------------------------------
 server.tool(
   "list_directory",
@@ -170,7 +172,7 @@ server.tool(
 );
 
 // -----------------------------------------------------------------------
-// Resource: Read any text file by path (URI template)
+// Ressource: Beliebige Textdatei nach Pfad lesen (URI-Vorlage)
 // -----------------------------------------------------------------------
 server.resource(
   "text-file",
@@ -196,7 +198,7 @@ server.resource(
 );
 
 // -----------------------------------------------------------------------
-// Prompt: Guided file analysis template
+// Prompt: Geführte Dateianalyse-Vorlage
 // -----------------------------------------------------------------------
 server.prompt(
   "analyze_file",
@@ -237,12 +239,12 @@ Be concise and structured.`,
 );
 
 // -----------------------------------------------------------------------
-// Start the server
+// Den Server starten
 // -----------------------------------------------------------------------
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  // Log to stderr so it doesn't interfere with the stdio protocol
+  // Nach stderr loggen, damit es das stdio-Protokoll nicht stört
   console.error("file-and-weather-server is running on stdio");
 }
 
@@ -262,18 +264,18 @@ import express from "express";
 const app = express();
 const server = new McpServer({ name: "remote-server", version: "1.0.0" });
 
-// Register your tools, resources, and prompts here (same API as stdio)
+// Ihre Tools, Ressourcen und Prompts hier registrieren (gleiche API wie stdio)
 // server.tool(...), server.resource(...), server.prompt(...)
 
-// SSE endpoint: clients connect here to receive server-to-client messages
+// SSE-Endpunkt: Clients verbinden sich hier, um Server-zu-Client-Nachrichten zu empfangen
 app.get("/sse", async (req, res) => {
   const transport = new SSEServerTransport("/messages", res);
   await server.connect(transport);
 });
 
-// POST endpoint: clients send messages here
+// POST-Endpunkt: Clients senden Nachrichten hier
 app.post("/messages", express.json(), async (req, res) => {
-  // The SSEServerTransport handles routing from the active session
+  // Der SSEServerTransport handhabt das Routing von der aktiven Sitzung
   res.status(200).send("ok");
 });
 
@@ -285,12 +287,12 @@ app.listen(3000, () => {
 ## Praktische Ressourcen
 
 - [MCP TypeScript SDK — Server-API-Referenz](https://github.com/modelcontextprotocol/typescript-sdk/tree/main/src/server) — Quellcode und Inline-Dokumentation für `McpServer`, Transporte und alle serverseitigen Typen.
-- [Offizielle MCP-Server-Beispiele](https://github.com/modelcontextprotocol/servers) — Referenzimplementierungen einschließlich Dateisystem, GitHub, PostgreSQL, Slack und mehr — unverzichtbar als Ausgangspunkte.
-- [MCP-Transport-Dokumentation](https://spec.modelcontextprotocol.io/specification/architecture/) — Protokollspezifikationsabschnitt zu stdio, HTTP/SSE und Streamable HTTP Transporten im Detail.
-- [Zod-Dokumentation](https://zod.dev) — Die Schema-Bibliothek, die vom TypeScript-SDK für die Eingabevalidierung verwendet wird; das Verständnis von Zod-Typen entspricht direkt Tool-Parameter-Schemas.
+- [Offizielle MCP-Server-Beispiele](https://github.com/modelcontextprotocol/servers) — Referenzimplementierungen einschließlich Dateisystem, GitHub, PostgreSQL, Slack und mehr — unschätzbar als Ausgangspunkte.
+- [MCP-Transport-Dokumentation](https://spec.modelcontextprotocol.io/specification/architecture/) — Protokollspezifikationsabschnitt, der stdio, HTTP/SSE und Streamable HTTP-Transporte ausführlich abdeckt.
+- [Zod-Dokumentation](https://zod.dev) — Die Schema-Bibliothek, die vom TypeScript SDK für die Eingabevalidierung verwendet wird; das Verständnis von Zod-Typen entspricht direkt Tool-Parameter-Schemas.
 
 ## Siehe auch
 
-- [Model Context Protocol-Übersicht](/docs/mcp)
+- [Model Context Protocol Übersicht](/docs/mcp)
 - [MCP-Clients erstellen](/docs/mcp/building-clients)
-- [Agenten-Tools und -Aktionen](/docs/agents/tools-actions)
+- [Agent-Tools und -Aktionen](/docs/agents/tools-actions)

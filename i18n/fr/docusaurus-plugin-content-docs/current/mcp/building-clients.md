@@ -2,6 +2,8 @@
 title: Construire des clients MCP
 description: Comment construire des clients MCP qui connectent les applications IA aux serveurs MCP — couvrant l'initialisation du client, la découverte des capacités, l'invocation des outils, la lecture des ressources et la sélection du transport.
 keywords: [client MCP, Model Context Protocol, construire un client MCP, découverte des capacités, invocation des outils, lecture des ressources, TypeScript, SDK MCP, transport stdio, transport SSE, intégration IA]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # Construire des clients MCP

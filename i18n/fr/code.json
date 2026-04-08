@@ -1,1 +1,290 @@
-{"theme.common.editThisPage":{"message":"Modifier cette page","description":"Edit page link"},"theme.docs.paginator.previous":{"message":"Précédent","description":"Previous doc"},"theme.docs.paginator.next":{"message":"Suivant","description":"Next doc"},"theme.docs.paginator.navAriaLabel":{"message":"Pages de la documentation","description":"Pagination ARIA"},"home.hero.title":{"message":"AI Summary Hub","description":"Hero title"},"home.hero.tagline":{"message":"Votre source de référence pour les concepts d'IA, des fondamentaux aux agents avancés","description":"Hero tagline"},"home.hero.startLearning":{"message":"Commencer à apprendre","description":"Button"},"home.section.whatTitle":{"message":"Qu'est-ce que ce projet ?","description":"Section title"},"home.section.whatBody":{"message":"AI Summary Hub est votre compagnon pour les concepts d'IA modernes. Chaque thème propose des définitions, le fonctionnement, des exemples et des liens utiles – RAG, transformers, LLMs, agents et 50+ sujets.","description":"Section body"},"home.section.exploreDocs":{"message":"Explorer la documentation","description":"Button aria"},"home.section.exploreDocsButton":{"message":"Explorer les Docs","description":"Button text"},"home.section.helpTitle":{"message":"Aidez à améliorer ce guide","description":"Section title"},"home.section.helpBody":{"message":"Ce projet repose sur les contributions de la communauté. Si vous travaillez avec l'IA, les LLMs ou les agents, votre expertise compte. Vous pouvez :","description":"Section body"},"home.section.contributeButton":{"message":"Contribuer au projet","description":"Contribute button"},"home.section.helpBullet1":{"message":"Ajouter des sujets selon votre expérience","description":"Help bullet"},"home.section.helpBullet2":{"message":"Mettre à jour les points clés avec les derniers concepts","description":"Help bullet"},"home.section.helpBullet3":{"message":"Contribuer avec des exemples et du code","description":"Help bullet"},"home.section.helpBullet4":{"message":"Corriger les informations obsolètes","description":"Help bullet"},"home.section.helpBullet5":{"message":"Améliorer les explications et traduire le contenu","description":"Help bullet"},"home.section.helpFooter":{"message":"Vos contributions gardent ce guide à jour et utile. Consultez nos guidelines pour contribuer.","description":"Help section closing"},"allTopics.title":{"message":"Tous les sujets","description":"All topics title"},"allTopics.intro":{"message":"Parcourez tous les sujets du hub par catégorie. Vous pouvez aussi utiliser la {sidebarLink} ou la recherche.","description":"All topics intro"}}
+{
+  "theme.common.editThisPage": {
+    "message": "Modifier cette page",
+    "description": "The link label to edit the current page"
+  },
+  "theme.docs.paginator.previous": {
+    "message": "Précédent",
+    "description": "The label used to navigate to the previous doc"
+  },
+  "theme.docs.paginator.next": {
+    "message": "Suivant",
+    "description": "The label used to navigate to the next doc"
+  },
+  "theme.docs.paginator.navAriaLabel": {
+    "message": "Pages de documentation",
+    "description": "The ARIA label for the docs pagination"
+  },
+  "home.hero.title": {
+    "message": "Maîtrisez l’IA — des fondamentaux à la production",
+    "description": "Hero section title"
+  },
+  "home.hero.tagline": {
+    "message": "Plus de 145 articles approfondis avec exemples de code, tableaux comparatifs et diagrammes Mermaid. Suivez des parcours ou parcourez par catégorie.",
+    "description": "Hero section tagline"
+  },
+  "home.hero.startLearning": {
+    "message": "Commencer à apprendre",
+    "description": "Start learning button"
+  },
+  "home.section.whatTitle": {
+    "message": "Qu'est-ce que ce projet ?",
+    "description": "What is this project section title"
+  },
+  "home.section.whatBody": {
+    "message": "AI Summary Hub est votre compagnon pour les concepts modernes d'IA. Chaque sujet est structuré avec définitions, fonctionnement, exemples et liens utiles. Vous comprenez rapidement RAG, transformers, LLM, agents et plus de 50 sujets, des fondamentaux aux systèmes avancés.",
+    "description": "What is this project body"
+  },
+  "home.section.exploreDocs": {
+    "message": "Explorer la documentation",
+    "description": "Explore docs button aria label"
+  },
+  "home.section.exploreDocsButton": {
+    "message": "Explorer les docs",
+    "description": "Explore Docs button text"
+  },
+  "home.section.helpTitle": {
+    "message": "Aidez à améliorer ce guide",
+    "description": "Help improve this guide title"
+  },
+  "home.section.helpBody": {
+    "message": "Ce projet vit grâce aux contributions. Si vous travaillez sur l'IA, les LLM ou les agents, vos idées comptent. Vous pouvez :",
+    "description": "Help improve body intro"
+  },
+  "home.section.contributeButton": {
+    "message": "Contribuer au projet",
+    "description": "Contribute button text"
+  },
+  "home.section.helpBullet1": {
+    "message": "Ajouter de nouveaux sujets selon votre expérience",
+    "description": "Help bullet"
+  },
+  "home.section.helpBullet2": {
+    "message": "Mettre à jour les points clés avec les concepts récents",
+    "description": "Help bullet"
+  },
+  "home.section.helpBullet3": {
+    "message": "Proposer des exemples et extraits de code",
+    "description": "Help bullet"
+  },
+  "home.section.helpBullet4": {
+    "message": "Corriger les informations obsolètes",
+    "description": "Help bullet"
+  },
+  "home.section.helpBullet5": {
+    "message": "Améliorer les explications et traduire le contenu",
+    "description": "Help bullet"
+  },
+  "home.section.helpFooter": {
+    "message": "Vos contributions gardent ce guide à jour et utile pour tous. Consultez nos guides de contribution pour commencer.",
+    "description": "Help section closing"
+  },
+  "allTopics.title": {
+    "message": "Tous les sujets",
+    "description": "All topics page title"
+  },
+  "allTopics.intro": {
+    "message": "Parcourez tous les sujets du hub par catégorie. Vous pouvez aussi utiliser la {sidebarLink} ou la recherche.",
+    "description": "All topics page intro"
+  },
+  "allTopics.description": {
+    "message": "Liste complète des sujets de documentation du AI Summary Hub, regroupés par catégorie.",
+    "description": "All topics meta description"
+  },
+  "allTopics.sidebarLink": {
+    "message": "barre latérale",
+    "description": "Inline link label in allTopics intro"
+  },
+  "allTopics.level.beginner": {
+    "message": "Débutant",
+    "description": "Difficulty filter"
+  },
+  "allTopics.level.intermediate": {
+    "message": "Intermédiaire",
+    "description": "Difficulty filter"
+  },
+  "allTopics.level.advanced": {
+    "message": "Avancé",
+    "description": "Difficulty filter"
+  },
+  "docLink.intro": {
+    "message": "Introduction",
+    "description": "Doc title for intro"
+  },
+  "docLink.overview": {
+    "message": "Aperçu",
+    "description": "Doc title for index pages"
+  },
+  "notFound.title": {
+    "message": "Page introuvable",
+    "description": "404 page title"
+  },
+  "notFound.description": {
+    "message": "La page que vous cherchez est introuvable.",
+    "description": "404 meta description"
+  },
+  "notFound.message": {
+    "message": "Nous n'avons pas trouvé la page. Elle a peut-être été déplacée, renommée ou n'existe plus.",
+    "description": "404 body"
+  },
+  "notFound.docs": {
+    "message": "Voir la documentation",
+    "description": "404 link to docs"
+  },
+  "notFound.home": {
+    "message": "Retour à l'accueil",
+    "description": "404 link home"
+  },
+  "sidebarSwitcher.title": {
+    "message": "Parcours d’apprentissage",
+    "description": "Sidebar learning path dropdown title"
+  },
+  "home.hero.browseTopics": {
+    "message": "Parcourir tous les sujets",
+    "description": "Home secondary CTA"
+  },
+  "home.meta.description": {
+    "message": "Maîtrisez l'IA des fondamentaux à la production. Plus de 145 articles avec code, comparaisons, parcours et schémas.",
+    "description": "Home meta description"
+  },
+  "home.feat.heading": {
+    "message": "Tout ce qu'il vous faut pour apprendre l'IA — structuré, pratique et approfondi",
+    "description": "Features section heading"
+  },
+  "home.banner.agentskit": {
+    "message": "La bibliothèque la plus complète pour construire des agents IA. Framework prêt pour la production avec mémoire, outils, orchestration multi-agents et plus.",
+    "description": "AgentsKit banner"
+  },
+  "home.banner.agentskitCta": {
+    "message": "Voir la documentation →",
+    "description": "AgentsKit banner CTA"
+  },
+  "home.banner.skills": {
+    "message": "Dépôt organisé de skills réutilisables pour Claude Code et autres assistants de code IA.",
+    "description": "Skills banner"
+  },
+  "home.banner.skillsCta": {
+    "message": "Voir sur GitHub →",
+    "description": "Skills banner CTA"
+  },
+  "home.topics.heading": {
+    "message": "Couverture de toute la stack IA",
+    "description": "Topic highlights heading"
+  },
+  "home.paths.heading": {
+    "message": "8 parcours guidés",
+    "description": "Learning paths heading"
+  },
+  "home.paths.subtitle": {
+    "message": "Vous ne savez pas par où commencer ? Choisissez un parcours et suivez-le étape par étape.",
+    "description": "Learning paths subtitle"
+  },
+  "home.contribute.heading": {
+    "message": "Open source et porté par la communauté",
+    "description": "Contribute heading"
+  },
+  "home.contribute.body": {
+    "message": "AI Summary Hub est gratuit et open source. Ajoutez des sujets, améliorez les articles, proposez du code ou aidez à traduire en 6 langues.",
+    "description": "Contribute body"
+  },
+  "home.contribute.cta": {
+    "message": "Contribuer sur GitHub",
+    "description": "Contribute button"
+  },
+  "learningPath.aiFundamentals.label": {
+    "message": "Fondamentaux de l’IA",
+    "description": "Learning path name"
+  },
+  "learningPath.aiFundamentals.description": {
+    "message": "Concepts clés du ML aux transformers",
+    "description": "Learning path description"
+  },
+  "learningPath.aiFundamentals.level": {
+    "message": "débutant",
+    "description": "Learning path level"
+  },
+  "learningPath.ragFromZero.label": {
+    "message": "RAG depuis zéro",
+    "description": "Learning path name"
+  },
+  "learningPath.ragFromZero.description": {
+    "message": "Construire des systèmes de génération augmentée par récupération",
+    "description": "Learning path description"
+  },
+  "learningPath.ragFromZero.level": {
+    "message": "débutant → intermédiaire",
+    "description": "Learning path level"
+  },
+  "learningPath.masteringAgents.label": {
+    "message": "Maîtriser les agents",
+    "description": "Learning path name"
+  },
+  "learningPath.masteringAgents.description": {
+    "message": "Des agents simples aux systèmes multi-agents",
+    "description": "Learning path description"
+  },
+  "learningPath.masteringAgents.level": {
+    "message": "intermédiaire → avancé",
+    "description": "Learning path level"
+  },
+  "learningPath.promptEngineeringMastery.label": {
+    "message": "Maîtrise du prompt engineering",
+    "description": "Learning path name"
+  },
+  "learningPath.promptEngineeringMastery.description": {
+    "message": "Configuration, techniques et fiabilité",
+    "description": "Learning path description"
+  },
+  "learningPath.promptEngineeringMastery.level": {
+    "message": "débutant → avancé",
+    "description": "Learning path level"
+  },
+  "learningPath.practicalMlops.label": {
+    "message": "MLOps pratique",
+    "description": "Learning path name"
+  },
+  "learningPath.practicalMlops.description": {
+    "message": "Pipeline MLOps de bout en bout",
+    "description": "Learning path description"
+  },
+  "learningPath.practicalMlops.level": {
+    "message": "intermédiaire → avancé",
+    "description": "Learning path level"
+  },
+  "learningPath.aiToolsFrameworks.label": {
+    "message": "Outils & frameworks IA",
+    "description": "Learning path name"
+  },
+  "learningPath.aiToolsFrameworks.description": {
+    "message": "Fournisseurs de modèles, frameworks et outils de développement",
+    "description": "Learning path description"
+  },
+  "learningPath.aiToolsFrameworks.level": {
+    "message": "débutant → intermédiaire",
+    "description": "Learning path level"
+  },
+  "learningPath.aiSafetyEthics.label": {
+    "message": "Sécurité & éthique de l’IA",
+    "description": "Learning path name"
+  },
+  "learningPath.aiSafetyEthics.description": {
+    "message": "Sécurité, biais, explicabilité et éthique",
+    "description": "Learning path description"
+  },
+  "learningPath.aiSafetyEthics.level": {
+    "message": "débutant → intermédiaire",
+    "description": "Learning path level"
+  },
+  "learningPath.claudeCodeDeepDive.label": {
+    "message": "Claude Code en profondeur",
+    "description": "Learning path name"
+  },
+  "learningPath.claudeCodeDeepDive.description": {
+    "message": "Maîtriser Claude Code et MCP",
+    "description": "Learning path description"
+  },
+  "learningPath.claudeCodeDeepDive.level": {
+    "message": "débutant → avancé",
+    "description": "Learning path level"
+  }
+}

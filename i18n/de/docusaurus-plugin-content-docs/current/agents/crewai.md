@@ -1,36 +1,38 @@
 ---
 title: CrewAI
-description: Rollenbasiertes Multi-Agenten-Framework, bei dem Agenten explizite Rollen, Ziele und Hintergrundgeschichten haben und durch strukturierte Aufgaben und Crew-Prozesse zusammenarbeiten.
-keywords: [CrewAI, Multi-Agenten, rollenbasierte Agenten, Aufgaben, Crew, sequenzieller Prozess, hierarchischer Prozess]
+description: Role-based multi-agent framework where agents have explicit roles, goals, and backstories, collaborating through structured tasks and crew processes.
+keywords: [CrewAI, multi-agent, role-based agents, tasks, crew, sequential process, hierarchical process]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # CrewAI
 
 ## Definition
 
-CrewAI ist ein Open-Source-Python-Framework zur Orchestrierung **rollenbasierter Multi-Agenten-Systeme**. Jeder Agent in einer Crew wird durch drei Dinge definiert: eine **Rolle** (was der Agent tut, z. B. "Senior Researcher"), ein **Ziel** (was der Agent zu erreichen versucht, z. B. "Genaue und aktuelle Informationen finden") und eine **Hintergrundgeschichte** (eine Persona-Beschreibung, die das Verhalten und den Ton des Agenten prägt). Diese Struktur macht das Agentenverhalten intuitiv spezifizierbar und leicht verständlich – es spiegelt wider, wie man ein menschliches Teammitglied einarbeiten würde.
+CrewAI ist ein Open-Source-Python-Framework zur Orchestrierung **rollenbasierter Multi-Agenten-Systeme**. Jeder Agent in einer Crew wird durch drei Dinge definiert: eine **Rolle** (was der Agent tut, z.B. "Senior Researcher"), ein **Ziel** (was der Agent erreichen möchte, z.B. "Genaue und aktuelle Informationen finden") und eine **Hintergrundgeschichte** (eine Persona-Beschreibung, die das Verhalten und den Ton des Agenten prägt). Diese Struktur macht das Agentenverhalten intuitiv zu spezifizieren und leicht zu verstehen — sie spiegelt wider, wie Sie ein menschliches Teammitglied einarbeiten würden.
 
-Aufgaben in CrewAI sind diskrete Arbeitseinheiten, die Agenten zugewiesen werden. Eine Aufgabe hat eine Beschreibung, eine erwartete Ausgabe und optional Kontext aus früheren Aufgaben. Aufgaben werden in einer **Crew** zusammengefasst, die den Ausführungsprozess definiert: **sequenziell** (Aufgaben werden nacheinander ausgeführt, wobei die Ausgabe jeder Aufgabe in die nächste einfließt) oder **hierarchisch** (ein Manager-Agent delegiert und koordiniert Aufgaben unter Arbeitern). Dieses deklarative Modell abstrahiert die Nachrichtenübermittlungsschleife weg und lässt Entwickler sich darauf konzentrieren, *was* getan werden muss, anstatt *wie* die Agenten miteinander kommunizieren.
+Aufgaben in CrewAI sind diskrete Arbeitseinheiten, die Agenten zugewiesen werden. Eine Aufgabe hat eine Beschreibung, eine erwartete Ausgabe und optional Kontext aus vorherigen Aufgaben. Aufgaben werden in einer **Crew** gruppiert, die den Ausführungsprozess definiert: **sequentiell** (Aufgaben laufen nacheinander, wobei die Ausgabe jeder Aufgabe in die nächste einfließt) oder **hierarchisch** (ein Manager-Agent delegiert und koordiniert Aufgaben unter Arbeitern). Dieses deklarative Modell abstrahiert die Nachrichtenweiterleitungsschleife, sodass sich Entwickler darauf konzentrieren können, *was* getan werden muss, anstatt *wie* die Agenten miteinander kommunizieren.
 
-CrewAI verfügt über integrierte Tool-Integration und unterstützt LangChain-Tools, benutzerdefinierte Python-Funktionen, die mit `@tool` dekoriert sind, und eine wachsende Bibliothek eingebauter Tools (Websuche, Datei-I/O, Code-Ausführung). Agenten können auch mit Gedächtnis ausgestattet werden (Kurzzeit-, Langzeit-, Entity-Gedächtnis), um Kontext über Aufgabenausführungen und Crew-Läufe hinweg zu erhalten.
+CrewAI verfügt über integrierte Werkzeugintegration und unterstützt LangChain-Werkzeuge, benutzerdefinierte Python-Funktionen, die mit `@tool` dekoriert sind, und eine wachsende Bibliothek von eingebauten Werkzeugen (Websuche, Datei-E/A, Code-Ausführung). Agenten können auch mit Gedächtnis ausgestattet werden (Kurzzeitgedächtnis, Langzeitgedächtnis, Entitätsgedächtnis), um Kontext über Aufgabenausführungen und Crew-Läufe hinweg zu pflegen.
 
 ## Funktionsweise
 
 ### Agenten: Rollen, Ziele und Hintergrundgeschichten
 
-Ein Agent ist die fundamentale Arbeitseinheit in CrewAI. Man instanziiert einen `Agent` mit einer Rolle, einem Ziel und einer Hintergrundgeschichte, plus optionalen Tools und einem LLM-Override. Die Hintergrundgeschichte grundiert den System-Prompt des Agenten und gibt ihm eine konsistente Persona über alle Aufgabeninteraktionen hinweg. Agenten können mit `verbose=True` konfiguriert werden, um ihre internen Denkschritte offenzulegen. Jeder Agent arbeitet unabhängig innerhalb der Orchestrierungsschicht der Crew, empfängt Aufgaben vom Prozessmanager und gibt strukturierte Ausgaben zurück. Das Agentengedächtnis (wenn aktiviert) persistiert Beobachtungen zwischen Aufgaben, was für lang laufende Forschungs- oder Analyse-Workflows entscheidend ist.
+Ein Agent ist die grundlegende Arbeitseinheit in CrewAI. Sie instantiieren einen `Agent` mit einer Rolle, einem Ziel und einer Hintergrundgeschichte sowie optionalen Werkzeugen und einem LLM-Override. Die Hintergrundgeschichte prägt die Systemaufforderung des Agenten und verleiht ihm eine konsistente Persona in allen Aufgabeninteraktionen. Agenten können mit `verbose=True` konfiguriert werden, um ihre internen Denkschritte zu zeigen. Jeder Agent arbeitet unabhängig innerhalb der Orchestrierungsschicht der Crew und empfängt Aufgaben vom Prozessmanager und liefert strukturierte Ausgaben zurück.
 
 ### Aufgaben: Beschreibungen, erwartete Ausgaben und Kontext
 
-Ein `Task`-Objekt beschreibt, was ein Agent tun muss, wie eine gute Ausgabe aussieht und welcher Agent sie ausführen soll. Aufgaben können `context`-Abhängigkeiten von anderen Aufgaben deklarieren, wodurch deren Ausgaben automatisch als Kontext eingefügt werden. Erwartete Ausgabebeschreibungen leiten das LLM an, strukturierte, verwendbare Ergebnisse zu produzieren. Aufgaben unterstützen Ausgabeformate: einfacher Text, JSON über Pydantic-Modelle oder Dateiausgaben. Bei Verwendung eines hierarchischen Prozesses nutzt der Manager-Agent Aufgabenbeschreibungen, um Zuweisung und Sequenzierung dynamisch zu entscheiden, ohne dass der Entwickler Abhängigkeiten fest kodieren muss.
+Ein `Task`-Objekt beschreibt, was ein Agent tun muss, wie eine gute Ausgabe aussieht und welcher Agent sie ausführen soll. Aufgaben können `context`-Abhängigkeiten von anderen Aufgaben deklarieren, wodurch deren Ausgaben automatisch als Kontext eingefügt werden. Beschreibungen der erwarteten Ausgabe leiten das LLM zu strukturierten, verwendbaren Ergebnissen. Aufgaben unterstützen Ausgabeformate: einfachen Text, JSON über Pydantic-Modelle oder Dateiausgaben. Bei einem hierarchischen Prozess entscheidet der Manager-Agent anhand von Aufgabenbeschreibungen über Zuweisung und Sequenzierung dynamisch.
 
-### Prozesse: sequenziell und hierarchisch
+### Prozesse: sequentiell und hierarchisch
 
-Das `Crew`-Objekt verbindet Agenten und Aufgaben und gibt einen `Process` an. In `Process.sequential` werden Aufgaben in der Listenreihenfolge ausgeführt, wobei die Ausgabe jeder Aufgabe an die nächste weitergegeben wird. In `Process.hierarchical` wird automatisch ein Manager-LLM instanziiert, um Ziele zu zerlegen, Arbeit zuzuweisen und Ergebnisse zu überprüfen – was emergente Koordination ohne explizite Verkabelung ermöglicht. Sequenziell ist vorhersehbar und leicht zu testen; hierarchisch ist flexibler, aber weniger deterministisch. Die Wahl zwischen beiden hängt davon ab, ob der Workflow einen festen DAG hat (sequenziell) oder dynamische Aufgabenverteilung benötigt (hierarchisch).
+Das `Crew`-Objekt verbindet Agenten und Aufgaben und gibt einen `Process` an. In `Process.sequential` werden Aufgaben in Listenreihenfolge ausgeführt, wobei jede Aufgabenausgabe an die nächste weitergegeben wird. In `Process.hierarchical` wird automatisch ein Manager-LLM instantiiert, um Ziele zu zerlegen, Arbeit zuzuweisen und Ergebnisse zu überprüfen — was emergente Koordination ohne explizite Verdrahtung ermöglicht. Sequentiell ist vorhersehbar und einfach zu testen; hierarchisch ist flexibler, aber weniger deterministisch.
 
-### Eingebaute Tool-Integration
+### Integrierte Werkzeugintegration
 
-CrewAI wird mit einem `@tool`-Dekorator geliefert, der mit LangChain-Tools kompatibel ist, was es einfach macht, Agenten mit Websuche (SerperDev, DuckDuckGo), Code-Ausführung, Dateilesen/-schreiben und benutzerdefinierten API-Aufrufen auszustatten. Tools werden pro Agent registriert, sodass der Forscher-Agent Suchwerkzeuge haben kann, während der Schreiber-Agent Datei-Tools hat. Tool-Beschreibungen werden in den Prompt des Agenten einbezogen, und das Framework übernimmt die Tool-Aufruf-Schleife transparent. Für den Produktionseinsatz bietet das `CrewAI Tools`-Paket eine kuratierte Sammlung vorgefertigter Integrationen.
+CrewAI enthält einen `@tool`-Dekorator, der mit LangChain-Werkzeugen kompatibel ist, was es einfach macht, Agenten mit Websuche (SerperDev, DuckDuckGo), Code-Ausführung, Dateilesen/-schreiben und benutzerdefinierten API-Aufrufen auszustatten. Werkzeuge sind pro Agent registriert, sodass der Forscher-Agent Suchwerkzeuge haben kann, während der Schreiber-Agent Datei-Werkzeuge hat.
 
 ```mermaid
 flowchart TD
@@ -50,21 +52,21 @@ flowchart TD
 
 | Verwenden wenn | Vermeiden wenn |
 |---|---|
-| Das Problem natürlicherweise auf distinkte menschenähnliche Rollen abbildbar ist (Forscher, Schreiber, Prüfer) | Ein einzelner Agent mit Tools benötigt wird – CrewAIs Overhead ist unnötig |
-| Eine deklarative High-Level-API gewünscht wird, die die Nachrichtenübermittlungs-Komplexität verbirgt | Präzise Kontrolle über jede zwischen Agenten ausgetauschte Nachricht benötigt wird |
-| Inhalts-Pipelines, Recherche-Workflows oder Analyse-Systeme aufgebaut werden | Der Workflow komplexes bedingtes Branching oder Zyklen erfordert, die von sequenziell/hierarchisch nicht unterstützt werden |
-| Eingebautes Gedächtnis und Tool-Integration mit minimaler Konfiguration gewünscht wird | Echtzeit-Latenz kritisch ist – Multi-Agenten-sequenzielle Läufe fügen Overhead hinzu |
-| Das Team kein Experte in Agent-Frameworks ist und eine intuitive API benötigt | Feinkörnige Beobachtbarkeit jeder Agenteninteraktion auf Graph-Ebene benötigt wird |
+| Ihr Problem auf natürliche Weise auf menschenähnliche Rollen abbildet (Forscher, Autor, Prüfer) | Sie einen einzelnen Agenten mit Werkzeugen benötigen — der Overhead von CrewAI ist unnötig |
+| Sie eine deklarative, hochstufige API möchten, die die Komplexität des Nachrichtenaustausches verbirgt | Sie präzise Kontrolle über jede ausgetauschte Nachricht zwischen Agenten benötigen |
+| Sie Inhaltspipelines, Forschungsworkflows oder Analysesysteme erstellen | Ihr Workflow komplexe bedingte Verzweigungen oder Zyklen erfordert, die von sequentiell/hierarchisch nicht unterstützt werden |
+| Sie eingebautes Gedächtnis und Werkzeugintegration mit minimaler Konfiguration wünschen | Echtzeit-Latenz kritisch ist — multi-agenten sequentielle Läufe fügen Overhead hinzu |
+| Ihr Team kein Experte in Agent-Frameworks ist und eine intuitive API benötigt | Sie detaillierte Beobachtbarkeit jeder Agenteninteraktion auf Graphebene benötigen |
 
 ## Vergleiche
 
 | Kriterium | CrewAI | AutoGen | LangGraph |
 |---|---|---|---|
-| **Abstraktionsebene** | Hoch: deklarative Rollen, Ziele, Aufgaben | Mittel: konversationale Agenten mit nachrichtenbasierter API | Niedrig: explizite Graph-Knoten und -Kanten |
-| **Multi-Agenten-Modell** | Rollenbasierte Crew mit sequenziellen oder hierarchischen Prozessen | Konversationsgesteuerte Agentenpaare oder Gruppen-Chats | Subgraphen; einzelner zustandsbehafteter Graph mit mehreren Knoten pro Agent |
-| **Zustandsverwaltung** | Implizit: über Aufgabenkontext und Crew-Gedächtnis weitergegeben | Implizit: Nachrichtenhistorie | Explizit: TypedDict-Zustand geteilt über alle Knoten |
-| **Einfachheit der Einrichtung** | Sehr einfach: 10–20 Zeilen für eine funktionierende Multi-Agenten-Crew | Moderat: erfordert Verständnis von Agententypen und Initiierungsmustern | Schwieriger: erfordert Graph-Konstruktions-Denkmodell |
-| **Bedingte/zyklische Flows** | Begrenzt: sequenziell ist linear, hierarchisch ist undurchsichtig | Begrenzt: hängt von Agentenantworten ab | Erstklassig: bedingte Kanten und Zyklen sind das Kernmerkmal |
+| **Abstraktionsebene** | Hoch: deklarative Rollen, Ziele, Aufgaben | Mittel: Konversationsagenten mit nachrichtenbasierter API | Niedrig: explizite Graphknoten und -kanten |
+| **Multi-Agenten-Modell** | Rollenbasierte Crew mit sequentiellen oder hierarchischen Prozessen | Konversationsgesteuerte Agentenpaare oder Gruppenchats | Teilgraphen; einzelner zustandsbehafteter Graph mit mehreren Knoten pro Agent |
+| **Zustandsverwaltung** | Implizit: über Aufgabenkontext und Crew-Gedächtnis weitergegeben | Implizit: Nachrichtenhistorie | Explizit: TypedDict-Zustand über alle Knoten geteilt |
+| **Einrichtungsleichtigkeit** | Sehr einfach: 10–20 Zeilen für eine funktionierende Multi-Agenten-Crew | Mäßig: erfordert das Verstehen von Agententypen und Initiationsmustern | Schwieriger: erfordert Graphkonstruktions-Denkmodell |
+| **Bedingte/zyklische Flüsse** | Begrenzt: sequentiell ist linear, hierarchisch ist undurchsichtig | Begrenzt: hängt von Agentenantworten ab | Erstklassig: bedingte Kanten und Zyklen sind das Kernfeature |
 
 ## Code-Beispiele
 
@@ -179,14 +181,14 @@ print(result.raw)
 
 ## Praktische Ressourcen
 
-- [CrewAI offizielle Dokumentation](https://docs.crewai.com/) — Vollständige Referenz für Agenten, Aufgaben, Crews, Prozesse, Tools und Gedächtniskonfiguration.
+- [CrewAI offizielle Dokumentation](https://docs.crewai.com/) — Vollständige Referenz zu Agenten, Aufgaben, Crews, Prozessen, Werkzeugen und Gedächtniskonfiguration.
 - [CrewAI GitHub-Repository](https://github.com/crewAIInc/crewAI) — Quellcode, Beispiele und Issue-Tracker für das Open-Source-Framework.
-- [CrewAI Tools Dokumentation](https://docs.crewai.com/concepts/tools) — Vorgefertigte Tool-Integrationen: Websuche, Datei-I/O, Code-Ausführung und benutzerdefinierte Tool-Erstellung.
-- [CrewAI + LangChain Integrations-Leitfaden](https://docs.crewai.com/how-to/llm-connections) — Wie verschiedene LLM-Anbieter einschließlich OpenAI, Anthropic und lokaler Modelle konfiguriert werden.
+- [CrewAI Tools Dokumentation](https://docs.crewai.com/concepts/tools) — Vorgefertigte Werkzeugintegrationen: Websuche, Datei-E/A, Code-Ausführung und benutzerdefinierte Werkzeugerstellung.
+- [CrewAI + LangChain Integrationsleitfaden](https://docs.crewai.com/how-to/llm-connections) — Wie verschiedene LLM-Anbieter einschließlich OpenAI, Anthropic und lokaler Modelle konfiguriert werden.
 
 ## Siehe auch
 
-- [Überblick über Agent-Frameworks](/docs/agents/frameworks-overview)
+- [Agent-Frameworks-Übersicht](/docs/agents/frameworks-overview)
 - [AutoGen](/docs/agents/autogen)
 - [LangGraph](/docs/agents/langgraph)
 - [Multi-Agenten-Systeme](/docs/agents/multi-agent-systems)

@@ -1,35 +1,44 @@
 ---
 title: Aprendizaje por transferencia
-description: Reusing pretrained models for new tasks.
-keywords: [transfer learning, pretraining, fine-tuning]
+description: Reutilización de modelos preentrenados para nuevas tareas.
+keywords: [aprendizaje por transferencia, preentrenamiento, ajuste fino]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # Aprendizaje por transferencia
 
 ## Definición
 
-El transfer learning reutiliza conocimiento de una tarea o dominio fuente to improve learning on a target task with limited data. Modelos preentrenados (por ej. ImageNet, BERT) are fine-tuned on downstream tasks.
+El aprendizaje por transferencia reutiliza el conocimiento de una tarea o dominio fuente para mejorar el aprendizaje en una tarea objetivo con datos limitados. Los modelos preentrenados (como ImageNet, BERT) se ajustan finamente en tareas posteriores.
 
-Es standard in [NLP](/docs/nlp) (por ej. BERT, GPT) and [vision](/docs/cv) (por ej. ImageNet backbones). When the target has little labeled data, starting from a **source model** and [fine-tuning](/docs/llms/fine-tuning) on **target data** is much more data-efficient than training from scratch. See [few-shot](/docs/few-shot-learning) and [zero-shot](/docs/zero-shot-learning) for the extreme of very few or sin ejemplos objetivo.
+Es estándar en [NLP](/docs/nlp) (como BERT, GPT) y [visión](/docs/cv) (como backbones de ImageNet). Cuando el objetivo tiene pocos datos etiquetados, comenzar desde un **modelo fuente** y [ajustar finamente](/docs/llms/fine-tuning) con **datos objetivo** es mucho más eficiente en datos que entrenar desde cero. Ver [few-shot](/docs/few-shot-learning) y [zero-shot](/docs/zero-shot-learning) para el extremo de muy pocos o ningún ejemplo objetivo.
 
 ## Cómo funciona
 
-Obtain a **source model** (preentrenado en a large dataset, por ej. ImageNet or web text). Take **target data** (your task’s labeled examples) and **fine-tune**: update the model (all parameters or only a subset, por ej. adapter, head) to minimize loss on the target task. El resultado es un **target model**. **Full fine-tuning** updates all weights; **adapter** or **prompt tuning** updates a small number of parameters to save compute and preserve source knowledge. Works best when source and target share useful representations (por ej. same modality, related domains).
+```mermaid
+flowchart LR
+  Source[Modelo fuente] --> FineTune[Ajustar finamente]
+  TargetData[Datos objetivo] --> FineTune
+  FineTune --> TargetModel[Modelo objetivo]
+```
+
+Obtenga un **modelo fuente** (preentrenado en un gran conjunto de datos, como ImageNet o texto web). Tome **datos objetivo** (los ejemplos etiquetados de su tarea) y **ajuste finamente**: actualice el modelo (todos los parámetros o solo un subconjunto, como adaptador, cabeza) para minimizar la pérdida en la tarea objetivo. El resultado es un **modelo objetivo**. El **ajuste fino completo** actualiza todos los pesos; el **adaptador** o el **ajuste de indicaciones** actualiza un pequeño número de parámetros para ahorrar cómputo y preservar el conocimiento fuente. Funciona mejor cuando la fuente y el objetivo comparten representaciones útiles (como la misma modalidad, dominios relacionados).
 
 ## Casos de uso
 
-Transfer learning is standard when you have limited target data and a related pretrained model to adapt.
+El aprendizaje por transferencia es estándar cuando se tienen datos objetivo limitados y un modelo preentrenado relacionado para adaptar.
 
-- Fine-tuning BERT or GPT on domain-specific NLP tasks
-- Adapting ImageNet-pretrained models to medical or satellite imagery
-- Reusing pretrained representations when target data is limited
+- Ajustar finamente BERT o GPT en tareas NLP específicas del dominio
+- Adaptar modelos preentrenados en ImageNet a imágenes médicas o satelitales
+- Reutilizar representaciones preentrenadas cuando los datos objetivo son limitados
 
-## Documentación externa
+## Recursos prácticos
 
-- [Hugging Face – Transfer learning](https://huggingface.co/course/chapter1/4?fw=pt)
-- [TensorFlow – Transfer learning](https://www.tensorflow.org/tutorials/images/transfer_learning)
+- [Hugging Face – Aprendizaje por transferencia](https://huggingface.co/course/chapter1/4?fw=pt)
+- [TensorFlow – Aprendizaje por transferencia](https://www.tensorflow.org/tutorials/images/transfer_learning)
 
 ## Ver también
 
-- [Fine-tuning](/docs/llms/fine-tuning)
-- [Few-shot learning](/docs/few-shot-learning)
+- [Ajuste fino](/docs/llms/fine-tuning)
+- [Aprendizaje few-shot](/docs/few-shot-learning)

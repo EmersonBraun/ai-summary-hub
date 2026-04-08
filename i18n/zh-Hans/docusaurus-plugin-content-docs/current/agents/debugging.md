@@ -1,18 +1,20 @@
 ---
-title: 代理调试与可观测性
-description: 追踪、记录和诊断 AI 代理系统故障的技术和工具。
-keywords: [代理调试, 可观测性, 分布式追踪, LangSmith, Phoenix, Weights & Biases, OpenTelemetry, 结构化日志]
+title: Agent debugging and observability
+description: Techniques and tools for tracing, logging, and diagnosing failures in AI agent systems.
+keywords: [agent debugging, observability, distributed tracing, LangSmith, Phoenix, Weights & Biases, OpenTelemetry, structured logging]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # 代理调试与可观测性
 
 ## 定义
 
-代理调试与可观测性是使 AI 代理系统足够透明，以便识别、诊断和修复故障、回归和低效的学科。与传统软件调试（堆栈追踪指向确切的行）不同，代理故障通常是涌现性的：正确的 LLM 调用产生看似合理但错误的输出，这种错误在后续工具调用中级联，破坏代理状态，产生没有任何异常的错误最终答案。可观测性为您提供重建所发生情况所需的数据。
+Agenten-Debugging und Beobachtbarkeit ist die Disziplin, KI-Agentensysteme so transparent zu machen, dass Fehler, Regressionen und Ineffizienzen identifiziert, diagnostiziert und behoben werden können. Anders als beim traditionellen Software-Debugging – wo ein Stack-Trace auf eine genaue Zeile zeigt – sind Agentenfehler oft emergent: Ein korrekter LLM-Aufruf produziert plausible, aber falsche Ausgaben, die sich durch nachfolgende Werkzeugaufrufe kaskadieren, den Agentenzustand korrumpieren und eine falsche Endantwort erzeugen, ohne dass eine Ausnahme ausgelöst wird. Beobachtbarkeit liefert die Daten, die nötig sind, um zu rekonstruieren, was geschehen ist.
 
-可观测性的三大支柱——日志、指标和追踪——适用于代理，就像适用于分布式系统一样，但需要重要的调整。日志不仅必须捕获错误，还必须捕获 LLM 输入和输出的语义内容。指标必须包括令牌计数、每个跨度的延迟和工具调用频率，以及通常的系统指标。追踪必须对代理运行的层级结构进行建模：整个任务的根跨度、每个 LLM 调用的子跨度、每个工具调用的孙跨度，以此类推。这些共同为您提供每次代理执行的完整、可重放记录。
+Die drei Säulen der Beobachtbarkeit – Logs, Metriken und Traces – gelten für Agenten wie für verteilte Systeme, aber mit wichtigen Anpassungen. Logs müssen nicht nur Fehler, sondern auch den semantischen Inhalt von LLM-Eingaben und -Ausgaben erfassen. Metriken müssen Token-Zählungen, Latenz pro Span und Werkzeugaufruf-Häufigkeiten neben den üblichen Systemmetriken einschließen. Traces müssen die hierarchische Struktur eines Agenten-Laufs modellieren: ein Root-Span für die Gesamtaufgabe, Child-Spans für jeden LLM-Aufruf, Grandchild-Spans für jede Werkzeugaufruf und so weiter. Zusammen ergeben diese ein vollständiges, reproduzierbares Protokoll jeder Agenten-Ausführung.
 
-没有良好的可观测性，调试就变成了猜谜：您重新运行代理，可能由于非确定性得到不同的结果，无法确定您的修复是否解决了根本原因。有了它，您可以精确定位推理出错的确切 LLM 调用，识别哪个工具返回了意外数据，测量每个步骤的延迟贡献，并将两次运行并排比较以了解发生了什么变化。
+Ohne gute Beobachtbarkeit wird Debugging zum Raten: Sie führen den Agenten erneut aus, erhalten möglicherweise aufgrund von Nicht-Determinismus ein anderes Ergebnis und können nicht sicher sein, ob Ihre Lösung die Grundursache behebt. Mit ihr können Sie den genauen LLM-Aufruf identifizieren, bei dem die Überlegung falsch lief, feststellen, welches Werkzeug unerwartete Daten zurückgegeben hat, den Latenzanteil jedes Schritts messen und zwei Läufe nebeneinander vergleichen, um zu verstehen, was sich geändert hat.
 
 ## 工作原理
 
@@ -28,45 +30,45 @@ flowchart LR
   Viewer -->|analyzed for| RootCause[Root Cause]
 ```
 
-### 结构化日志
+### Strukturiertes Logging
 
-结构化日志意味着发出机器可读的 JSON 日志，而不是自由文本字符串。对于代理，每条日志条目应包括：运行 ID、步骤编号、跨度类型（llm/tool/memory）、输入负载、输出负载、时间戳、令牌计数和任何错误。结构化日志使过滤、聚合和关联分布式运行中的事件成为可能，无需手动字符串解析。Python 的 `structlog` 或 `loguru` 等库使这变得简单直接。
+Strukturiertes Logging bedeutet, maschinenlesbare JSON-Logs anstelle von Freitextzeichenfolgen auszugeben. Bei Agenten sollte jeder Log-Eintrag Folgendes enthalten: Lauf-ID, Schrittnummer, Span-Typ (llm/tool/memory), Eingabe-Payload, Ausgabe-Payload, Zeitstempel, Token-Zählungen und etwaige Fehler. Strukturierte Logs ermöglichen es, Ereignisse über einen verteilten Lauf hinweg zu filtern, zu aggregieren und zu korrelieren, ohne manuelles String-Parsing. Bibliotheken wie Pythons `structlog` oder `loguru` machen dies unkompliziert.
 
-### 分布式追踪和跨度
+### Verteiltes Tracing und Spans
 
-追踪是表示单次代理执行的跨度有向无环图。根跨度涵盖整个运行；子跨度涵盖 LLM 调用、工具调用和内存查找。每个跨度携带一个追踪 ID（在整个运行中共享）和一个跨度 ID（每个跨度唯一），从而实现完整重建。OpenTelemetry（OTel）是发出追踪的开放标准；它有 Jaeger、Zipkin、Phoenix 和 LangSmith 的导出器。使用 OTel 跨度对代理进行检测需要用跨度上下文管理器包装 LLM 调用和工具调用。
+Ein Trace ist ein gerichteter azyklischer Graph von Spans, der eine einzelne Agenten-Ausführung repräsentiert. Der Root-Span deckt den gesamten Lauf ab; Child-Spans decken LLM-Aufrufe, Werkzeugaufrufungen und Speicherabfragen ab. Jeder Span trägt eine Trace-ID (über den gesamten Lauf geteilt) und eine Span-ID (eindeutig pro Span), was eine vollständige Rekonstruktion ermöglicht. OpenTelemetry (OTel) ist der offene Standard für die Ausgabe von Traces; es hat Exporteure für Jaeger, Zipkin, Phoenix und LangSmith. Die Instrumentierung eines Agenten mit OTel-Spans erfordert das Umhüllen von LLM-Aufrufen und Werkzeugaufrufen mit Span-Kontextmanagern.
 
-### 追踪可视化
+### Trace-Visualisierung
 
-追踪查看器以可视方式呈现跨度树，显示每个跨度的时间线、持续时间、输入、输出和错误。LangSmith 为 LangChain 代理提供专门构建的追踪查看器，具有令牌级详细信息。Phoenix（Arize）是一个支持任何 OpenTelemetry 兼容源的开源替代方案。Weights & Biases Traces 与 W&B 运行集成，适合已经将其用于实验追踪的团队。良好的追踪查看器让您可以并排比较两次运行，按类型过滤跨度，并深入到导致失败的确切令牌级输入/输出。
+Trace-Viewer rendern den Span-Baum visuell und zeigen die Zeitleiste, Dauer, Eingaben, Ausgaben und Fehler für jeden Span. LangSmith bietet einen zweckgebundenen Trace-Viewer für LangChain-Agenten mit Token-Level-Details. Phoenix (Arize) ist eine Open-Source-Alternative, die jede OpenTelemetry-kompatible Quelle unterstützt. Weights & Biases Traces integriert sich in W&B-Läufe für Teams, die es bereits für Experiment-Tracking verwenden. Gute Trace-Viewer ermöglichen es Ihnen, zwei Läufe nebeneinander zu vergleichen, Spans nach Typ zu filtern und in die genaue Token-Level-Eingabe/Ausgabe zu bohren, die einen Fehler verursacht hat.
 
-### 根本原因分析
+### Ursachenanalyse
 
-有了追踪，根本原因分析遵循系统化的过程：找到输出与预期偏离的第一个跨度，检查其输入（它们是否正确？），并确定失败是在 LLM 推理、工具返回错误数据还是内存/上下文问题中。非确定性使这更难——对同一输入运行两次可能产生不同结果——因此捕获每次运行的追踪（不仅仅是失败的运行）并与已知良好的追踪进行比较至关重要。用元数据（用户 ID、任务类型、提示版本）标记追踪，可以进行群体分析以在许多运行中发现模式。
+Mit Traces in der Hand folgt die Ursachenanalyse einem systematischen Prozess: Finden Sie den ersten Span, bei dem die Ausgabe von der Erwartung abwich, inspizieren Sie seine Eingaben (waren sie korrekt?) und bestimmen Sie, ob der Fehler in der LLM-Überlegung lag, ein Werkzeug schlechte Daten zurückgegeben hat oder ein Speicher-/Kontextproblem vorlag. Nicht-Determinismus erschwert dies – das Ausführen derselben Eingabe zweimal kann unterschiedliche Ergebnisse erzeugen – daher ist das Erfassen von Traces für jeden Lauf (nicht nur für Fehler) und der Vergleich mit einem bekannt-guten Trace unerlässlich. Das Markieren von Traces mit Metadaten (Benutzer-ID, Aufgabentyp, Prompt-Version) ermöglicht eine Kohorten-Analyse, um Muster über viele Läufe hinweg zu erkennen.
 
-### 常见调试挑战
+### Häufige Debugging-Herausforderungen
 
-非确定性意味着同一个 bug 可能不会在下一次运行中重现，需要对许多追踪进行统计分析。多步骤失败会累积：第 2 步的错误可能直到第 7 步才会出现，因此您必须向后追踪错误传播。工具错误——网络超时、格式错误的 API 响应、权限错误——通常是无声的（代理将错误字符串作为工具结果接收并继续运行）。提示注入和上下文窗口限制可能会导致突然的行为变化，在没有追踪上下文的情况下看起来是随机的。
+Nicht-Determinismus bedeutet, dass derselbe Fehler beim nächsten Lauf möglicherweise nicht reproduzierbar ist, was eine statistische Analyse über viele Traces hinweg erfordert. Mehrstufige Fehler kumulieren: Ein Fehler in Schritt 2 taucht möglicherweise erst in Schritt 7 auf, sodass Sie die Fehlerausbreitung rückwärts verfolgen müssen. Werkzeugfehler – Netzwerk-Timeouts, fehlerhafte API-Antworten, Berechtigungsfehler – sind oft still (der Agent erhält eine Fehlerzeichenfolge als Werkzeug-Ergebnis und setzt fort). Prompt-Injection und Kontextfenster-Grenzen können plötzliche Verhaltensänderungen verursachen, die ohne Trace-Kontext zufällig erscheinen.
 
-## 适用场景 / 不适用场景
+## 何时使用 / 何时不使用
 
-| 适用场景 | 不适用场景 |
+| 使用场景 | 避免场景 |
 |---|---|
-| 诊断生产中的特定代理故障 | 在部署后将可观测性视为事后考虑 |
-| 比较两个提示版本以了解行为差异 | 在低延迟、高吞吐量流水线中过度记录每个令牌，而不进行采样 |
-| 识别哪个工具调用是延迟瓶颈 | 仅依赖最终答案来判断运行是否成功 |
-| 构建需要追踪级别断言的回归测试套件 | 在多租户系统中未经脱敏地记录原始 PII |
-| 审计工具调用频率和参数分布 | 使用打印语句代替结构化、关联的追踪 |
+| Einen spezifischen Agentenfehler in der Produktion diagnostizieren | Beobachtbarkeit als nachträglichen Gedanken nach der Bereitstellung behandeln |
+| Zwei Prompt-Versionen vergleichen, um Verhaltensunterschiede zu verstehen | Jeden Token in einer latenzarmen, hochvolumigen Pipeline ohne Sampling übermäßig protokollieren |
+| Identifizieren, welcher Werkzeugaufruf der Engpass für die Latenz ist | Sich nur auf die endgültige Antwort verlassen, um zu beurteilen, ob ein Lauf erfolgreich war |
+| Eine Regressionssuite erstellen, die Trace-Level-Assertionen erfordert | Rohe PII ohne Redaktion in mandantenfähigen Systemen protokollieren |
+| Werkzeugaufruf-Häufigkeiten und Argumentverteilungen prüfen | Print-Anweisungen statt strukturierter, korrelierter Traces verwenden |
 
 ## 优缺点
 
 | 优点 | 缺点 |
 |---|---|
-| 实现对多步骤失败的精确根本原因分析 | 检测增加了代码复杂性和轻微的延迟开销 |
-| 为合规性和调试提供完整的审计追踪 | 存储完整的 LLM I/O 追踪会产生大量数据量 |
-| 通过运行比较使非确定性行为可处理 | 追踪查看器对新团队成员有学习曲线 |
-| 与现有 MLOps 和监控堆栈集成 | 必须调整采样策略以平衡覆盖率与成本 |
-| 结构化日志实现自动异常检测 | 追踪中的敏感用户数据需要谨慎的访问控制 |
+| Ermöglicht präzise Ursachenanalyse für mehrstufige Fehler | Instrumentierung fügt Code-Komplexität und geringe Latenz-Overhead hinzu |
+| Bietet einen vollständigen Prüfpfad für Compliance und Debugging | Das Speichern vollständiger LLM-I/O-Traces erzeugt erhebliches Datenvolumen |
+| Macht nicht-deterministisches Verhalten durch Lauf-Vergleich handhabbar | Trace-Viewer haben eine Lernkurve für neue Teammitglieder |
+| Integriert sich in bestehende MLOps- und Monitoring-Stacks | Sampling-Strategien müssen ausbalanciert werden zwischen Abdeckung und Kosten |
+| Strukturierte Logs ermöglichen automatisierte Anomalieerkennung | Sensible Benutzerdaten in Traces erfordern sorgfältige Zugangskontrolle |
 
 ## 代码示例
 
@@ -195,14 +197,14 @@ if __name__ == "__main__":
 
 ## 实用资源
 
-- [LangSmith 文档](https://docs.smith.langchain.com/) — 完整的追踪、数据集管理和评估平台，专为基于 LangChain 的代理构建，具有专用追踪查看器。
-- [Arize 的 Phoenix 文档](https://docs.arize.com/phoenix) — 支持 OpenTelemetry 追踪的开源 LLM 可观测性平台；适用于任何代理框架。
-- [OpenTelemetry Python 文档](https://opentelemetry-python.readthedocs.io/) — 使用分布式追踪、指标和日志对 Python 应用程序进行检测的官方文档。
-- [Weights & Biases Weave](https://wandb.github.io/weave/) — W&B 针对 LLM 应用程序的追踪和评估工具，与 W&B 实验追踪集成。
-- [OpenInference 检测](https://github.com/Arize-ai/openinference) — 用于 LLM、代理和向量存储的基于 OTel 的开源检测库（Phoenix 使用）。
+- [LangSmith documentation](https://docs.smith.langchain.com/) — Vollständige Tracing-, Datensatz-Management- und Evaluierungsplattform für LangChain-basierte Agenten, mit einem zweckgebundenen Trace-Viewer.
+- [Phoenix by Arize documentation](https://docs.arize.com/phoenix) — Open-Source LLM-Beobachtbarkeitsplattform, die OpenTelemetry-Traces unterstützt; funktioniert mit jedem Agenten-Framework.
+- [OpenTelemetry Python documentation](https://opentelemetry-python.readthedocs.io/) — Offizielle Docs für die Instrumentierung von Python-Anwendungen mit verteiltem Tracing, Metriken und Logs.
+- [Weights & Biases Weave](https://wandb.github.io/weave/) — W&Bs Tracing- und Evaluierungswerkzeug für LLM-Apps, integriert mit W&B Experiment-Tracking.
+- [OpenInference instrumentation](https://github.com/Arize-ai/openinference) — Open-Source OTel-basierte Instrumentierungsbibliotheken für LLMs, Agenten und Vektorspeicher (verwendet von Phoenix).
 
-## 另请参阅
+## 另见
 
-- [代理评估与测试](/docs/agents/evaluation)
-- [代理](/docs/agents)
-- [MLOps 监控](/docs/mlops/monitoring)
+- [Agent evaluation and testing](/docs/agents/evaluation)
+- [Agents](/docs/agents)
+- [MLOps monitoring](/docs/mlops/monitoring)

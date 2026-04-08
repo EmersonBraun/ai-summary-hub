@@ -1,18 +1,20 @@
 ---
-title: Ingeniería Automática de Prompts (APE)
-description: La Ingeniería Automática de Prompts (APE) usa LLMs para generar, puntuar y refinar iterativamente instrucciones de prompts, reemplazando el ensayo y error manual por un bucle de optimización basado en datos que descubre prompts de alto rendimiento a escala.
-keywords: [ingeniería automática de prompts, APE, optimización de prompts, prompts generados por LLM, DSPy, Zhou et al, búsqueda de prompts, inducción de instrucciones, ajuste de prompts, meta-prompting]
+title: Ingeniería automática de prompts (APE)
+description: La ingeniería automática de prompts (APE) utiliza LLM para generar, puntuar y refinar iterativamente instrucciones de prompts, reemplazando el ensayo y error manual con un bucle de optimización basado en datos que descubre prompts de alto rendimiento a escala.
+keywords: [automatic prompt engineering, APE, prompt optimization, LLM-generated prompts, DSPy, Zhou et al, prompt search, instruction induction, prompt tuning, meta-prompting]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
-# Ingeniería Automática de Prompts (APE)
+# Ingeniería automática de prompts (APE)
 
 ## Definición
 
-La Ingeniería Automática de Prompts (APE) es la práctica de usar un modelo de lenguaje para generar y optimizar instrucciones de prompts en lugar de escribirlas a mano. Introducida por Zhou et al. (2022) en el artículo *Large Language Models Are Human-Level Prompt Engineers*, APE enmarca el diseño de prompts como un problema de síntesis de programas: dado un conjunto de pares de demostración entrada-salida, encontrar la instrucción en lenguaje natural que, cuando se antepone a un prompt, maximice el rendimiento de la tarea en un conjunto de evaluación reservado. La búsqueda, puntuación y refinamiento de instrucciones candidatas se realizan todos de forma programática — el rol del humano cambia de autor de prompts a definidor de tareas y diseñador de métricas.
+La ingeniería automática de prompts (APE) es la práctica de utilizar un modelo de lenguaje para generar y optimizar instrucciones de prompts en lugar de escribirlas a mano. Introducida por Zhou et al. (2022) en el artículo *Large Language Models Are Human-Level Prompt Engineers*, la APE enmarca el diseño de prompts como un problema de síntesis de programas: dado un conjunto de pares de demostración entrada-salida, encontrar la instrucción en lenguaje natural que, cuando se antepone a un prompt, maximiza el rendimiento de la tarea en un conjunto de evaluación reservado. La búsqueda, puntuación y refinamiento de instrucciones candidatas se realizan de forma programática —el rol del humano pasa de ser autor de prompts a definidor de tareas y diseñador de métricas.
 
-La motivación para automatizar el diseño de prompts es práctica. La ingeniería manual de prompts es lenta, frágil y está sesgada por las intuiciones del ingeniero humano sobre cómo los modelos de lenguaje procesan el texto. Pequeños cambios en la redacción — "Piensa paso a paso" frente a "Pensemos con cuidado paso a paso" — producen diferencias de precisión medibles que son imposibles de predecir sin pruebas empíricas. APE reemplaza esta adivinanza con una búsqueda sistemática: generar un gran conjunto de instrucciones candidatas, evaluar cada una en un benchmark y conservar las de mejor rendimiento. Esta es la misma filosofía de diseño que hay detrás de la búsqueda de hiperparámetros en ML clásico — los humanos especifican el objetivo, las máquinas realizan la búsqueda.
+La motivación para automatizar el diseño de prompts es práctica. La ingeniería manual de prompts es laboriosa, frágil y sesgada por las intuiciones del ingeniero humano sobre cómo los modelos de lenguaje procesan el texto. Pequeños cambios en la redacción —"Piensa paso a paso" vs "Pensemos cuidadosamente paso a paso"— producen diferencias de precisión medibles que son imposibles de predecir sin pruebas empíricas. La APE reemplaza estas conjeturas con una búsqueda sistemática: generar un gran grupo de instrucciones candidatas, evaluar cada una en un benchmark y conservar los mejores resultados. Esta es la misma filosofía de diseño detrás de la búsqueda de hiperparámetros en ML clásico —los humanos especifican el objetivo, las máquinas hacen la búsqueda.
 
-APE es distinta del ajuste fino de prompts suaves (que optimiza incrustaciones continuas de tokens mediante descenso de gradiente) y del fine-tuning (que actualiza los pesos del modelo). APE opera completamente en el espacio del lenguaje natural usando modelos congelados. Esto la hace agnóstica al modelo, interpretable — se puede leer y comprender la instrucción ganadora — y desplegable sin ninguna infraestructura de entrenamiento. La contrapartida es que el espacio de búsqueda discreto del lenguaje natural es vasto y no diferenciable, por lo que APE se basa en muestreo, heurísticas de puntuación y refinamiento iterativo en lugar de optimización basada en gradientes.
+La APE se distingue del ajuste suave de prompts (que optimiza incrustaciones continuas de tokens mediante descenso de gradiente) y del ajuste fino (que actualiza los pesos del modelo). La APE opera completamente en el espacio del lenguaje natural usando modelos congelados. Esto la hace agnóstica al modelo, interpretable —se puede leer y entender la instrucción ganadora— y desplegable sin ninguna infraestructura de entrenamiento. La compensación es que el espacio de búsqueda discreto del lenguaje natural es vasto y no diferenciable, por lo que la APE se basa en muestreo, heurísticas de puntuación y refinamiento iterativo en lugar de la optimización basada en gradientes.
 
 ## Cómo funciona
 
@@ -30,38 +32,38 @@ flowchart TD
 
 ### Generación de candidatos
 
-El bucle APE comienza con un conjunto de ejemplos de demostración — pares entrada-salida que ilustran la tarea objetivo. Estos ejemplos se pasan a un meta-LLM (el mismo u otro modelo) con un meta-prompt que le pide inferir la instrucción que produciría las salidas dadas a partir de las entradas dadas. Los meta-prompts típicos tienen este aspecto: *"Aquí hay pares entrada-salida. ¿Cuál es la instrucción que produce estas salidas? Genera 10 instrucciones candidatas diversas."* Al muestrear con temperature > 0, el meta-LLM produce un conjunto diverso de instrucciones candidatas que difieren en redacción, encuadre y especificidad. La calidad y diversidad de este conjunto inicial determina directamente el techo de la optimización.
+El bucle APE comienza con un conjunto de ejemplos de demostración —pares entrada-salida que ilustran la tarea objetivo. Estos ejemplos se pasan a un meta-LLM (el mismo u otro modelo) con un meta-prompt que le pide inferir la instrucción que produciría las salidas dadas a partir de las entradas dadas. Los meta-prompts típicos se ven así: *"Aquí hay pares entrada-salida. ¿Cuál es la instrucción que produce estas salidas? Genera 10 instrucciones candidatas diversas."* Al muestrear con temperatura \> 0, el meta-LLM produce un grupo diverso de instrucciones candidatas que difieren en redacción, encuadre y especificidad. La calidad y diversidad de este grupo inicial determina directamente el techo de la optimización.
 
 ### Puntuación
 
-Cada instrucción candidata se instancia como un prefijo en el prompt (o como el mensaje de sistema) y se evalúa en un benchmark reservado. La función de puntuación es específica de la tarea: precisión para clasificación, corrección de ejecución para generación de código, ROUGE o BERTScore para resumen, o un juez LLM secundario para tareas abiertas. La decisión de diseño clave es si la puntuación se calcula con el propio meta-LLM (usando estimaciones de log-probabilidad de salidas correctas) o con un evaluador específico de la tarea separado. La puntuación por log-probabilidad es más rápida pero puede sobreajustarse a la calibración del meta-LLM. La puntuación con evaluador separado es más fiable pero requiere datos etiquetados.
+Cada instrucción candidata se instancia como un prefijo en el prompt (o como el mensaje del sistema) y se evalúa contra un benchmark reservado. La función de puntuación es específica de la tarea: precisión para clasificación, corrección de ejecución para generación de código, ROUGE o BERTScore para resumen, o un juez LLM secundario para tareas de extremo abierto. La decisión de diseño clave es si la puntuación se calcula con el propio meta-LLM (usando estimaciones de log-probabilidad de las salidas correctas) o con un evaluador separado específico de la tarea. La puntuación por log-probabilidad es más rápida pero puede sobreajustarse a la calibración del meta-LLM. La puntuación con un evaluador separado es más fiable pero requiere datos etiquetados.
 
 ### Refinamiento iterativo
 
-Después de la puntuación inicial, se seleccionan las mejores K instrucciones candidatas para refinamiento. Se le pide al meta-LLM que parafrasee, extienda o combine los mejores candidatos — generando un nuevo conjunto de variantes semánticamente relacionadas pero textualmente distintas. Este bucle de refinamiento se ejecuta durante un número fijo de iteraciones o hasta que se alcanza un umbral de puntuación objetivo. Cada iteración estrecha la búsqueda en torno a regiones prometedoras del espacio de instrucciones, de forma análoga a la búsqueda evolutiva o la escalada de colinas sobre un paisaje discreto. En la práctica, una o dos rondas de refinamiento después de un gran conjunto inicial (N ≥ 50) tiende a recuperar la mayor parte de la ganancia alcanzable.
+Después de la puntuación inicial, las instrucciones candidatas top-K se seleccionan para refinamiento. El meta-LLM recibe un prompt para parafrasear, extender o combinar los mejores candidatos, produciendo un nuevo grupo de variantes que están semánticamente relacionadas pero textualmente distintas. Este bucle de refinamiento se ejecuta durante un número fijo de iteraciones o hasta que se alcanza un umbral de puntuación objetivo. Cada iteración estrecha la búsqueda alrededor de regiones prometedoras del espacio de instrucciones, análogo a la búsqueda evolutiva o escalada de colinas sobre un paisaje discreto. En la práctica, una o dos rondas de refinamiento después de un gran grupo inicial (N ≥ 50) tiende a recuperar la mayor parte de la ganancia alcanzable.
 
 ## Comparaciones
 
-| Criterio | APE | Ingeniería manual de prompts | Fine-tuning |
+| Criterio | APE | Ingeniería manual de prompts | Ajuste fino |
 |----------|-----|------------------------------|-------------|
-| Esfuerzo humano | Bajo — definir tarea y métrica | Alto — autoría y prueba iterativas | Alto — recopilación de datos y ejecuciones de entrenamiento |
+| Esfuerzo humano | Bajo — definir tarea y métrica | Alto — autoría iterativa y pruebas | Alto — recolección de datos y ejecuciones de entrenamiento |
 | Requiere datos etiquetados | Sí — para puntuación | No — se puede hacer empíricamente | Sí — típicamente miles de ejemplos |
 | Pesos del modelo actualizados | No | No | Sí |
 | Salida interpretable | Sí — instrucción en lenguaje natural | Sí | No — los cambios de pesos son opacos |
-| Generaliza entre modelos | Sí — re-ejecutar búsqueda por modelo | Parcialmente | No — ligado al modelo base |
+| Generaliza entre modelos | Sí — volver a ejecutar la búsqueda por modelo | Parcialmente | No — vinculado al modelo base |
 | Latencia en inferencia | Ninguna — sin sobrecarga en tiempo de ejecución | Ninguna | Ninguna |
-| Coste | Medio — N × M llamadas de evaluación | Bajo | Alto — tiempo de GPU |
+| Costo | Medio — N × M llamadas de evaluación | Bajo | Alto — tiempo de GPU |
 | Mejor para | Tareas con una métrica clara y ≥ 50 ejemplos | Tareas novedosas sin una métrica | Tareas de alto volumen donde las ganancias de precisión justifican el entrenamiento |
 
 ## Cuándo usar / Cuándo NO usar
 
 | Usar cuando | Evitar cuando |
 |-------------|---------------|
-| Tienes un conjunto de evaluación etiquetado y puedes definir una métrica de puntuación clara | La tarea no tiene una métrica automatizada fiable — APE no puede buscar sin una señal |
-| La iteración manual de prompts lleva más de un día y la precisión sigue estancada | Necesitas un resultado de inmediato — APE requiere múltiples llamadas a la API del LLM para evaluación |
-| Estás desplegando el mismo prompt para muchos usuarios y las ganancias de precisión del 1–2% importan | Tu conjunto de demostración es demasiado pequeño (< 10 ejemplos) — la puntuación tendrá mucho ruido |
-| Quieres auditar la mejor instrucción encontrada por seguridad antes del despliegue | La tarea requiere creatividad o juicio subjetivo donde una sola métrica es engañosa |
-| Estás usando DSPy o un framework similar donde la optimización de prompts está integrada | El fine-tuning ya está planificado — APE optimiza prompts, no pesos |
+| Tienes un conjunto de evaluación etiquetado y puedes definir una métrica de puntuación clara | La tarea no tiene una métrica automatizada fiable — la APE no puede buscar sin una señal |
+| La iteración manual de prompts está tomando más de un día y la precisión sigue en meseta | Necesitas un resultado de inmediato — la APE requiere múltiples llamadas a la API del LLM para evaluación |
+| Estás desplegando el mismo prompt para muchos usuarios y incluso ganancias de precisión del 1–2% importan | Tu grupo de demostración es demasiado pequeño (\< 10 ejemplos) — la puntuación será ruidosa |
+| Quieres auditar la instrucción mejor encontrada por seguridad antes del despliegue | La tarea requiere creatividad o juicio subjetivo donde una sola métrica es engañosa |
+| Estás usando DSPy o un framework similar donde la optimización de prompts está integrada | El ajuste fino ya está planeado — la APE optimiza prompts, no pesos |
 
 ## Ejemplos de código
 
@@ -196,7 +198,7 @@ if __name__ == "__main__":
     print(result["instruction"])
 ```
 
-### Usando DSPy para APE estructurado
+### Uso de DSPy para APE estructurada
 
 ```python
 # DSPy provides a higher-level abstraction for automatic prompt optimization.
@@ -253,13 +255,13 @@ if __name__ == "__main__":
 
 ## Recursos prácticos
 
-- [Large Language Models Are Human-Level Prompt Engineers (Zhou et al., 2022)](https://arxiv.org/abs/2211.01910) — El paper original de APE; introduce la formulación de inducción de instrucciones, la búsqueda iterativa de Monte Carlo y resultados en 24 tareas de NLP.
-- [DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines (Khattab et al., 2023)](https://arxiv.org/abs/2310.03714) — El framework que operacionaliza la optimización al estilo APE como una abstracción de primer nivel; ver también [dspy.ai](https://dspy.ai).
-- [Automatic Prompt Optimization with "Gradient Descent" and Beam Search (Pryzant et al., 2023)](https://arxiv.org/abs/2305.03495) — Extiende APE con un enfoque de "gradiente textual" que usa retroalimentación generada por LLM como señal de gradiente sustituta.
-- [PromptBreeder: Self-Referential Self-Improvement Via Prompt Evolution (Fernando et al., 2023)](https://arxiv.org/abs/2309.16797) — Un enfoque evolutivo de APE que también evoluciona los meta-prompts usados para la generación de instrucciones.
+- [Large Language Models Are Human-Level Prompt Engineers (Zhou et al., 2022)](https://arxiv.org/abs/2211.01910) — El artículo APE original; introduce la formulación de inducción de instrucciones, la búsqueda iterativa de Monte Carlo y los resultados de benchmarks en 24 tareas de NLP.
+- [DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines (Khattab et al., 2023)](https://arxiv.org/abs/2310.03714) — El framework que pone en práctica la optimización estilo APE como abstracción de primera clase; ver también [dspy.ai](https://dspy.ai).
+- [Automatic Prompt Optimization with "Gradient Descent" and Beam Search (Pryzant et al., 2023)](https://arxiv.org/abs/2305.03495) — Extiende la APE con un enfoque de "gradiente textual" que utiliza retroalimentación generada por LLM como señal de gradiente proxy.
+- [PromptBreeder: Self-Referential Self-Improvement Via Prompt Evolution (Fernando et al., 2023)](https://arxiv.org/abs/2309.16797) — Un enfoque APE evolutivo que también evoluciona los meta-prompts utilizados para la generación de instrucciones.
 
 ## Ver también
 
 - [Ingeniería de prompts](/docs/prompt-engineering)
-- [Auto-evaluación y calibración](/docs/prompt-engineering/self-evaluation-calibration)
-- [Fine-tuning](/docs/llms/fine-tuning)
+- [Autoevaluación y calibración](/docs/prompt-engineering/self-evaluation-calibration)
+- [Ajuste fino](/docs/llms/fine-tuning)

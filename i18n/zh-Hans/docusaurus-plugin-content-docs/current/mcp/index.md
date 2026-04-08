@@ -2,6 +2,8 @@
 title: 模型上下文协议（MCP）
 description: 连接 AI 模型与外部工具、数据源和服务的开放标准——实现任何 AI 应用程序中可移植、可互操作的工具使用。
 keywords: [MCP, 模型上下文协议, AI 工具, AI 集成, 工具使用, 函数调用, LLM 工具, 开放标准, Anthropic, AI 架构]
+tags: [intermediate]
+authors: [EmersonBraun]
 ---
 
 # 模型上下文协议（MCP）

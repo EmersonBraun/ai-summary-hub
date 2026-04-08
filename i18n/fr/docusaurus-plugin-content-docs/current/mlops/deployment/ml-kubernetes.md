@@ -1,18 +1,20 @@
 ---
 title: ML sur Kubernetes
-description: Exécution de charges de travail d'apprentissage automatique sur Kubernetes — conteneurisation des modèles, planification GPU et stratégies de scaling.
-keywords: [Kubernetes, charges de travail ML, Docker, planification GPU, conteneurisation, K8s, MLOps, gestion des ressources, scaling]
+description: Exécution de charges de travail de machine learning sur Kubernetes — conteneurisation des modèles, ordonnancement GPU et stratégies de mise à l'échelle.
+keywords: [Kubernetes, charges de travail ML, Docker, ordonnancement GPU, conteneurisation, K8s, MLOps, gestion des ressources, mise à l'échelle]
+tags: [advanced]
+authors: [EmersonBraun]
 ---
 
 # ML sur Kubernetes
 
 ## Définition
 
-Kubernetes (K8s) est une plateforme d'orchestration de conteneurs qui automatise le déploiement, le scaling et la gestion des charges de travail conteneurisées. Bien que Kubernetes ait été conçu pour les services web sans état, la communauté ML l'a largement adopté comme épine dorsale d'infrastructure pour les jobs d'entraînement, le scoring par lots et le service de modèles — parce qu'il résout les problèmes d'infrastructure ML les plus difficiles : isolation des ressources, environnements reproductibles, planification GPU et scaling horizontal.
+Kubernetes (K8s) est une plateforme d'orchestration de conteneurs qui automatise le déploiement, la mise à l'échelle et la gestion des charges de travail conteneurisées. Bien que Kubernetes ait été conçu pour les services web sans état, la communauté ML l'a largement adopté comme infrastructure de base pour les travaux d'entraînement, le scoring par lots et le service de modèles — car il résout les problèmes d'infrastructure ML les plus difficiles : isolation des ressources, environnements reproductibles, ordonnancement GPU et mise à l'échelle horizontale.
 
-Exécuter du ML sur Kubernetes vanilla — sans abstraction de niveau supérieur comme [KubeFlow](/docs/mlops/deployment/kubeflow) — signifie composer des primitives Kubernetes standard : `Job` pour les exécutions d'entraînement ponctuelles, `CronJob` pour le réentraînement planifié, `Deployment` pour les instances de service de longue durée et `HorizontalPodAutoscaler` pour l'autoscaling. Cette approche donne aux équipes un contrôle total sur tous les aspects de leurs charges de travail au prix d'une plus grande création de YAML et de moins d'outillage spécifique au ML intégré.
+Exécuter du ML sur Kubernetes vanilla — sans abstraction de niveau supérieur comme [KubeFlow](/docs/mlops/deployment/kubeflow) — signifie composer des primitives Kubernetes standards : `Job` pour les exécutions d'entraînement ponctuelles, `CronJob` pour le réentraînement programmé, `Deployment` pour les instances de service à longue durée de vie, et `HorizontalPodAutoscaler` pour l'autoscaling. Cette approche donne aux équipes un contrôle total sur chaque aspect de leurs charges de travail, au prix d'une création YAML plus importante et de moins d'outillage ML spécifique intégré.
 
-La différence clé par rapport à l'exécution du ML sur des VMs nues est que Kubernetes fournit une gestion déclarative des ressources : vous spécifiez combien de CPU, RAM et GPU un job d'entraînement nécessite, et le scheduler le place automatiquement sur un nœud approprié. Kubernetes gère également les défaillances de nœuds, les redémarrages de pods et les déploiements en cours sans intervention manuelle. Pour les équipes ML qui exploitent déjà un cluster Kubernetes (ou dont l'organisation en possède un), c'est souvent le chemin pragmatique vers la production avant d'investir dans une plateforme complète comme KubeFlow.
+La différence essentielle par rapport à l'exécution de ML sur des VMs bare-metal est que Kubernetes fournit une gestion déclarative des ressources : on spécifie combien de CPU, RAM et GPU un travail d'entraînement nécessite, et l'ordonnanceur le place automatiquement sur un nœud approprié. Kubernetes gère également les défaillances de nœuds, les redémarrages de pods et les déploiements continus sans intervention manuelle. Pour les équipes ML qui opèrent déjà un cluster Kubernetes (ou dont l'organisation en possède un), c'est souvent le chemin pragmatique vers la production avant d'investir dans une plateforme complète comme KubeFlow.
 
 ## Fonctionnement
 
@@ -31,50 +33,50 @@ flowchart TB
 
 ### Conteneurisation des modèles ML
 
-La première étape pour exécuter du ML sur Kubernetes est d'empaqueter le code du modèle et ses dépendances dans une image Docker. Un Dockerfile ML bien structuré utilise des builds multi-étapes pour séparer la couche d'installation des dépendances (qui change rarement et est cacheable) de la couche de code d'application (qui change fréquemment). L'image de base doit être épinglée à une version spécifique — pour les charges de travail GPU, NVIDIA fournit des images de base `nvcr.io/nvidia/pytorch` et `nvcr.io/nvidia/tensorflow` qui incluent CUDA, cuDNN et NCCL pré-installés et validés ensemble. L'image résultante est poussée vers un registre de conteneurs et référencée par son nom et son digest (pas `latest`) dans les manifestes Kubernetes, garantissant que le même environnement exact est utilisé à chaque fois.
+La première étape pour exécuter du ML sur Kubernetes consiste à empaqueter le code du modèle et ses dépendances dans une image Docker. Un Dockerfile ML bien structuré utilise des builds multi-étapes pour séparer la couche d'installation des dépendances (qui change rarement et est cacheable) de la couche de code applicatif (qui change fréquemment). L'image de base doit être épinglée à une version spécifique — pour les charges de travail GPU, NVIDIA fournit des images de base `nvcr.io/nvidia/pytorch` et `nvcr.io/nvidia/tensorflow` qui incluent CUDA, cuDNN et NCCL préinstallés et validés ensemble. L'image résultante est poussée vers un registre de conteneurs et référencée par nom et condensé (pas `latest`) dans les manifestes Kubernetes, garantissant que le même environnement exact est utilisé à chaque fois.
 
-### Planification GPU et gestion des ressources
+### Ordonnancement GPU et gestion des ressources
 
-Kubernetes supporte la planification GPU via le plugin de périphérique NVIDIA, qui expose les GPUs comme une ressource planifiable (`nvidia.com/gpu`). Un pod qui demande `nvidia.com/gpu: 1` ne sera planifié que sur un nœud disposant d'un GPU libre, et le GPU est exclusivement alloué à ce pod pendant toute sa durée de vie. Les pools de nœuds sont généralement configurés avec différents types de GPU (T4 pour l'inférence, A100 pour les grands jobs d'entraînement) et étiquetés en conséquence, permettant aux pods d'utiliser `nodeSelector` ou `nodeAffinity` pour cibler le matériel approprié. Les quotas de ressources au niveau du namespace empêchent toute équipe unique de monopoliser la capacité GPU du cluster.
+Kubernetes prend en charge l'ordonnancement GPU via le plugin de périphériques NVIDIA, qui expose les GPU comme une ressource ordonnançable (`nvidia.com/gpu`). Un pod demandant `nvidia.com/gpu: 1` ne sera planifié que sur un nœud disposant d'un GPU libre, et le GPU est alloué exclusivement à ce pod pendant toute sa durée de vie. Les pools de nœuds sont généralement configurés avec différents types de GPU (T4 pour l'inférence, A100 pour les grands travaux d'entraînement) et étiquetés en conséquence, permettant aux pods d'utiliser `nodeSelector` ou `nodeAffinity` pour cibler le matériel approprié. Les quotas de ressources au niveau de l'espace de noms empêchent qu'une seule équipe monopolise la capacité GPU du cluster.
 
-### Jobs d'entraînement
+### Travaux d'entraînement
 
-Les exécutions d'entraînement ponctuelles sont exprimées comme des objets `Job` Kubernetes. Un Job crée un ou plusieurs pods, attend leur completion avec succès (exit 0) et enregistre le résultat. Pour l'entraînement distribué sur plusieurs GPUs ou nœuds, le `training-operator` (anciennement le Kubeflow Training Operator, mais déployable de manière autonome) étend Kubernetes avec des ressources personnalisées `PyTorchJob` et `TFJob` qui coordonnent l'entraînement multi-nœud et multi-GPU avec PyTorch DDP ou Horovod. Chaque pod worker reçoit la même image de conteneur mais des variables d'environnement de rang et de world-size différentes, permettant un entraînement parallèle de données avec rendezvous automatique.
+Les exécutions d'entraînement ponctuelles sont exprimées comme des objets `Job` Kubernetes. Un Job crée un ou plusieurs pods, attend leur complétion réussie (code de sortie 0) et enregistre le résultat. Pour l'entraînement distribué sur plusieurs GPU ou nœuds, le `training-operator` (anciennement le Kubeflow Training Operator, mais déployable de manière autonome) étend Kubernetes avec les ressources personnalisées `PyTorchJob` et `TFJob` qui coordonnent l'entraînement multi-nœuds, multi-GPU avec PyTorch DDP ou Horovod. Chaque pod worker reçoit la même image de conteneur mais différentes variables d'environnement de rang et de taille de monde, permettant l'entraînement parallèle de données avec rendezvous automatique.
 
 ### Déploiements de service et autoscaling
 
-Le service de modèles est exprimé comme un `Deployment` Kubernetes avec un nombre de réplicas souhaité et des demandes/limites de ressources. Un `Service` de type `ClusterIP` route le trafic entre les réplicas, et un `Ingress` ou service `LoadBalancer` expose l'endpoint en externe. Le `HorizontalPodAutoscaler` (HPA) fait évoluer le nombre de réplicas en fonction de l'utilisation du CPU, de métriques personnalisées (par exemple, les requêtes par seconde de Prometheus) ou de métriques externes (par exemple, la profondeur de file SQS pour les workers batch). Pour le service sensible à la latence, les `PodDisruptionBudgets` garantissent que les mises à jour en cours ne prennent jamais plus d'une fraction configurable de réplicas simultanément.
+Le service de modèles est exprimé comme un `Deployment` Kubernetes avec un nombre de réplicas souhaité et des demandes/limites de ressources. Un `Service` de type `ClusterIP` achemine le trafic entre les réplicas, et un service `Ingress` ou `LoadBalancer` expose le point de terminaison en externe. Le `HorizontalPodAutoscaler` (HPA) met à l'échelle le nombre de réplicas selon l'utilisation CPU, les métriques personnalisées (ex. : requêtes par seconde de Prometheus) ou les métriques externes (ex. : profondeur de file SQS pour les workers batch). Pour le service sensible à la latence, les `PodDisruptionBudgets` garantissent que les mises à jour continues ne mettent jamais hors service plus d'une fraction configurable de réplicas simultanément.
 
 ## Quand utiliser / Quand NE PAS utiliser
 
 | Utiliser quand | Éviter quand |
 |---|---|
-| L'organisation exploite déjà un cluster Kubernetes | Votre équipe n'a pas d'expérience Kubernetes et pas d'équipe de plateforme pour la soutenir |
-| Un contrôle total de l'infrastructure est requis (sur site, air-gapped) | Un service ML géré (SageMaker, Vertex AI) est disponible et correspond au cas d'utilisation |
-| Les charges de travail ML doivent partager un cluster avec d'autres charges de travail d'ingénierie | La simplicité d'une VM ou d'un job d'entraînement cloud est suffisante |
-| Vous avez besoin de planification GPU sans la surcharge d'une plateforme ML complète | Le coût de configuration et de maintenance de K8s dépasse les avantages opérationnels |
-| La portabilité entre les fournisseurs cloud est une exigence stricte | Vous avez besoin d'AutoML, de suivi d'expériences ou de multi-tenancy (considérez KubeFlow) |
+| L'organisation opère déjà un cluster Kubernetes | L'équipe n'a pas d'expérience Kubernetes et aucune équipe de plateforme pour la soutenir |
+| Un contrôle total sur l'infrastructure est requis (on-premises, air-gapped) | Un service ML géré (SageMaker, Vertex AI) est disponible et correspond au cas d'usage |
+| Les charges de travail ML doivent partager un cluster avec d'autres charges de travail d'ingénierie | La simplicité d'une VM ou d'un travail d'entraînement cloud est suffisante |
+| L'ordonnancement GPU sans la surcharge d'une plateforme ML complète est nécessaire | Le coût de configuration et de maintenance de K8s dépasse les bénéfices opérationnels |
+| La portabilité entre fournisseurs cloud est une exigence stricte | AutoML, le suivi d'expériences ou la multi-location sont nécessaires (considérer KubeFlow) |
 
 ## Comparaisons
 
 | Critère | ML sur Kubernetes (vanilla) | KubeFlow |
 |---|---|---|
-| Complexité | Moyenne — objets K8s standard | Élevée — nombreux CRDs, Istio, Argo, MLMD |
-| Fonctionnalités | Manuel — construisez ce dont vous avez besoin | Pipelines intégrés, AutoML (Katib), service (KServe), notebooks |
-| Courbe d'apprentissage | Moyenne — connaissance K8s suffisante | Raide — nécessite une connaissance spécifique à KubeFlow en plus de K8s |
-| Flexibilité | Élevée — utilisation sans restriction des primitives K8s | Modérée — lié aux abstractions KubeFlow |
-| Options gérées | EKS, GKE, AKS (tout K8s géré) | Vertex AI Pipelines (basé sur GKE), AWS managed KubeFlow |
+| Complexité | Moyenne — objets K8s standards | Élevée — nombreux CRDs, Istio, Argo, MLMD |
+| Fonctionnalités | Manuel — construire ce dont on a besoin | Intégrées : pipelines, AutoML (Katib), service (KServe), notebooks |
+| Courbe d'apprentissage | Moyenne — connaissances K8s suffisantes | Abrupte — nécessite une connaissance spécifique KubeFlow en plus de K8s |
+| Flexibilité | Élevée — utilisation sans restriction des primitives K8s | Modérée — liée aux abstractions KubeFlow |
+| Options gérées | EKS, GKE, AKS (tout K8s géré) | Vertex AI Pipelines (basé GKE), AWS Managed KubeFlow |
 | Temps de configuration | Heures à jours | Jours à semaines |
 
 ## Avantages et inconvénients
 
 | Avantages | Inconvénients |
 |---|---|
-| Contrôle total — utilisez n'importe quelle ressource K8s sans contraintes de framework | Tout l'outillage spécifique au ML (interface pipeline, suivi d'expériences) doit être ajouté séparément |
-| Planification GPU et entraînement multi-nœud avec le training-operator | Lourd en YAML — la création de manifestes peut être fastidieuse et sujette aux erreurs |
-| Fonctionne sur tout cloud ou cluster sur site (pas de verrouillage fournisseur) | Le débogage GPU sur K8s nécessite une familiarité avec les taints de nœuds, les limites et le plugin de périphérique |
-| Déploiements en cours et autoscaling avec le HPA standard K8s | La configuration des quotas de ressources et de l'affinité de nœuds nécessite l'implication de l'équipe de plateforme |
-| S'intègre dans les workflows GitOps existants (Argo CD, Flux) | Pas de registre de modèles, de suivi d'expériences ou d'interface de pipeline intégrés |
+| Contrôle total — utiliser n'importe quelle ressource K8s sans contraintes de framework | Tous les outils ML spécifiques (UI de pipeline, suivi d'expériences) doivent être ajoutés séparément |
+| Ordonnancement GPU et entraînement multi-nœuds avec le training-operator | Lourd en YAML — la création de manifestes peut être fastidieuse et sujette aux erreurs |
+| Fonctionne sur n'importe quel cloud ou cluster on-premises (sans dépendance fournisseur) | Le débogage GPU sur K8s nécessite une familiarité avec les taints de nœuds, les limites et le plugin de périphériques |
+| Déploiements continus et autoscaling avec le HPA K8s standard | La configuration des quotas de ressources et de l'affinité de nœuds nécessite l'implication de l'équipe de plateforme |
+| S'intègre aux workflows GitOps existants (Argo CD, Flux) | Pas de registre de modèles, de suivi d'expériences ni d'UI de pipeline intégrés |
 
 ## Exemples de code
 
@@ -276,10 +278,10 @@ kubectl rollout status deploy/fraud-detector -n ml-serving
 
 ## Ressources pratiques
 
-- [Documentation officielle Kubernetes](https://kubernetes.io/docs/) — Référence complète pour tous les concepts et objets API Kubernetes.
-- [NVIDIA GPU Operator pour Kubernetes](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/overview.html) — Automatise la configuration des pilotes GPU, des plugins de périphérique et de la surveillance sur les nœuds K8s.
-- [Kubeflow Training Operator](https://www.kubeflow.org/docs/components/training/) — CRDs autonomes pour PyTorchJob, TFJob et entraînement distribué MPI (déployable sans KubeFlow complet).
-- [Documentation Kubernetes HPA](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) — Guide officiel pour l'autoscaling CPU, mémoire et métriques personnalisées.
+- [Documentation officielle Kubernetes](https://kubernetes.io/docs/) — Référence complète pour tous les concepts Kubernetes et les objets API.
+- [NVIDIA GPU Operator pour Kubernetes](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/overview.html) — Automatise la configuration des pilotes GPU, des plugins de périphériques et de la surveillance sur les nœuds K8s.
+- [Kubeflow Training Operator](https://www.kubeflow.org/docs/components/training/) — CRDs autonomes pour PyTorchJob, TFJob et l'entraînement distribué MPI (déployable sans KubeFlow complet).
+- [Documentation HPA Kubernetes](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) — Guide officiel pour l'autoscaling CPU, mémoire et métriques personnalisées.
 
 ## Voir aussi
 
