@@ -40,12 +40,12 @@
     "@docusaurus/types": "3.10.0",
     "@types/react": "^19.0.0",
     "dotenv": "^17.4.2",
-    "eslint": "^10.2.0",
+    "eslint": "^10.2.1",
     "glob": "^13.0.6",
     "gray-matter": "^4.0.3",
     "markdownlint-cli2": "^0.22.0",
-    "typescript": "~6.0.2",
-    "typescript-eslint": "^8.58.1"
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.58.2"
   },
   "browserslist": {
     "production": [
