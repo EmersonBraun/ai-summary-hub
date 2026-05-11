@@ -30,8 +30,8 @@
     "@mdx-js/react": "^3.0.0",
     "clsx": "^2.0.0",
     "prism-react-renderer": "^2.3.0",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5"
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
   },
   "devDependencies": {
     "@docusaurus/eslint-plugin": "3.10.1",
@@ -45,7 +45,7 @@
     "gray-matter": "^4.0.3",
     "markdownlint-cli2": "^0.22.1",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.59.1"
+    "typescript-eslint": "^8.59.2"
   },
   "browserslist": {
     "production": [
