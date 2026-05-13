@@ -2,12 +2,37 @@ import './global.css';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import type { ReactNode } from 'react';
 
-export const metadata = {
+import type { Metadata } from 'next';
+import { SITE } from '@/lib/site';
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE.url),
   title: {
-    default: 'AI Summary Hub',
-    template: '%s | AI Summary Hub',
+    default: SITE.name,
+    template: `%s | ${SITE.name}`,
   },
-  description: 'Open AI knowledge wiki: fundamentals, agents, MLOps, prompt engineering, and more.',
+  description: SITE.tagline,
+  applicationName: SITE.name,
+  authors: [{ name: SITE.author, url: SITE.authorUrl }],
+  creator: SITE.author,
+  publisher: SITE.author,
+  openGraph: {
+    type: 'website',
+    siteName: SITE.name,
+    title: SITE.name,
+    description: SITE.tagline,
+    url: SITE.url,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    creator: SITE.twitter,
+  },
+  alternates: {
+    types: {
+      'application/rss+xml': '/feed.xml',
+    },
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
