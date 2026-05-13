@@ -1,6 +1,8 @@
 ---
 title: AI fundamentals
 description: Core concepts in artificial intelligence and machine learning.
+tags:
+  - beginner
 ---
 
 ## Definition
@@ -12,6 +14,16 @@ These ideas underpin both classical [machine learning](/docs/fundamentals/machin
 At the heart of AI is a simple loop: you collect data that encodes some aspect of the world, you define an objective that formalizes what "good" means, and you run an optimizer that adjusts a model until it meets the objective on held-out examples. Everything else — neural architectures, regularization techniques, alignment algorithms — is a refinement of this core loop. Building intuition about each component helps you diagnose failures quickly and make principled design choices when building real systems.
 
 ## How it works
+
+```mermaid
+flowchart LR
+  Data[Raw Data] -->|collect & label| Preprocess[Preprocessing]
+  Preprocess -->|features / tensors| Model[Model]
+  Model -->|loss computation| Optimizer[Optimizer]
+  Optimizer -->|update weights| Model
+  Model -->|inference| Prediction[Prediction]
+  Prediction -->|evaluate on held-out set| Metrics[Metrics]
+```
 
 ### Data collection and preprocessing
 
@@ -36,6 +48,15 @@ The result is a fitted model that must generalize to new inputs. Evaluation uses
 | Real-time decisions requiring strict guarantees | No | ML models are probabilistic; use with fallbacks |
 | Exploration or recommendation with user feedback | Yes | RL and collaborative filtering shine here |
 
+## Comparisons
+
+| Concept | Description | Typical Data | Requires Labels |
+|---|---|---|---|
+| Supervised learning | Learn from labeled examples | Structured, images, text | Yes |
+| Unsupervised learning | Find structure without labels | Any | No |
+| Reinforcement learning | Learn from reward signals | Sequential/interactive | No (uses rewards) |
+| Classical rule systems | Hand-coded logic | Any | No |
+
 ## Code examples
 
 ```python
@@ -46,18 +67,36 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
+# 1. Load data
 X, y = load_iris(return_X_y=True)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 2. Split into train / test
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# 3. Preprocess
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
+
+# 4. Train model
 model = LogisticRegression(max_iter=200)
 model.fit(X_train, y_train)
+
+# 5. Evaluate
 preds = model.predict(X_test)
 print(f"Accuracy: {accuracy_score(y_test, preds):.2%}")
 ```
+
+## Practical resources
+
+- [Google ML crash course](https://developers.google.com/machine-learning/crash-course) — Comprehensive introduction to ML concepts with interactive exercises
+- [MIT 6.S191 – Introduction to Deep Learning](http://introtodeeplearning.com/) — Lecture slides, videos, and labs covering the full deep learning stack
+- [fast.ai – Practical Deep Learning for Coders](https://course.fast.ai/) — Top-down, code-first introduction ideal for practitioners
 
 ## See also
 
 - [Machine learning](/docs/fundamentals/machine-learning)
 - [Deep learning](/docs/fundamentals/deep-learning)
+- [Neural networks](/docs/neural-networks)
