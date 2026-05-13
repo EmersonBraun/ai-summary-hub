@@ -4,6 +4,5 @@ import { i18n } from '@/lib/i18n';
 export default createI18nMiddleware(i18n);
 
 export const config = {
-  // Skip Next internals + static files.
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|opengraph-image|robots.txt|sitemap.xml).*)'],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|opengraph-image|robots.txt|sitemap.xml|feed.xml|social-card.jpg|logo.svg).*)'],
 };
