@@ -8,7 +8,7 @@ A comprehensive, multilingual knowledge base covering 145+ articles across 47 ca
 - **6 locales** — English (default), Spanish, Portuguese (BR), German, French, Simplified Chinese
 - **Learning paths** — Curated sidebar switcher with 8 guided learning paths
 - **SEO optimized** — Structured metadata, Open Graph tags, and Plausible analytics
-- **Algolia DocSearch** — Full-text search (configure with your own credentials for production)
+- **Orama search** — Embedded, client-side full-text search via Fumadocs (no external service)
 - **Mermaid diagrams** — In-doc flowcharts and architecture diagrams
 - **Dark default** — AWS-Cheatsheet-style theme with optional light mode
 - **Content validation** — Frontmatter, link, and markdown linting via CI
@@ -58,7 +58,7 @@ Run `npm run lint` and `npm run typecheck` before committing.
 ## Configuration
 
 - **Base URL:** `/ai-summary-hub/` (GitHub Pages project site)
-- **Algolia:** Copy `example.env` to `.env` and set `ALGOLIA_APP_ID` and `ALGOLIA_API_KEY` (or use placeholders; search will work once you [apply for DocSearch](https://docsearch.algolia.io/)). For GitHub Actions deploy, add these as repo secrets.
+- **Search:** Powered by Orama (embedded) via Fumadocs in the `/next` app. No API keys required.
 - **Analytics:** Plausible is pre-configured in `docusaurus.config.ts`
 
 ## Deployment

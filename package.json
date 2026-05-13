@@ -39,7 +39,6 @@
     "@docusaurus/tsconfig": "3.10.1",
     "@docusaurus/types": "3.10.1",
     "@types/react": "^19.0.0",
-    "dotenv": "^17.4.2",
     "eslint": "^10.3.0",
     "glob": "^13.0.6",
     "gray-matter": "^4.0.3",
