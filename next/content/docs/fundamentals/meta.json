@@ -1,4 +1,7 @@
 {
-  "title": "Fundamentals",
-  "pages": ["index", "machine-learning", "deep-learning"]
+  "pages": [
+    "index",
+    "machine-learning",
+    "deep-learning"
+  ]
 }

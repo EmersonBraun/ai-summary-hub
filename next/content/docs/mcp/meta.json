@@ -1,0 +1,8 @@
+{
+  "pages": [
+    "index",
+    "building-servers",
+    "building-clients"
+  ],
+  "title": "Model Context Protocol (MCP)"
+}
