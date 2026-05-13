@@ -1,0 +1,8 @@
+{
+  "pages": [
+    "index",
+    "prometheus",
+    "grafana"
+  ],
+  "title": "Monitoring"
+}

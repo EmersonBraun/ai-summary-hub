@@ -1,0 +1,8 @@
+{
+  "pages": [
+    "tflite",
+    "pytorch-mobile",
+    "onnx"
+  ],
+  "title": "Edge AI"
+}

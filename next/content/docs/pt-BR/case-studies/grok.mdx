@@ -1,0 +1,37 @@
+---
+title: Case study — Grok
+description: LLM da xAI com conhecimento em tempo real e raciocínio.
+tags:
+  - beginner
+---
+
+# Case study: Grok
+
+## Definição
+
+Grok é uma família de [LLMs](/docs/llms) da xAI. É posicionado em torno de conhecimento em tempo real ou atualizado (p. ex., acesso a dados do X/Twitter) e raciocínio sólido, oferecido via API e na experiência de produto do X.
+
+Assim como [ChatGPT](/docs/case-studies/chatgpt) e [Claude](/docs/case-studies/claude), Grok usa uma base pré-treinada, ajuste de instruções e alinhamento; a diferenciação inclui ancoragem no estilo [RAG](/docs/rag) em tempo real e integração com a plataforma do X. Caso de uso: chat, pesquisa e aplicações que se beneficiam de informações atuais e raciocínio.
+
+## Como funciona
+
+Um **modelo base** ([transformer](/docs/transformers) apenas decodificador) é pré-treinado em texto em larga escala (e opcionalmente outros dados). O **ajuste de instruções** e o **alinhamento** (p. ex., otimização de preferências) moldam utilidade e segurança. O **conhecimento em tempo real ou ao vivo** é fornecido recuperando e condicionando sobre conteúdo fresco (p. ex., do X) para que as respostas possam refletir eventos recentes. O produto expõe o Grok via chat e API; [engenharia de prompts](/docs/prompt-engineering) e uso de ferramentas o estendem para [agentes](/docs/agents) e fluxos de trabalho personalizados.
+
+## Casos de uso
+
+Grok é adequado para casos de uso onde informações atualizadas e raciocínio importam mais do que um ponto de corte de treinamento estático.
+
+- Chat e pesquisa com consciência de notícias e eventos recentes
+- Aplicações que precisam de respostas em tempo real ou aumentadas por pesquisa
+- Integração no X e em produtos de terceiros via API
+
+## Documentação externa
+
+- [xAI – Grok](https://x.ai/) — Produto e API
+- [xAI – Blog](https://x.ai/blog) — Atualizações do modelo e capacidades
+
+## Veja também
+
+- [LLMs](/docs/llms)
+- [RAG](/docs/rag)
+- [Engenharia de prompts](/docs/prompt-engineering)

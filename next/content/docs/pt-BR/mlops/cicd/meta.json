@@ -1,0 +1,8 @@
+{
+  "pages": [
+    "index",
+    "dvc",
+    "model-registry"
+  ],
+  "title": "CI/CD & Versioning"
+}
