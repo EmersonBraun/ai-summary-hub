@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+      - run: npm ci
+      - name: Validate frontmatter
+        run: npm run validate:frontmatter
+      - name: Validate links
+        run: npm run validate:links
+      - name: Markdownlint
+        run: npm run validate:markdown
+
+  build-next:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: next/package-lock.json
+      - name: Install Next app
+        working-directory: next
+        run: npm ci
+      - name: Typecheck
+        working-directory: next
+        run: npm run typecheck
+      - name: Build
+        working-directory: next
+        run: npm run build

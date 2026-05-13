@@ -1,74 +1,92 @@
-import { readFileSync, existsSync } from 'fs';
+#!/usr/bin/env node
+/**
+ * Validate internal links in Fumadocs MDX docs.
+ *
+ * Scans next/content/docs/{en,pt-BR}/**\/*.mdx and verifies that
+ * `/docs/...` and relative links resolve to an existing .mdx file in
+ * the same locale.
+ *
+ * Skips: external URLs, hash-only anchors, links inside fenced code
+ * blocks (templates and tutorials often contain illustrative paths).
+ */
+
+import { readFileSync, existsSync } from 'node:fs';
+import { resolve, relative, dirname } from 'node:path';
+import { globSync } from 'glob';
 import matter from 'gray-matter';
-import { resolve, relative, dirname } from 'path';
 
-let globSync;
-try {
-  const globModule = await import('glob');
-  globSync = globModule.globSync;
-} catch {
-  console.error('glob package not found');
-  process.exit(1);
-}
+const ROOT = process.cwd();
+const DOCS_DIR = resolve(ROOT, 'next/content/docs');
+const LOCALES = ['en', 'pt-BR'];
 
-const DOCS_DIR = resolve(process.cwd(), 'docs');
-const files = globSync(`${DOCS_DIR}/**/*.md`).filter(
-  (f) => !f.endsWith('tags.yml')
-);
+const files = globSync(`${DOCS_DIR}/**/*.mdx`);
 
 function resolveDocLink(link, sourceFile) {
-  const cleanLink = link.split('#')[0];
-  if (!cleanLink) return true;
+  const clean = link.split('#')[0];
+  if (!clean) return true;
+  if (/^https?:\/\//.test(clean)) return true;
+  if (clean.startsWith('mailto:')) return true;
 
-  if (cleanLink.startsWith('http://') || cleanLink.startsWith('https://')) {
-    return true;
+  const relPath = relative(DOCS_DIR, sourceFile);
+  const locale = LOCALES.find((l) => relPath === l || relPath.startsWith(`${l}/`));
+
+  if (clean.startsWith('/docs/')) {
+    if (!locale) return true;
+    const sub = clean.slice('/docs/'.length);
+    const candidates = [
+      resolve(DOCS_DIR, locale, `${sub}.mdx`),
+      resolve(DOCS_DIR, locale, sub, 'index.mdx'),
+    ];
+    return candidates.some(existsSync);
   }
 
-  if (!cleanLink.startsWith('/docs/') && !cleanLink.startsWith('./') && !cleanLink.startsWith('../')) {
-    return true;
+  for (const loc of LOCALES) {
+    const prefix = `/${loc}/docs/`;
+    if (clean.startsWith(prefix)) {
+      const sub = clean.slice(prefix.length);
+      return (
+        existsSync(resolve(DOCS_DIR, loc, `${sub}.mdx`)) ||
+        existsSync(resolve(DOCS_DIR, loc, sub, 'index.mdx'))
+      );
+    }
   }
 
-  if (cleanLink.startsWith('/docs/')) {
-    const docPath = cleanLink.replace(/^\//, '');
-    if (existsSync(resolve(process.cwd(), `${docPath}.md`))) return true;
-    if (existsSync(resolve(process.cwd(), `${docPath}/index.md`))) return true;
-    if (existsSync(resolve(process.cwd(), docPath))) return true;
-    return false;
+  if (clean.startsWith('./') || clean.startsWith('../')) {
+    const sourceDir = dirname(sourceFile);
+    const targetPath = resolve(sourceDir, clean);
+    return (
+      existsSync(targetPath) ||
+      existsSync(`${targetPath}.mdx`) ||
+      existsSync(resolve(targetPath, 'index.mdx'))
+    );
   }
 
-  const sourceDir = dirname(sourceFile);
-  const targetPath = resolve(sourceDir, cleanLink);
-  if (existsSync(targetPath)) return true;
-  if (existsSync(`${targetPath}.md`)) return true;
-  if (existsSync(resolve(targetPath, 'index.md'))) return true;
-  return false;
+  return true;
 }
 
 const errors = [];
 const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
 
 for (const file of files) {
-  const rel = relative(process.cwd(), file);
-  const content = readFileSync(file, 'utf-8');
-  const { content: body } = matter(content);
+  const rel = relative(ROOT, file);
+  const raw = readFileSync(file, 'utf8');
+  const { content } = matter(raw);
 
-  // Strip fenced code blocks to avoid checking links inside examples/templates
-  const bodyNoCode = body.replace(/```[\s\S]*?```/g, '');
+  const bodyNoCode = content.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]+`/g, '');
 
-  let match;
-  while ((match = linkRegex.exec(bodyNoCode)) !== null) {
-    const [, linkText, link] = match;
+  let m;
+  while ((m = linkRegex.exec(bodyNoCode))) {
+    const [, text, link] = m;
+    if (link.startsWith('<')) continue;
     if (!resolveDocLink(link, file)) {
-      errors.push(`${rel}: broken link [${linkText}](${link})`);
+      errors.push(`${rel}: broken link [${text}](${link})`);
     }
   }
 }
 
-if (errors.length > 0) {
-  console.error(`\n❌ Link validation failed (${errors.length} broken link(s)):\n`);
-  errors.forEach((e) => console.error(`  • ${e}`));
-  console.error('');
+if (errors.length) {
+  console.error(`\nLink validation failed (${errors.length} broken link(s)):\n`);
+  errors.forEach((e) => console.error(`  - ${e}`));
   process.exit(1);
-} else {
-  console.log(`✅ Link validation passed (${files.length} files checked)`);
 }
+console.log(`Link validation passed (${files.length} files checked).`);

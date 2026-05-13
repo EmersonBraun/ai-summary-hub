@@ -35,7 +35,6 @@ A UI de rastreamento permite filtrar, classificar e comparar execuções nas qua
 
 O artefato da melhor execução é registrado em um registro de modelos com um número de versão e estado de transição (Staging → Production → Archived). Os sistemas CI/CD subsequentes consultam o registro para saber qual versão do modelo implantar, criando uma entrega limpa entre experimentação e serving.
 
-
 ```mermaid
 flowchart LR
   Script[Training script] -->|"log params, metrics"| Tracker[Tracking server]
@@ -45,7 +44,6 @@ flowchart LR
   UI -->|"promote best run"| Registry[Model registry]
   Registry -->|"version tag"| Deploy[CI/CD deployment]
 ```
-
 
 ## Quando usar / Quando NÃO usar
 
@@ -119,7 +117,6 @@ with mlflow.start_run(run_name=f"logreg-C{PARAMS['C']}") as run:
     print(f"Run ID : {run.info.run_id}")
     print(f"Accuracy: {metrics['accuracy']:.4f} | ROC-AUC: {metrics['roc_auc']:.4f}")
 ```
-
 
 ## Comparações
 
