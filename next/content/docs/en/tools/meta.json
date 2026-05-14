@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "huggingface",
+    "langchain",
+    "llamaindex",
+    "cursor",
+    "github-copilot",
+    "claude-code",
+    "antigravity",
+    "kiro"
+  ],
+  "title": "Tools & Ecosystem"
+}

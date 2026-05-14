@@ -1,0 +1,8 @@
+{
+  "pages": [
+    "index",
+    "cnn",
+    "rnn"
+  ],
+  "title": "Neural Networks"
+}

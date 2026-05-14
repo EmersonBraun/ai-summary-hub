@@ -16,6 +16,6 @@
     // Allow duplicate headings in different sections (e.g., multiple "Definition" across files)
     "MD024": { "siblings_only": true }
   },
-  "globs": ["docs/**/*.md"],
-  "ignores": ["docs/tags.yml", "node_modules"]
+  "globs": ["next/content/docs/**/*.mdx"],
+  "ignores": ["node_modules", "next/node_modules", "next/.next", "next/.source"]
 }

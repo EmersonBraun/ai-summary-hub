@@ -1,0 +1,65 @@
+---
+title: Prompt engineering
+description: Designing prompts to steer LLM behavior and improve outputs.
+tags:
+  - intermediate
+---
+
+## Definition
+
+Prompt engineering is the practice of crafting input text — instructions, examples, constraints, and context — to control the behavior of large language models without modifying their weights. It is the primary interface between human intent and model output, encompassing everything from simple instruction phrasing to sophisticated multi-step reasoning strategies.
+
+The discipline spans three interconnected areas. **Configuration** covers the sampling parameters (temperature, Top-K, Top-P) and generation controls (max tokens, stop sequences) that shape how the model produces tokens. **Techniques** include structured approaches like chain-of-thought, self-consistency, step-back prompting, and system/role prompting that guide the model's reasoning process. **Reliability** addresses methods for making outputs more trustworthy — debiasing, prompt ensembling, and self-evaluation.
+
+As LLMs move into production systems, prompt engineering has evolved from ad-hoc experimentation into a systematic practice. Tools like [DSPy](https://dspy-docs.vercel.app/) and [Automatic Prompt Engineering](/docs/prompt-engineering/automatic-prompt-engineering) even automate parts of the process. Whether you are building a chatbot, a code assistant, or a data extraction pipeline, prompt engineering is the first and most accessible lever for improving output quality.
+
+## How it works
+
+### The prompt pipeline
+
+Every interaction with an LLM begins with a prompt — a structured input that may include a system message, user instructions, examples, and retrieved context. The model processes this input and generates output token by token, shaped by both the prompt content and the sampling configuration.
+
+```mermaid
+flowchart LR
+  SM[System Message] -->|sets behavior| P[Prompt Builder]
+  CTX[Context / Examples] -->|grounds output| P
+  UI[User Input] -->|defines task| P
+  P -->|structured input| LLM[LLM]
+  CFG[Config: temp, top-p, max tokens] -->|controls sampling| LLM
+  LLM -->|generated| OUT[Output]
+  OUT -->|evaluated by| REL[Reliability Layer]
+  REL -->|self-eval, ensembling| FINAL[Final Output]
+```
+
+### Configuration vs. technique
+
+Configuration parameters (temperature, Top-K, Top-P, max tokens) operate at the token-sampling level — they affect *how* the model selects each token. Techniques (chain-of-thought, self-consistency, step-back) operate at the prompt-design level — they affect *what* the model reasons about. Both layers interact: self-consistency requires high temperature to generate diverse reasoning paths, while structured output extraction works best with low temperature for determinism.
+
+### The reliability layer
+
+Advanced prompt engineering adds a reliability layer on top of basic prompting. This includes running multiple prompts in parallel (ensembling), having the model critique its own output (self-evaluation), and applying debiasing strategies to reduce systematic errors. These methods trade compute cost for output quality and are especially important in high-stakes applications.
+
+## Practical resources
+
+- [OpenAI — Prompt engineering guide](https://platform.openai.com/docs/guides/prompt-engineering) — Comprehensive guide covering best practices and strategies
+- [Anthropic — Prompt design](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Anthropic's official prompting documentation
+- [Learn Prompting](https://learnprompting.org/) — Open-source course covering prompt engineering techniques
+- [Prompt Engineering Guide (DAIR.AI)](https://www.promptingguide.ai/) — Community-maintained guide with papers and techniques
+- [DSPy documentation](https://dspy-docs.vercel.app/) — Framework for programmatic prompt optimization
+
+## See also
+
+- [Temperature, Top-K, Top-P](/docs/prompt-engineering/temperature-top-k-top-p)
+- [Max tokens and stop sequences](/docs/prompt-engineering/max-tokens-stop-sequences)
+- [Structured outputs](/docs/prompt-engineering/structured-outputs)
+- [System, role, and contextual prompting](/docs/prompt-engineering/system-role-contextual-prompting)
+- [Self-consistency](/docs/prompt-engineering/self-consistency)
+- [Step-back prompting](/docs/prompt-engineering/step-back-prompting)
+- [Automatic Prompt Engineering (APE)](/docs/prompt-engineering/automatic-prompt-engineering)
+- [Debiasing techniques](/docs/prompt-engineering/debiasing-techniques)
+- [Prompt ensembling](/docs/prompt-engineering/prompt-ensembling)
+- [Self-evaluation and calibration](/docs/prompt-engineering/self-evaluation-calibration)
+- [LLMs](/docs/llms)
+- [Chain-of-thought](/docs/reasoning-patterns/cot)
+- [RAG](/docs/rag)
+- [AI Agents](/docs/agents)

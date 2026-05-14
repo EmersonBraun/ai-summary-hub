@@ -1,0 +1,12 @@
+{
+  "pages": [
+    "index",
+    "claude-md",
+    "skills",
+    "thinking-modes",
+    "prompt-caching",
+    "context-management",
+    "mcp-plugins"
+  ],
+  "title": "Claude Code Deep Dive"
+}

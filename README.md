@@ -1,83 +1,79 @@
 # AI Summary Hub
 
-A comprehensive, multilingual knowledge base covering 145+ articles across 47 categories of modern AI — from fundamentals to MLOps, agents, prompt engineering, and beyond. Built with [Docusaurus 3](https://docusaurus.io) and deployed on GitHub Pages.
+Open AI knowledge wiki — 290+ articles across 50+ categories of modern AI, from fundamentals to MLOps, agents, prompt engineering, and beyond. Built with [Fumadocs](https://fumadocs.dev/) on Next.js, deployed on Vercel.
+
+> The active app lives in [`/next`](./next). The legacy Docusaurus build at the repo root is preserved during the migration and will be removed after cutover (see [CUTOVER.md](./CUTOVER.md)).
 
 ## Features
 
-- **145+ articles across 47 categories** — Fundamentals, neural networks, transformers, LLMs, RAG, agents, prompt engineering, Claude Code, MCP, MLOps, edge AI, model providers, and more
-- **6 locales** — English (default), Spanish, Portuguese (BR), German, French, Simplified Chinese
-- **Learning paths** — Curated sidebar switcher with 8 guided learning paths
-- **SEO optimized** — Structured metadata, Open Graph tags, and Plausible analytics
-- **Algolia DocSearch** — Full-text search (configure with your own credentials for production)
-- **Mermaid diagrams** — In-doc flowcharts and architecture diagrams
-- **Dark default** — AWS-Cheatsheet-style theme with optional light mode
-- **Content validation** — Frontmatter, link, and markdown linting via CI
-
-## Content categories
-
-| Area | Topics |
-|------|--------|
-| Foundations | Fundamentals, Neural Networks, Transformers, NLP, CV |
-| Models | LLMs, GANs, VAEs, Diffusion Models, Transfer/Few-shot/Zero-shot Learning |
-| Applications | RAG, Agents, Subagents, Autonomous Agents, Reasoning Patterns |
-| Tooling | Claude Code, MCP, Prompt Engineering, Tools (Cursor, Copilot, etc.) |
-| Infrastructure | MLOps, Frameworks (PyTorch, TensorFlow), Edge AI, Model Compression, Quantization, Pruning |
-| Advanced | Federated Learning, Knowledge Distillation, DRL, XAI, AI Safety, AI Ethics |
-| Reference | Model Providers, Benchmarks, Case Studies, Glossary |
+- **290+ articles across 50+ categories** — Fundamentals, neural networks, transformers, LLMs, RAG, agents, prompt engineering, Claude Code, MCP, MLOps, edge AI, model providers, and more
+- **Bilingual** — English (default, no URL prefix) and Portuguese (BR) at `/pt-BR/...`
+- **Orama search** — Embedded, client-side full-text search via Fumadocs (no API keys, no Algolia)
+- **SEO-first** — JSON-LD (WebSite, TechArticle, BreadcrumbList), canonical + hreflang, multi-locale sitemap, RSS feed, dynamic OG image
+- **Mermaid diagrams** — Client-rendered via a small remark plugin
+- **Content validation** — Frontmatter, link, and markdown linting in CI
 
 ## Quick start
 
-**Requirements:** Node.js >= 18
+**Requirements:** Node.js >= 22
 
 ```bash
+cd next
 npm install
-npm run start
+npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000). For production build:
 
 ```bash
+cd next
 npm run build
-npm run serve
+npm run start
 ```
 
 ## Available scripts
 
+### Root (validation)
+
 | Command | Description |
 |---------|-------------|
-| `npm run start` | Start dev server |
-| `npm run build` | Production build (all 6 locales) |
-| `npm run lint` | ESLint |
-| `npm run typecheck` | TypeScript check |
-| `npm run validate` | Frontmatter + links + markdown lint |
-| `npm run i18n:audit-docs` | Detect English leaks in translations |
-| `npm run i18n:generate-code` | Generate locale-specific code.json |
+| `npm run validate` | Frontmatter + links + markdownlint across `next/content/docs` |
+| `npm run validate:frontmatter` | Validate MDX frontmatter |
+| `npm run validate:links` | Validate internal links per locale |
+| `npm run validate:markdown` | Run markdownlint-cli2 |
 
-Run `npm run lint` and `npm run typecheck` before committing.
+### `/next` (app)
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Next.js dev server (Turbopack) |
+| `npm run build` | Production build |
+| `npm run start` | Serve production build locally |
+| `npm run typecheck` | TypeScript check |
+
+### Migration scripts (`scripts/migrate/`)
+
+| Command | Description |
+|---------|-------------|
+| `node scripts/migrate/codemod.mjs --src <dir> --dest <dir>` | Convert Docusaurus `.md` → Fumadocs `.mdx` |
+| `node_modules/.bin/tsx scripts/migrate/gen-meta.ts --dest <dir>` | Generate `meta.json` files from `sidebars.ts` |
 
 ## Configuration
 
-- **Base URL:** `/ai-summary-hub/` (GitHub Pages project site)
-- **Algolia:** Copy `example.env` to `.env` and set `ALGOLIA_APP_ID` and `ALGOLIA_API_KEY` (or use placeholders; search will work once you [apply for DocSearch](https://docsearch.algolia.io/)). For GitHub Actions deploy, add these as repo secrets.
-- **Analytics:** Plausible is pre-configured in `docusaurus.config.ts`
+- **Search:** Orama embedded, served at `/api/search` via `createFromSource`
+- **i18n:** `parser: 'dir'`, `hideLocale: 'default-locale'` — EN at `/docs/...`, pt-BR at `/pt-BR/docs/...`
+- **Hosting:** Vercel (Root Directory: `next`)
 
 ## Deployment
 
-1. Push the repo to `EmersonBraun/ai-summary-hub` on GitHub.
-2. In **Settings → Pages**, set source to **GitHub Actions**.
-3. On push to `main`, the workflow builds and deploys to `https://emersonbraun.github.io/ai-summary-hub/`.
+See [CUTOVER.md](./CUTOVER.md) for the full Docusaurus → Fumadocs → Vercel migration plan and rollback procedure.
 
 ## Tech stack
 
-- **Framework:** Docusaurus 3.9.2
-- **Language:** TypeScript 6.0, React 19
-- **Linting:** ESLint 10 (flat config), markdownlint-cli2
-- **CI/CD:** GitHub Actions (deploy + dependabot auto-merge)
-
-## Contributing
-
-See [Contributing](/docs/contributing) in the docs (or `docs/contributing.md`) for the topic template, how to add/translate content, and versioning.
-
-## Spec
-
-Implementation follows [prd.md](./prd.md) (Product Requirements Document).
+- **Framework:** Fumadocs UI/Core/MDX + Next.js 16 (Turbopack)
+- **Search:** Orama (embedded)
+- **Styling:** Tailwind v4 + Fumadocs preset
+- **Diagrams:** Mermaid 11 (client-rendered)
+- **Language:** TypeScript, React 19
+- **CI:** GitHub Actions (validation + build verification)
+- **Deploy:** Vercel

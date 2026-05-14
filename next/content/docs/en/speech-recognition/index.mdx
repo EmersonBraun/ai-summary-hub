@@ -1,0 +1,100 @@
+---
+title: Speech recognition
+description: Converting speech to text and related audio tasks.
+tags:
+  - beginner
+---
+
+## Definition
+
+Speech recognition, formally known as Automatic Speech Recognition (ASR), is the technology that converts spoken audio into written text. It is one of the oldest and most commercially mature areas of AI, now powering voice assistants, live captioning, meeting transcription, call center analytics, and accessibility tools. Beyond transcription, the speech domain encompasses speaker identification (who is speaking?), spoken language understanding (SLU, extracting intent and entities from speech), and speech synthesis — text-to-speech (TTS) — which is the inverse task of generating natural-sounding audio from text.
+
+Modern ASR systems are predominantly end-to-end neural models. The dominant paradigm shifted from traditional pipeline systems (acoustic model → language model → decoder, each trained separately) to end-to-end models like Whisper (OpenAI) and wav2vec 2.0 (Meta), which learn to map raw audio or spectrograms directly to text in a single model. Self-supervised pretraining on large unlabeled audio corpora — learning representations without transcription labels — has dramatically reduced the labeled data needed to achieve high accuracy across diverse languages and accents. Models like Whisper, trained on 680,000 hours of multilingual audio, perform well zero-shot on languages it was not explicitly optimized for.
+
+Speech recognition sits at the intersection of [multimodal AI](/docs/multimodal-ai) (audio is a modality distinct from text and vision) and [NLP](/docs/nlp) (the output of ASR is text that feeds into downstream language understanding). Challenges include noisy environments, accented speech, domain-specific vocabulary, code-switching (mixing languages mid-sentence), and the computational cost of real-time streaming inference. Speaker diarization — segmenting who spoke when — is a closely related task often combined with ASR in meeting or call-center applications.
+
+## How it works
+
+### Feature extraction
+
+Raw audio (a waveform sampled at 16 kHz or higher) is converted to a feature representation. Traditional systems compute mel-frequency cepstral coefficients (MFCCs) or filter bank features. Modern end-to-end models like Whisper accept mel spectrograms computed with a short-time Fourier transform; wav2vec 2.0 learns representations directly from raw waveforms using a CNN feature encoder.
+
+### Acoustic modeling and decoding
+
+```mermaid
+flowchart LR
+  Waveform[Audio waveform] -->|STFT / mel filterbank| Spectrogram[Mel spectrogram]
+  Spectrogram -->|CNN or conformer encoder| AcousticRep[Acoustic representations]
+  AcousticRep -->|self-supervised pretraining| Pretrained[Pretrained encoder]
+  Pretrained -->|fine-tune on labeled ASR data| AcousticModel[Acoustic model]
+  AcousticModel -->|CTC / attention decoder| Tokens[Subword tokens]
+  Tokens -->|language model rescoring| Text[Final transcript]
+```
+
+### Decoding strategies
+
+Three main decoding architectures exist. **CTC (Connectionist Temporal Classification)** aligns output tokens to frames without requiring explicit alignment labels, enabling fast, streaming-capable decoding. **RNN-T (Recurrent Neural Network Transducer)** extends CTC with a prediction network, allowing streaming inference with strong language modeling. **Attention-based encoder-decoder** (used in Whisper) processes the full audio with an encoder and generates tokens autoregressively with a decoder, producing the highest accuracy but requiring the full audio upfront.
+
+## When to use / When NOT to use
+
+| Use when | Avoid when |
+|----------|------------|
+| Input is spoken audio and output must be text (transcription, captions, voice commands) | Audio quality is so poor that even human transcribers cannot understand it |
+| Building voice interfaces or accessibility tools | A text-only interface is simpler and meets user needs |
+| Processing meeting recordings or call center audio at scale | Real-time latency requirements are incompatible with encoder-decoder inference |
+| Speaker identification or diarization is needed alongside transcription | The domain vocabulary is so specialized that general models need costly adaptation |
+
+## Comparisons
+
+| Model / approach | Strengths | Limitations |
+|-----------------|-----------|-------------|
+| Whisper (OpenAI) | Multilingual, robust, zero-shot | Not streaming-native; slower for real-time |
+| wav2vec 2.0 | Self-supervised, low labeled data | Fine-tuning needed per domain/language |
+| Google Cloud Speech-to-Text | Production-ready API, streaming | Proprietary, per-minute cost |
+| Traditional HMM-DNN | Well-understood, streaming | Requires extensive feature engineering; lower accuracy |
+
+## Pros and cons
+
+| Pros | Cons |
+|------|------|
+| Mature technology with strong open-source and cloud options | Accuracy degrades with noise, accents, or domain-specific terms |
+| Self-supervised pretraining reduces labeled data needs | Real-time streaming adds latency and complexity |
+| Enables accessibility features at scale | Speaker diarization and overlapping speech remain hard problems |
+| Multilingual models cover hundreds of languages | Large models are expensive to run on-device or at the edge |
+
+## Code examples
+
+### Transcription with OpenAI Whisper (Python)
+
+```python
+import whisper
+
+# Load model (options: tiny, base, small, medium, large-v3)
+model = whisper.load_model("base")
+
+# Transcribe an audio file
+result = model.transcribe("meeting.mp3", language="en", word_timestamps=True)
+
+print(f"Transcript:\n{result['text']}\n")
+
+# Print word-level timestamps
+for segment in result["segments"]:
+    for word_info in segment.get("words", []):
+        start = word_info["start"]
+        end = word_info["end"]
+        word = word_info["word"]
+        print(f"  [{start:.2f}s - {end:.2f}s] {word}")
+```
+
+## Practical resources
+
+- [wav2vec 2.0 paper (Baevski et al., 2020)](https://arxiv.org/abs/2006.11477) — Foundational self-supervised speech representation learning
+- [Whisper paper (Radford et al., 2022)](https://arxiv.org/abs/2212.04356) — Robust speech recognition via large-scale weak supervision
+- [Hugging Face – Audio course](https://huggingface.co/learn/audio-course/) — Hands-on course covering ASR, TTS, and classification
+- [OpenAI Whisper GitHub](https://github.com/openai/whisper) — Open-source Whisper with usage examples
+- [NVIDIA NeMo – Speech AI](https://docs.nvidia.com/nemo-framework/user-guide/latest/nemotoolkit/asr/intro.html) — Production-grade ASR and TTS framework
+
+## See also
+
+- [NLP](/docs/nlp)
+- [Multimodal AI](/docs/multimodal-ai)

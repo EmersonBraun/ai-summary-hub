@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "chatgpt",
+    "dall-e",
+    "claude",
+    "gemini",
+    "bart",
+    "grok",
+    "deepseek",
+    "qwen"
+  ],
+  "title": "Case Studies"
+}
