@@ -1,0 +1,4 @@
+{
+  "title": "Cost Optimization",
+  "pages": ["index", "token-budgeting", "prompt-caching", "model-tiering"]
+}

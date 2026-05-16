@@ -1,0 +1,71 @@
+---
+title: Benchmark contamination
+description: >-
+  How training-data overlap with benchmark test sets inflates reported model
+  scores — and methods to detect and mitigate contamination.
+tags:
+  - intermediate
+---
+
+## Definition
+
+**Benchmark contamination** (also called **data contamination** or **test-set leakage**) occurs when examples from a benchmark's test split appear — verbatim or near-verbatim — in a model's pre-training or fine-tuning corpus. When a model has "seen" the answers during training, its benchmark scores no longer reflect true generalization; they reflect memorization.
+
+Contamination is a pervasive problem in the LLM era because pre-training corpora are crawled from the web at a scale that makes it practically impossible to guarantee that no benchmark question was indexed. Popular benchmarks like MMLU, HumanEval, GSM8K, and BIG-Bench have all been found in widely-used training datasets.
+
+The consequence is that leaderboard rankings become unreliable signals of real-world capability. A model that scores 90% on a contaminated benchmark may perform significantly worse on a fresh, unseen version of the same task.
+
+## How it works
+
+```mermaid
+flowchart LR
+  Web[Web crawl] -->|includes benchmark pages| PretrainData[Pre-training corpus]
+  PretrainData -->|train| Model[LLM]
+  Model -->|evaluate| Benchmark[Benchmark test set]
+  Benchmark -->|high score| Leaderboard[Public leaderboard]
+  Leaderboard -->|misleads| Users[Practitioners choosing models]
+```
+
+The contamination path is typically indirect: benchmark problems are published on the web (GitHub, Kaggle, ArXiv, HuggingFace datasets), scraped into common-crawl-style datasets, and then included in pre-training. Deduplication removes exact duplicates but misses paraphrase-level contamination.
+
+## Detection methods
+
+| Method | Description | Strength |
+|---|---|---|
+| N-gram overlap | Check if long n-grams from test questions appear in training data | Fast but misses paraphrases |
+| Min-K% prob | Measure if model assigns unusually high probability to benchmark tokens | Model-agnostic, needs logprobs |
+| Canary insertion | Plant synthetic test questions; check if model recalls them | Controlled, future-oriented |
+| Task variant testing | Test on slightly rephrased versions; score drop reveals memorization | Practical for practitioners |
+| Membership inference | Train a binary classifier to distinguish seen vs. unseen examples | Research-grade, high precision |
+
+## Mitigation strategies
+
+- **Dynamic benchmarks**: Use benchmarks that are continuously refreshed with new questions (e.g., LiveCodeBench, LMSys Arena) rather than static test sets.
+- **Contamination-aware evaluation**: Report results on both the standard benchmark and a known-clean subset.
+- **Decontamination filtering**: Before training, remove examples whose n-gram overlap with benchmark test sets exceeds a threshold (e.g., 13-gram overlap).
+- **Held-out evaluation sets**: Keep internal test sets private and unreleased; only share aggregate metrics.
+- **Behavioral probing**: Supplement benchmarks with adversarial variants, counterfactuals, and multi-step reasoning chains that are harder to memorize.
+
+## When to worry about contamination
+
+| Situation | Risk level |
+|---|---|
+| Using a model trained on public data for a public benchmark | High — assume some contamination |
+| Fine-tuning on user data for a private task | Low — unless fine-tuning data contains benchmark examples |
+| Comparing models on a benchmark both were trained on | High — differences may reflect contamination degree |
+| Using a live dynamic benchmark (Arena, LiveCodeBench) | Low — questions rotate out before training |
+| Building internal evals with proprietary test cases | Low — not publicly indexed |
+
+## Sources
+
+- [Contamination survey — Arxiv 2024](https://arxiv.org/abs/2311.04850) — systematic analysis of benchmark contamination across major LLMs
+- [Min-K% Prob method paper](https://arxiv.org/abs/2310.16789) — training-free contamination detection via token probability analysis
+- [LiveCodeBench](https://livecodebench.github.io/) — continuously updated coding benchmark to reduce contamination
+- [Decontamination in GPT-4 technical report](https://arxiv.org/abs/2303.08774) — OpenAI's decontamination methodology for GPT-4 evaluation
+
+## See also
+
+- [Evals](/docs/evals)
+- [LLM-as-judge](/docs/evals/llm-as-judge)
+- [Eval frameworks](/docs/evals/eval-frameworks)
+- [Benchmarks](/docs/benchmarks)

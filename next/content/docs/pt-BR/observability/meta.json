@@ -1,0 +1,4 @@
+{
+  "title": "Observabilidade",
+  "pages": ["index", "tracing", "langfuse", "cost-attribution"]
+}

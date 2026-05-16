@@ -1,0 +1,4 @@
+{
+  "title": "Otimização de Inferência",
+  "pages": ["index", "vllm", "speculative-decoding", "kv-cache"]
+}

@@ -1,0 +1,74 @@
+---
+title: Late interaction — ColBERT
+description: >-
+  How ColBERT's token-level MaxSim late interaction mechanism improves retrieval
+  precision over single-vector embeddings, and how to deploy it with RAGatouille
+  or Vespa.
+tags:
+  - advanced
+---
+
+## Definition
+
+**ColBERT** (Contextualized Late Interaction over BERT) is a neural retrieval model that represents both queries and documents as **matrices of token-level embeddings** rather than a single pooled vector. At retrieval time, relevance is computed by the **MaxSim** operator: for each query token, find its maximum cosine similarity across all document token embeddings, then sum these per-query-token maxima to produce the final relevance score. This fine-grained interaction captures whether *each word in the query* is addressed somewhere in the document, rather than trusting a single pooled vector to capture the full query semantics.
+
+Compared to bi-encoders (single-vector embeddings), ColBERT achieves higher retrieval precision — especially on queries with multiple distinct sub-concepts — at the cost of higher storage (one vector per token, typically 128-dim, per document) and more complex indexing. ColBERT v2 (2022) introduced distillation-based training and residual compression, reducing the storage overhead by ~4× compared to the original ColBERT while preserving quality.
+
+In 2025, **Jina ColBERT v2** extended late interaction to 89 languages with MRL support (128/96/64-dim outputs), and **ColPali** adapted the mechanism to visual document retrieval using patch-level image embeddings.
+
+## How it works
+
+```mermaid
+flowchart LR
+  Query[User query\n"best hotels near\n river AND rooftop"] --> QEnc[Query encoder\nfine-tuned BERT]
+  QEnc -->|Q matrix\n32 × 128| MaxSim
+
+  Doc[Document\n512 tokens] --> DEnc[Document encoder\nshared BERT weights]
+  DEnc -->|D matrix\n512 × 128| MaxSim
+
+  MaxSim[MaxSim operator\nfor each q_i: max over d_j sim q_i·d_j\nsum all q scores] --> Score[Relevance score]
+  Score --> Rank[Ranked results]
+```
+
+**Query encoding:** the query (padded to 32 tokens) passes through the BERT encoder, producing a 32 × 128 matrix. **Document encoding:** the document passes through the same encoder, producing an N × 128 matrix (N = token count). Both matrices are computed at index time for documents; queries are computed at retrieval time. **MaxSim:** for each of the 32 query token vectors, find the maximum dot product across all N document token vectors; sum these 32 values to get the document's relevance score. **Ranking:** top-k documents by MaxSim score are returned.
+
+### Storage and indexing
+
+ColBERT stores one 128-dim float16 vector per token per document. A 100-token document produces 100 × 128 × 2 bytes = 25.6 KB of index data. For a 1M-document corpus averaging 200 tokens per document, this yields ~5 GB of index storage — 5–10× more than a single-vector bi-encoder index. ColBERT v2's residual compression reduces this by 4× via product quantization.
+
+### Deployment options
+
+| Library | Backend | Notes |
+|---|---|---|
+| **RAGatouille** | ColBERT v2 (Python) | Simplest path; `RAGPretrainedColBERT` in 3 lines |
+| **Stanford ColBERT** | FAISS + custom indexer | Reference implementation; full control |
+| **Vespa** | Native ColBERT tensors | Production-grade; ANN + MaxSim in one query |
+| **Weaviate** | ColBERT via plugin | Managed vector DB with late interaction support |
+| **Datastax ColBERT Live!** | Cassandra + custom pooling | Eliminates low-signal vectors via adaptive pooling |
+
+## When to use / When NOT to use
+
+| Scenario | Use ColBERT | Use single-vector bi-encoder |
+|---|---|---|
+| Queries with multiple distinct sub-concepts | Yes — MaxSim finds each concept independently | No — pooled vector averages sub-concepts |
+| Long documents with dispersed relevant passages | Yes — token-level matching spans the document | No — single vector struggles with long docs |
+| Storage is constrained | No — ColBERT index is 5–10× larger | Yes — bi-encoder index is compact |
+| Latency must be < 50 ms at high QPS | No — MaxSim adds compute; use ANN pre-filter | Yes — ANN on single vectors is fast |
+| Multilingual retrieval | Yes — Jina ColBERT v2 (89 languages) | Yes — multilingual bi-encoders (Qwen3) also strong |
+| Visual document retrieval (PDFs, slides) | Yes — ColPali adapts MaxSim to image patches | No — text-only bi-encoders cannot handle images |
+
+## Sources
+
+- [ColBERT: efficient and effective passage search via contextualized late interaction — SIGIR 2020](https://dl.acm.org/doi/10.1145/3397271.3401075)
+- [ColBERT GitHub — Stanford FutureData Lab](https://github.com/stanford-futuredata/ColBERT)
+- [An overview of late interaction retrieval models: ColBERT, ColPali, ColQwen — Weaviate](https://weaviate.io/blog/late-interaction-overview)
+- [ColBERT in practice: bridging research and industry — Sease (November 2025)](https://sease.io/2025/11/colbert-in-practice-bridging-research-and-industry.html)
+- [Jina ColBERT v2: multilingual late interaction — Jina AI](https://jina.ai/news/jina-colbert-v2-multilingual-late-interaction-retriever/)
+
+## See also
+
+- [Embeddings](/docs/embeddings)
+- [Fine-tuning embeddings](/docs/embeddings/fine-tuning-embeddings)
+- [RAG architecture](/docs/rag/architecture)
+- [Vector databases](/docs/rag/vector-databases)
+- [Semantic search](/docs/semantic-search)

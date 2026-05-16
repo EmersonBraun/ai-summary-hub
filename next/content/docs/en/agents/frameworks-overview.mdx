@@ -90,7 +90,7 @@ def search(query: str) -> str:
     """Search the web for information."""
     return f"Results for: {query}"
 
-llm = ChatAnthropic(model="claude-3-5-sonnet-20241022")
+llm = ChatAnthropic(model="claude-sonnet-4-6")
 agent = create_react_agent(llm, tools=[search])
 executor = AgentExecutor(agent=agent, tools=[search])
 result = executor.invoke({"input": "What is LangGraph?"})
@@ -137,7 +137,7 @@ import anthropic
 client = anthropic.Anthropic()
 tools = [{"name": "search", "description": "Search the web", "input_schema": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]}}]
 response = client.messages.create(
-    model="claude-opus-4-5",
+    model="claude-opus-4-7",
     max_tokens=1024,
     tools=tools,
     messages=[{"role": "user", "content": "Search for LangGraph documentation."}]
@@ -151,9 +151,23 @@ response = client.messages.create(
 - [AutoGen documentation (Microsoft)](https://microsoft.github.io/autogen/) — Covers ConversableAgent, group chats, code execution, and human-in-the-loop patterns.
 - [LangGraph documentation](https://langchain-ai.github.io/langgraph/) — Graph-based agent state machines, persistence, and human-in-the-loop checkpoints.
 - [Anthropic Tool Use guide](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Official guide to defining tools with JSON schema and handling tool_use / tool_result message types.
-- [AgentsKit](https://emersonbraun.github.io/agentskit/) — Production-ready framework for building AI agents with memory, tools, and multi-agent orchestration
+- [AgentsKit](https://www.agentskit.io/) — Production-ready full-stack JavaScript framework for building AI agents with memory, tools, RAG, and multi-agent orchestration
+
+## Beyond frameworks: runtimes and orchestrators
+
+Frameworks help you *build* an agent loop. A separate, fast-growing layer (2026) focuses on *running and coordinating* agents long-term: **AgentsKit** as an end-to-end JS stack, **Hermes Agent** as a persistent self-improving single agent, and **Paperclip** as a UI-driven orchestrator that runs a team of existing agents like a company. If your hard problem is operation rather than construction, see [agent runtimes and orchestrators](/docs/agents/agent-runtimes).
+
+## Sources
+
+- [ReAct: Synergizing Reasoning and Acting in Language Models (Yao et al., 2022)](https://arxiv.org/abs/2210.03629) — Foundational paper on the thought–action–observation loop that underlies most single-agent frameworks.
+- [AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation (Wu et al., 2023)](https://arxiv.org/abs/2308.08155) — Research basis for the conversation-driven multi-agent paradigm.
+- [LangGraph official documentation](https://langchain-ai.github.io/langgraph/) — Reference for graph-based agent state machine design.
+- [Anthropic Tool Use guide](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Official specification for native tool use in Claude agents.
+- [Cognitive Architectures for Language Agents (Sumers et al., 2023)](https://arxiv.org/abs/2309.02427) — Survey taxonomizing agent architectures, memory, and reasoning approaches.
 
 ## See also
+
+- [Agent runtimes and orchestrators](/docs/agents/agent-runtimes)
 
 - [CrewAI](/docs/agents/crewai)
 - [AutoGen](/docs/agents/autogen)

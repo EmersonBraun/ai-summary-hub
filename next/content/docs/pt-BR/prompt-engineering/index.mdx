@@ -41,6 +41,18 @@ Parâmetros de configuração (temperatura, Top-K, Top-P, máximo de tokens) ope
 
 A engenharia avançada de prompts adiciona uma camada de confiabilidade sobre o prompting básico. Isso inclui executar múltiplos prompts em paralelo (ensembling), pedir ao modelo que critique sua própria saída (autoavaliação) e aplicar estratégias de desviesamento para reduzir erros sistemáticos. Esses métodos trocam custo computacional por qualidade de saída e são especialmente importantes em aplicações de alto risco.
 
+## Quando usar / Quando NÃO usar
+
+| Cenário | Aplicar engenharia de prompts | Pular / usar alternativas |
+|---|---|---|
+| Melhorar a qualidade das saídas sem retreinar | Sim — a engenharia de prompts é a alavanca mais rápida | Não — se o problema é uma lacuna de capacidade que o modelo não consegue superar |
+| Ajustar persona, tom ou formato do modelo | Sim — system prompts e instruções de papel são altamente eficazes | Não — se o parsing downstream exige schemas rígidos, use [saídas estruturadas](/docs/prompt-engineering/structured-outputs) com modo JSON |
+| Tarefas de raciocínio em múltiplas etapas (matemática, lógica, planejamento de código) | Sim — adicione cadeia de pensamento ou step-back prompting | Não — para respostas simples em etapa única, adicionar etapas de raciocínio aumenta o custo sem benefício |
+| Reduzir alucinações em consultas com muito conhecimento | Sim — combine com [RAG](/docs/rag) para fundamentar respostas em fatos recuperados | Não — a engenharia de prompts isolada não adiciona conhecimento que o modelo não foi treinado |
+| Inferência de alto volume e com restrição de latência | Parcialmente — mantenha os prompts concisos; evite exemplos few-shot quando zero-shot é suficiente | Sim — prompts longos e técnicas com múltiplas chamadas (autoconsistência, ensembling) adicionam custo e latência |
+| Salvaguardas de segurança e conformidade | Parcialmente — system prompts podem restringir o comportamento | Não — para requisitos de segurança estritos, adicione guardrails programáticos; modelos podem ser jailbroken |
+| Precisão em domínio específico em escala | Parcialmente — o prompting few-shot ajuda | Sim — considere [ajuste fino](/docs/llms/fine-tuning) quando a engenharia de prompts atinge o teto de qualidade |
+
 ## Recursos práticos
 
 - [OpenAI — Guia de engenharia de prompts](https://platform.openai.com/docs/guides/prompt-engineering) — Guia abrangente cobrindo melhores práticas e estratégias

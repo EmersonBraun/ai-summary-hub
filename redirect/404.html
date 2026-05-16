@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, follow">
+<title>AI Summary Hub has moved</title>
+<script>
+/* Old GitHub Pages site (Docusaurus, base /ai-summary-hub/) now redirects to
+   the new Fumadocs site on aisummaryhub.dev, preserving the path.
+   Served as both index.html and 404.html so every deep link is caught. */
+(function () {
+  var NEW_ORIGIN = 'https://aisummaryhub.dev';
+  var BASE = '/ai-summary-hub';
+  // Locales the new site supports. Others (es, fr, de, zh-Hans) fold to EN.
+  var KEEP_LOCALES = { 'pt-BR': 1 };
+  var DROP_LOCALES = { es: 1, fr: 1, de: 1, 'zh-Hans': 1 };
+
+  var path = window.location.pathname || '/';
+  if (path.indexOf(BASE) === 0) path = path.slice(BASE.length);
+  if (path === '' || path === '/') {
+    window.location.replace(NEW_ORIGIN + '/');
+    return;
+  }
+  var parts = path.split('/').filter(Boolean);
+  var first = parts[0];
+  if (DROP_LOCALES[first]) {
+    parts.shift(); // drop unsupported locale -> EN at root
+  } else if (KEEP_LOCALES[first]) {
+    // keep pt-BR prefix as-is
+  }
+  var dest = NEW_ORIGIN + '/' + parts.join('/') + window.location.search + window.location.hash;
+  window.location.replace(dest);
+})();
+</script>
+<link rel="canonical" href="https://aisummaryhub.dev/">
+<meta http-equiv="refresh" content="3; url=https://aisummaryhub.dev/">
+<style>
+  body{font:16px/1.6 system-ui,sans-serif;background:#0a0c10;color:#f5f7fa;
+       display:flex;min-height:100vh;margin:0;align-items:center;justify-content:center;text-align:center}
+  a{color:#00e0c6}
+</style>
+</head>
+<body>
+<main>
+  <h1>AI Summary Hub has moved</h1>
+  <p>Redirecting to <a href="https://aisummaryhub.dev/">aisummaryhub.dev</a>…</p>
+</main>
+</body>
+</html>

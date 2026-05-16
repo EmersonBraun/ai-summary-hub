@@ -1,0 +1,77 @@
+---
+title: Interpretabilidade
+description: >-
+  Entendendo o que acontece dentro de redes neurais — interpretabilidade mecanística,
+  análise de circuitos e autoencoders esparsos (SAEs) para LLMs.
+tags:
+  - advanced
+---
+
+## Definição
+
+Interpretabilidade (também chamada de interpretabilidade mecanística ou mech interp) é o campo que estuda as computações internas de redes neurais para entender *por que* elas produzem as saídas que produzem. Diferente dos métodos de explicabilidade que produzem atribuições post-hoc (SHAP, LIME), a interpretabilidade mecanística tenta fazer engenharia reversa dos algoritmos reais codificados nos pesos e ativações de um modelo.
+
+O campo distingue três níveis de análise:
+
+- **Identificação de features** — quais conceitos neurônios individuais ou direções no espaço de ativação representam? (por exemplo, "o token 312 na camada 7 ativa para nomes de cidades europeias")
+- **Análise de circuitos** — como grupos de cabeças de atenção e neurônios MLP interagem para implementar comportamentos específicos? (por exemplo, o circuito de identificação de objeto indireto no GPT-2)
+- **Compreensão completa do modelo** — conseguimos derivar uma descrição algorítmica completa e fiel do modelo? (problema de pesquisa aberto)
+
+**Autoencoders esparsos (SAEs)** emergiram como a principal ferramenta para interpretabilidade mecanística escalável de LLMs. Os SAEs decompõem a superposição densa de features no fluxo residual em uma base esparsa e interpretável por humanos — encontrando milhares a milhões de features monossemânticas correspondendo a conceitos coerentes (por exemplo, "DNA", "o conceito de confiança", "codificação base64"). A pesquisa de interpretabilidade da Anthropic usando SAEs no Claude se tornou uma linha de trabalho líder no campo.
+
+## Como funciona
+
+### Análise de neurônios / features
+
+A interpretabilidade inicial examinava neurônios individuais — plotando as entradas que maximalmente ativam um neurônio para inferir o que ele "detecta". A análise moderna de transformers foca em direções no espaço de ativação em vez de neurônios individuais porque o fluxo residual é polissemântico: um único neurônio pode codificar múltiplas features não relacionadas simultaneamente (hipótese de superposição).
+
+### Descoberta de circuitos
+
+```mermaid
+flowchart LR
+  Input[Tokens de entrada] -->|cabeças de atenção| Attn[Padrões de atenção]
+  Attn -->|projeções de valor| Residual[Atualização do fluxo residual]
+  Residual -->|camadas MLP| MLP[Atualizações MLP]
+  MLP -->|saída composta| Next[Próximo fluxo residual da camada]
+  Next -->|ablação / patching| Circuit[Circuito isolado]
+```
+
+O patching de ativação (rastreamento causal) identifica quais componentes são causalmente responsáveis por um comportamento, substituindo ativações de uma execução "limpa" pelas de uma execução "corrompida" e medindo o efeito na saída. Isso isola o conjunto mínimo de componentes — o circuito — responsável por uma capacidade.
+
+### Autoencoders esparsos (SAEs)
+
+```mermaid
+flowchart LR
+  Act[Ativação do fluxo residual h] -->|encoder W_enc| Pre[Pré-ativação z]
+  Pre -->|ReLU / JumpReLU| Sparse[Ativações esparsas de features f]
+  Sparse -->|decoder W_dec| Recon[Ativação reconstruída]
+  Act -->|perda MSE| Recon
+  Sparse -->|penalidade de esparsidade L1| Penalty[Perda de esparsidade]
+```
+
+Um SAE é um autoencoder raso treinado para reconstruir ativações do fluxo residual usando uma camada oculta esparsa com muito mais dimensões do que o fluxo residual (por exemplo, resíduo de 4096 dim → SAE de 32768 dim). A penalidade L1 força a maioria das features a ser zero para qualquer entrada. Cada feature ativa pode então ser analisada inspecionando quais entradas a ativam — produzindo conceitos monossemânticos e interpretáveis por humanos.
+
+## Quando usar / Quando NÃO usar
+
+| Cenário | Usar interpretabilidade | Observações |
+|---|---|---|
+| Auditar um modelo em busca de representações internas inesperadas | Análise de features SAE — escalável, sistemática | Caso de uso central para auditoria de segurança |
+| Depurar uma falha de capacidade ou comportamento inesperado | Patching de ativação / análise de circuitos — localiza a causa | Requer acesso aos pesos e ativações do modelo |
+| Explicação post-hoc para usuários finais (SHAP, LIME) | Métodos de atribuição — mais rápidos, agnósticos ao modelo | Não mecanístico, mas prático para conformidade |
+| Modelo de API de caixa-preta | Limitado — só é possível estudar o comportamento entrada-saída | Sem acesso aos internos |
+| Pesquisa sobre capacidades e segurança do modelo | Interpretabilidade mecanística — compreensão mais profunda | Investimento significativo de engenharia |
+
+## Fontes
+
+- [Anthropic — Scaling Monosemanticity: Extraindo features interpretáveis do Claude (2024)](https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html)
+- [Circuits Thread — Aprendizado em contexto e cabeças de indução (Olsson et al., 2022)](https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html)
+- [Towards Monosemanticity (Elhage et al., Anthropic, 2023)](https://transformer-circuits.pub/2023/monosemantic-features/index.html)
+- [Interpretability in the Wild — circuito IOI no GPT-2 (Wang et al., 2022)](https://arxiv.org/abs/2211.00593)
+- [SAEBench — Avaliando autoencoders esparsos (2024)](https://arxiv.org/abs/2408.11508)
+
+## Veja também
+
+- [Segurança em IA](/docs/ai-safety)
+- [Métodos de alinhamento](/docs/ai-safety/alignment-methods)
+- [Red teaming](/docs/ai-safety/red-teaming)
+- [IA explicável](/docs/xai)

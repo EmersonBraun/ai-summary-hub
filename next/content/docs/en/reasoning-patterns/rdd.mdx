@@ -131,6 +131,13 @@ print(result)
 - [LangChain – Agents and tools](https://python.langchain.com/docs/concepts/agents/) — Orchestration patterns for building RDD-style loops
 - [Constitutional AI (Anthropic)](https://arxiv.org/abs/2212.08073) — Related idea: using retrieved principles to guide and validate model outputs
 
+## Sources
+
+- [Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (Lewis et al., 2020)](https://arxiv.org/abs/2005.11401) — Foundational RAG paper providing the retrieval basis for RDD's spec-fetching step.
+- [Constitutional AI: Harmlessness from AI Feedback (Bai et al., 2022)](https://arxiv.org/abs/2212.08073) — Principle-based approach to guiding and validating model decisions against retrieved rules.
+- [Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection (Asai et al., 2023)](https://arxiv.org/abs/2310.11511) — Extends retrieval-augmented generation with inline self-critique, complementary to RDD's validate step.
+- [ReAct: Synergizing Reasoning and Acting in Language Models (Yao et al., 2022)](https://arxiv.org/abs/2210.03629) — Agent loop that RDD composes with for step-level reasoning within the retrieve–decide–design cycle.
+
 ## See also
 
 - [Spec-driven development](/docs/spec-driven-development)

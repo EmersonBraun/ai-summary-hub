@@ -1,38 +1,39 @@
 ---
 title: LangGraph
 description: >-
-  Stateful agent graphs built on LangChain, where nodes are Python functions,
-  edges define routing, and a shared TypedDict state enables cycles, conditional
-  branching, persistence, and human-in-the-loop checkpoints.
+  Grafos de agentes com estado construídos sobre LangChain, onde os nós são
+  funções Python, as arestas definem o roteamento e um estado TypedDict
+  compartilhado habilita ciclos, ramificações condicionais, persistência e
+  checkpoints com humanos no ciclo.
 tags:
   - intermediate
 ---
 
 ## Definição
 
-LangGraph ist eine Open-Source-Python-Bibliothek, die auf LangChain aufbaut, zur Konstruktion **zustandsbehafteter Agenten-Workflows als explizite gerichtete Graphen**. Wo die meisten Agenten-Frameworks die Ausführungsschleife hinter einem undurchsichtigen `run()`-Aufruf verbergen, legt LangGraph sie als erstklassiges Graph-Objekt frei, das Sie inspizieren, testen und modifizieren können. Knoten sind normale Python-Funktionen (jede kann ein LLM, ein Werkzeug oder beliebige Logik aufrufen); Kanten sind Übergänge zwischen Knoten; und der gesamte Workflow teilt ein einziges **Zustands**-Objekt – ein typisiertes Dictionary, aus dem jeder Knoten lesen und in das schreiben kann.
+LangGraph é uma biblioteca Python de código aberto, construída sobre o LangChain, para construir **fluxos de trabalho de agentes com estado como grafos dirigidos explícitos**. Onde a maioria dos frameworks de agentes esconde o ciclo de execução por trás de uma chamada `run()` opaca, o LangGraph o expõe como um objeto de grafo de primeira classe que você pode inspecionar, testar e modificar. Os nós são funções Python comuns (cada uma pode chamar um LLM, uma ferramenta ou lógica arbitrária); as arestas são transições entre nós; e todo o fluxo de trabalho compartilha um único objeto de **estado** — um dicionário tipado que cada nó pode ler e escrever.
 
-Die Schlüsselerkenntnis in LangGraph ist, dass viele Agenten-Verhaltensweisen, die komplex erscheinen – Loopen bis eine Bedingung erfüllt ist, Branching auf dem Inhalt einer LLM-Antwort, Pausieren für menschliche Genehmigung, Wiederaufnehmen von einem gespeicherten Checkpoint – sauber auf Graph-Primitive abbilden: Zyklen, bedingte Kanten, Interrupts und persistenter Zustand. Diese Explizitheit hat einen Preis (mehr Boilerplate als CrewAI oder AutoGen), zahlt sich aber in der Produktion aus: Sie können jeden Knoten isoliert unit-testen, genau verfolgen, welchen Pfad eine Ausführung genommen hat, und einen Workflow von jedem Checkpoint aus wiedergeben.
+O insight principal do LangGraph é que muitos comportamentos de agentes que parecem complexos — iterar até que uma condição seja satisfeita, ramificar com base no conteúdo de uma resposta do LLM, pausar para aprovação humana, retomar a partir de um checkpoint salvo — mapeiam-se claramente em primitivos de grafo: ciclos, arestas condicionais, interrupções e estado persistente. Essa explicitação tem um custo (mais boilerplate do que CrewAI ou AutoGen), mas compensa na produção: você pode testar cada nó isoladamente, rastrear exatamente qual caminho uma execução tomou e reproduzir um fluxo de trabalho a partir de qualquer checkpoint.
 
-LangGraph unterstützt sowohl **Single-Agent**-Muster (ein Graph mit wenigen Knoten, der Werkzeuge in einer Schleife aufruft) als auch **Multi-Agent**-Muster (mehrere Subgraphen zusammengesetzt, mit Graph-übergreifender Zustandsteilung). Es integriert sich nativ in LangChains Werkzeug-Ökosystem, Chat-Modelle und LangSmith für Beobachtbarkeit. Das Framework ist die Grundlage der empfohlenen Produktions-Agenten-Architektur von LangChain ab 2024-2025.
+O LangGraph suporta tanto padrões de **agente único** (um grafo com alguns nós que chama ferramentas em um ciclo) quanto padrões de **multi-agente** (múltiplos subgrafos compostos juntos, com compartilhamento de estado entre grafos). Ele se integra nativamente ao ecossistema de ferramentas do LangChain, modelos de chat e LangSmith para observabilidade. O framework é a base da arquitetura de agentes de produção recomendada pelo LangChain a partir de 2024-2025.
 
 ## Como funciona
 
-### Knoten: Python-Funktionen als Ausführungseinheiten
+### Nós: funções Python como unidades de execução
 
-Ein Knoten in LangGraph ist jedes Python-Callable, das den aktuellen Zustand akzeptiert und einen (teilweisen) aktualisierten Zustand zurückgibt. Knoten werden dem Graphen mit `graph.add_node("name", function)` hinzugefügt. Die Funktionssignatur ist immer `(state: State) -> dict` – sie liest, was sie braucht, aus dem Zustand, erledigt ihre Arbeit (LLM-Aufruf, Werkzeugausführung, Datentransformation) und gibt nur die Schlüssel zurück, die sie aktualisieren möchte. Das macht Knoten einfach unabhängig zu testen: Übergeben Sie einen Mock-Zustand, bestätigen Sie das zurückgegebene Dict. LangChains `ToolNode` ist ein vorgefertigter Knoten, der Werkzeugaufrufe aus einer LLM-Antwort ausführt und deckt das gängigste Agenten-Muster direkt ab.
+Um nó no LangGraph é qualquer callable Python que aceita o estado atual e retorna um estado atualizado (parcial). Os nós são adicionados ao grafo com `graph.add_node("nome", função)`. A assinatura da função é sempre `(state: State) -> dict` — ela lê o que precisa do estado, faz seu trabalho (chamada ao LLM, execução de ferramenta, transformação de dados) e retorna apenas as chaves que quer atualizar. Isso torna os nós fáceis de testar independentemente: passe um estado simulado, verifique o dicionário retornado. O `ToolNode` do LangChain é um nó pré-construído que executa chamadas de ferramentas a partir da resposta de um LLM, cobrindo o padrão mais comum de agente imediatamente.
 
-### Kanten: Routing und bedingtes Branching
+### Arestas: roteamento e ramificação condicional
 
-Kanten verbinden Knoten und bestimmen die Ausführungsreihenfolge. Eine einfache Kante (`graph.add_edge("a", "b")`) übergeht immer von Knoten `a` zu Knoten `b`. Eine bedingte Kante (`graph.add_conditional_edges`) ruft eine Routing-Funktion mit dem aktuellen Zustand auf und verwendet die zurückgegebene Zeichenfolge, um den nächsten Knoten zu bestimmen. Dies ist der Mechanismus für dynamischen Kontrollfluss: Nachdem ein LLM eine Antwort generiert hat, prüft ein Router, ob sie Werkzeugaufrufe enthält (Route zu `tools`) oder eine Endantwort (Route zu `END`). Bedingte Kanten machen LangGraph deutlich mächtiger als eine sequentielle Pipeline – Sie können komplexe Entscheidungsbäume, Wiederholungslogik und Eskalationspfade als lesbare Graphstruktur ausdrücken.
+Arestas conectam nós e determinam a ordem de execução. Uma aresta simples (`graph.add_edge("a", "b")`) sempre faz a transição do nó `a` para o nó `b`. Uma aresta condicional (`graph.add_conditional_edges`) chama uma função de roteamento com o estado atual e usa a string retornada para decidir o próximo nó. Este é o mecanismo para fluxo de controle dinâmico: após um LLM gerar uma resposta, um roteador verifica se ela contém chamadas de ferramentas (rota para `tools`) ou uma resposta final (rota para `END`). Arestas condicionais tornam o LangGraph significativamente mais poderoso do que um pipeline sequencial — você pode expressar árvores de decisão complexas, lógica de repetição e caminhos de escalada como estrutura de grafo legível.
 
-### Zustand: geteiltes TypedDict über alle Knoten
+### Estado: TypedDict compartilhado em todos os nós
 
-Zustand ist das Rückgrat einer LangGraph-Anwendung. Sie definieren ein `TypedDict` (oder ein Pydantic-Modell) mit allen Feldern, die Ihr Workflow benötigt: Nachrichten, Zwischenergebnisse, Flags, Zähler. Jeder Knoten erhält den vollständigen Zustand und gibt nur die Felder zurück, die er ändert. LangGraph fügt partielle Updates mit dem aktuellen Zustand mithilfe von **Reducern** zusammen – standardmäßig überschreiben Zuweisungen; mit dem `add_messages`-Reducer wird die Nachrichtenliste angefügt statt ersetzt. Explizite Zustandstypisierung bedeutet, dass Typprüfer Fehler vor der Laufzeit erkennen können, und der Zustands-Snapshot bei jedem Checkpoint ist ein vollständiges, inspizierbares Protokoll dessen, was passiert ist.
+O estado é a espinha dorsal de uma aplicação LangGraph. Você define um `TypedDict` (ou um modelo Pydantic) com todos os campos que seu fluxo de trabalho precisa: mensagens, resultados intermediários, sinalizadores, contadores. Cada nó recebe o estado completo e retorna apenas os campos que modifica. O LangGraph mescla atualizações parciais com o estado atual usando **redutores** — por padrão, atribuições sobrescrevem; com o redutor `add_messages`, a lista de mensagens é anexada em vez de substituída. A tipagem explícita do estado significa que verificadores de tipo podem capturar erros antes da execução, e o snapshot do estado em qualquer checkpoint é um registro completo e inspecionável do que aconteceu.
 
-### Zyklen, Persistenz und Human-in-the-Loop
+### Ciclos, persistência e humanos no ciclo
 
-LangGraph verarbeitet Zyklen nativ: Ein Knoten kann basierend auf einer Bedingung zu einem vorherigen Knoten (oder sich selbst) zurückkanten und ermöglicht so Agenten-Wiederholungsschleifen, Selbstkorrekturmuster und mehrstufige Werkzeug-Nutzung ohne spezielle Behandlung. Persistenz wird von **Checkpointern** (SQLite, Postgres, Redis oder In-Memory) bereitgestellt: Der Graph speichert den vollständigen Zustand nach jeder Knotenausführung, sodass Sie von jedem Punkt aus nach einem Absturz oder einer Unterbrechung fortsetzen können. Human-in-the-Loop wird über `interrupt_before` und `interrupt_after` implementiert – der Graph pausiert beim angegebenen Knoten, zeigt dem Aufrufer den aktuellen Zustand, akzeptiert menschliche Eingaben und setzt fort. Dies macht LangGraph zur stärksten Wahl, wenn Sie auditierbare, unterbrechbare, produktionsreife Agenten-Pipelines benötigen.
+O LangGraph lida com ciclos nativamente: um nó pode ter uma aresta de volta para um nó anterior (ou para si mesmo) com base em uma condição, habilitando ciclos de repetição do agente, padrões de autocorreção e uso de ferramentas em múltiplos turnos sem nenhum tratamento especial. A persistência é fornecida por **checkpointers** (SQLite, Postgres, Redis ou em memória): o grafo salva o estado completo após cada execução de nó, para que você possa retomar de qualquer ponto após uma falha ou interrupção. Humanos no ciclo são implementados via `interrupt_before` e `interrupt_after` — o grafo pausa no nó especificado, expõe o estado atual ao chamador, aceita entrada humana e retoma. Isso torna o LangGraph a escolha mais forte quando você precisa de pipelines de agentes auditáveis, interrompíveis e prontos para produção.
 
 ```mermaid
 flowchart TD
@@ -48,23 +49,23 @@ flowchart TD
 
 ## Quando usar / Quando NÃO usar
 
-| Usar quando | Evitar quando |
+| Use quando | Evite quando |
 |---|---|
-| Feingranulare Kontrolle über jeden Schritt der Agenten-Ausführung benötigt wird | Eine deklarative, hochrangige API gewünscht wird und keine Schritt-Level-Kontrolle benötigt wird |
-| Persistenz und die Möglichkeit, Workflows mitten in der Ausführung fortzusetzen, erforderlich sind | Der Workflow einfach und linear ist — eine Kette oder Single-Agent-Schleife ausreicht |
-| Human-in-the-Loop-Genehmigungen bei bestimmten Schritten erforderlich sind | Das Team nicht mit Graph-Theorie vertraut ist und ein einfacheres Denkmodell bevorzugt |
-| Produktionssysteme gebaut werden, die vollständige Beobachtbarkeit und Replay benötigen | Agenten Forschungsprototypen sind, die keine produktionsreife Zuverlässigkeit benötigen |
-| Der Workflow komplexes bedingtes Branching oder Zyklen hat, die sich linear schwer ausdrücken lassen | Multi-Agent-Rollenkoordination der primäre Bedarf ist — CrewAI oder AutoGen sind einfacher |
+| Você precisa de controle refinado sobre cada etapa da execução do agente | Você quer uma API declarativa de alto nível e não precisa de controle no nível de cada passo |
+| Você precisa de persistência e a capacidade de retomar fluxos de trabalho no meio da execução | Seu fluxo de trabalho é simples e linear — uma cadeia ou ciclo de agente único é suficiente |
+| Aprovações com humanos no ciclo em etapas específicas são necessárias | A equipe não está familiarizada com teoria de grafos e prefere um modelo mental mais simples |
+| Você está construindo sistemas de produção que precisam de observabilidade completa e reprodução | Seus agentes são protótipos de pesquisa que não precisam de confiabilidade de nível de produção |
+| Seu fluxo de trabalho tem ramificações condicionais complexas ou ciclos difíceis de expressar linearmente | A coordenação de papéis multi-agente é sua necessidade principal — CrewAI ou AutoGen são mais simples |
 
 ## Comparações
 
-| Kriterium | LangGraph | CrewAI | AutoGen |
+| Critério | LangGraph | CrewAI | AutoGen |
 |---|---|---|---|
-| **Abstraktionsebene** | Niedrig: expliziter Graph, Knoten, Kanten und Zustand | Hoch: deklarative Rollen, Ziele, Aufgaben | Mittel: konversationale Agenten mit Nachrichtenverlauf |
-| **Kontrollfluss** | Explizite bedingte Kanten und Zyklen | Sequentieller oder hierarchischer Prozess (undurchsichtig) | Nachrichtengesteuert, rundenbasiert (undurchsichtig) |
-| **Persistenz** | Erstklassig: Checkpointer für SQLite, Postgres, Redis | Nicht eingebaut | Nicht eingebaut |
-| **Human-in-the-Loop** | Erstklassig: `interrupt_before` / `interrupt_after` | Nur manuell | Erstklassig: `human_input_mode` pro Agent |
-| **Testbarkeit** | Hoch: Knoten sind reine Funktionen, einfach unit-zu-testen | Mittel: Aufgaben können getestet werden, aber Crew-Ausführung ist undurchsichtig | Niedrig: Konversationsflows sind schwer deterministisch unit-zu-testen |
+| **Nível de abstração** | Baixo: grafo explícito, nós, arestas e estado | Alto: papéis declarativos, objetivos, tarefas | Médio: agentes conversacionais com histórico de mensagens |
+| **Fluxo de controle** | Arestas condicionais explícitas e ciclos | Processo sequencial ou hierárquico (opaco) | Baseado em mensagens, por turno (opaco) |
+| **Persistência** | Nativa: checkpointers para SQLite, Postgres, Redis | Não integrado | Não integrado |
+| **Humanos no ciclo** | Nativo: `interrupt_before` / `interrupt_after` | Apenas manual | Nativo: `human_input_mode` por agente |
+| **Testabilidade** | Alta: nós são funções puras, fáceis de testar unitariamente | Média: tarefas podem ser testadas, mas a execução da equipe é opaca | Baixa: fluxos de conversa são difíceis de testar unitariamente de forma determinística |
 
 ## Exemplos de código
 
@@ -189,16 +190,23 @@ print("Total steps:", result["step_count"])
 
 ## Recursos práticos
 
-- [LangGraph official documentation](https://langchain-ai.github.io/langgraph/) — Vollständige Referenz für Graph-Konstruktion, Zustandsverwaltung, Checkpointer und Human-in-the-Loop-Muster.
-- [LangGraph GitHub repository](https://github.com/langchain-ai/langgraph) — Quellcode, Issue-Tracker und Beispiel-Notebooks, die gängige Muster abdecken.
-- [LangGraph "How-to" guides](https://langchain-ai.github.io/langgraph/how-tos/) — Praktische Rezepte für Persistenz, Streaming, Subgraphen, Multi-Agent-Koordination und mehr.
-- [LangSmith tracing for LangGraph](https://docs.smith.langchain.com/) — Beobachtbarkeitsplattform zum Tracing von LangGraph-Ausführungen, Inspektion des Zustands bei jedem Knoten und Debugging von Fehlern.
+- [Documentação oficial do LangGraph](https://langchain-ai.github.io/langgraph/) — Referência completa para construção de grafos, gerenciamento de estado, checkpointers e padrões com humanos no ciclo.
+- [Repositório GitHub do LangGraph](https://github.com/langchain-ai/langgraph) — Código-fonte, rastreador de problemas e notebooks de exemplos cobrindo padrões comuns.
+- [Guias "Como fazer" do LangGraph](https://langchain-ai.github.io/langgraph/how-tos/) — Receitas práticas para persistência, streaming, subgrafos, coordenação multi-agente e mais.
+- [Rastreamento LangSmith para LangGraph](https://docs.smith.langchain.com/) — Plataforma de observabilidade para rastrear execuções do LangGraph, inspecionar estado em cada nó e depurar falhas.
+
+## Fontes
+
+- [LangGraph official documentation](https://langchain-ai.github.io/langgraph/) — Referência autoritativa para máquinas de estado de agentes baseadas em grafos, persistência e checkpointing.
+- [ReAct: Synergizing Reasoning and Acting in Language Models (Yao et al., 2022)](https://arxiv.org/abs/2210.03629) — Base teórica para o loop de agente que os nós do LangGraph implementam.
+- [LLM Compiler: Parallel Function Calling (Kim et al., 2023)](https://arxiv.org/abs/2312.04511) — Pesquisa sobre execução paralela de ferramentas em fluxos de trabalho de agentes estruturados em grafos.
+- [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models (Wei et al., 2022)](https://arxiv.org/abs/2201.11903) — Padrão de raciocínio fundamental usado dentro dos nós do LangGraph.
 
 ## Veja também
 
-- [Agent frameworks overview](/docs/agents/frameworks-overview)
+- [Visão geral dos frameworks de agentes](/docs/agents/frameworks-overview)
 - [CrewAI](/docs/agents/crewai)
 - [AutoGen](/docs/agents/autogen)
 - [LangChain](/docs/tools/langchain)
-- [Multi-agent systems](/docs/agents/multi-agent-systems)
+- [Sistemas multi-agentes](/docs/agents/multi-agent-systems)
 - [ReAct](/docs/reasoning-patterns/react)

@@ -75,8 +75,14 @@ function) before cutover.
 1. In Google Search Console, submit the new sitemap:
    `https://<domain>/sitemap.xml`
 2. Confirm hreflang is recognized (Indexing → Pages → Filter: hreflang).
-3. The old GitHub Pages deploy is now stale — disable
-   `actions/deploy-pages` (already removed from `.github/workflows/`).
+3. The old GitHub Pages deploy is now a **redirect-only shell**: the
+   `redirect/` directory (index.html + 404.html) is published to Pages by
+   `.github/workflows/redirect-pages.yml`. GitHub Pages serves `404.html`
+   for unknown deep links, so *every* old URL
+   (`emersonbraun.github.io/ai-summary-hub/...`) bounces to the matching
+   path on `https://aisummaryhub.dev`, dropping unsupported locales
+   (es/fr/de/zh-Hans → EN) and keeping `pt-BR`. To activate: repo Settings
+   → Pages → Source = GitHub Actions, then run the workflow once.
 4. Update any external backlinks pointing at the old GH Pages URL
    (`emersonbraun.github.io/ai-summary-hub/`).
 

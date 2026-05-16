@@ -1,0 +1,4 @@
+{
+  "title": "Embeddings",
+  "pages": ["index", "fine-tuning-embeddings", "late-interaction-colbert"]
+}

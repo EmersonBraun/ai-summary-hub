@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 import { FEATURED_CATEGORIES, HOME_COPY, SITE, type Locale } from '@/lib/site';
 import { JsonLd } from '@/components/json-ld';
 
@@ -12,7 +13,7 @@ export async function generateMetadata(props: {
   const isEn = lang === 'en';
   const canonical = isEn ? '/' : `/${lang}`;
   return {
-    title: SITE.name,
+    title: { absolute: `${SITE.name} — ${SITE.tagline}` },
     description: SITE.tagline,
     alternates: {
       canonical,
@@ -39,6 +40,83 @@ export async function generateMetadata(props: {
   };
 }
 
+/* Per-category line icons (inherit currentColor) */
+const ICONS: Record<string, ReactNode> = {
+  fundamentals: (
+    <path d="M12 3 3 8l9 5 9-5-9-5Zm0 13L3 11m18 0-9 5" />
+  ),
+  'prompt-engineering': (
+    <path d="M4 17h6m4-9 4 4-4 4M8 4l-2 16" />
+  ),
+  agents: (
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2m0-14-2 2M7 17l-2 2" />
+    </>
+  ),
+  rag: (
+    <path d="M4 6c0-1.1 3.6-2 8-2s8 .9 8 2-3.6 2-8 2-8-.9-8-2Zm0 0v12c0 1.1 3.6 2 8 2s8-.9 8-2V6M4 12c0 1.1 3.6 2 8 2s8-.9 8-2" />
+  ),
+  mlops: (
+    <path d="M12 2v4m0 12v4M2 12h4m12 0h4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" />
+  ),
+  'claude-code': (
+    <path d="m8 9-3 3 3 3m8-6 3 3-3 3m-2-9-4 12" />
+  ),
+};
+
+const WHY = {
+  en: [
+    { t: 'Source-cited', d: 'Every summary links to primary papers, docs, or repos — no hand-wavy claims.' },
+    { t: 'LLM-friendly', d: 'Dense, structured pages designed to drop straight into an agent context window.' },
+    { t: 'No paywall', d: 'Fully open knowledge. Read it, share it, fork it, translate it.' },
+  ],
+  'pt-BR': [
+    { t: 'Com fontes', d: 'Todo resumo cita papers, docs ou repositórios primários — sem achismo.' },
+    { t: 'Pronto para LLM', d: 'Páginas densas e estruturadas, feitas para caber no contexto de um agente.' },
+    { t: 'Sem paywall', d: 'Conhecimento 100% aberto. Leia, compartilhe, fork, traduza.' },
+  ],
+} as const;
+
+const PROJECTS = {
+  en: {
+    heading: 'Open-source projects',
+    subtitle: 'Tools from the same author — free and open source.',
+    cards: [
+      {
+        name: 'AgentsKit',
+        href: 'https://www.agentskit.io/',
+        desc: 'The most complete library for building AI agents. Production-ready framework with memory, tools, multi-agent orchestration, and more.',
+        cta: 'Visit documentation →',
+      },
+      {
+        name: 'Skills',
+        href: 'https://github.com/EmersonBraun/skills',
+        desc: 'A curated repository of reusable AI skills for Claude Code and other AI coding assistants. Boost your dev workflow instantly.',
+        cta: 'View on GitHub →',
+      },
+    ],
+  },
+  'pt-BR': {
+    heading: 'Projetos open source',
+    subtitle: 'Ferramentas do mesmo autor — gratuitas e open source.',
+    cards: [
+      {
+        name: 'AgentsKit',
+        href: 'https://www.agentskit.io/',
+        desc: 'A biblioteca mais completa para construir agentes de IA. Framework pronto para produção com memória, ferramentas, orquestração multi-agente e mais.',
+        cta: 'Ver documentação →',
+      },
+      {
+        name: 'Skills',
+        href: 'https://github.com/EmersonBraun/skills',
+        desc: 'Um repositório curado de skills de IA reutilizáveis para Claude Code e outros assistentes de código. Acelere seu fluxo de dev na hora.',
+        cta: 'Ver no GitHub →',
+      },
+    ],
+  },
+} as const;
+
 export default async function HomePage(props: { params: Promise<Params> }) {
   const { lang } = await props.params;
   const copy = HOME_COPY[lang];
@@ -56,58 +134,77 @@ export default async function HomePage(props: { params: Promise<Params> }) {
       target: `${SITE.url}/docs?q={search_term_string}`,
       'query-input': 'required name=search_term_string',
     },
-    author: {
-      '@type': 'Person',
-      name: SITE.author,
-      url: SITE.authorUrl,
-    },
+    author: { '@type': 'Person', name: SITE.author, url: SITE.authorUrl },
   };
 
   return (
     <>
       <JsonLd data={jsonLd} />
-      <main className="mx-auto w-full max-w-6xl px-4 py-16 sm:py-24">
-        <section className="text-center">
-          <p className="mb-4 text-sm font-medium uppercase tracking-wide text-fd-muted-foreground">
-            {copy.eyebrow}
-          </p>
-          <h1 className="mb-6 text-balance text-5xl font-bold tracking-tight sm:text-6xl">
-            {SITE.name}
-          </h1>
-          <p className="mx-auto mb-10 max-w-2xl text-balance text-lg text-fd-muted-foreground">
-            {SITE.tagline}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href={docsHref}
-              className="rounded-md bg-fd-primary px-6 py-3 font-medium text-fd-primary-foreground transition hover:opacity-90"
-            >
-              {copy.cta_primary}
-            </Link>
-            <a
-              href={SITE.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-md border border-fd-border px-6 py-3 font-medium transition hover:bg-fd-accent"
-            >
-              {copy.cta_secondary}
-            </a>
-          </div>
-        </section>
 
-        <section className="mt-16 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-fd-border bg-fd-border sm:grid-cols-4">
-          {copy.stats.map((s) => (
-            <div key={s.label} className="bg-fd-background p-6 text-center">
-              <div className="text-3xl font-bold">{s.value}</div>
-              <div className="mt-1 text-sm text-fd-muted-foreground">{s.label}</div>
+      {/* Hero */}
+      <section className="ash-hero">
+        <div className="mx-auto w-full max-w-6xl px-4 py-24 sm:py-32">
+          <div className="flex flex-col items-center text-center">
+            <span className="ash-eyebrow">{copy.eyebrow}</span>
+            <h1 className="mt-7 text-balance text-5xl font-bold tracking-tight sm:text-7xl">
+              <span className="ash-gradient-text">{SITE.name}</span>
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-balance text-lg text-white/70 sm:text-xl">
+              {SITE.tagline}
+            </p>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+              <Link href={docsHref} className="ash-btn-primary rounded-lg px-7 py-3.5 text-sm">
+                {copy.cta_primary}
+              </Link>
+              <a
+                href={SITE.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ash-btn-ghost rounded-lg px-7 py-3.5 text-sm"
+              >
+                {copy.cta_secondary}
+              </a>
             </div>
-          ))}
-        </section>
 
-        <section className="mt-24">
-          <div className="mb-10 text-center">
-            <h2 className="text-3xl font-bold tracking-tight">{copy.featured_title}</h2>
-            <p className="mt-2 text-fd-muted-foreground">{copy.featured_subtitle}</p>
+            <div className="ash-term mt-14 w-full max-w-xl rounded-xl px-5 py-4 text-left text-sm">
+              <div className="mb-3 flex gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
+                <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
+                <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
+              </div>
+              <code className="block text-white/80">
+                <span style={{ color: 'var(--ash-accent)' }}>$</span> curl
+                aisummaryhub.dev/docs/agents/index.mdx
+                <br />
+                <span className="text-white/40">
+                  # 290+ source-cited AI summaries, agent-ready
+                </span>
+              </code>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="mx-auto mt-16 grid max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/5 sm:grid-cols-4">
+            {copy.stats.map((s) => (
+              <div key={s.label} className="px-4 py-6 text-center">
+                <div className="text-3xl font-bold text-white">{s.value}</div>
+                <div className="mt-1 text-xs uppercase tracking-wide text-white/50">
+                  {s.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <main className="mx-auto w-full max-w-6xl px-4">
+        {/* Featured categories */}
+        <section className="py-24">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              {copy.featured_title}
+            </h2>
+            <p className="mt-3 text-fd-muted-foreground">{copy.featured_subtitle}</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURED_CATEGORIES.map((cat) => {
@@ -116,33 +213,102 @@ export default async function HomePage(props: { params: Promise<Params> }) {
                 <Link
                   key={cat.slug}
                   href={href}
-                  className="group rounded-xl border border-fd-border bg-fd-card p-6 transition hover:border-fd-primary hover:bg-fd-accent"
+                  className="ash-card group flex flex-col rounded-2xl p-6"
                 >
-                  <h3 className="text-lg font-semibold group-hover:text-fd-primary">
-                    {cat.title[lang]}
-                  </h3>
+                  <span
+                    className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-fd-border bg-fd-background text-fd-primary transition group-hover:scale-110"
+                    aria-hidden
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      {ICONS[cat.slug]}
+                    </svg>
+                  </span>
+                  <h3 className="text-lg font-semibold">{cat.title[lang]}</h3>
                   <p className="mt-2 text-sm text-fd-muted-foreground">
                     {cat.description[lang]}
                   </p>
+                  <span className="mt-4 text-sm font-medium text-fd-primary opacity-0 transition group-hover:opacity-100">
+                    {lang === 'en' ? 'Explore →' : 'Explorar →'}
+                  </span>
                 </Link>
               );
             })}
           </div>
         </section>
 
-        <section className="mt-24 rounded-2xl border border-fd-border bg-fd-card p-10 text-center">
-          <h2 className="mb-3 text-balance text-2xl font-bold sm:text-3xl">
-            {copy.final_cta_title}
-          </h2>
-          <p className="mx-auto mb-6 max-w-xl text-fd-muted-foreground">
-            {copy.final_cta_subtitle}
-          </p>
-          <Link
-            href={docsHref}
-            className="inline-block rounded-md bg-fd-primary px-6 py-3 font-medium text-fd-primary-foreground transition hover:opacity-90"
-          >
-            {copy.cta_primary}
-          </Link>
+        {/* Why */}
+        <section className="border-t border-fd-border py-24">
+          <div className="grid gap-10 sm:grid-cols-3">
+            {WHY[lang].map((w, i) => (
+              <div key={w.t}>
+                <div className="font-mono text-sm text-fd-primary">
+                  {String(i + 1).padStart(2, '0')}
+                </div>
+                <h3 className="mt-3 text-xl font-semibold">{w.t}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-fd-muted-foreground">
+                  {w.d}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Open-source projects */}
+        <section className="border-t border-fd-border py-24">
+          <div className="mb-10 text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              {PROJECTS[lang].heading}
+            </h2>
+            <p className="mt-3 text-fd-muted-foreground">{PROJECTS[lang].subtitle}</p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2">
+            {PROJECTS[lang].cards.map((p) => (
+              <a
+                key={p.name}
+                href={p.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ash-banner group flex flex-col rounded-2xl p-8"
+              >
+                <span className="ash-badge w-fit">Open Source</span>
+                <h3 className="mt-5 text-2xl font-bold">{p.name}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-white/70">{p.desc}</p>
+                <span
+                  className="mt-6 text-sm font-semibold transition group-hover:translate-x-1"
+                  style={{ color: 'var(--ash-accent)' }}
+                >
+                  {p.cta}
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="mb-24">
+          <div className="ash-cta-panel rounded-3xl px-6 py-16 text-center sm:px-10">
+            <h2 className="mx-auto max-w-2xl text-balance text-2xl font-bold sm:text-4xl">
+              {copy.final_cta_title}
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-white/65">
+              {copy.final_cta_subtitle}
+            </p>
+            <Link
+              href={docsHref}
+              className="ash-btn-primary mt-8 inline-block rounded-lg px-7 py-3.5 text-sm"
+            >
+              {copy.cta_primary}
+            </Link>
+          </div>
         </section>
       </main>
     </>

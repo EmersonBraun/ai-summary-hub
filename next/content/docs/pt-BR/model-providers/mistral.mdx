@@ -2,211 +2,281 @@
 title: Mistral AI
 description: >-
   Plataforma dual de pesos abertos e API comercial da Mistral AI — modelos
-  eficientes, pontos fortes multilíngues e La Plateforme para uso empresarial.
+  eficientes MoE, pontos fortes multilíngues e La Plateforme para uso
+  empresarial.
 tags:
   - intermediate
 ---
 
 ## Definição
 
-**Mistral AI** é uma empresa de IA francesa fundada em 2023 que oferece tanto modelos de pesos abertos quanto uma plataforma de API comercial. A estratégia distinta da Mistral consiste em lançar modelos de pesos abertos de alta qualidade (permitindo auto-hospedagem e fine-tuning) enquanto oferece uma API comercial para implantações empresariais. Essa dualidade permite que eles atendam desenvolvedores que querem controle total, empresas que precisam de serviços gerenciados e equipes de pesquisa que querem construir em cima de modelos de base abertos.
+A Mistral AI é uma startup francesa de IA fundada em 2023 que rapidamente se estabeleceu como uma das players mais influentes no ecossistema europeu de IA. A filosofia definidora da empresa é uma **abordagem dual**: lançar modelos de pesos abertos eficientes para a comunidade de pesquisa e o ecossistema de desenvolvedores, enquanto simultaneamente oferece uma plataforma de API comercial (**La Plateforme**) com modelos premium e recursos empresariais. Essa combinação tornou a Mistral particularmente popular entre desenvolvedores que querem experimentar livremente antes de se comprometer com uma implantação paga, e com empresas europeias que buscam um provedor de IA soberano com infraestrutura compatível com o GDPR hospedada em data centers da UE.
 
-A família de modelos da Mistral inclui: **Mistral 7B** (seu modelo de referência inicial que supera o Llama 2 13B sendo menor), **Mixtral 8x7B** (um modelo Mixture-of-Experts de pesos abertos que alcança desempenho equivalente ao GPT-3.5 enquanto ativa apenas 2 especialistas de 8 na inferência, reduzindo consideravelmente a carga computacional), **Mistral Small** e **Mistral Large** (modelos de API comercial otimizados para diferentes pontos de preço), **Codestral** (especializado em geração de código), **Mistral Embed** (modelos de embeddings), e **Mistral NeMo** (um modelo 12B desenvolvido em colaboração com a NVIDIA). A Mistral se distingue por seu forte desempenho multilíngue, particularmente em francês, espanhol, alemão e italiano, refletindo sua origem europeia.
+Em maio de 2026, a linha de modelos atual é construída em torno de grandes arquiteturas Mixture-of-Experts (MoE) e densas:
+
+| Modelo | API Model ID | Janela de Contexto | Arquitetura | Entrada ($/1M) | Saída ($/1M) |
+|-------|-------------|----------------|--------------|--------------|---------------|
+| Mistral Large 3 | `mistral-large-2512` | 256K tokens | 41B ativo / 675B total (MoE) | $0,50 | $1,50 |
+| Mistral Medium 3.5 | `mistral-medium-3-5` | 256K tokens | 128B denso | — | — |
+| Devstral 2 | `devstral-2512` | 256K tokens | 123B denso | — | — |
+| Mistral Small 4 | `mistral-small-2603` | 256K tokens | — | — | — |
+| Ministral 14B | `ministral-14b-2512` | — | 14B | — | — |
+| Ministral 8B | `ministral-8b-2512` | — | 8B | — | — |
+| Ministral 3B | `ministral-3b-2512` | — | 3B | — | — |
+
+Modelos especializados incluem **Voxtral TTS** (`voxtral-tts-2603`) para texto em fala com clonagem de voz, **Codestral** para geração de código, **OCR 3** para OCR de documentos e **Mistral Moderation 2** (`mistral-moderation-2603`) para moderação de conteúdo e detecção de jailbreak.
+
+> **Descontinuados — não referenciar:** Mistral 7B (substituído pelo Mistral Small 4); Mixtral 8x7B e 8x22B (substituídos pelo Mistral Large 3); versões mais antigas do Mistral Small (descontinuadas em novembro de 2025); Mistral Large 2.0 (`mistral-large-2407`, superado pelo Mistral Large 3).
+
+Os pontos fortes da Mistral se concentram em eficiência, desempenho multilíngue (particularmente em idiomas europeus — francês, espanhol, alemão, italiano) e uma API amigável ao desenvolvedor que segue de perto a interface da OpenAI. A empresa participa ativamente das discussões sobre a Lei de IA da UE e se posiciona como uma alternativa responsável e europeia às APIs de laboratórios de fronteira baseados nos EUA.
 
 ## Como funciona
 
-### A arquitetura Mixture of Experts (MoE)
-
-O Mixtral 8x7B apresenta a arquitetura MoE da Mistral, que é fundamental para entender por que os modelos Mistral são eficientes:
-
-```mermaid
-flowchart LR
-  INPUT[Input token] --> ROUTER[Gating router\nselects top-2 experts]
-  ROUTER --> E1[Expert FFN 1]
-  ROUTER --> E2[Expert FFN 2]
-  ROUTER --> EN[Expert FFN N\n... 8 total ...]
-  E1 --> OUT[Weighted sum\nof active experts]
-  E2 --> OUT
-  EN --> OUT
-```
-
-Em uma arquitetura transformer padrão, cada token passa pela mesma camada Feed-Forward Network (FFN). MoE substitui a FFN por N "especialistas" (redes menores) e um roteador aprendido que seleciona os K melhores especialistas para cada token. Com 8 especialistas e K=2, o Mixtral 8x7B tem ~47B de parâmetros no total mas usa apenas ~13B na inferência — oferecendo qualidade próxima a um modelo 40B com a velocidade de um modelo 13B.
-
 ### API La Plateforme
 
-A API comercial da Mistral (La Plateforme) expõe os modelos Mistral via formato compatível com OpenAI, simplificando a migração do OpenAI. Ela suporta completions de chat, embeddings, modo JSON e chamadas de função. O fine-tuning está disponível para Mistral Small e outros modelos.
+La Plateforme (`api.mistral.ai`) é a API de inferência gerenciada da Mistral, construída em torno da interface de chat completions da OpenAI. As requisições são estruturadas como `{"model": "...", "messages": [...]}` — qualquer biblioteca cliente construída para a API OpenAI pode ser redirecionada com uma única mudança de `base_url`. A API serve tanto modelos comerciais proprietários quanto modelos de pesos abertos. A autenticação usa tokens Bearer. La Plateforme é hospedada em data centers europeus, tornando-a uma escolha natural para organizações com requisitos de residência de dados na UE.
 
 ### Modelos de pesos abertos
 
-Os modelos de pesos abertos da Mistral (Mistral 7B, Mixtral 8x7B, Mistral NeMo) são lançados no Hugging Face sob licenças Apache 2.0, permitindo uso comercial sem restrições de redistribuição. Eles podem ser executados localmente via Ollama, llama.cpp ou vLLM.
+O Mistral Large 3 está disponível como modelo de pesos abertos sob uma Licença MIT Modificada, distribuído via Hugging Face. Ele pode ser auto-hospedado usando o toolchain padrão de Transformers, vLLM ou llama.cpp (formato GGUF). A arquitetura MoE (41B ativo / 675B total, 256K de contexto) torna viável servir com menor custo computacional do que um modelo denso de qualidade equivalente. Mistral Medium 3.5 e Devstral 2 (ambos densos) também são de pesos abertos.
+
+### Function calling
+
+A Mistral suporta function calling estruturado (também chamado de tool use) tanto nos modelos instruct de pesos abertos quanto em todos os modelos da La Plateforme. A interface espelha o parâmetro `tools` da OpenAI: você passa uma lista de definições de ferramentas definidas por JSON Schema, o modelo retorna um array `tool_calls` especificando qual função invocar e com quais argumentos, sua aplicação executa a função e o resultado é retornado como uma mensagem de role `tool` para continuar a conversa.
+
+### Embeddings
+
+La Plateforme fornece um endpoint de embedding de texto (`/v1/embeddings`) alimentado pelo Mistral Embed, um modelo de embedding dedicado que produz vetores densos de 1024 dimensões. O modelo de embedding se destaca em tarefas de similaridade semântica, recuperação e classificação em múltiplos idiomas europeus. A interface é idêntica à API de embeddings da OpenAI.
+
+```mermaid
+flowchart LR
+    Dev["Developer / Application"] -->|"Bearer token"| API["La Plateforme\napi.mistral.ai (EU hosted)"]
+
+    API -->|"routes to model"| Large["Mistral Large 3\nopen-weight MoE flagship"]
+    API -->|"routes to model"| Medium["Mistral Medium 3.5\ndense, 128B"]
+    API -->|"routes to model"| Devstral["Devstral 2\ncode generation, 123B"]
+    API -->|"routes to model"| Small["Mistral Small 4\ncost-efficient"]
+    API -->|"embedding endpoint"| Embed["Mistral Embed\n1024-dim multilingual vectors"]
+
+    HF["Hugging Face Hub\nopen weights"] -->|"download weights"| SelfHost
+
+    subgraph SelfHost["Self-hosted inference"]
+        direction LR
+        vLLM["vLLM\n(OpenAI-compatible server)"]
+        TF["Transformers\n(research / fine-tuning)"]
+        LCPP["llama.cpp\n(CPU / consumer GPU, GGUF)"]
+    end
+
+    SelfHost -->|"inference response"| App["Your Application"]
+    API -->|"chat completion / function call / embedding"| App
+```
 
 ## Quando usar / Quando NÃO usar
 
-| Usar Mistral quando | Evitar ou considerar alternativas quando |
-|---------------------|------------------------------------------|
-| O desempenho multilíngue é importante, particularmente para idiomas europeus | Você precisa de multimodalidade (visão, áudio) — a Mistral foca em texto |
-| Você quer pesos abertos mas precisa de suporte de qualidade comercial | Você precisa de janelas de contexto muito longas — as janelas de contexto da Mistral (8K–128K dependendo do modelo) podem ser mais curtas que Gemini ou Claude |
-| A eficiência é crítica — o Mixtral é um dos melhores modelos por watt/dólar | Tarefas de raciocínio complexas requerem as últimas capacidades de ponta |
-| Residência de dados na Europa é necessária — a Mistral oferece opções de hospedagem na UE | Você precisa de um ecossistema amplo com muitas integrações de terceiros |
-| Implantação edge requer modelos pequenos e eficientes | — |
+| Use quando | Evite quando |
+|----------|------------|
+| Você precisa de residência de dados na UE e infraestrutura de IA compatível com o GDPR de forma nativa | Você exige a capacidade absoluta mais alta em raciocínio complexo de múltiplos passos — o Mistral Large 3 é forte, mas pode ficar atrás dos melhores modelos fechados nos benchmarks mais difíceis |
+| Você quer uma API compatível com OpenAI com custo mínimo de migração de integrações GPT existentes | Você precisa de um ecossistema extenso de fine-tunes de terceiros e suporte da comunidade (o Meta Llama tem uma comunidade aberta maior) |
+| A eficiência importa — o MoE do Mistral Large 3 (41B parâmetros ativos) entrega alta qualidade com menor custo computacional ativo do que modelos densos de desempenho equivalente | Sua carga de trabalho requer grounding em tempo real na web ou endpoints de geração de imagens nativos |
+| Idiomas europeus multilíngues (francês, espanhol, alemão, italiano) são fundamentais para seu caso de uso | Você precisa de inferência on-device / edge com modelos abaixo de 1B de parâmetros |
+| Você quer auto-hospedar um modelo de pesos abertos sob licença permissiva (MIT Modificada) e potencialmente fazer fine-tuning em dados proprietários | Sua carga de trabalho requer I/O de áudio extenso além de TTS |
 
 ## Comparações
 
-| Critérios | Mistral Large 2 | GPT-4o | Claude 3.7 Sonnet | Llama 3.1 70B |
-|-----------|-----------------|--------|-------------------|---------------|
-| Disponibilidade dos pesos | Alguns modelos (7B, Mixtral) | Não | Não | Sim |
-| Janela de contexto | 128K | 128K | 200K | 128K |
-| Multilíngue | Excelente (foco europeu) | Bom | Bom | Bom |
-| Preço API (modelo principal) | ~$2/1M tokens | ~$2,5/1M tokens | ~$3/1M tokens | ~$0,9/1M tokens (hospedado) |
-| Arquitetura | Densa + MoE | Densa | Densa | Densa |
-| Código | Codestral especializado | Forte | Forte | Code Llama |
+| Critério | Mistral AI | Meta Llama 4 | OpenAI GPT-5.4 |
+|-----------|-----------|-------------|----------------|
+| Disponibilidade dos pesos | Aberto para Mistral Large 3, Medium 3.5, Devstral 2; alguns fechados | Aberto para todos os tamanhos lançados | Somente API fechada |
+| Localização do provedor de API | UE (Paris); nativo GDPR | Hosts de terceiros baseados nos EUA (Together, Groq) | EUA (regiões UE do Azure disponíveis) |
+| Arquitetura MoE | Sim (Mistral Large 3: 41B ativo / 675B total) | Sim (Llama 4 Scout/Maverick) | Não divulgado |
+| Function calling | Tool use completo em todos os modelos instruct/API | Sim (Llama 4) | Sim (maduro, mais documentado) |
+| Multilíngue (idiomas da UE) | Forte — objetivo central de design | Bom, mas ênfase de treinamento centrada nos EUA | Forte em todos os principais idiomas |
+| Suporte a fine-tuning | Pesos abertos: LoRA/QLoRA; fine-tuning via API em beta | Pesos abertos: fine-tuning completo disponível | API de fine-tuning para modelos aplicáveis |
+| API de embedding | Mistral Embed (1024 dim, multilíngue) | Não disponível via Meta diretamente | text-embedding-3-small/large |
+| Janela de contexto | 256K tokens (Mistral Large 3) | 10M (Scout), 1M (Maverick) | 1.050K tokens |
+
+## Prós e contras
+
+| Prós | Contras |
+|------|------|
+| API hospedada na UE com forte posicionamento GDPR; atrai clientes empresariais europeus | Ecossistema comunitário menor e menos fine-tunes da comunidade em comparação com Llama |
+| Interface compatível com OpenAI minimiza esforço de migração | Janela de contexto do Mistral Large 3 (256K) é menor que os 10M do Llama 4 Scout |
+| Lançamentos de pesos abertos genuinamente úteis sob licença MIT Modificada permissiva | Preços de muitos modelos mais novos (Medium 3.5, Devstral 2, Small 4) não são listados publicamente |
+| Arquitetura MoE (Mistral Large 3) entrega alta qualidade com menor custo de parâmetros ativos | Sem geração nativa de imagem/vídeo em modelos prontos para produção |
 
 ## Exemplos de código
 
-### API Mistral via La Plateforme
-
 ```python
-# Mistral API via La Plateforme
+# mistral_examples.py
+# Demonstrates chat completion and function calling with the mistralai Python SDK.
 # pip install mistralai
 
 import os
+import json
 from mistralai import Mistral
 
+# ── Configuration ─────────────────────────────────────────────────────────────
+# Get your API key at: https://console.mistral.ai/api-keys
+# Set it with: export MISTRAL_API_KEY="..."
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 
-# Basic chat completion
-response = client.chat.complete(
-    model="mistral-large-latest",
-    messages=[
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Explain the Mixture of Experts architecture in 3 sentences."},
-    ],
-    temperature=0.3,
-    max_tokens=256,
-)
-print(response.choices[0].message.content)
-```
 
-### Modo JSON com Mistral
+# ── 1. Chat completion ─────────────────────────────────────────────────────────
+def chat_completion_example():
+    """Standard multi-turn chat with Mistral Large 3."""
+    response = client.chat.complete(
+        model="mistral-large-2512",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are a senior machine learning engineer. "
+                    "Provide concise, technically accurate answers."
+                ),
+            },
+            {
+                "role": "user",
+                "content": "What are the key differences between MoE and dense transformer architectures?",
+            },
+        ],
+        temperature=0.4,
+        max_tokens=512,
+    )
 
-```python
-# JSON mode with Mistral API
-# pip install mistralai
+    print("=== Chat Completion ===")
+    print(response.choices[0].message.content)
+    print(f"\nModel : {response.model}")
+    print(f"Usage : {response.usage}")
 
-import os, json
-from mistralai import Mistral
 
-client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
+# ── 2. Function calling ────────────────────────────────────────────────────────
+def function_calling_example():
+    """
+    Mistral function calling (tool use).
+    The model decides which tool to call and with what arguments.
+    Your application executes the function and returns the result.
+    """
+    # Define available tools with JSON Schema
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "get_model_benchmark",
+                "description": (
+                    "Retrieves benchmark scores for a specified language model "
+                    "on a given benchmark suite."
+                ),
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "model_name": {
+                            "type": "string",
+                            "description": "The name of the model, e.g. 'mistral-large-2512'",
+                        },
+                        "benchmark": {
+                            "type": "string",
+                            "enum": ["MMLU", "HumanEval", "GSM8K", "HellaSwag"],
+                            "description": "The benchmark suite to query.",
+                        },
+                    },
+                    "required": ["model_name", "benchmark"],
+                },
+            },
+        }
+    ]
 
-response = client.chat.complete(
-    model="mistral-small-latest",
-    messages=[
+    # First turn — model decides to call a tool
+    messages = [
         {
             "role": "user",
-            "content": (
-                "Extract the following from this text as JSON with keys "
-                "'company', 'founded', 'country': "
-                "Mistral AI was founded in 2023 in Paris, France."
-            ),
+            "content": "What is Mistral Large 3's score on the MMLU benchmark?",
         }
-    ],
-    response_format={"type": "json_object"},
-    temperature=0,
-)
+    ]
 
-data = json.loads(response.choices[0].message.content)
-print(data)
-```
-
-### Pesos abertos Mistral com Ollama
-
-```python
-# Mistral open-weights via Ollama
-# Install Ollama from https://ollama.com, then: ollama pull mistral
-
-import requests
-
-def chat_mistral(prompt: str) -> str:
-    response = requests.post(
-        "http://localhost:11434/api/generate",
-        json={"model": "mistral", "prompt": prompt, "stream": False},
+    response = client.chat.complete(
+        model="mistral-large-2512",
+        messages=messages,
+        tools=tools,
+        tool_choice="auto",
     )
-    return response.json()["response"]
 
-if __name__ == "__main__":
-    answer = chat_mistral("What are the main differences between MoE and dense transformer models?")
-    print(answer)
-```
+    assistant_message = response.choices[0].message
+    print("=== Function Calling — Step 1: model requests tool call ===")
+    print(f"Tool calls: {assistant_message.tool_calls}")
 
-### Chamada de função com Mistral
+    # Simulate executing the tool
+    if assistant_message.tool_calls:
+        tool_call = assistant_message.tool_calls[0]
+        function_args = json.loads(tool_call.function.arguments)
+        print(f"\nExecuting: {tool_call.function.name}({function_args})")
 
-```python
-# Function calling with Mistral
-# pip install mistralai
+        # Simulated function result
+        tool_result = {
+            "model": function_args["model_name"],
+            "benchmark": function_args["benchmark"],
+            "score": 84.0,
+            "source": "Mistral AI official benchmarks",
+        }
 
-import os, json
-from mistralai import Mistral
-from mistralai.models import UserMessage, ToolMessage
+        # Second turn — return the tool result and get the final response
+        messages.append({"role": "assistant", "content": None, "tool_calls": assistant_message.tool_calls})
+        messages.append({
+            "role": "tool",
+            "tool_call_id": tool_call.id,
+            "content": json.dumps(tool_result),
+        })
 
-client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
-
-tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "get_exchange_rate",
-            "description": "Get the current exchange rate between two currencies",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "from_currency": {"type": "string", "description": "Source currency code"},
-                    "to_currency": {"type": "string", "description": "Target currency code"},
-                },
-                "required": ["from_currency", "to_currency"],
-            },
-        },
-    }
-]
-
-messages = [{"role": "user", "content": "What is the EUR to USD exchange rate?"}]
-
-# First call
-response = client.chat.complete(
-    model="mistral-large-latest",
-    messages=messages,
-    tools=tools,
-    tool_choice="auto",
-)
-
-msg = response.choices[0].message
-messages.append(msg)
-
-# Execute tool and add result
-if msg.tool_calls:
-    for tc in msg.tool_calls:
-        # Simulated result
-        result = {"from": "EUR", "to": "USD", "rate": 1.08}
-        messages.append(
-            ToolMessage(tool_call_id=tc.id, content=json.dumps(result))
+        final_response = client.chat.complete(
+            model="mistral-large-2512",
+            messages=messages,
+            tools=tools,
         )
 
-# Final answer
-final = client.chat.complete(model="mistral-large-latest", messages=messages)
-print(final.choices[0].message.content)
+        print("\n=== Function Calling — Step 2: final answer ===")
+        print(final_response.choices[0].message.content)
+
+
+# ── 3. Embeddings ──────────────────────────────────────────────────────────────
+def embeddings_example(texts: list[str]):
+    """
+    Generate multilingual embeddings with Mistral Embed.
+    Returns 1024-dimensional dense vectors suitable for semantic search and RAG.
+    """
+    response = client.embeddings.create(
+        model="mistral-embed",
+        inputs=texts,
+    )
+
+    print("\n=== Embeddings ===")
+    for i, embedding_obj in enumerate(response.data):
+        vec = embedding_obj.embedding
+        print(f"Text    : {texts[i][:60]}...")
+        print(f"Dims    : {len(vec)}")
+        print(f"First 5 : {vec[:5]}\n")
+
+
+# ── Entry point ────────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    chat_completion_example()
+    function_calling_example()
+    embeddings_example([
+        "L'intelligence artificielle transforme l'industrie.",
+        "Machine learning models require careful evaluation.",
+        "Die Verarbeitung natürlicher Sprache verbessert sich rasant.",
+    ])
 ```
 
 ## Recursos práticos
 
-- [Documentação Mistral AI](https://docs.mistral.ai/) — Documentação completa da API incluindo endpoints, parâmetros e guias de fine-tuning
-- [Mistral no Hugging Face](https://huggingface.co/mistralai) — Pesos de código aberto, cartões de modelo e contribuições da comunidade
-- [SDK Python Mistral](https://github.com/mistralai/client-python) — Cliente oficial com exemplos de streaming, chamadas de função e modo JSON
-- [Preços Mistral](https://mistral.ai/technology/#pricing) — Preços por token para todos os modelos de API incluindo Mistral Small, Large e Codestral
+- [Documentação Mistral AI](https://docs.mistral.ai/) — Referência completa da API cobrindo chat, embeddings, function calling, fine-tuning e todos os modelos disponíveis.
+- [Cartão de modelo Mistral Large 3](https://docs.mistral.ai/models/mistral-large-3-25-12) — Cartão oficial para o Mistral Large 3 (`mistral-large-2512`).
+- [Changelog Mistral](https://docs.mistral.ai/getting-started/changelog/) — Histórico de lançamentos e atualizações de modelos.
+- [Console La Plateforme](https://console.mistral.ai/) — Gerenciamento de chaves de API, dashboards de uso e playground de modelos para testes interativos.
+- [Modelos Mistral no Hugging Face](https://huggingface.co/mistralai) — Pesos oficiais dos modelos para Mistral Large 3, Medium 3.5, Devstral 2 e variantes Ministral.
+- [SDK Python mistralai no PyPI](https://pypi.org/project/mistralai/) — Código-fonte do SDK, changelog e exemplos de código para todos os recursos da API.
 
 ## Veja também
 
-- [Provedores de modelos](/docs/model-providers)
+- [Provedores de Modelos](/docs/model-providers)
 - [Meta Llama](/docs/model-providers/meta-llama)
-- [OpenAI](/docs/model-providers/openai)
-- [Engenharia de prompts](/docs/prompt-engineering)
-- [Ajuste fino](/docs/llms/fine-tuning)
-- [MLOps](/docs/mlops)
+- [Inferência Local](/docs/local-inference)
+- [RAG — Embeddings](/docs/rag/embeddings)

@@ -1,5 +1,7 @@
 {
   "pages": [
-    "index"
+    "index",
+    "rlhf",
+    "policy-gradient-methods"
   ]
 }
