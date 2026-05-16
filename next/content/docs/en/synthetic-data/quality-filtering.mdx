@@ -18,15 +18,15 @@ Filtering operates at two stages: (1) immediately after context / instruction ge
 
 ```mermaid
 flowchart TD
-  RawData[Raw synthetic pairs\ninstruction + response] --> Dedup[Deduplication\nMinHash / ROUGE-L threshold]
-  Dedup --> LengthFilter[Length / format check\nmin/max tokens, JSON validity]
-  LengthFilter --> LLMJudge[LLM-as-a-judge\nrubric scoring 1-5]
-  LLMJudge -->|score ≥ threshold| RewardModel[Reward model score\noptional second gate]
+  RawData[Raw synthetic pairs<br/>instruction + response] --> Dedup[Deduplication<br/>MinHash / ROUGE-L threshold]
+  Dedup --> LengthFilter[Length / format check<br/>min/max tokens, JSON validity]
+  LengthFilter --> LLMJudge[LLM-as-a-judge<br/>rubric scoring 1-5]
+  LLMJudge -->|score ≥ threshold| RewardModel[Reward model score<br/>optional second gate]
   LLMJudge -->|score < threshold| Reject1[Discard]
-  RewardModel -->|pass| VerifTask{Verifiable task?\ncode / math}
+  RewardModel -->|pass| VerifTask{Verifiable task?<br/>code / math}
   RewardModel -->|fail| Reject2[Discard]
-  VerifTask -->|Yes| Execute[Execute / unit test\nor symbolic check]
-  VerifTask -->|No| Safety[Safety classifier\ntoxicity, PII, bias]
+  VerifTask -->|Yes| Execute[Execute / unit test<br/>or symbolic check]
+  VerifTask -->|No| Safety[Safety classifier<br/>toxicity, PII, bias]
   Execute -->|pass| Safety
   Execute -->|fail| Reject3[Discard]
   Safety -->|pass| FinalData[Final training set]

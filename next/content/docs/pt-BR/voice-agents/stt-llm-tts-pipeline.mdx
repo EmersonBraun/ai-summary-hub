@@ -18,13 +18,13 @@ A restrição central é um **orçamento de 300 ms**: em 300 ms ou menos de lat�
 
 ```mermaid
 flowchart TD
-  Audio[Stream de áudio bruto] --> VAD[Detecção de Atividade de Voz\nsilero-VAD / Deepgram streaming]
-  VAD -->|sinal de fim de enunciado| STT[ASR\nDeepgram Nova-3 / Whisper v3]
-  STT -->|texto transcrito| Prompt[Construção do prompt\nsistema + histórico + turno do usuário]
-  Prompt --> LLM[LLM — streaming\nGPT-4o / Claude / Gemini]
-  LLM -->|stream de tokens| Splitter[Divisor de sentenças\nprimeiros 8-15 tokens → enviar]
-  Splitter -->|chunk de sentença| TTS[Síntese TTS\nElevenLabs / Deepgram Aura]
-  TTS -->|chunks de áudio| Playback[Reprodução de áudio\nWebRTC / PCM]
+  Audio[Stream de áudio bruto] --> VAD[Detecção de Atividade de Voz<br/>silero-VAD / Deepgram streaming]
+  VAD -->|sinal de fim de enunciado| STT[ASR<br/>Deepgram Nova-3 / Whisper v3]
+  STT -->|texto transcrito| Prompt[Construção do prompt<br/>sistema + histórico + turno do usuário]
+  Prompt --> LLM[LLM — streaming<br/>GPT-4o / Claude / Gemini]
+  LLM -->|stream de tokens| Splitter[Divisor de sentenças<br/>primeiros 8-15 tokens → enviar]
+  Splitter -->|chunk de sentença| TTS[Síntese TTS<br/>ElevenLabs / Deepgram Aura]
+  TTS -->|chunks de áudio| Playback[Reprodução de áudio<br/>WebRTC / PCM]
 ```
 
 ### Estágio 1 — Detecção de Atividade de Voz (VAD)

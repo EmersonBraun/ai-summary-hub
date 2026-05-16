@@ -26,7 +26,7 @@ Key capabilities:
 flowchart LR
   App[LLM application] -->|SDK or OTLP| Langfuse[Langfuse server]
   Langfuse -->|store| DB[(PostgreSQL + ClickHouse)]
-  DB --> UI[Web dashboard\nTraces · Prompts · Scores]
+  DB --> UI[Web dashboard<br/>Traces · Prompts · Scores]
   UI --> Annotators[Human annotators]
   UI --> Evals[Automated eval jobs]
   Langfuse -->|export| Analytics[Cost / quality reports]

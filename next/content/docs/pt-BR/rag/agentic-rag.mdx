@@ -29,14 +29,14 @@ Benchmarks de pesquisa consistentemente mostram que o RAG agêntico supera pipel
 
 ```mermaid
 flowchart TD
-  Q[User question] --> Plan[Agent: decompose into sub-questions\nand plan retrieval strategy]
-  Plan --> Retrieve[Retrieve evidence\nfrom one or more tools]
-  Retrieve --> Grade[Agent: grade retrieved docs\nfor relevance and quality]
+  Q[User question] --> Plan[Agent: decompose into sub-questions<br/>and plan retrieval strategy]
+  Plan --> Retrieve[Retrieve evidence<br/>from one or more tools]
+  Retrieve --> Grade[Agent: grade retrieved docs<br/>for relevance and quality]
   Grade --> Sufficient{Evidence sufficient?}
-  Sufficient -->|No| Rewrite[Rewrite query\nor choose different tool]
+  Sufficient -->|No| Rewrite[Rewrite query<br/>or choose different tool]
   Rewrite --> Retrieve
   Sufficient -->|Yes| Compose[Compose answer from evidence]
-  Compose --> Reflect[Agent: self-critique answer\nfor completeness and accuracy]
+  Compose --> Reflect[Agent: self-critique answer<br/>for completeness and accuracy]
   Reflect --> Done{Satisfactory?}
   Done -->|No — revise| Retrieve
   Done -->|Yes| Answer[Final answer + citations]

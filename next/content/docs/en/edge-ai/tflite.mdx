@@ -22,7 +22,7 @@ flowchart LR
   TF["TensorFlow / Keras Model"] -->|"saved_model or .h5"| Converter["TFLite Converter"]
   Converter -->|"quantize / optimize"| FlatBuffer[".tflite FlatBuffer"]
   FlatBuffer -->|"load via Python / C++ / Java"| Interpreter["TFLite Interpreter"]
-  Interpreter -->|"delegate selection"| Delegate["Hardware Delegate\n(GPU / NNAPI / CoreML)"]
+  Interpreter -->|"delegate selection"| Delegate["Hardware Delegate<br/>(GPU / NNAPI / CoreML)"]
   Delegate -->|"accelerated kernels"| Device["Target Device"]
 ```
 

@@ -19,11 +19,11 @@ The scale of infrastructure needed is driven primarily by [LLMs](/docs/llms) and
 
 ```mermaid
 flowchart LR
-  Data["Training data\n(object store / NFS)"] -->|"tf.data / DataLoader"| Preprocess["Data preprocessing\n(tokenization, augmentation)"]
-  Config["Model config\n(hyperparameters)"] -->|"defines"| TrainJob["Distributed training job\n(SLURM / K8s / cloud)"]
+  Data["Training data<br/>(object store / NFS)"] -->|"tf.data / DataLoader"| Preprocess["Data preprocessing<br/>(tokenization, augmentation)"]
+  Config["Model config<br/>(hyperparameters)"] -->|"defines"| TrainJob["Distributed training job<br/>(SLURM / K8s / cloud)"]
   Preprocess -->|"batches"| TrainJob
-  TrainJob -->|"data parallel\nor model parallel"| GPUCluster["GPU / TPU cluster"]
-  GPUCluster -->|"checkpoints"| Storage["Model checkpoint\n(S3 / GCS / NFS)"]
+  TrainJob -->|"data parallel<br/>or model parallel"| GPUCluster["GPU / TPU cluster"]
+  GPUCluster -->|"checkpoints"| Storage["Model checkpoint<br/>(S3 / GCS / NFS)"]
   Storage -->|"best checkpoint"| Model["Final model weights"]
 ```
 
@@ -31,7 +31,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  Model["Model weights"] -->|"load + quantize"| InferenceServer["Inference server\n(vLLM / TGI / TF Serving)"]
+  Model["Model weights"] -->|"load + quantize"| InferenceServer["Inference server<br/>(vLLM / TGI / TF Serving)"]
   Request["Incoming request"] -->|"route"| LoadBalancer["Load balancer"]
   LoadBalancer -->|"dispatch"| InferenceServer
   InferenceServer -->|"continuous batching"| GPU["Inference GPU"]

@@ -40,13 +40,13 @@ Os módulos do Ansible são projetados para ser idempotentes: executar um playbo
 
 ```mermaid
 flowchart LR
-  ControlNode[Control node\nAnsible CLI] -->|"parse inventory"| Inventory[Inventory\nstatic / dynamic]
-  Inventory -->|"resolve target hosts"| Hosts[Target hosts\nGPU training nodes]
-  ControlNode -->|"read playbook"| Playbook[Playbook\n.yml tasks & roles]
+  ControlNode[Control node<br/>Ansible CLI] -->|"parse inventory"| Inventory[Inventory<br/>static / dynamic]
+  Inventory -->|"resolve target hosts"| Hosts[Target hosts<br/>GPU training nodes]
+  ControlNode -->|"read playbook"| Playbook[Playbook<br/>.yml tasks & roles]
   Playbook -->|"SSH connection"| Hosts
-  Hosts -->|"execute modules"| Tasks[Task execution\ninstall CUDA, pip, config]
-  Tasks -->|"notify on change"| Handlers[Handlers\nrestart services]
-  Tasks -->|"report status"| Summary[Run summary\nok / changed / failed]
+  Hosts -->|"execute modules"| Tasks[Task execution<br/>install CUDA, pip, config]
+  Tasks -->|"notify on change"| Handlers[Handlers<br/>restart services]
+  Tasks -->|"report status"| Summary[Run summary<br/>ok / changed / failed]
 ```
 
 ## Quando usar / Quando NÃO usar

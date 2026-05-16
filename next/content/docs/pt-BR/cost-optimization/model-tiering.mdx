@@ -20,13 +20,13 @@ Dados da indústria de 2025–2026 mostram consistentemente que 50–70% das req
 
 ```mermaid
 flowchart TD
-  Query[Consulta recebida] --> SemCache\{Cache semântico\nacerto? cosseno ≥ 0,92\}
-  SemCache -->|Sim| CacheReturn[Retornar resposta em cache\n0 tokens consumidos]
-  SemCache -->|Não| Classifier[Classificador de complexidade\nmodelo pequeno / baseado em regras]
-  Classifier -->|pontuação ≤ 0,4\nsimples| Tier1[Nível 1 — modelo pequeno\nHaiku / GPT-4o-mini\n~$0,15/1M tokens]
-  Classifier -->|0,4–0,75\nmédio| Tier2[Nível 2 — modelo intermediário\nSonnet / GPT-4o\n~$3/1M tokens]
-  Classifier -->|pontuação > 0,75\ncomplexo| Tier3[Nível 3 — premium\nOpus / o3\n~$15/1M tokens]
-  Tier1 --> ConfCheck\{Confiança da saída\n≥ limiar?\}
+  Query[Consulta recebida] --> SemCache\{Cache semântico<br/>acerto? cosseno ≥ 0,92\}
+  SemCache -->|Sim| CacheReturn[Retornar resposta em cache<br/>0 tokens consumidos]
+  SemCache -->|Não| Classifier[Classificador de complexidade<br/>modelo pequeno / baseado em regras]
+  Classifier -->|pontuação ≤ 0,4<br/>simples| Tier1[Nível 1 — modelo pequeno<br/>Haiku / GPT-4o-mini<br/>~$0,15/1M tokens]
+  Classifier -->|0,4–0,75<br/>médio| Tier2[Nível 2 — modelo intermediário<br/>Sonnet / GPT-4o<br/>~$3/1M tokens]
+  Classifier -->|pontuação > 0,75<br/>complexo| Tier3[Nível 3 — premium<br/>Opus / o3<br/>~$15/1M tokens]
+  Tier1 --> ConfCheck\{Confiança da saída<br/>≥ limiar?\}
   ConfCheck -->|Não| Escalate[Escalar para Nível 2]
   ConfCheck -->|Sim| Store[Armazenar no cache semântico]
   Tier2 --> Store

@@ -17,7 +17,7 @@ As APIs de LLM implementam o streaming via **Server-Sent Events (SSE)** ou respo
 
 ```mermaid
 flowchart LR
-  Client["Cliente"] -->|"POST /v1/messages\nstream: true"| API["API do LLM"]
+  Client["Cliente"] -->|"POST /v1/messages<br/>stream: true"| API["API do LLM"]
   API -->|"SSE: data: {delta: 'Ol'}"| Client
   API -->|"SSE: data: {delta: 'á'}"| Client
   API -->|"SSE: data: {delta: '!'}"| Client

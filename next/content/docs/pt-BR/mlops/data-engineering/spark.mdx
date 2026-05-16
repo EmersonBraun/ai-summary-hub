@@ -33,11 +33,11 @@ Uma aplicação Spark tem um processo **driver** e um ou mais processos **execut
 
 ```mermaid
 flowchart LR
-  UserCode["User code\n(PySpark)"] -- "submits application" --> Driver["Driver\n(SparkContext)"]
-  Driver -- "requests resources" --> ClusterManager["Cluster Manager\n(YARN / K8s)"]
-  ClusterManager -- "allocates" --> Executors["Executors\n(Worker nodes)"]
+  UserCode["User code<br/>(PySpark)"] -- "submits application" --> Driver["Driver<br/>(SparkContext)"]
+  Driver -- "requests resources" --> ClusterManager["Cluster Manager<br/>(YARN / K8s)"]
+  ClusterManager -- "allocates" --> Executors["Executors<br/>(Worker nodes)"]
   Driver -- "sends tasks" --> Executors
-  Executors -- "read / write data" --> Storage["Storage\n(HDFS / S3 / Delta)"]
+  Executors -- "read / write data" --> Storage["Storage<br/>(HDFS / S3 / Delta)"]
   Executors -- "return results" --> Driver
 ```
 

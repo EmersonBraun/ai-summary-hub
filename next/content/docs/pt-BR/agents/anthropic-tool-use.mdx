@@ -37,7 +37,7 @@ Tarefas complexas frequentemente requerem várias rodadas de chamadas de ferrame
 
 ```mermaid
 flowchart LR
-  User[User message] -->|appended to messages| API[Anthropic API\nClaude model]
+  User[User message] -->|appended to messages| API[Anthropic API<br/>Claude model]
   API -->|stop_reason: tool_use| Parse[Parse tool_use blocks]
   Parse -->|one block per tool call| Exec[Execute tools in parallel]
   Exec -->|results| Wrap[Wrap in tool_result blocks]

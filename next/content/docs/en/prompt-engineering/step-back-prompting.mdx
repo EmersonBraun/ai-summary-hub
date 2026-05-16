@@ -21,8 +21,8 @@ In the original paper, step-back prompting is demonstrated with few-shot example
 ```mermaid
 flowchart TD
   Original[Original specific question] -->|"step-back prompt"| Abstract[Abstract / higher-level question]
-  Abstract -->|"answer abstract question"| Principle[General principle\nor concept]
-  Original -->|"combine with principle"| Grounded[Grounded prompt:\nprinciple + original question]
+  Abstract -->|"answer abstract question"| Principle[General principle<br/>or concept]
+  Original -->|"combine with principle"| Grounded[Grounded prompt:<br/>principle + original question]
   Principle -->|"provides context"| Grounded
   Grounded -->|"reason to answer"| Final[Final answer]
 ```

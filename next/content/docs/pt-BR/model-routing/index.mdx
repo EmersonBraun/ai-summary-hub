@@ -18,12 +18,12 @@ O roteamento é distinto da cascata (que sempre começa no nível mais barato e 
 
 ```mermaid
 flowchart LR
-  Request[Consulta] --> SemCache\{Cache semântico\nacerto?\}
-  SemCache -->|Sim| CacheHit[Resposta em cache\n0 custo de modelo]
+  Request[Consulta] --> SemCache\{Cache semântico<br/>acerto?\}
+  SemCache -->|Sim| CacheHit[Resposta em cache<br/>0 custo de modelo]
   SemCache -->|Não| Router[Roteador de modelos]
-  Router -->|simples| SmallModel[Modelo pequeno\nex.: Gemini Flash / Haiku]
-  Router -->|médio| MidModel[Modelo intermediário\nex.: GPT-4o / Sonnet]
-  Router -->|complexo| LargeModel[Modelo grande\nex.: o3 / Opus]
+  Router -->|simples| SmallModel[Modelo pequeno<br/>ex.: Gemini Flash / Haiku]
+  Router -->|médio| MidModel[Modelo intermediário<br/>ex.: GPT-4o / Sonnet]
+  Router -->|complexo| LargeModel[Modelo grande<br/>ex.: o3 / Opus]
   SmallModel --> Cache[Armazenar no cache semântico]
   MidModel --> Cache
   LargeModel --> Cache

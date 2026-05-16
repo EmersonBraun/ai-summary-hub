@@ -19,14 +19,14 @@ Scaling a model serving system involves challenges that are specific to ML: mode
 
 ```mermaid
 flowchart LR
-  Client["Client\n(mobile / web / service)"] -->|"HTTPS request"| Gateway["API Gateway\n(rate limit, auth)"]
-  Gateway -->|"route request"| Server["Model Server\n(TorchServe / Triton / BentoML)"]
-  Server -->|"load model"| Store["Model Store\n(S3 / registry)"]
-  Server -->|"batched GPU calls"| GPU["GPU / CPU\n(inference worker)"]
+  Client["Client<br/>(mobile / web / service)"] -->|"HTTPS request"| Gateway["API Gateway<br/>(rate limit, auth)"]
+  Gateway -->|"route request"| Server["Model Server<br/>(TorchServe / Triton / BentoML)"]
+  Server -->|"load model"| Store["Model Store<br/>(S3 / registry)"]
+  Server -->|"batched GPU calls"| GPU["GPU / CPU<br/>(inference worker)"]
   GPU -->|"prediction"| Server
   Server -->|"JSON response"| Gateway
   Gateway -->|"response"| Client
-  Server -->|"metrics"| Monitor["Monitoring\n(latency, throughput)"]
+  Server -->|"metrics"| Monitor["Monitoring<br/>(latency, throughput)"]
 ```
 
 ### Batch inference

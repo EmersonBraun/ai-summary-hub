@@ -20,8 +20,8 @@ O speculative decoding é **sem perdas por design**: nunca altera a distribuiç�
 
 ```mermaid
 flowchart LR
-  Prompt[Prompt\n+ contexto] -->|k forward passes| Draft[Modelo de rascunho\npropõe tokens t1...tk]
-  Draft -->|t1 t2 t3 t4| Target[Modelo alvo\nverifica todos os 4 em um pass]
+  Prompt[Prompt<br/>+ contexto] -->|k forward passes| Draft[Modelo de rascunho<br/>propõe tokens t1...tk]
+  Draft -->|t1 t2 t3 t4| Target[Modelo alvo<br/>verifica todos os 4 em um pass]
   Target -->|aceita t1 t2 t3| Accepted[Aceitar 3 tokens]
   Target -->|rejeita t4, reamostra| Resampled[Reamostrar t4 do alvo]
   Accepted & Resampled --> Output[Saída: 4 tokens em ~2 passes do alvo]

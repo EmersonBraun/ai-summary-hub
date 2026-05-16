@@ -21,9 +21,9 @@ Understanding which technique to apply — and why — matters for anyone buildi
 ```mermaid
 flowchart LR
   Prompt[Prompt + schema] -->|"structured request"| LLM[LLM]
-  LLM -->|"raw structured response"| Validation{Schema\nvalidation}
-  Validation -->|"valid"| Downstream[Downstream system\nor application]
-  Validation -->|"invalid"| Retry[Retry / correction\nloop]
+  LLM -->|"raw structured response"| Validation{Schema<br/>validation}
+  Validation -->|"valid"| Downstream[Downstream system<br/>or application]
+  Validation -->|"invalid"| Retry[Retry / correction<br/>loop]
   Retry -->|"reprompt with error"| LLM
 ```
 

@@ -23,11 +23,11 @@ Prompt caching delivers the greatest benefit when the same large prefix is reuse
 
 ```mermaid
 flowchart LR
-  Request[New request\nsystem + docs + user query] --> Split[Split at cache breakpoint]
-  Split -->|Prefix ≤ breakpoint| Check{KV-cache\nhit?}
-  Split -->|Suffix after breakpoint| Always[Always computed\nfull price]
-  Check -->|Hit| Cheap[Cached tokens\n10% price Anthropic\n50% price OpenAI]
-  Check -->|Miss| Full[Full price\n+ cache write fee]
+  Request[New request<br/>system + docs + user query] --> Split[Split at cache breakpoint]
+  Split -->|Prefix ≤ breakpoint| Check{KV-cache<br/>hit?}
+  Split -->|Suffix after breakpoint| Always[Always computed<br/>full price]
+  Check -->|Hit| Cheap[Cached tokens<br/>10% price Anthropic<br/>50% price OpenAI]
+  Check -->|Miss| Full[Full price<br/>+ cache write fee]
   Cheap --> Merge[Merge KV states]
   Full --> Merge
   Always --> Merge

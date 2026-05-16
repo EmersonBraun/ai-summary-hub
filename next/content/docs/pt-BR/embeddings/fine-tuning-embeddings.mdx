@@ -18,14 +18,14 @@ O objetivo de treinamento padrão é a **perda contrastiva** (InfoNCE / NT-Xent)
 
 ```mermaid
 flowchart TD
-  Data[Pares de treinamento\nconsulta + positivo + negativos difíceis] --> Tokenize[Tokenizar consulta e documento]
-  Tokenize --> Encoder[Passagem direta pelo encoder\npesos compartilhados]
+  Data[Pares de treinamento<br/>consulta + positivo + negativos difíceis] --> Tokenize[Tokenizar consulta e documento]
+  Tokenize --> Encoder[Passagem direta pelo encoder<br/>pesos compartilhados]
   Encoder --> Pool[Pooling médio → embedding]
-  Pool --> Loss[Perda contrastiva\nInfoNCE / MultipleNegativesRanking]
+  Pool --> Loss[Perda contrastiva<br/>InfoNCE / MultipleNegativesRanking]
   Loss --> Grad[Retropropagação]
-  Grad --> Update[Atualização de pesos\nAdamW + agenda de LR]
+  Grad --> Update[Atualização de pesos<br/>AdamW + agenda de LR]
   Update -->|repetir| Tokenize
-  Update -->|avaliar| BEIR[Avaliar em subconjunto BEIR / MTEB\nnDCG@10]
+  Update -->|avaliar| BEIR[Avaliar em subconjunto BEIR / MTEB<br/>nDCG@10]
 ```
 
 ### Dados de treinamento

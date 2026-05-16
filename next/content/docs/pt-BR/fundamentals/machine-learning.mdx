@@ -23,7 +23,7 @@ A maioria dos casos de uso de ML do dia a dia (spam, reconhecimento de imagens, 
 
 ```mermaid
 flowchart LR
-  Data["Dados\n(exemplos rotulados ou não)"] -->|"alimentar"| Model["Modelo\n(parâmetros aprendidos)"]
+  Data["Dados<br/>(exemplos rotulados ou não)"] -->|"alimentar"| Model["Modelo<br/>(parâmetros aprendidos)"]
   Model -->|"prever"| Prediction["Previsão / saída"]
   Prediction -->|"comparar com rótulo"| Loss["Sinal de perda / recompensa"]
   Loss -->|"atualizar parâmetros"| Model

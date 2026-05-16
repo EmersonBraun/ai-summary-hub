@@ -22,7 +22,7 @@ Three dominant patterns have emerged:
 
 ```mermaid
 flowchart LR
-  Prompt[Evaluation prompt\nrubric + candidate output] --> Judge[Judge LLM]
+  Prompt[Evaluation prompt<br/>rubric + candidate output] --> Judge[Judge LLM]
   Judge -->|chain-of-thought reasoning| CoT[Reasoning trace]
   CoT -->|numeric score or verdict| Score[Score / ranking]
   Score --> Aggregator[Score aggregator]

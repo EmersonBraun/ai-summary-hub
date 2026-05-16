@@ -24,8 +24,8 @@ flowchart TD
   App -->|LLM call| LLMProvider[LLM provider API]
   App -->|tool call| Tool[External tool]
   App -->|vector query| VectorDB[Vector store]
-  Collector -->|OTLP| Backend[Observability backend\nLangfuse / Datadog / Grafana]
-  Backend --> Dashboard[Dashboards\nTraces · Cost · Latency · Quality]
+  Collector -->|OTLP| Backend[Observability backend<br/>Langfuse / Datadog / Grafana]
+  Backend --> Dashboard[Dashboards<br/>Traces · Cost · Latency · Quality]
 ```
 
 Each logical operation — an LLM call, a retrieval step, a tool invocation — is wrapped in an **OTel span**. Spans carry start/end timestamps, status, and attributes. Nested spans form a **trace tree** that represents the full execution path of a single request. Backends ingest traces over OTLP (HTTP or gRPC) and render them as waterfall diagrams, enabling root-cause analysis when a response is slow or incorrect.

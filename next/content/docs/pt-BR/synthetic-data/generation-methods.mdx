@@ -22,16 +22,16 @@ O campo pode ser organizado em quatro famílias:
 
 ```mermaid
 flowchart TD
-  Seed[Tarefas semente\n~175 exemplos humanos] --> SelfInstr[Self-Instruct\nmodelo gera novas tarefas]
+  Seed[Tarefas semente<br/>~175 exemplos humanos] --> SelfInstr[Self-Instruct<br/>modelo gera novas tarefas]
   SelfInstr -->|filtrar| SIData[Conjunto de dados Self-Instruct]
 
-  Teacher[Modelo professor\nGPT-4o / Claude Opus] --> Distil[Destilação\nprofessor anota entradas]
+  Teacher[Modelo professor<br/>GPT-4o / Claude Opus] --> Distil[Destilação<br/>professor anota entradas]
   Distil -->|respostas do professor| DistilData[Conjunto de dados de destilação]
 
-  Base[Instruções base] --> Evol[Evol-Instruct\nreescrever para adicionar complexidade]
+  Base[Instruções base] --> Evol[Evol-Instruct<br/>reescrever para adicionar complexidade]
   Evol -->|variantes mais difíceis| EvolData[Conjunto de dados evoluído]
 
-  Personas[Biblioteca de personas\n1M+ personas] --> Magpie[Magpie / amostragem de personas\nsimulação multi-turno de usuário]
+  Personas[Biblioteca de personas<br/>1M+ personas] --> Magpie[Magpie / amostragem de personas<br/>simulação multi-turno de usuário]
   Magpie -->|pares multi-turno| PersonaData[Conjunto de dados de persona]
 
   SIData --> Combine[Combinar + deduplicar]

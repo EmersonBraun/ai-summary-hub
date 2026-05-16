@@ -19,10 +19,10 @@ Compression is applied at different stages: **post-training** (applied after tra
 
 ```mermaid
 flowchart LR
-  Large["Large model\n(FP32 / FP16)"] -->|"identify targets"| Analysis["Sensitivity analysis\n(which layers to compress)"]
-  Analysis -->|"apply"| Prune["Pruning\n(remove weights / channels)"]
-  Analysis -->|"apply"| Quant["Quantization\n(INT8 / INT4)"]
-  Analysis -->|"train student"| Distill["Knowledge distillation\n(student mimics teacher)"]
+  Large["Large model<br/>(FP32 / FP16)"] -->|"identify targets"| Analysis["Sensitivity analysis<br/>(which layers to compress)"]
+  Analysis -->|"apply"| Prune["Pruning<br/>(remove weights / channels)"]
+  Analysis -->|"apply"| Quant["Quantization<br/>(INT8 / INT4)"]
+  Analysis -->|"train student"| Distill["Knowledge distillation<br/>(student mimics teacher)"]
   Prune -->|"fine-tune"| Small["Compressed model"]
   Quant -->|"calibrate"| Small
   Distill -->|"student training"| Small

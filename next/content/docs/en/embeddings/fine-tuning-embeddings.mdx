@@ -18,14 +18,14 @@ The standard training objective is **contrastive loss** (InfoNCE / NT-Xent): for
 
 ```mermaid
 flowchart TD
-  Data[Training pairs\nquery + positive + hard negatives] --> Tokenize[Tokenise query and document]
-  Tokenize --> Encoder[Encoder forward pass\nshared weights]
+  Data[Training pairs<br/>query + positive + hard negatives] --> Tokenize[Tokenise query and document]
+  Tokenize --> Encoder[Encoder forward pass<br/>shared weights]
   Encoder --> Pool[Mean pooling → embedding]
-  Pool --> Loss[Contrastive loss\nInfoNCE / MultipleNegativesRanking]
+  Pool --> Loss[Contrastive loss<br/>InfoNCE / MultipleNegativesRanking]
   Loss --> Grad[Backpropagation]
-  Grad --> Update[Weight update\nAdamW + LR schedule]
+  Grad --> Update[Weight update<br/>AdamW + LR schedule]
   Update -->|repeat| Tokenize
-  Update -->|eval| BEIR[Evaluate on BEIR / MTEB subset\nnDCG@10]
+  Update -->|eval| BEIR[Evaluate on BEIR / MTEB subset<br/>nDCG@10]
 ```
 
 ### Training data

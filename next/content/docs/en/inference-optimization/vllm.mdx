@@ -21,8 +21,8 @@ Traditional attention implementations require a contiguous memory region for eac
 
 ```mermaid
 flowchart LR
-  Seq1[Sequence A\nblock table: 0→3, 1→7] -->|lookup| Pool[Physical KV block pool\n0 1 2 3 4 5 6 7 ...]
-  Seq2[Sequence B\nblock table: 0→1, 1→5] -->|lookup| Pool
+  Seq1[Sequence A<br/>block table: 0→3, 1→7] -->|lookup| Pool[Physical KV block pool<br/>0 1 2 3 4 5 6 7 ...]
+  Seq2[Sequence B<br/>block table: 0→1, 1→5] -->|lookup| Pool
   Seq3[Sequence C prefix shared] -->|copy-on-write| Pool
 ```
 

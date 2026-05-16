@@ -31,11 +31,11 @@ A fase de indexação offline é o passo mais distintivo do GraphRAG e seu princ
 ```mermaid
 flowchart TD
   Docs[Raw documents] --> Chunk[Text chunking]
-  Chunk --> Extract[LLM entity & relationship extraction\nper chunk]
-  Extract --> Graph[Knowledge graph\nentities + relationships + claims]
-  Graph --> Community[Community detection\nLeiden algorithm]
-  Community --> Summarize[LLM community summary generation\nper community level]
-  Summarize --> Index[Graph index + vector embeddings\nstored in parquet / vector DB]
+  Chunk --> Extract[LLM entity & relationship extraction<br/>per chunk]
+  Extract --> Graph[Knowledge graph<br/>entities + relationships + claims]
+  Graph --> Community[Community detection<br/>Leiden algorithm]
+  Community --> Summarize[LLM community summary generation<br/>per community level]
+  Summarize --> Index[Graph index + vector embeddings<br/>stored in parquet / vector DB]
 ```
 
 1. **Chunking** — Documentos são divididos em unidades de texto (padrão ~300 tokens com sobreposição).
@@ -50,8 +50,8 @@ flowchart TD
 ```mermaid
 flowchart LR
   Q[User query] --> Route{Query type}
-  Route -->|Global: themes / overview| GS[Global search\nmap-reduce over community summaries]
-  Route -->|Local: specific entity| LS[Local search\ngraph traversal from entity nodes]
+  Route -->|Global: themes / overview| GS[Global search<br/>map-reduce over community summaries]
+  Route -->|Local: specific entity| LS[Local search<br/>graph traversal from entity nodes]
   GS --> LLM[LLM synthesizes answer]
   LS --> LLM
   LLM --> Answer[Response with citations]

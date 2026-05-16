@@ -17,10 +17,10 @@ O ecossistema do PyTorch inclui o TorchVision (modelos de visão computacional e
 
 ```mermaid
 flowchart LR
-  Data["Dados\n(Dataset + DataLoader)"] -->|"lotes"| Model["Modelo nn.Module"]
+  Data["Dados<br/>(Dataset + DataLoader)"] -->|"lotes"| Model["Modelo nn.Module"]
   Model -->|"forward pass"| Loss["Função de perda"]
-  Loss -->|"backward()"| Autograd["Motor autograd\n(calcula gradientes)"]
-  Autograd -->|"step()"| Optimizer["Otimizador\n(SGD, Adam, etc.)"]
+  Loss -->|"backward()"| Autograd["Motor autograd<br/>(calcula gradientes)"]
+  Autograd -->|"step()"| Optimizer["Otimizador<br/>(SGD, Adam, etc.)"]
   Optimizer -->|"atualiza pesos"| Model
 ```
 

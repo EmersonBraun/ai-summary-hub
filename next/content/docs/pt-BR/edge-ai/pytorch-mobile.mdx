@@ -19,12 +19,12 @@ O Google e a Meta desenvolveram conjuntamente o **ExecuTorch** como o framework 
 
 ```mermaid
 flowchart LR
-  PyModel["PyTorch Model\n(nn.Module)"] -->|"torch.jit.trace / script"| TorchScript["TorchScript\nScriptModule"]
-  PyModel -->|"torch.export.export"| ExportedProgram["ExportedProgram\n(ATen IR)"]
+  PyModel["PyTorch Model<br/>(nn.Module)"] -->|"torch.jit.trace / script"| TorchScript["TorchScript<br/>ScriptModule"]
+  PyModel -->|"torch.export.export"| ExportedProgram["ExportedProgram<br/>(ATen IR)"]
   TorchScript -->|"optimize_for_mobile"| PTL[".ptl Bundle"]
-  ExportedProgram -->|"to_edge + link + serialize"| PTE[".pte Bundle\n(ExecuTorch)"]
-  PTL -->|"Module.load()"| LibTorch["LibTorch\nMobile Runtime"]
-  PTE -->|"Module::load()"| ETRuntime["ExecuTorch\nRuntime"]
+  ExportedProgram -->|"to_edge + link + serialize"| PTE[".pte Bundle<br/>(ExecuTorch)"]
+  PTL -->|"Module.load()"| LibTorch["LibTorch<br/>Mobile Runtime"]
+  PTE -->|"Module::load()"| ETRuntime["ExecuTorch<br/>Runtime"]
   LibTorch -->|"forward()"| Device["Android / iOS Device"]
   ETRuntime -->|"execute()"| Device
 ```

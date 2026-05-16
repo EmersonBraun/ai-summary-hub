@@ -44,10 +44,10 @@ The transport layer determines how the server communicates with clients. **stdio
 flowchart TB
   Client["MCP Client"]
   Server["MCP Server Process"]
-  ToolReg["Tool Registry\n(get_forecast, read_file, ...)"]
-  ResourceReg["Resource Registry\n(file:///, db:///...)"]
-  PromptReg["Prompt Registry\n(query_builder, summarize, ...)"]
-  External["External Systems\n(APIs, DBs, File System)"]
+  ToolReg["Tool Registry<br/>(get_forecast, read_file, ...)"]
+  ResourceReg["Resource Registry<br/>(file:///, db:///...)"]
+  PromptReg["Prompt Registry<br/>(query_builder, summarize, ...)"]
+  External["External Systems<br/>(APIs, DBs, File System)"]
 
   Client -->|"initialize handshake"| Server
   Server -->|"capabilities response"| Client

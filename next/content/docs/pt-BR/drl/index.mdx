@@ -35,7 +35,7 @@ O Soft Actor-Critic (SAC) maximiza tanto a recompensa quanto a entropia da polí
 
 ```mermaid
 flowchart LR
-  Env[Ambiente] -->|estado s, recompensa r| Agent[Agente DRL\npolítica π_θ]
+  Env[Ambiente] -->|estado s, recompensa r| Agent[Agente DRL<br/>política π_θ]
   Agent -->|ação a| Env
   Agent -->|armazena transição| Buffer[Buffer de replay]
   Buffer -->|minilote| Train[Treinamento da rede neural]

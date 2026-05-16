@@ -40,8 +40,8 @@ Para cenários multi-cluster ou de longa retenção, o Prometheus faz remote-wri
 
 ```mermaid
 flowchart LR
-  Targets[Instrumented targets\nML serving / training jobs] -->|"HTTP scrape /metrics"| Scrape[Prometheus scrape engine]
-  Scrape -->|"write samples"| TSDB[Time-series database\nlocal TSDB]
+  Targets[Instrumented targets<br/>ML serving / training jobs] -->|"HTTP scrape /metrics"| Scrape[Prometheus scrape engine]
+  Scrape -->|"write samples"| TSDB[Time-series database<br/>local TSDB]
   TSDB -->|"evaluate PromQL rules"| AlertRules[Alerting rules engine]
   AlertRules -->|"fire alert"| Alertmanager[Alertmanager]
   Alertmanager -->|"route notification"| Receivers[Slack / PagerDuty / email]

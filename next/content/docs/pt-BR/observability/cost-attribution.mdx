@@ -26,11 +26,11 @@ Esses atributos, combinados com tags de dimensão personalizadas (ID do usuário
 
 ```mermaid
 flowchart LR
-  Request[Requisição do usuário] -->|marcada com user_id + feature| Span[Span OTel\ngen_ai.usage.input_tokens\ngen_ai.usage.output_tokens]
+  Request[Requisição do usuário] -->|marcada com user_id + feature| Span[Span OTel<br/>gen_ai.usage.input_tokens<br/>gen_ai.usage.output_tokens]
   Span -->|exporta| Backend[Backend de observabilidade]
   Backend -->|token × consulta de preço| CostEngine[Cálculo de custo]
-  CostEngine --> Dashboard[Dashboard de custo\npor usuário · equipe · modelo · funcionalidade]
-  Dashboard --> Alerts[Alertas de orçamento\nlimiar de $ / dia]
+  CostEngine --> Dashboard[Dashboard de custo<br/>por usuário · equipe · modelo · funcionalidade]
+  Dashboard --> Alerts[Alertas de orçamento<br/>limiar de $ / dia]
 ```
 
 No momento da instrumentação, atributos de span personalizados marcam cada chamada LLM com dimensões de negócio (`user.id`, `team.name`, `feature.name`, `experiment.id`). O backend de observabilidade multiplica as contagens de tokens pela tabela de preços por token do provedor (atualizada periodicamente) para calcular o custo em reais/dólares. Dashboards agregados e alertas disparam quando o gasto por usuário ou por funcionalidade excede os limiares configurados.

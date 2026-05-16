@@ -22,14 +22,14 @@ Cost is determined by four factors: the number of **input tokens** sent to the m
 
 ```mermaid
 flowchart LR
-  Request[Incoming query] --> Cache{Semantic cache\nhit?}
-  Cache -->|Yes| Return[Return cached response\n100% savings]
-  Cache -->|No| Router[Model router\ncomplexity classifier]
-  Router -->|simple| Cheap[Small model\ne.g. Haiku / GPT-4o-mini]
-  Router -->|complex| Premium[Premium model\ne.g. Opus / GPT-4o]
-  Cheap --> PromptCache{Prompt prefix\ncached?}
+  Request[Incoming query] --> Cache{Semantic cache<br/>hit?}
+  Cache -->|Yes| Return[Return cached response<br/>100% savings]
+  Cache -->|No| Router[Model router<br/>complexity classifier]
+  Router -->|simple| Cheap[Small model<br/>e.g. Haiku / GPT-4o-mini]
+  Router -->|complex| Premium[Premium model<br/>e.g. Opus / GPT-4o]
+  Cheap --> PromptCache{Prompt prefix<br/>cached?}
   Premium --> PromptCache
-  PromptCache -->|Yes| Discount[90% input cost discount\nAnthropic / 50% OpenAI]
+  PromptCache -->|Yes| Discount[90% input cost discount<br/>Anthropic / 50% OpenAI]
   PromptCache -->|No| Full[Full price inference]
   Discount --> Store[Store in semantic cache]
   Full --> Store

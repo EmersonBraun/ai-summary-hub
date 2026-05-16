@@ -18,15 +18,15 @@ A filtragem opera em dois estágios: (1) imediatamente após a geração de cont
 
 ```mermaid
 flowchart TD
-  RawData[Pares sintéticos brutos\ninstrução + resposta] --> Dedup[Deduplicação\nMinHash / limiar ROUGE-L]
-  Dedup --> LengthFilter[Verificação de comprimento / formato\ntokens mín/máx, validade JSON]
-  LengthFilter --> LLMJudge[LLM como juiz\npontuação por rubrica 1-5]
-  LLMJudge -->|pontuação ≥ limiar| RewardModel[Pontuação do modelo de recompensa\nportão secundário opcional]
+  RawData[Pares sintéticos brutos<br/>instrução + resposta] --> Dedup[Deduplicação<br/>MinHash / limiar ROUGE-L]
+  Dedup --> LengthFilter[Verificação de comprimento / formato<br/>tokens mín/máx, validade JSON]
+  LengthFilter --> LLMJudge[LLM como juiz<br/>pontuação por rubrica 1-5]
+  LLMJudge -->|pontuação ≥ limiar| RewardModel[Pontuação do modelo de recompensa<br/>portão secundário opcional]
   LLMJudge -->|pontuação < limiar| Reject1[Descartar]
-  RewardModel -->|aprovado| VerifTask\{Tarefa verificável?\ncódigo / matemática\}
+  RewardModel -->|aprovado| VerifTask\{Tarefa verificável?<br/>código / matemática\}
   RewardModel -->|reprovado| Reject2[Descartar]
-  VerifTask -->|Sim| Execute[Executar / teste unitário\nou verificação simbólica]
-  VerifTask -->|Não| Safety[Classificador de segurança\ntoxicidade, PII, viés]
+  VerifTask -->|Sim| Execute[Executar / teste unitário<br/>ou verificação simbólica]
+  VerifTask -->|Não| Safety[Classificador de segurança<br/>toxicidade, PII, viés]
   Execute -->|aprovado| Safety
   Execute -->|reprovado| Reject3[Descartar]
   Safety -->|aprovado| FinalData[Conjunto de treinamento final]

@@ -18,12 +18,12 @@ Routing is distinct from cascading (which always starts at the cheapest tier and
 
 ```mermaid
 flowchart LR
-  Request[Query] --> SemCache{Semantic cache\nhit?}
-  SemCache -->|Yes| CacheHit[Cached response\n0 model cost]
+  Request[Query] --> SemCache{Semantic cache<br/>hit?}
+  SemCache -->|Yes| CacheHit[Cached response<br/>0 model cost]
   SemCache -->|No| Router[Model router]
-  Router -->|simple| SmallModel[Small model\ne.g. Gemini Flash / Haiku]
-  Router -->|medium| MidModel[Mid model\ne.g. GPT-4o / Sonnet]
-  Router -->|complex| LargeModel[Large model\ne.g. o3 / Opus]
+  Router -->|simple| SmallModel[Small model<br/>e.g. Gemini Flash / Haiku]
+  Router -->|medium| MidModel[Mid model<br/>e.g. GPT-4o / Sonnet]
+  Router -->|complex| LargeModel[Large model<br/>e.g. o3 / Opus]
   SmallModel --> Cache[Store in semantic cache]
   MidModel --> Cache
   LargeModel --> Cache

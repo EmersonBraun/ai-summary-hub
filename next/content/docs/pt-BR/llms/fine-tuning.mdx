@@ -17,8 +17,8 @@ O fine-tuning resolve limitações do prompting: pode ensinar o modelo a adotar 
 
 ```mermaid
 flowchart LR
-  PreTrained["Modelo pré-treinado\n(base ou ajustado por instrução)"] -->|"carregar"| FTSetup["Configuração de fine-tuning\n(PEFT / full)"]
-  Dataset["Conjunto de dados de fine-tuning\n(pares instrução-resposta)"] -->|"formatar + tokenizar"| FTSetup
+  PreTrained["Modelo pré-treinado<br/>(base ou ajustado por instrução)"] -->|"carregar"| FTSetup["Configuração de fine-tuning<br/>(PEFT / full)"]
+  Dataset["Conjunto de dados de fine-tuning<br/>(pares instrução-resposta)"] -->|"formatar + tokenizar"| FTSetup
   FTSetup -->|"treinar em lotes"| FineTuned["Modelo ajustado"]
   FineTuned -->|"avaliar em validação"| Eval["Métricas de avaliação"]
   Eval -->|"suficientemente bom?"| Deploy["Implantação"]

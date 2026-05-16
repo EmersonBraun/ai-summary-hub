@@ -19,9 +19,9 @@ Local inference is not a single technology but a stack: model weights (GGUF, Saf
 
 ```mermaid
 flowchart LR
-  Hub["Model Hub\n(HuggingFace, Ollama registry)"] -->|"download weights"| Weights["Model weights\n(GGUF / SafeTensors)"]
-  Weights -->|"load + memory map"| Runtime["Inference runtime\n(llama.cpp / vLLM / TFLite)"]
-  Quantize["Quantization layer\n(INT4/INT8 via GPTQ/AWQ)"] -->|"reduces memory"| Runtime
+  Hub["Model Hub<br/>(HuggingFace, Ollama registry)"] -->|"download weights"| Weights["Model weights<br/>(GGUF / SafeTensors)"]
+  Weights -->|"load + memory map"| Runtime["Inference runtime<br/>(llama.cpp / vLLM / TFLite)"]
+  Quantize["Quantization layer<br/>(INT4/INT8 via GPTQ/AWQ)"] -->|"reduces memory"| Runtime
   Prompt["Prompt / request"] -->|"tokenize"| Runtime
   Runtime -->|"forward pass on hardware"| Hardware["CPU / GPU / NPU / Apple Silicon"]
   Hardware -->|"generated tokens"| Output["Output / stream"]

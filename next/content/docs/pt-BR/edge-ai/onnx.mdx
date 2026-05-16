@@ -22,10 +22,10 @@ flowchart LR
   PyTorch["PyTorch Model"] -->|"torch.onnx.export()"| ONNX["ONNX Model (.onnx)"]
   TF["TensorFlow / Keras"] -->|"tf2onnx convert"| ONNX
   SKLearn["scikit-learn / XGBoost"] -->|"skl2onnx / onnxmltools"| ONNX
-  ONNX -->|"ort.InferenceSession()"| ORT["ONNX Runtime\nSession"]
-  ORT -->|"graph optimizations"| GraphOpt["Optimized Graph\n(fused ops, constants folded)"]
-  GraphOpt -->|"EP selection"| EP["Execution Provider\n(CPU / CUDA / TensorRT / CoreML / NNAPI)"]
-  EP -->|"kernel dispatch"| Device["Target Device\n(CPU, GPU, NPU)"]
+  ONNX -->|"ort.InferenceSession()"| ORT["ONNX Runtime<br/>Session"]
+  ORT -->|"graph optimizations"| GraphOpt["Optimized Graph<br/>(fused ops, constants folded)"]
+  GraphOpt -->|"EP selection"| EP["Execution Provider<br/>(CPU / CUDA / TensorRT / CoreML / NNAPI)"]
+  EP -->|"kernel dispatch"| Device["Target Device<br/>(CPU, GPU, NPU)"]
 ```
 
 ### Formato ONNX e interoperabilidade de modelos

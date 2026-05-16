@@ -21,16 +21,16 @@ The field can be organised into four families:
 
 ```mermaid
 flowchart TD
-  Seed[Seed tasks\n~175 human examples] --> SelfInstr[Self-Instruct\nmodel generates new tasks]
+  Seed[Seed tasks<br/>~175 human examples] --> SelfInstr[Self-Instruct<br/>model generates new tasks]
   SelfInstr -->|filter| SIData[Self-instruct dataset]
 
-  Teacher[Teacher model\nGPT-4o / Claude Opus] --> Distil[Distillation\nteacher annotates inputs]
+  Teacher[Teacher model<br/>GPT-4o / Claude Opus] --> Distil[Distillation<br/>teacher annotates inputs]
   Distil -->|teacher responses| DistilData[Distillation dataset]
 
-  Base[Base instructions] --> Evol[Evol-Instruct\nrewrite to add complexity]
+  Base[Base instructions] --> Evol[Evol-Instruct<br/>rewrite to add complexity]
   Evol -->|harder variants| EvolData[Evolved dataset]
 
-  Personas[Persona library\n1M+ personas] --> Magpie[Magpie / persona sampling\nmulti-turn user simulation]
+  Personas[Persona library<br/>1M+ personas] --> Magpie[Magpie / persona sampling<br/>multi-turn user simulation]
   Magpie -->|multi-turn pairs| PersonaData[Persona dataset]
 
   SIData --> Combine[Combine + deduplicate]

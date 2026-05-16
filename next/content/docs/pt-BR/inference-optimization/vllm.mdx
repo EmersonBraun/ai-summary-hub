@@ -21,8 +21,8 @@ As implementações de atenção tradicionais requerem uma região de memória c
 
 ```mermaid
 flowchart LR
-  Seq1[Sequência A\ntabela de blocos: 0→3, 1→7] -->|consulta| Pool[Pool físico de blocos KV\n0 1 2 3 4 5 6 7 ...]
-  Seq2[Sequência B\ntabela de blocos: 0→1, 1→5] -->|consulta| Pool
+  Seq1[Sequência A<br/>tabela de blocos: 0→3, 1→7] -->|consulta| Pool[Pool físico de blocos KV<br/>0 1 2 3 4 5 6 7 ...]
+  Seq2[Sequência B<br/>tabela de blocos: 0→1, 1→5] -->|consulta| Pool
   Seq3[Prefixo compartilhado da Sequência C] -->|copy-on-write| Pool
 ```
 

@@ -36,11 +36,11 @@ Servidores MCP gerenciam sua própria autenticação. Um servidor MCP do GitHub,
 
 ```mermaid
 flowchart LR
-  Dev[Developer request] -->|natural language| ClaudeCode[Claude Code\nMCP client]
+  Dev[Developer request] -->|natural language| ClaudeCode[Claude Code<br/>MCP client]
   ClaudeCode -->|initialize + list tools| MCPServer[MCP Server]
   MCPServer -->|tool manifest| ClaudeCode
   ClaudeCode -->|tool call request| MCPServer
-  MCPServer -->|calls external service| External[External Service\ne.g. GitHub, DB, Jira]
+  MCPServer -->|calls external service| External[External Service<br/>e.g. GitHub, DB, Jira]
   External -->|response| MCPServer
   MCPServer -->|tool result| ClaudeCode
   ClaudeCode -->|result injected into context| Model[Claude model]

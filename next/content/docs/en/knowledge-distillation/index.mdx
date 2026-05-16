@@ -19,12 +19,12 @@ Knowledge distillation is complementary to [quantization](/docs/quantization) an
 
 ```mermaid
 flowchart LR
-  TrainData["Training data"] -->|"forward pass"| Teacher["Teacher model\n(large, frozen)"]
-  Teacher -->|"soft logits\n(temperature T)"| SoftLabels["Soft labels\n(probability distribution)"]
-  TrainData -->|"ground truth"| HardLabels["Hard labels\n(one-hot)"]
+  TrainData["Training data"] -->|"forward pass"| Teacher["Teacher model<br/>(large, frozen)"]
+  Teacher -->|"soft logits<br/>(temperature T)"| SoftLabels["Soft labels<br/>(probability distribution)"]
+  TrainData -->|"ground truth"| HardLabels["Hard labels<br/>(one-hot)"]
   SoftLabels -->|"KL divergence loss"| Loss["Combined distillation loss"]
   HardLabels -->|"cross-entropy loss"| Loss
-  Loss -->|"backprop"| Student["Student model\n(small, trainable)"]
+  Loss -->|"backprop"| Student["Student model<br/>(small, trainable)"]
   Student -->|"converges"| Deployed["Deployed student"]
 ```
 

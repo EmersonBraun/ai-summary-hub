@@ -26,10 +26,10 @@ This section covers:
 
 ```mermaid
 flowchart LR
-  Seeds[Seed tasks / prompts\nfew real examples] --> Generator[Generator model\nGPT-4o / Claude / Llama]
-  Generator -->|raw synthetic pairs| Filter[Quality filter\nLLM judge + dedup]
+  Seeds[Seed tasks / prompts<br/>few real examples] --> Generator[Generator model<br/>GPT-4o / Claude / Llama]
+  Generator -->|raw synthetic pairs| Filter[Quality filter<br/>LLM judge + dedup]
   Filter -->|clean dataset| Train[Fine-tune student model]
-  Train -->|student outputs| Verify[Optional: verification\ncode execution, factcheck]
+  Train -->|student outputs| Verify[Optional: verification<br/>code execution, factcheck]
   Verify -->|pass| Dataset[Final training set]
   Verify -->|fail| Reject[Discard]
 ```

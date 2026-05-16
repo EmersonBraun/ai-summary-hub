@@ -17,8 +17,8 @@ O aprendizado acontece via **backpropagation** combinado com **descida de gradie
 
 ```mermaid
 flowchart LR
-  Input["Camada de entrada\n(dados brutos)"] -->|"pesos × entradas + bias"| Hidden["Camadas ocultas\n(f de ativação)"]
-  Hidden -->|"representações aprendidas"| Output["Camada de saída\n(previsão)"]
+  Input["Camada de entrada<br/>(dados brutos)"] -->|"pesos × entradas + bias"| Hidden["Camadas ocultas<br/>(f de ativação)"]
+  Hidden -->|"representações aprendidas"| Output["Camada de saída<br/>(previsão)"]
   Output -->|"comparar com rótulo"| Loss["Função de perda"]
   Loss -->|"backpropagation"| Hidden
   Hidden -->|"atualizar pesos"| Hidden

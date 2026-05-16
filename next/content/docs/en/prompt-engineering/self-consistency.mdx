@@ -20,11 +20,11 @@ What makes self-consistency practically useful — and distinct from simply addi
 
 ```mermaid
 flowchart TD
-  Prompt[Question + CoT prompt] -->|"sample, temp > 0"| Path1[Reasoning path 1\n-> Answer A]
-  Prompt -->|"sample, temp > 0"| Path2[Reasoning path 2\n-> Answer A]
-  Prompt -->|"sample, temp > 0"| Path3[Reasoning path 3\n-> Answer B]
-  Prompt -->|"sample, temp > 0"| PathN[Reasoning path N\n-> Answer A]
-  Path1 -->|"extract answer"| Vote{Majority\nvote}
+  Prompt[Question + CoT prompt] -->|"sample, temp > 0"| Path1[Reasoning path 1<br/>-> Answer A]
+  Prompt -->|"sample, temp > 0"| Path2[Reasoning path 2<br/>-> Answer A]
+  Prompt -->|"sample, temp > 0"| Path3[Reasoning path 3<br/>-> Answer B]
+  Prompt -->|"sample, temp > 0"| PathN[Reasoning path N<br/>-> Answer A]
+  Path1 -->|"extract answer"| Vote{Majority<br/>vote}
   Path2 -->|"extract answer"| Vote
   Path3 -->|"extract answer"| Vote
   PathN -->|"extract answer"| Vote

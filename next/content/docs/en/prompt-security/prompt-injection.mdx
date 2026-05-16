@@ -18,16 +18,16 @@ Unlike SQL injection or buffer overflows, prompt injection exploits a fundamenta
 
 ```mermaid
 flowchart TD
-  Attacker[Attacker] -->|embeds malicious text| Vector[Injection vector\ne.g. document / user input / tool result]
-  Vector --> Prompt[Combined prompt\nsystem + retrieval + user]
+  Attacker[Attacker] -->|embeds malicious text| Vector[Injection vector<br/>e.g. document / user input / tool result]
+  Vector --> Prompt[Combined prompt<br/>system + retrieval + user]
   Prompt --> LLM[LLM processes tokens]
-  LLM -->|injection succeeds| Hijack[Override intent\nexfiltrate data / bypass policy]
+  LLM -->|injection succeeds| Hijack[Override intent<br/>exfiltrate data / bypass policy]
   LLM -->|injection blocked| Safe[Normal response]
 
-  Defense[Defenses] --> InputClassifier[Input classifier\ndetect injection patterns]
-  Defense --> Boundary[Boundary markers\nXML tags / delimiters]
-  Defense --> PrivilegeCtrl[Privilege separation\nuntrusted content zone]
-  Defense --> ToolGuard[Tool-call allowlist\n sandboxed execution]
+  Defense[Defenses] --> InputClassifier[Input classifier<br/>detect injection patterns]
+  Defense --> Boundary[Boundary markers<br/>XML tags / delimiters]
+  Defense --> PrivilegeCtrl[Privilege separation<br/>untrusted content zone]
+  Defense --> ToolGuard[Tool-call allowlist<br/> sandboxed execution]
 ```
 
 ## Attack taxonomy

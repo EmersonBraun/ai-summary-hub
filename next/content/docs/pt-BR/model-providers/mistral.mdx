@@ -50,21 +50,21 @@ La Plateforme fornece um endpoint de embedding de texto (`/v1/embeddings`) alime
 
 ```mermaid
 flowchart LR
-    Dev["Developer / Application"] -->|"Bearer token"| API["La Plateforme\napi.mistral.ai (EU hosted)"]
+    Dev["Developer / Application"] -->|"Bearer token"| API["La Plateforme<br/>api.mistral.ai (EU hosted)"]
 
-    API -->|"routes to model"| Large["Mistral Large 3\nopen-weight MoE flagship"]
-    API -->|"routes to model"| Medium["Mistral Medium 3.5\ndense, 128B"]
-    API -->|"routes to model"| Devstral["Devstral 2\ncode generation, 123B"]
-    API -->|"routes to model"| Small["Mistral Small 4\ncost-efficient"]
-    API -->|"embedding endpoint"| Embed["Mistral Embed\n1024-dim multilingual vectors"]
+    API -->|"routes to model"| Large["Mistral Large 3<br/>open-weight MoE flagship"]
+    API -->|"routes to model"| Medium["Mistral Medium 3.5<br/>dense, 128B"]
+    API -->|"routes to model"| Devstral["Devstral 2<br/>code generation, 123B"]
+    API -->|"routes to model"| Small["Mistral Small 4<br/>cost-efficient"]
+    API -->|"embedding endpoint"| Embed["Mistral Embed<br/>1024-dim multilingual vectors"]
 
-    HF["Hugging Face Hub\nopen weights"] -->|"download weights"| SelfHost
+    HF["Hugging Face Hub<br/>open weights"] -->|"download weights"| SelfHost
 
     subgraph SelfHost["Self-hosted inference"]
         direction LR
-        vLLM["vLLM\n(OpenAI-compatible server)"]
-        TF["Transformers\n(research / fine-tuning)"]
-        LCPP["llama.cpp\n(CPU / consumer GPU, GGUF)"]
+        vLLM["vLLM<br/>(OpenAI-compatible server)"]
+        TF["Transformers<br/>(research / fine-tuning)"]
+        LCPP["llama.cpp<br/>(CPU / consumer GPU, GGUF)"]
     end
 
     SelfHost -->|"inference response"| App["Your Application"]

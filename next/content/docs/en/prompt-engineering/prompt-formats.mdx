@@ -87,10 +87,10 @@ flowchart TD
   Raw[Raw request] --> Role{Durable rule or task?}
   Role -->|durable| Sys[system / developer / system_instruction]
   Role -->|task + data| User[user message]
-  User --> Delim[Wrap data in delimiter\nXML tags / fenced block]
+  User --> Delim[Wrap data in delimiter<br/>XML tags / fenced block]
   Sys --> Model[LLM]
   Delim --> Model
-  Model --> Out[Output contract\nschema / tags / prefill]
+  Model --> Out[Output contract<br/>schema / tags / prefill]
 ```
 
 ## When to use / When NOT to use

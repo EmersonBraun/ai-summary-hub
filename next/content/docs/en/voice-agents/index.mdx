@@ -24,9 +24,9 @@ Key building blocks covered in this section:
 ```mermaid
 flowchart LR
   Mic[Microphone / phone audio] -->|WebRTC / SIP| VAD[VAD — speech segmentation]
-  VAD -->|speech segments| STT[ASR model\ne.g. Deepgram Nova-3]
-  STT -->|transcript| LLM[LLM\ne.g. GPT-4o / Claude]
-  LLM -->|text reply| TTS[TTS model\ne.g. ElevenLabs / Deepgram Aura]
+  VAD -->|speech segments| STT[ASR model<br/>e.g. Deepgram Nova-3]
+  STT -->|transcript| LLM[LLM<br/>e.g. GPT-4o / Claude]
+  LLM -->|text reply| TTS[TTS model<br/>e.g. ElevenLabs / Deepgram Aura]
   TTS -->|audio stream| Speaker[Speaker / telephony]
 ```
 

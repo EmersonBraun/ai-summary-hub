@@ -32,10 +32,10 @@ Each OTel span has:
 
 ```mermaid
 flowchart TD
-  UserSpan[Span: handle_user_request\ntrace_id=abc123] -->|child| RetSpan[Span: vector_search\nlatency=42ms, results=4]
-  UserSpan -->|child| LLMSpan[Span: gen_ai.chat\nmodel=gpt-4o, tokens=1240]
-  LLMSpan -->|child| ToolSpan[Span: tool_call::get_weather\nlatency=210ms]
-  UserSpan -->|child| GuardSpan[Span: guardrail_check\nresult=pass]
+  UserSpan[Span: handle_user_request<br/>trace_id=abc123] -->|child| RetSpan[Span: vector_search<br/>latency=42ms, results=4]
+  UserSpan -->|child| LLMSpan[Span: gen_ai.chat<br/>model=gpt-4o, tokens=1240]
+  LLMSpan -->|child| ToolSpan[Span: tool_call::get_weather<br/>latency=210ms]
+  UserSpan -->|child| GuardSpan[Span: guardrail_check<br/>result=pass]
 ```
 
 The OTel SDK, instrumentation libraries (opentelemetry-instrumentation-openai, opentelemetry-instrumentation-langchain), or manual span creation propagate the `trace_id` through all nested calls. The OTel Collector receives spans, applies sampling and batching, and forwards them over OTLP to an observability backend.

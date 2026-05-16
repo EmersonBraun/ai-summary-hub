@@ -24,13 +24,13 @@ O MCP segue um modelo estrito de cliente-servidor com três papéis distintos. A
 
 ```mermaid
 flowchart LR
-  HostApp["Host Application\n(AI App / Agent)"]
+  HostApp["Host Application<br/>(AI App / Agent)"]
   Client1["MCP Client A"]
   Client2["MCP Client B"]
-  Server1["MCP Server A\n(File System)"]
-  Server2["MCP Server B\n(Weather API)"]
-  Tools1["Tools / Resources\n(read_file, list_dir)"]
-  Tools2["Tools / Resources\n(get_forecast, get_alerts)"]
+  Server1["MCP Server A<br/>(File System)"]
+  Server2["MCP Server B<br/>(Weather API)"]
+  Tools1["Tools / Resources<br/>(read_file, list_dir)"]
+  Tools2["Tools / Resources<br/>(get_forecast, get_alerts)"]
 
   HostApp -->|"embeds"| Client1
   HostApp -->|"embeds"| Client2

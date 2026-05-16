@@ -20,8 +20,8 @@ O trade-off é a memória: o KV cache cresce linearmente com o comprimento do co
 
 ```mermaid
 flowchart LR
-  Prefill[Fase de prefill\ncomputa K,V para todos os tokens do prompt\narmazena no KV cache] --> Decode
-  Decode[Fase de decode\ncomputa K,V apenas para o novo token\nconsulta todos os K,V anteriores do cache] -->|próximo token| Decode
+  Prefill[Fase de prefill<br/>computa K,V para todos os tokens do prompt<br/>armazena no KV cache] --> Decode
+  Decode[Fase de decode<br/>computa K,V apenas para o novo token<br/>consulta todos os K,V anteriores do cache] -->|próximo token| Decode
   Decode -->|sequência completa| Evict[Despejar blocos do pool]
 ```
 

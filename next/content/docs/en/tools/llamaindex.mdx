@@ -19,10 +19,10 @@ LlamaIndex also supports [agents](/docs/agents): query engines can be registered
 
 ```mermaid
 flowchart LR
-  Source["Data source\n(files, APIs, DBs)"] -->|"load"| Loader["Document loader"]
-  Loader -->|"split"| Parser["Node parser\n(chunking)"]
+  Source["Data source<br/>(files, APIs, DBs)"] -->|"load"| Loader["Document loader"]
+  Loader -->|"split"| Parser["Node parser<br/>(chunking)"]
   Parser -->|"embed"| Embed["Embedding model"]
-  Embed -->|"store"| Index["Index\n(vector / keyword / graph)"]
+  Embed -->|"store"| Index["Index<br/>(vector / keyword / graph)"]
 ```
 
 ### Query pipeline
@@ -31,7 +31,7 @@ flowchart LR
 flowchart LR
   Query["User query"] -->|"embed & search"| Retriever["Retriever"]
   Retriever -->|"top-k nodes"| Reranker["Reranker (optional)"]
-  Reranker -->|"ranked context"| Synth["Response synthesizer\n(LLM)"]
+  Reranker -->|"ranked context"| Synth["Response synthesizer<br/>(LLM)"]
   Synth -->|"answer"| Response["Final response"]
 ```
 

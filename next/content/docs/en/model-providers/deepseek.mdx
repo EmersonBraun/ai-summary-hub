@@ -51,14 +51,14 @@ DeepSeek V4 model weights are released on Hugging Face under permissive licenses
 
 ```mermaid
 flowchart TD
-  U[User / Application] -->|OpenAI-compatible request| API[DeepSeek API\napi.deepseek.com]
-  U -->|self-hosted request| SH[Self-Hosted Inference\nvLLM / Ollama / NIM]
+  U[User / Application] -->|OpenAI-compatible request| API[DeepSeek API<br/>api.deepseek.com]
+  U -->|self-hosted request| SH[Self-Hosted Inference<br/>vLLM / Ollama / NIM]
 
   API -->|general chat + thinking| V4F[DeepSeek V4 Flash]
   API -->|higher quality + thinking| V4P[DeepSeek V4 Pro]
-  SH -->|open weights| HF[Hugging Face\nModel Weights]
+  SH -->|open weights| HF[Hugging Face<br/>Model Weights]
 
-  V4F -->|thinking mode| THINK["reasoning trace\n(chain-of-thought)"]
+  V4F -->|thinking mode| THINK["reasoning trace<br/>(chain-of-thought)"]
   THINK -->|produces| ANS[Final Answer]
   V4F -->|non-thinking mode| ANS
   V4P -->|thinking / non-thinking| ANS

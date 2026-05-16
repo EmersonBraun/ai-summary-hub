@@ -39,9 +39,9 @@ The retrieval loop connects all layers. On each turn, the agent queries long-ter
 
 ```mermaid
 flowchart LR
-  Input[User Input] -->|"new message"| WM[Working Memory\nContext Window]
+  Input[User Input] -->|"new message"| WM[Working Memory<br/>Context Window]
   WM -->|"query embedding"| Retrieval[Retrieval Engine]
-  Retrieval -->|"semantic search"| LTS[Long-term Store\nVector DB]
+  Retrieval -->|"semantic search"| LTS[Long-term Store<br/>Vector DB]
   LTS -->|"relevant chunks"| WM
   WM -->|"recent N turns"| STB[Short-term Buffer]
   STB -->|"inject history"| WM

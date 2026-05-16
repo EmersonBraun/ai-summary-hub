@@ -21,9 +21,9 @@ Together, self-evaluation and calibration address two distinct but related failu
 ```mermaid
 flowchart TD
   Input[User question / task] -->|"generation prompt"| Draft[Initial response draft]
-  Draft -->|"self-critique prompt"| Critique[Critique: identify\nerrors and gaps]
-  Critique -->|"confidence scoring prompt"| Score[Confidence score\n+ reasoning]
-  Score -->|"score < threshold"| CoV[Chain-of-verification:\nfact-check sub-claims]
+  Draft -->|"self-critique prompt"| Critique[Critique: identify<br/>errors and gaps]
+  Critique -->|"confidence scoring prompt"| Score[Confidence score<br/>+ reasoning]
+  Score -->|"score < threshold"| CoV[Chain-of-verification:<br/>fact-check sub-claims]
   Score -->|"score >= threshold"| Accept[Accept response]
   CoV -->|"failed verifications"| Revise[Revised response]
   Revise -->|"re-score"| Score

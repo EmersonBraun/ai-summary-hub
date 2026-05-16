@@ -31,7 +31,7 @@ Para conversas longas, os estados de chave-valor de atenção são armazenados e
 
 ```mermaid
 flowchart TD
-  Input[Prompt do usuário] --> Runtime[Tempo de execução de borda\nllama.cpp / ONNX / TFLite]
+  Input[Prompt do usuário] --> Runtime[Tempo de execução de borda<br/>llama.cpp / ONNX / TFLite]
   Runtime --> HW{Hardware disponível}
   HW -->|CPU| CPU[Kernel BLAS otimizado]
   HW -->|GPU| GPU[Metal / Vulkan]

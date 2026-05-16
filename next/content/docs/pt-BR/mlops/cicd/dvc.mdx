@@ -19,11 +19,11 @@ O DVC se integra estreitamente com os fluxos de trabalho do Git. Um arquivo `dvc
 
 ```mermaid
 flowchart LR
-  Code["Code & Config\n(Git)"] -->|"dvc repro"| Pipeline["DVC Pipeline\n(dvc.yaml)"]
+  Code["Code & Config<br/>(Git)"] -->|"dvc repro"| Pipeline["DVC Pipeline<br/>(dvc.yaml)"]
   Pipeline -->|"runs stage"| Train["Training Stage"]
-  Train -->|"produces artifact"| Artifact["model artifact\n(local cache)"]
-  Artifact -->|"dvc push"| Remote["Remote Storage\n(S3 / GCS / Azure)"]
-  Remote -->|"dvc pull"| Colleague["Colleague's machine\nor CI runner"]
+  Train -->|"produces artifact"| Artifact["model artifact<br/>(local cache)"]
+  Artifact -->|"dvc push"| Remote["Remote Storage<br/>(S3 / GCS / Azure)"]
+  Remote -->|"dvc pull"| Colleague["Colleague's machine<br/>or CI runner"]
   Artifact -->|"pointer .dvc file"| Git["Git repository"]
   Git -->|"git checkout"| Colleague
 ```

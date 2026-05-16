@@ -17,13 +17,13 @@ A intuição é que processos de raciocínio corretos tendem a convergir para a 
 
 ```mermaid
 flowchart TD
-  Q[Question + CoT prompt] --> S1[Sample path 1\nhigh temperature]
-  Q --> S2[Sample path 2\nhigh temperature]
-  Q --> SN[Sample path N\nhigh temperature]
+  Q[Question + CoT prompt] --> S1[Sample path 1<br/>high temperature]
+  Q --> S2[Sample path 2<br/>high temperature]
+  Q --> SN[Sample path N<br/>high temperature]
   S1 --> A1[Answer 1]
   S2 --> A2[Answer 2]
   SN --> AN[Answer N]
-  A1 --> VOTE[Majority vote\nover answers]
+  A1 --> VOTE[Majority vote<br/>over answers]
   A2 --> VOTE
   AN --> VOTE
   VOTE --> FINAL[Final answer]

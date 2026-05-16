@@ -19,10 +19,10 @@ O LlamaIndex também suporta [agentes](/docs/agents): motores de consulta podem 
 
 ```mermaid
 flowchart LR
-  Source["Fonte de dados\n(arquivos, APIs, BDs)"] -->|"carregar"| Loader["Carregador de documentos"]
-  Loader -->|"dividir"| Parser["Analisador de nós\n(chunking)"]
+  Source["Fonte de dados<br/>(arquivos, APIs, BDs)"] -->|"carregar"| Loader["Carregador de documentos"]
+  Loader -->|"dividir"| Parser["Analisador de nós<br/>(chunking)"]
   Parser -->|"incorporar"| Embed["Modelo de embedding"]
-  Embed -->|"armazenar"| Index["Índice\n(vetor / palavras-chave / grafo)"]
+  Embed -->|"armazenar"| Index["Índice<br/>(vetor / palavras-chave / grafo)"]
 ```
 
 ### Pipeline de consulta
@@ -31,7 +31,7 @@ flowchart LR
 flowchart LR
   Query["Consulta do usuário"] -->|"incorporar & buscar"| Retriever["Recuperador"]
   Retriever -->|"top-k nós"| Reranker["Reranker (opcional)"]
-  Reranker -->|"contexto ranqueado"| Synth["Sintetizador de respostas\n(LLM)"]
+  Reranker -->|"contexto ranqueado"| Synth["Sintetizador de respostas<br/>(LLM)"]
   Synth -->|"resposta"| Response["Resposta final"]
 ```
 

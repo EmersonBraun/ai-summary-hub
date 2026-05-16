@@ -22,14 +22,14 @@ A complete guardrail architecture enforces four categories of control:
 
 ```mermaid
 flowchart TD
-  Input[User input] --> PIIScan[PII scanner\ndetect names, emails, phone, etc.]
-  PIIScan -->|anonymise| InjectionDetect[Injection detector\nclassifier / pattern match]
-  InjectionDetect -->|safe| TopicGate[Topic / policy gate\nallowed topic list]
+  Input[User input] --> PIIScan[PII scanner<br/>detect names, emails, phone, etc.]
+  PIIScan -->|anonymise| InjectionDetect[Injection detector<br/>classifier / pattern match]
+  InjectionDetect -->|safe| TopicGate[Topic / policy gate<br/>allowed topic list]
   InjectionDetect -->|blocked| RejectIn[Reject input]
   TopicGate -->|allowed| LLM[LLM generation]
   TopicGate -->|off-topic| Deflect[Deflect response]
   LLM --> ToxScan[Toxicity / harm classifier]
-  ToxScan -->|safe| PIIOut[Output PII scanner\nredact before send]
+  ToxScan -->|safe| PIIOut[Output PII scanner<br/>redact before send]
   ToxScan -->|unsafe| Fallback[Fallback / safe response]
   PIIOut --> User[Response to user]
 ```

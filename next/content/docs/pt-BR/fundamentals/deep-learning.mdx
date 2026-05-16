@@ -17,10 +17,10 @@ As arquiteturas de deep learning abrangem CNNs para visão, RNNs para sequência
 
 ```mermaid
 flowchart LR
-  RawData["Dados brutos\n(imagens, texto, áudio)"] -->|"extrair features brutas"| Layer1["Camada 1\n(features de baixo nível)"]
-  Layer1 -->|"combinar features"| Layer2["Camada 2\n(features de nível médio)"]
-  Layer2 -->|"abstrair ainda mais"| LayerN["Camada N\n(features abstratas)"]
-  LayerN -->|"prever"| Output["Saída\n(classe / token / valor)"]
+  RawData["Dados brutos<br/>(imagens, texto, áudio)"] -->|"extrair features brutas"| Layer1["Camada 1<br/>(features de baixo nível)"]
+  Layer1 -->|"combinar features"| Layer2["Camada 2<br/>(features de nível médio)"]
+  Layer2 -->|"abstrair ainda mais"| LayerN["Camada N<br/>(features abstratas)"]
+  LayerN -->|"prever"| Output["Saída<br/>(classe / token / valor)"]
   Output -->|"perda → gradientes"| RawData
 ```
 

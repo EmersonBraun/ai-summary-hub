@@ -26,11 +26,11 @@ As propriedades-chave de um modelo de embedding são:
 ```mermaid
 flowchart LR
   Text[Texto de entrada] --> Tokenizer[Tokenizador]
-  Tokenizer --> Encoder[Encoder transformer\nBERT / RoBERTa / personalizado]
-  Encoder --> Pool[Pooling\nmédia / CLS / ponderado]
-  Pool --> Project[Projeção linear\nredução de dimensão opcional]
+  Tokenizer --> Encoder[Encoder transformer<br/>BERT / RoBERTa / personalizado]
+  Encoder --> Pool[Pooling<br/>média / CLS / ponderado]
+  Pool --> Project[Projeção linear<br/>redução de dimensão opcional]
   Project --> Norm[Normalização L2]
-  Norm --> Vector[Vetor de embedding\nex.: 1536-dim float32]
+  Norm --> Vector[Vetor de embedding<br/>ex.: 1536-dim float32]
 ```
 
 **Tokenizar:** o texto é dividido em subtokens. **Codificar:** um transformer processa todos os tokens em paralelo, produzindo representações contextuais dos tokens. **Fazer pooling:** as representações de tokens são agregadas em um único vetor de sentença (pooling médio é o mais comum para embeddings de sentença). **Projetar:** uma camada linear opcional reduz a dimensão (ex.: 768→256 para truncamento MRL). **Normalizar:** a normalização L2 permite que a similaridade de cosseno seja calculada como produto escalar.

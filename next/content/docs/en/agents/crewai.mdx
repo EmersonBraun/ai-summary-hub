@@ -36,11 +36,11 @@ CrewAI ships with a `@tool` decorator compatible with LangChain tools, making it
 ```mermaid
 flowchart TD
   Input[User goal / kickoff input] -->|starts| Crew[Crew orchestrator]
-  Crew -->|assigns task 1| Agent1[Researcher agent\nrole + goal + tools]
+  Crew -->|assigns task 1| Agent1[Researcher agent<br/>role + goal + tools]
   Agent1 -->|calls tools| Tools1[Web search / APIs]
   Tools1 -->|observation| Agent1
   Agent1 -->|task 1 output| Crew
-  Crew -->|injects context, assigns task 2| Agent2[Writer agent\nrole + goal + tools]
+  Crew -->|injects context, assigns task 2| Agent2[Writer agent<br/>role + goal + tools]
   Agent2 -->|calls tools| Tools2[File I/O / Code]
   Tools2 -->|observation| Agent2
   Agent2 -->|task 2 output| Crew
