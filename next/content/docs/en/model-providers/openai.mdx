@@ -1,8 +1,8 @@
 ---
 title: OpenAI
 description: >-
-  OpenAI as a developer platform — GPT-4o, o1/o3 reasoning, DALL-E, Whisper, API
-  features, function calling, and SDKs.
+  OpenAI as a developer platform — GPT-5.5 / GPT-5.4 models, function calling,
+  image generation, and SDKs.
 tags:
   - beginner
 ---
@@ -11,9 +11,11 @@ tags:
 
 **OpenAI** is an AI research company and developer platform headquartered in San Francisco. Founded in 2015 and widely known for releasing ChatGPT in late 2022, OpenAI operates one of the most widely used model APIs in the industry. The platform gives developers programmatic access to a family of models spanning language, vision, audio, and image generation — making it a one-stop shop for most generative AI use cases.
 
-The OpenAI model lineup as of 2025 includes: **GPT-4o** (flagship multimodal model handling text, images, and audio in a single model), **GPT-4o-mini** (cost-optimized variant for high-volume tasks), the **o-series** reasoning models — **o1**, **o1-mini**, **o3**, and **o3-mini** — which use extended chain-of-thought reasoning for math, coding, and complex analysis, **DALL-E 3** for text-to-image generation, **Whisper** for speech-to-text transcription, and **TTS** (text-to-speech) for audio synthesis. Embeddings models (text-embedding-3-small and text-embedding-3-large) power semantic search and RAG pipelines.
+The OpenAI model lineup as of May 2026 centers on the **GPT-5.x family**. **GPT-5.5** (`gpt-5.5`) is the flagship model with a 1,050,000-token context window at $5.00/$30.00 per 1M tokens (input/output). **GPT-5.4** (`gpt-5.4`) is the balanced mid-tier at $2.50/$15.00 per 1M tokens with the same 1M context. **GPT-5.4 mini** (`gpt-5.4-mini`) is the cost-optimized variant at $0.75/$1.25 per 1M tokens with a 400K context window. For image generation, **GPT Image 2** (`gpt-image-2`) and GPT Image 1.5 replace the retired DALL-E series. **Sora 2** handles video generation. **GPT Realtime 2** provides real-time audio I/O.
 
-From a platform perspective, OpenAI offers a tiered API with usage-based pricing, a Playground for interactive testing, a Batch API for async bulk inference at 50% cost reduction, fine-tuning for GPT-4o-mini and GPT-3.5-turbo, an Assistants API for stateful agent-style interactions, and an Evals framework for systematic model evaluation. The Python SDK (`openai`) and a TypeScript/Node.js SDK are the primary client libraries, and the API format has become a de facto standard that other providers (Mistral, Together, Groq) partially mirror.
+> Note: GPT-4o, o1, o3-mini, DALL-E 2/3, and GPT-3.5 Turbo are all scheduled for full shutdown on **2026-10-23** and should not be used in new integrations.
+
+From a platform perspective, OpenAI offers a tiered API with usage-based pricing, a Playground for interactive testing, a Batch API for async bulk inference at 50% cost reduction, fine-tuning for applicable models, and an Evals framework for systematic model evaluation. The Python SDK (`openai`) and a TypeScript/Node.js SDK are the primary client libraries.
 
 ## How it works
 
@@ -21,15 +23,19 @@ From a platform perspective, OpenAI offers a tiered API with usage-based pricing
 
 The chat completions endpoint (`POST /v1/chat/completions`) is the core of the OpenAI platform. You send an array of messages with roles (`system`, `user`, `assistant`) and receive a completion. The `system` message sets the assistant's persona and constraints; `user` messages carry user input; `assistant` messages represent prior model turns for multi-turn conversation. Streaming is supported via server-sent events so the response can be displayed token-by-token. Temperature and top-p control response randomness; `max_tokens` caps output length.
 
+GPT-5.4 and GPT-5.5 support five reasoning modes — `none`, `low`, `medium`, `high`, and `xhigh` — letting you trade compute for reasoning quality.
+
+> **Long-context pricing note:** Inputs exceeding 272K tokens on GPT-5.5 incur a 2x input / 1.5x output surcharge. Cached input pricing: $0.50/1M (GPT-5.5), $0.25/1M (GPT-5.4).
+
 ```mermaid
 flowchart LR
   Client[Client app] -->|POST messages array| ChatAPI[/v1/chat/completions]
   ChatAPI -->|model routing| Selector{Model\nselector}
-  Selector -->|standard| GPT4o[GPT-4o]
-  Selector -->|reasoning| O3[o3 / o1]
-  Selector -->|budget| Mini[GPT-4o-mini]
-  GPT4o -->|stream or complete| Resp[JSON response]
-  O3 --> Resp
+  Selector -->|flagship| GPT55[GPT-5.5]
+  Selector -->|balanced| GPT54[GPT-5.4]
+  Selector -->|cost-optimized| Mini[GPT-5.4 mini]
+  GPT55 -->|stream or complete| Resp[JSON response]
+  GPT54 --> Resp
   Mini --> Resp
   Resp --> Client
 ```
@@ -38,9 +44,11 @@ flowchart LR
 
 Function calling (also called "tool use") lets the model invoke external tools by outputting structured JSON instead of free text. You declare tool schemas in the request; the model decides when to call a tool and populates its arguments. Your code executes the function and returns the result as a `tool` message; the model then uses that result to produce its final answer. This is the foundation of most agent frameworks: the model acts as a reasoning and routing layer while actual computation happens in your code.
 
+GPT-5.4 and GPT-5.5 also support built-in tools: web search, file search, code interpreter, computer use, and image generation.
+
 ```mermaid
 flowchart LR
-  User[User query] --> LLM[GPT-4o]
+  User[User query] --> LLM[GPT-5.4]
   LLM -->|decides to call tool| ToolCall[tool_calls JSON]
   ToolCall -->|your code executes| ExtFn[External function\nor API]
   ExtFn -->|result as tool message| LLM
@@ -51,31 +59,31 @@ flowchart LR
 
 The embeddings endpoint (`POST /v1/embeddings`) converts text into dense numerical vectors. These vectors encode semantic meaning: similar texts produce similar vectors. `text-embedding-3-large` (3072 dimensions) delivers the best retrieval quality; `text-embedding-3-small` (1536 dimensions) is faster and cheaper. Embeddings are the backbone of [RAG](/docs/rag) pipelines: you embed documents at index time and embed queries at search time, then retrieve documents by cosine similarity.
 
-### Image and audio APIs
+### Image and video APIs
 
-**DALL-E 3** (`POST /v1/images/generations`) generates images from text prompts. You specify size (1024×1024, 1792×1024, or 1024×1792), quality (standard or HD), and style (vivid or natural). **Whisper** (`POST /v1/audio/transcriptions`) transcribes audio files with high accuracy across 57+ languages. **TTS** (`POST /v1/audio/speech`) converts text to natural-sounding speech with six built-in voices. These APIs share the same authentication and billing model as the text APIs, making it straightforward to build multimodal pipelines in a single application.
+**GPT Image 2** (`POST /v1/images/generations`, model `gpt-image-2`) generates images from text prompts at $8.00 input / $30.00 output per 1M tokens. **Sora 2** handles video generation at $0.10/sec (720p) or $0.30–$0.70/sec (Pro). These APIs share the same authentication and billing model as the text APIs.
 
 ## When to use / When NOT to use
 
 | Use OpenAI when | Avoid or consider alternatives when |
 |-----------------|--------------------------------------|
 | You need the broadest ecosystem: libraries, tutorials, and community support all default to OpenAI | Your workload involves highly sensitive or regulated data and you cannot send it to a third-party US provider |
-| You want multimodal support (text + image + audio) from a single vendor | You need to fine-tune deeply or control every aspect of the model — open-weights models offer more flexibility |
-| You need advanced reasoning on math, code, or logic problems (o1, o3 series) | Costs at scale are prohibitive — at very high token volumes, open-weights hosting often beats per-token pricing |
+| You want multimodal support (text + image + audio + video) from a single vendor | You need to fine-tune deeply or control every aspect of the model — open-weights models offer more flexibility |
+| You need advanced reasoning on math, code, or logic problems (GPT-5.4 / GPT-5.5 with high/xhigh reasoning mode) | Costs at scale are prohibitive — at very high token volumes, open-weights hosting often beats per-token pricing |
 | You are building function-calling or agent workflows — OpenAI's structured outputs and tool calling are mature | You need a non-English-first experience — Qwen or Mistral may outperform on certain languages |
-| You want the Assistants API for stateful, file-enabled agents without building the state layer yourself | You need reproducible deterministic outputs from a frozen model version — OpenAI updates models on a rolling basis |
+| You want computer use or built-in web search tooling at the API level | You need reproducible deterministic outputs from a frozen model version — OpenAI updates models on a rolling basis |
 
 ## Comparisons
 
 | Criteria | OpenAI | Anthropic | Google Gemini |
 |----------|--------|-----------|---------------|
-| Flagship model | GPT-4o | Claude 3.7 Sonnet / Opus | Gemini 2.5 Pro |
-| Reasoning model | o3, o1 | Extended thinking (Claude 3.7) | Gemini 2.5 Pro (thinking) |
-| Context window | 128K (GPT-4o), 200K (o1) | 200K | Up to 1M (Gemini 1.5 Pro) |
-| Multimodal input | Text, image, audio, video | Text, image | Text, image, audio, video, code |
+| Flagship model | GPT-5.5 | Claude Opus 4.7 | Gemini 2.5 Pro |
+| Reasoning model | GPT-5.5 (xhigh mode) | Adaptive thinking (Opus 4.7) | Gemini 2.5 Pro (thinking) |
+| Context window | 1,050K (GPT-5.5 / GPT-5.4) | 1M (Opus 4.7, Sonnet 4.6) | 1M (Gemini 2.5 Pro) |
+| Multimodal input | Text, image, audio, video | Text, image | Text, image, audio, video |
 | Open-weights option | No | No | Gemma (partial) |
 | Function / tool calling | Mature, widely adopted | Strong, with computer use | Mature, Google ecosystem |
-| Pricing (flagship) | ~$2.50/1M input tokens (GPT-4o) | ~$3/1M input tokens (Sonnet) | ~$1.25/1M input tokens (Gemini 1.5 Pro) |
+| Pricing (flagship input) | $5.00/1M (GPT-5.5) | $5.00/1M (Opus 4.7) | $1.25–$2.50/1M (Gemini 2.5 Pro) |
 | Safety approach | Moderation API, usage policies | Constitutional AI, refusal tuning | Responsible AI guidelines |
 | Data residency | US (default), enterprise options | US (default), enterprise options | Multi-region, Google Cloud |
 | Best for | Broadest ecosystem, agent tooling, reasoning | Long docs, safety, nuanced instruction | Long context, multimodal, Google Cloud users |
@@ -85,8 +93,8 @@ The embeddings endpoint (`POST /v1/embeddings`) converts text into dense numeric
 | Pros | Cons |
 |------|------|
 | Industry-standard API adopted by most frameworks and libraries | Closed model — no visibility into weights or training data |
-| Widest model lineup: language, vision, audio, image in one platform | US-hosted by default; data residency is limited |
-| o-series reasoning models excel at math, code, and logic | Pricing can be high at scale compared to self-hosted open models |
+| Widest model lineup: language, vision, audio, image, video in one platform | US-hosted by default; data residency is limited |
+| GPT-5.x reasoning modes excel at math, code, and logic | Pricing can be high at scale compared to self-hosted open models |
 | Strong ecosystem: cookbook, evals, fine-tuning, batch API | Model versions change on a rolling basis — behavior may shift without notice |
 | Reliable rate limits and enterprise SLAs | No true open-weights offering |
 
@@ -95,13 +103,16 @@ The embeddings endpoint (`POST /v1/embeddings`) converts text into dense numeric
 ### Chat completion with streaming
 
 ```python
+import os
 from openai import OpenAI
 
-client = OpenAI(api_key="sk-...")  # or set OPENAI_API_KEY env var
+# Reads OPENAI_API_KEY from the environment; set it with:
+#   export OPENAI_API_KEY="sk-..."
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 # Basic completion
 response = client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-5.4",
     messages=[
         {"role": "system", "content": "You are a concise technical assistant."},
         {"role": "user", "content": "Explain embeddings in two sentences."},
@@ -113,7 +124,7 @@ print(response.choices[0].message.content)
 
 # Streaming response
 with client.chat.completions.stream(
-    model="gpt-4o",
+    model="gpt-5.4",
     messages=[{"role": "user", "content": "Write a haiku about APIs."}],
 ) as stream:
     for text in stream.text_stream:
@@ -151,7 +162,7 @@ messages = [{"role": "user", "content": "What's the weather in Tokyo?"}]
 
 # First call — model may decide to call a tool
 response = client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-5.4",
     messages=messages,
     tools=tools,
     tool_choice="auto",
@@ -173,7 +184,7 @@ if msg.tool_calls:
         })
 
 # Second call — model uses the tool result to answer
-final = client.chat.completions.create(model="gpt-4o", messages=messages)
+final = client.chat.completions.create(model="gpt-5.4", messages=messages)
 print(final.choices[0].message.content)
 ```
 
@@ -214,10 +225,10 @@ for score, doc in scores:
 
 ## Practical resources
 
-- [OpenAI API reference](https://platform.openai.com/docs/api-reference) — Complete endpoint documentation with request/response schemas
-- [OpenAI pricing](https://openai.com/api/pricing/) — Per-token pricing for all models including batch discounts
+- [OpenAI API reference](https://developers.openai.com/api/docs/models) — Current model IDs, context windows, capabilities, and deprecation timelines
+- [OpenAI pricing](https://developers.openai.com/api/docs/pricing) — Per-token pricing for all models including batch discounts and cached input rates
+- [OpenAI deprecations](https://developers.openai.com/api/docs/deprecations) — Retirement schedule for legacy models
 - [OpenAI Cookbook](https://cookbook.openai.com/) — Practical examples covering function calling, RAG, fine-tuning, evals, and more
-- [OpenAI models overview](https://platform.openai.com/docs/models) — Model IDs, context windows, capabilities, and deprecation timelines
 - [OpenAI Python SDK on GitHub](https://github.com/openai/openai-python) — Source, changelog, and migration guides
 
 ## See also

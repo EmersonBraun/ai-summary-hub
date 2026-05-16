@@ -15,7 +15,7 @@ Um **servidor MCP** é um processo que expõe capacidades a aplicações de IA c
 
 Um servidor MCP pode expor três categorias de capacidade. **Ferramentas** são funções chamáveis que aceitam entrada estruturada e retornam saída — a IA as invoca para realizar ações ou recuperar informações dinâmicas. **Recursos** são fontes de dados somente leitura endereçadas por URI que a IA pode ler para obter contexto — arquivos, registros de banco de dados, snapshots de API. **Prompts** são templates de prompt reutilizáveis e parametrizados armazenados no servidor que os clientes podem apresentar aos usuários ou injetar em conversas. Um único servidor pode oferecer qualquer combinação dessas; muitos servidores expõem apenas ferramentas.
 
-O **ciclo de vida do servidor** segue um padrão previsível: o servidor inicia e se liga a um transporte (stdio ou HTTP/SSE), aguarda um cliente se conectar, completa o handshake `initialize` para negociar versões de protocolo e capacidades, e então entra em seu loop principal respondendo a requisições. Quando o cliente se desconecta ou envia um sinal de desligamento, o servidor realiza limpeza e sai. Como o protocolo tem estado dentro de uma sessão, o servidor pode manter estado por conexão — por exemplo, armazenando em cache respostas de API caras pela duração de uma sessão.
+O **ciclo de vida do servidor** segue um padrão previsível: o servidor inicia e se liga a um transporte (stdio para servidores locais, Streamable HTTP para servidores remotos), aguarda um cliente se conectar, completa o handshake `initialize` para negociar versões de protocolo e capacidades, e então entra em seu loop principal respondendo a requisições. Quando o cliente se desconecta ou envia um sinal de desligamento, o servidor realiza limpeza e sai. Como o protocolo tem estado dentro de uma sessão, o servidor pode manter estado por conexão — por exemplo, armazenando em cache respostas de API caras pela duração de uma sessão.
 
 ## Como funciona
 
@@ -37,7 +37,9 @@ Os prompts são templates de interação reutilizáveis. Um prompt tem um nome, 
 
 ### Configuração de transporte
 
-A camada de transporte determina como o servidor se comunica com os clientes. O **transporte stdio** (`StdioServerTransport`) lê de `process.stdin` e escreve em `process.stdout`. É o padrão para servidores de ferramentas locais — a aplicação host cria o servidor como um processo filho e se comunica pelos fluxos do processo. Nenhuma configuração de rede é necessária, e o stderr do servidor está disponível para registro sem interferir com o protocolo. O **HTTP com transporte SSE** (`SSEServerTransport`) aceita requisições HTTP POST para mensagens do cliente ao servidor e transmite mensagens do servidor ao cliente por meio de um endpoint SSE `/sse`. Isso é adequado para servidores compartilhados que múltiplos clientes podem se conectar simultaneamente, ou para servidores que precisam ser executados como serviços de longa duração em vez de processos sob demanda.
+A camada de transporte determina como o servidor se comunica com os clientes. O **transporte stdio** (`StdioServerTransport`) lê de `process.stdin` e escreve em `process.stdout`. É o padrão para servidores de ferramentas locais — a aplicação host cria o servidor como um processo filho e se comunica pelos fluxos do processo. Nenhuma configuração de rede é necessária, e o stderr do servidor está disponível para registro sem interferir com o protocolo. O **transporte Streamable HTTP** (`StreamableHTTPServerTransport`) é o padrão atual para servidores remotos (introduzido na especificação MCP 2025-03-26). Ele lida com mensagens do cliente para o servidor e streaming do servidor para o cliente em um único endpoint usando uma abordagem HTTP unificada — substituindo o transporte anterior HTTP+SSE, que agora está descontinuado. O Streamable HTTP é mais compatível com proxies HTTP, balanceadores de carga e firewalls corporativos, e evita as armadilhas de segurança das conexões SSE de longa duração.
+
+> **Nota de descontinuação:** O `SSEServerTransport` (HTTP+SSE, da versão de especificação 2024-11-05) está **descontinuado** a partir da atualização da especificação MCP de março de 2025. Novos servidores devem usar `StreamableHTTPServerTransport`. Servidores SSE existentes podem continuar operando durante o período de transição, mas as principais plataformas (Atlassian, Keboola, Cloudflare) publicaram datas de fim de vida em meados de 2026.
 
 ```mermaid
 flowchart TB
@@ -77,7 +79,7 @@ flowchart TB
 | Envolvendo um sistema de arquivos, banco de dados ou fonte de dados interna para contexto de IA | Melhor opção — recursos e ferramentas mapeiam naturalmente | Pipeline RAG personalizado se recuperação semântica é a necessidade principal |
 | Fornecendo templates de prompt específicos de domínio para usuários de IA | A capacidade Prompts é feita especificamente para isso | Injeção de prompt de sistema se os templates são simples e estáticos |
 | Construindo tooling para uma única aplicação de IA interna com um provedor | MCP adiciona estrutura útil, mas pode ser excessivo | Funções de ferramentas em processo são mais simples |
-| Expondo ferramentas que exigem resultados em streaming em tempo real | Suportado via transporte SSE | WebSockets ou streaming personalizado se o overhead do protocolo importa |
+| Expondo ferramentas que exigem resultados em streaming em tempo real | Suportado via transporte Streamable HTTP | WebSockets ou streaming personalizado se o overhead do protocolo importa |
 | Ferramentas que precisam manter estado de longa duração por usuário entre sessões | Requer design cuidadoso do servidor — as sessões são 1:1 | Serviço backend com estado com um wrapper MCP fino |
 
 ## Exemplos de código
@@ -255,41 +257,42 @@ main().catch((err) => {
 });
 ```
 
-### Transporte HTTP/SSE (para servidores remotos compartilhados)
+### Transporte Streamable HTTP (transporte remoto padrão atual)
+
+O transporte Streamable HTTP é o padrão atual para servidores MCP remotos. Ele expõe um único endpoint HTTP que lida tanto com requisição/resposta quanto com streaming iniciado pelo servidor.
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
 
 const app = express();
+app.use(express.json());
+
 const server = new McpServer({ name: "remote-server", version: "1.0.0" });
 
 // Register your tools, resources, and prompts here (same API as stdio)
 // server.tool(...), server.resource(...), server.prompt(...)
 
-// SSE endpoint: clients connect here to receive server-to-client messages
-app.get("/sse", async (req, res) => {
-  const transport = new SSEServerTransport("/messages", res);
+// Single endpoint handles all MCP communication (requests + streaming)
+app.all("/mcp", async (req, res) => {
+  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   await server.connect(transport);
-});
-
-// POST endpoint: clients send messages here
-app.post("/messages", express.json(), async (req, res) => {
-  // The SSEServerTransport handles routing from the active session
-  res.status(200).send("ok");
+  await transport.handleRequest(req, res, req.body);
 });
 
 app.listen(3000, () => {
-  console.log("MCP server listening on http://localhost:3000");
+  console.log("MCP server listening on http://localhost:3000/mcp");
 });
 ```
+
+> **Transporte SSE legado (descontinuado):** Se você precisar suportar clientes mais antigos que implementam apenas a especificação 2024-11-05, o `SSEServerTransport` de `@modelcontextprotocol/sdk/server/sse.js` pode ser mantido ao lado do endpoint Streamable HTTP durante a migração. Novas implementações não devem usar SSE como transporte principal.
 
 ## Recursos práticos
 
 - [MCP TypeScript SDK — referência da API do servidor](https://github.com/modelcontextprotocol/typescript-sdk/tree/main/src/server) — Código-fonte e documentação inline para `McpServer`, transportes e todos os tipos do lado do servidor.
 - [Exemplos oficiais de servidores MCP](https://github.com/modelcontextprotocol/servers) — Implementações de referência incluindo sistema de arquivos, GitHub, PostgreSQL, Slack e mais — inestimáveis como pontos de partida.
-- [Documentação de transporte MCP](https://spec.modelcontextprotocol.io/specification/architecture/) — Seção da especificação do protocolo cobrindo os transportes stdio, HTTP/SSE e HTTP Streamable em profundidade.
+- [Documentação de transporte MCP](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports) — Especificação do protocolo cobrindo transportes stdio e Streamable HTTP (o padrão atual); inclui notas de descontinuação para o transporte legado HTTP+SSE.
 - [Documentação do Zod](https://zod.dev) — A biblioteca de schemas usada pelo SDK TypeScript para validação de entrada; entender os tipos Zod mapeia diretamente para schemas de parâmetros de ferramentas.
 
 ## Veja também

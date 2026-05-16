@@ -3,11 +3,46 @@ title: Changelog / Updates
 description: Recent updates and new topics in AI Summary Hub.
 ---
 
+## 2026-05 — Revisão de qualidade e índice de frameworks
+
+- Adicionadas seções `## Fontes` (3–4 artigos seminais/documentação oficial por artigo) a todos os arquivos `en/agents/*.mdx` e `en/reasoning-patterns/*.mdx`.
+- Novo `en/frameworks/index.mdx` — visão geral PyTorch vs TensorFlow com tabela quando-usar, diagrama mermaid e fontes.
+- Adicionada tabela `Quando usar / Quando NÃO usar` ao `en/prompt-engineering/index.mdx`.
+- `intro.mdx` atualizado com contagem de artigos refletindo a escala atual (mais de 150 artigos, mais de 50 categorias).
+- Glossário expandido com termos de 2025–2026: MCP, A2A, DPO, GRPO, RLHF, Agentic RAG, GraphRAG, Context Engineering, Computer Use, Extended compute, Vibe coding, LLM-as-judge.
+- Higiene de chaves de API: `en/model-providers/openai.mdx`, `deepseek.mdx` e `mistral.mdx` atualizados para ler credenciais de variáveis de ambiente.
+
+## 2026-01 — Expansão de agentes (Lote 3)
+
+- Novos artigos de agentes: `a2a-protocol.mdx`, `agent-runtimes.mdx`, `dag-agents.mdx`, `planner-executor.mdx`, `self-critique.mdx`, `security.mdx`, `debugging.mdx`, `evaluation.mdx`, `conversational-memory.mdx`, `memory.mdx`, `tools-actions.mdx`, `prompt-engineering.mdx`.
+- Novas subpáginas `en/agents/` cobrindo o Protocolo A2A (Linux Foundation, adoção por mais de 150 organizações), AgentsKit, Hermes Agent e runtimes Paperclip.
+- Retradução completa i18n lote 3 — 244 arquivos nos idiomas de, es, fr, pt-BR, zh-Hans.
+
+## 2025-Q4 — MLOps, Engenharia de Prompts, Claude Code, MCP, RAG
+
+- Categoria **MLOps**: CI/CD (`dvc.mdx`, `model-registry.mdx`), engenharia de dados (`airflow.mdx`, `kafka.mdx`, `spark.mdx`), implantação (`kubeflow.mdx`, `ml-kubernetes.mdx`) e subseções de monitoramento.
+- Expansão de **Engenharia de Prompts**: `prompt-formats.mdx`, `automatic-prompt-engineering.mdx`, `debiasing-techniques.mdx`, `prompt-ensembling.mdx`, `self-evaluation-calibration.mdx`, `step-back-prompting.mdx`, `structured-outputs.mdx`, `system-role-contextual-prompting.mdx`, `temperature-top-k-top-p.mdx`, `max-tokens-stop-sequences.mdx`, `self-consistency.mdx`.
+- Categoria **Claude Code**: `index.mdx`, `claude-md.mdx`, `context-management.mdx`, `mcp-plugins.mdx`, `prompt-caching.mdx`, `skills.mdx`, `thinking-modes.mdx`.
+- **MCP** (Model Context Protocol): `index.mdx`, `building-clients.mdx`, `building-servers.mdx`.
+- Expansão de **RAG**: `agentic-rag.mdx`, `graphrag.mdx` adicionados junto aos artigos existentes de arquitetura, embeddings, bancos de dados vetoriais e exemplos.
+- **LLMs** pós-treinamento: `post-training.mdx` cobrindo RLHF, DPO, GRPO.
+- Análises aprofundadas de **provedores de modelos**: Anthropic, OpenAI, Google Gemini, Meta Llama, Mistral, DeepSeek, Cohere.
+- Artigo sobre **Vibe coding** adicionado.
+
+## 2025-Q3 — Expansão do conteúdo central (Lotes 1 e 2)
+
+- Categoria de agentes: `index.mdx`, `multi-agent-systems.mdx`, `frameworks-overview.mdx`, `crewai.mdx`, `autogen.mdx`, `langgraph.mdx`, `anthropic-tool-use.mdx`.
+- Padrões de raciocínio: `cot.mdx`, `react.mdx`, `tot.mdx`, `rdd.mdx`.
+- Frameworks: `pytorch.mdx`, `tensorflow.mdx`.
+- Estudos de caso adicionados: ChatGPT, DALL·E, Claude, Gemini, BART, Grok, DeepSeek, Qwen.
+- Artigos de Edge AI: ONNX, PyTorch Mobile, TFLite.
+- Primeira passagem i18n para os idiomas es, pt-BR, de, fr, zh-Hans.
+
 ## Lançamento inicial
 
-- Estrutura do wiki com mais de 50 marcadores de posição de tópicos.
+- Estrutura do wiki com marcadores de posição de tópicos principais.
 - Documentação principal para RAG, Transformers, LLMs, Agents, Subagents, RDD.
 - 6 idiomas (en, es, pt-BR, de, fr, zh-Hans).
 - Tema escuro padrão, busca Algolia, implantação no GitHub Pages.
 
-_Assine ou acompanhe o repositório para novos tópicos e traduções._
+_Acompanhe o repositório para novos tópicos e traduções._

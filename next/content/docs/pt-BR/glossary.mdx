@@ -9,13 +9,25 @@ Uma referência rápida para termos-chave utilizados no AI Summary Hub.
 
 | Termo | Definição |
 |-------|-----------|
-| **RAG** | Geração aumentada por recuperação — combina recuperação com geração por LLM. |
-| **LLM** | Modelo de linguagem de grande porte. |
-| **Transformer** | Arquitetura baseada em auto-atenção (p. ex. BERT, GPT). |
+| **A2A** | Protocolo Agent2Agent — padrão aberto (Linux Foundation) para interoperabilidade agente a agente entre frameworks e fornecedores. |
+| **Agentic RAG** | Variante de RAG em que as etapas de recuperação e geração são controladas por um agente autônomo capaz de planejar e recuperar de forma iterativa. |
 | **Agent** | Sistema que percebe e age em direção a objetivos. |
-| **Subagent** | Agente dentro de um sistema hierárquico de agentes. |
-| **RDD** | Recuperação-Decisão-Design — padrão de raciocínio guiado por especificações. |
-| **CoT** | Chain-of-thought — raciocínio passo a passo. |
-| **ReAct** | Raciocínio + ação em etapas intercaladas. |
+| **Computer Use** | Capacidade que permite a um agente LLM controlar GUIs desktop (clicar, digitar, capturar tela) como ferramentas; termo da Anthropic para sua implementação beta no Claude. |
+| **Context Engineering** | Prática de projetar, gerenciar e otimizar as informações colocadas na janela de contexto de um LLM — incluindo estratégias de recuperação, compressão e cache. |
+| **CoT** | Chain-of-thought — raciocínio passo a passo elicitado via prompting. |
+| **DPO** | Direct Preference Optimization — técnica de pós-treinamento que ajusta um modelo em pares de preferência humana sem um modelo de recompensa separado. |
+| **Extended / Test-time compute** | Escalonamento do cômputo de inferência (ex.: mais etapas de busca, raciocínio mais longo) em vez do cômputo de treinamento para melhorar a qualidade da saída do modelo no momento do teste. |
+| **GraphRAG** | Variante de RAG que indexa documentos como um grafo de conhecimento, permitindo raciocínio multi-salto sobre relações entre entidades em vez de recuperação vetorial plana. |
+| **GRPO** | Group Relative Policy Optimization — método de pós-treinamento baseado em RL (usado no DeepSeek-R1) que melhora o raciocínio otimizando a recompensa relativa dentro de um grupo de saídas amostradas. |
+| **LLM** | Modelo de linguagem de grande porte. |
+| **LLM-as-judge** | Padrão de avaliação em que um LLM pontua ou classifica saídas do modelo em vez de (ou junto com) avaliadores humanos; usado em pipelines de evals automatizadas e dados de RLHF. |
+| **MCP** | Model Context Protocol — padrão aberto (Anthropic) que define como hosts LLM se conectam a ferramentas externas, fontes de dados e APIs via interface cliente-servidor. |
+| **RAG** | Geração aumentada por recuperação — combina recuperação com geração por LLM para fundamentar respostas em conhecimento externo. |
+| **ReAct** | Raciocínio + ação em etapas intercaladas — loop pensamento–ação–observação para agentes com uso de ferramentas. |
+| **RDD** | Recuperação-Decisão-Design — padrão de raciocínio guiado por especificações que recupera specs, toma decisões alinhadas a elas e valida as saídas. |
+| **RLHF** | Reinforcement Learning from Human Feedback — técnica de pós-treinamento que usa rankings de preferência humana para treinar um modelo de recompensa, que então orienta o ajuste fino da política via RL. |
+| **Subagent** | Agente dentro de um sistema hierárquico de agentes, com subtarefas delegadas por um orquestrador. |
+| **Transformer** | Arquitetura de rede neural baseada em auto-atenção (p. ex. BERT, GPT, Claude, Gemini). |
+| **Vibe coding** | Termo informal para programação assistida por IA em que o desenvolvedor descreve a intenção em linguagem natural e deixa um LLM gerar a implementação com codificação manual mínima. |
 
-_Mais termos serão adicionados conforme os tópicos forem expandidos. Consulte os documentos individuais de cada tópico para definições detalhadas._
+_Consulte os documentos individuais de cada tópico para definições detalhadas e exemplos de código._

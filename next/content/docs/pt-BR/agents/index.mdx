@@ -1,23 +1,21 @@
 ---
-title: AI agents
-description: 'Systems that perceive, reason, and act toward goals.'
+title: Agentes de IA
+description: 'Sistemas que percebem, raciocinam e agem em direção a objetivos.'
 tags:
   - beginner
 ---
 
-# Agentes de IA
-
 ## Definição
 
-Ein **KI-Agent** ist ein System, das seine Umgebung wahrnimmt (z. B. Benutzereingaben, Werkzeugausgaben), schlussfolgert (möglicherweise mit einem LLM) und Aktionen ausführt (z. B. APIs aufrufen, Code schreiben), um Ziele zu erreichen. Agenten verwenden oft Werkzeuge und Schleifen aus Gedanke–Aktion–Beobachtung, um Aufgaben zu lösen, die mehr als einen einzigen LLM-Aufruf erfordern.
+Um **agente de IA** é um sistema que percebe seu ambiente (por exemplo, entradas do usuário, resultados de ferramentas), raciocina (possivelmente com um LLM) e executa ações (por exemplo, chamar APIs, escrever código) para atingir objetivos. Agentes frequentemente utilizam ferramentas e ciclos de pensamento–ação–observação para resolver tarefas que exigem mais do que uma única chamada ao LLM.
 
-Formal gesagt: **Ein Agent ist ein autonomes Programm, das mit einem KI-Modell kommuniziert, um zielbasierte Operationen mithilfe der Werkzeuge und des Kontexts durchzuführen, die es hat, und das in der Lage ist, auf Wahrheit gegründete autonome Entscheidungen zu treffen.** Agenten überbrücken die Lücke zwischen einem einmaligen Prototyp (z. B. in AI Studio) und einer skalierbaren Anwendung: Sie definieren Werkzeuge, geben dem Agenten Zugang dazu, und er entscheidet, wann welches Werkzeug aufgerufen werden soll und wie Ergebnisse kombiniert werden, um das Ziel des Benutzers zu erfüllen.
+De forma mais formal: **um agente é um programa autônomo que se comunica com um modelo de IA para realizar operações baseadas em objetivos, usando as ferramentas e o contexto disponíveis, sendo capaz de tomar decisões autônomas fundamentadas na realidade.** Os agentes preenchem a lacuna entre um protótipo pontual (por exemplo, no AI Studio) e uma aplicação escalável: você define ferramentas, concede ao agente acesso a elas, e ele decide quando chamar qual ferramenta e como combinar os resultados para satisfazer o objetivo do usuário.
 
-Das Hauptmerkmal eines Agenten – im Gegensatz zu einer einfachen Kette oder Pipeline – ist **Autonomie bei der Entscheidung über die nächste Aktion**. Der Agent folgt keinem festen Skript; er verwendet das LLM, um über den aktuellen Zustand nachzudenken und die am besten geeignete Aktion auszuwählen. Dies macht Agenten mächtig für offene Aufgaben, aber auch schwieriger vorherzusagen und zu debuggen als deterministische Pipelines. [Multi-Agent](/docs/agents/multi-agent-systems) und [Subagenten](/docs/subagents)-Setups erweitern einzelne Agenten mit Koordinationsmustern und hierarchischer Delegation.
+A característica definidora de um agente — em contraste com uma simples cadeia ou pipeline — é a **autonomia na decisão da próxima ação**. O agente não segue um roteiro fixo; ele usa o LLM para raciocinar sobre o estado atual e selecionar a ação mais adequada. Isso torna os agentes poderosos para tarefas abertas, mas também mais difíceis de prever e depurar do que pipelines determinísticos. Configurações de [multi-agentes](/docs/agents/multi-agent-systems) e [subagentes](/docs/subagents) estendem agentes individuais com padrões de coordenação e delegação hierárquica.
 
 ## Como funciona
 
-### Agenten-Reasoning-Schleife
+### Ciclo de raciocínio do agente
 
 ```mermaid
 flowchart LR
@@ -31,7 +29,7 @@ flowchart LR
   Answer -->|return| UserReq
 ```
 
-### Werkzeugregistrierung und -dispatch
+### Registro e despacho de ferramentas
 
 ```mermaid
 flowchart LR
@@ -44,35 +42,35 @@ flowchart LR
   API -->|returns JSON| LLM
 ```
 
-Typische Schleife: Aufgabe empfangen → planen oder schlussfolgern → Aktion wählen (z. B. Werkzeugaufruf) → Ergebnis beobachten → wiederholen bis fertig oder Limit erreicht. Der **Benutzer** sendet eine Anfrage; der **Agent** (gestützt durch ein LLM) produziert einen **Gedanken** (Überlegung) und eine **Entscheidung**: entweder ein **Werkzeug** aufrufen (z. B. Suche, API, Code-Runner) und eine **Beobachtung** erhalten, oder eine **Endantwort** zurückgeben. Die Beobachtung wird für den nächsten Schritt zurück in den Agenten eingespeist. LLMs liefern Überlegung und Werkzeugauswahl; Frameworks (LangChain, LlamaIndex, Google ADK) übernehmen Orchestrierung, Werkzeugregistrierung und Nachrichtenübermittlung.
+Ciclo típico: receber tarefa → planejar ou raciocinar → escolher ação (por exemplo, chamada de ferramenta) → observar resultado → repetir até concluir ou atingir o limite. O **usuário** envia uma solicitação; o **agente** (apoiado por um LLM) produz um **pensamento** (raciocínio) e uma **decisão**: ou chama uma **ferramenta** (por exemplo, busca, API, executor de código) e obtém uma **observação**, ou retorna uma **resposta final**. A observação é devolvida ao agente para o próximo passo. LLMs fornecem raciocínio e seleção de ferramentas; frameworks (LangChain, LlamaIndex, Google ADK) cuidam da orquestração, registro de ferramentas e passagem de mensagens.
 
 ## Quando usar / Quando NÃO usar
 
-| Cenário | Usar agentes | Não usar agentes |
+| Cenário | Use agentes | Não use agentes |
 |---|---|---|
-| Mehrstufige Aufgaben, die mehrere Werkzeuge erfordern | Ja — Agenten bewältigen komplexe Werkzeugketten auf natürliche Weise | Nein — eine einfache Kette oder Pipeline ist günstiger und vorhersehbarer |
-| Aufgaben mit unbekannter Anzahl von Schritten im Voraus | Ja — Agenten entscheiden dynamisch, wie viele Schritte benötigt werden | Nein — wenn Schritte fest sind, verwenden Sie eine hardcodierte Pipeline |
-| Recherche und Synthese über viele Quellen | Ja — Agenten können iterativ suchen, lesen und integrieren | Nein — wenn die Daten bereits strukturiert sind, reicht eine Batch-Abfrage |
-| Sicherheitskritische Aufgaben ohne menschliche Aufsicht | Nein — Agenten können unerwartete Entscheidungen treffen | Ja — Menschen in der Schleife für hochriskante Aktionen behalten |
-| Niedrige Latenz, einfache, einstufige Antworten | Nein — Agenten-Overhead fügt Latenz hinzu | Ja — ein direkter LLM-Aufruf ist schneller |
+| Tarefas de múltiplos passos que exigem várias ferramentas | Sim — agentes lidam naturalmente com cadeias de ferramentas complexas | Não — uma cadeia simples ou pipeline é mais barato e previsível |
+| Tarefas com número desconhecido de etapas de antemão | Sim — agentes decidem dinamicamente quantas etapas são necessárias | Não — se os passos são fixos, use um pipeline codificado |
+| Pesquisa e síntese em muitas fontes | Sim — agentes podem buscar, ler e integrar iterativamente | Não — se os dados já são estruturados, uma consulta em lote é suficiente |
+| Tarefas críticas de segurança sem supervisão humana | Não — agentes podem tomar decisões inesperadas | Sim — mantenha humanos no ciclo para ações de alto risco |
+| Respostas simples e de baixa latência em um único passo | Não — a sobrecarga do agente adiciona latência | Sim — uma chamada direta ao LLM é mais rápida |
 
 ## Comparações
 
-| Ansatz | Autonomie | Werkzeug-Nutzung | Schritte | Vorhersehbarkeit | Kosten |
+| Abordagem | Autonomia | Uso de ferramentas | Etapas | Previsibilidade | Custo |
 |---|---|---|---|---|---|
-| Direkter LLM-Aufruf | Keine | Nein | 1 | Hoch | Niedrig |
-| Kette / Pipeline | Niedrig (fester Fluss) | Möglich | Fest | Hoch | Niedrig–mittel |
-| Agent (einzeln) | Hoch (dynamisch) | Ja | Dynamisch | Mittel | Mittel–hoch |
-| Multi-Agent | Sehr hoch | Ja | Dynamisch pro Agent | Niedrig–mittel | Hoch |
+| Chamada direta ao LLM | Nenhuma | Não | 1 | Alta | Baixo |
+| Cadeia / pipeline | Baixa (fluxo fixo) | Possível | Fixo | Alta | Baixo–médio |
+| Agente (único) | Alta (dinâmica) | Sim | Dinâmico | Média | Médio–alto |
+| Multi-agente | Muito alta | Sim | Dinâmico por agente | Baixa–média | Alto |
 
-## Vantagens e desvantagens
+## Prós e contras
 
-| Vantagens | Desvantagens |
+| Prós | Contras |
 |---|---|
-| Flexibel — kann viele Werkzeuge verwenden und offene Aufgaben bewältigen | Unvorhersehbar — kann loopen, steckenbleiben oder unerwartete Pfade nehmen |
-| Bewältigt mehrstufige Aufgaben mit dynamischem Branching | Latenz und Kosten durch mehrere LLM-Aufrufe |
-| Ermöglicht die Automatisierung komplexer Workflows | Erfordert gut gestaltete Werkzeuge, Schemas und Sicherheitsleitplanken |
-| Skaliert vom Prototyp zur Produktion mit dem richtigen Framework | Debugging erfordert das Inspizieren langer Gedanke–Aktion-Traces |
+| Flexível — pode usar muitas ferramentas e lidar com tarefas abertas | Imprevisível — pode entrar em loop, travar ou tomar caminhos inesperados |
+| Lida com tarefas de múltiplos passos com ramificações dinâmicas | Latência e custo decorrentes de múltiplas chamadas ao LLM |
+| Permite automação de fluxos de trabalho complexos | Requer ferramentas, esquemas e salvaguardas de segurança bem projetados |
+| Escala do protótipo à produção com o framework certo | Depuração exige inspeção de longas trilhas de pensamento–ação |
 
 ## Exemplos de código
 
@@ -108,17 +106,25 @@ print(result["output"])
 
 ## Recursos práticos
 
-- [From Prototypes to Agents with ADK – Google Codelabs](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — Erstellen Sie Ihren ersten Agenten mit Googles Agent Development Kit (ADK)
-- [LangChain – Agents](https://python.langchain.com/docs/concepts/agents/) — Agenten-Konzepte, Werkzeug-Nutzung und ReAct-Style-Orchestrierung
-- [LlamaIndex – Agents](https://docs.llamaindex.ai/en/stable/module_guides/deploying/agents/) — Agenten- und Query-Engine-Leitfäden
-- [OpenAI Assistants API](https://platform.openai.com/docs/assistants/overview) — Verwaltete Agenten mit eingebauten Werkzeugen (Code-Interpreter, Dateisuche)
-- [Anthropic – Build with Claude: Agents](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Claude Werkzeug-Nutzung und agentische Muster
-- [AgentsKit](https://emersonbraun.github.io/agentskit/) — Produktionsreifes Framework zum Aufbau von KI-Agenten mit Speicher, Werkzeugen und Multi-Agent-Orchestrierung
+- [From Prototypes to Agents with ADK – Google Codelabs](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — Construa seu primeiro agente com o Agent Development Kit (ADK) do Google
+- [LangChain – Agents](https://python.langchain.com/docs/concepts/agents/) — Conceitos de agentes, uso de ferramentas e orquestração no estilo ReAct
+- [LlamaIndex – Agents](https://docs.llamaindex.ai/en/stable/module_guides/deploying/agents/) — Guias de agentes e mecanismos de consulta
+- [OpenAI Assistants API](https://platform.openai.com/docs/assistants/overview) — Agentes gerenciados com ferramentas integradas (interpretador de código, busca em arquivos)
+- [Anthropic – Build with Claude: Agents](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Uso de ferramentas com Claude e padrões de agentes
+- [AgentsKit](https://emersonbraun.github.io/agentskit/) — Framework pronto para produção para construir agentes de IA com memória, ferramentas e orquestração multi-agente
+
+## Fontes
+
+- [ReAct: Synergizing Reasoning and Acting in Language Models (Yao et al., 2022)](https://arxiv.org/abs/2210.03629) — Artigo seminal que estabelece o loop pensamento–ação–observação do agente.
+- [Cognitive Architectures for Language Agents (Sumers et al., 2023)](https://arxiv.org/abs/2309.02427) — Levantamento abrangente de frameworks de raciocínio, memória e ação de agentes.
+- [Toolformer: Language Models Can Teach Themselves to Use Tools (Schick et al., 2023)](https://arxiv.org/abs/2302.04761) — Artigo-chave sobre LLMs aumentados com ferramentas.
+- [Anthropic – Build with Claude: Tool use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Guia oficial para padrões de uso agentico de ferramentas.
+- [LangChain Agents documentation](https://python.langchain.com/docs/concepts/agents/) — Referência prática para construir agentes em produção.
 
 ## Veja também
 
-- [Multi-agent systems](/docs/agents/multi-agent-systems)
-- [Subagents](/docs/subagents)
-- [Autonomous agents](/docs/autonomous-agents)
+- [Sistemas multi-agentes](/docs/agents/multi-agent-systems)
+- [Subagentes](/docs/subagents)
+- [Agentes autônomos](/docs/autonomous-agents)
 - [ReAct](/docs/reasoning-patterns/react)
 - [RDD](/docs/reasoning-patterns/rdd)

@@ -1,0 +1,4 @@
+{
+  "title": "Voice Agents",
+  "pages": ["index", "stt-llm-tts-pipeline", "realtime-audio"]
+}

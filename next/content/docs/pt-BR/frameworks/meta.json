@@ -1,7 +1,8 @@
 {
+  "title": "Frameworks",
   "pages": [
-    "tensorflow",
-    "pytorch"
-  ],
-  "title": "Frameworks"
+    "index",
+    "pytorch",
+    "tensorflow"
+  ]
 }

@@ -7,13 +7,25 @@ A quick reference for key terms used in AI Summary Hub.
 
 | Term | Definition |
 |------|------------|
-| **RAG** | Retrieval-augmented generation — combining retrieval with LLM generation. |
-| **LLM** | Large language model. |
-| **Transformer** | Architecture based on self-attention (e.g. BERT, GPT). |
+| **A2A** | Agent2Agent protocol — open standard (Linux Foundation) for agent-to-agent interoperability across frameworks and vendors. |
+| **Agentic RAG** | RAG variant where the retrieval and generation steps are controlled by an autonomous agent that can iteratively plan and re-retrieve. |
 | **Agent** | System that perceives and acts toward goals. |
-| **Subagent** | Agent within a hierarchical agent system. |
-| **RDD** | Retrieval-decision-design — spec-driven reasoning pattern. |
-| **CoT** | Chain-of-thought — step-by-step reasoning. |
-| **ReAct** | Reasoning + acting in interleaved steps. |
+| **Computer Use** | Capability allowing an LLM agent to control desktop GUIs (click, type, screenshot) as tools; Anthropic's term for its beta implementation in Claude. |
+| **Context Engineering** | The practice of designing, managing, and optimizing what information is placed in an LLM's context window — including retrieval, compression, and caching strategies. |
+| **CoT** | Chain-of-thought — step-by-step reasoning elicited via prompting. |
+| **DPO** | Direct Preference Optimization — post-training technique that fine-tunes a model on human preference pairs without a separate reward model. |
+| **Extended / Test-time compute** | Scaling inference compute (e.g. more search steps, longer thinking) rather than training compute to improve model output quality at test time. |
+| **GraphRAG** | RAG variant that indexes documents as a knowledge graph, enabling multi-hop reasoning over entity relationships rather than flat vector retrieval. |
+| **GRPO** | Group Relative Policy Optimization — RL-based post-training method (used in DeepSeek-R1) that improves reasoning by optimizing relative reward within a group of sampled outputs. |
+| **LLM** | Large language model. |
+| **LLM-as-judge** | Evaluation pattern where an LLM scores or ranks model outputs instead of (or alongside) human evaluators; used in automated evals and RLHF data pipelines. |
+| **MCP** | Model Context Protocol — open standard (Anthropic) that defines how LLM hosts connect to external tools, data sources, and APIs via a client–server interface. |
+| **RAG** | Retrieval-augmented generation — combining retrieval with LLM generation to ground responses in external knowledge. |
+| **ReAct** | Reasoning + acting in interleaved steps — thought–action–observation loop for tool-using agents. |
+| **RDD** | Retrieval-decision-design — spec-driven reasoning pattern that retrieves specifications, makes decisions aligned with them, and validates outputs. |
+| **RLHF** | Reinforcement Learning from Human Feedback — post-training technique that uses human preference rankings to train a reward model, which then guides policy fine-tuning via RL. |
+| **Subagent** | Agent within a hierarchical agent system, delegated sub-tasks by an orchestrator. |
+| **Transformer** | Neural network architecture based on self-attention (e.g. BERT, GPT, Claude, Gemini). |
+| **Vibe coding** | Informal term for AI-assisted programming where the developer describes intent in natural language and lets an LLM generate the implementation with minimal manual coding. |
 
-_More terms will be added as topics are expanded. See individual topic docs for detailed definitions._
+_See individual topic docs for detailed definitions and code examples._

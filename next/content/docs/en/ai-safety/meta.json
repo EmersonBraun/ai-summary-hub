@@ -1,5 +1,8 @@
 {
   "pages": [
-    "index"
+    "index",
+    "alignment-methods",
+    "interpretability",
+    "red-teaming"
   ]
 }

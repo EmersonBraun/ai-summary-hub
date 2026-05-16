@@ -1,5 +1,8 @@
 {
   "pages": [
-    "index"
+    "index",
+    "text-classification",
+    "information-extraction",
+    "translation-summarization"
   ]
 }

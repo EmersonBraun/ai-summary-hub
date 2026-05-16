@@ -14,7 +14,7 @@ An **MCP server** is a process that exposes capabilities to MCP-compatible AI ap
 
 An MCP server can expose three categories of capability. **Tools** are callable functions that accept structured input and return output — the AI invokes them to take actions or retrieve dynamic information. **Resources** are read-only, URI-addressed data sources that the AI can read for context — files, database records, API snapshots. **Prompts** are reusable, parameterized prompt templates stored on the server that clients can surface to users or inject into conversations. A single server can offer any combination of these; many servers expose only tools.
 
-The **server lifecycle** follows a predictable pattern: the server starts and binds to a transport (stdio or HTTP/SSE), waits for a client to connect, completes the `initialize` handshake to negotiate protocol versions and capabilities, then enters its main loop responding to requests. When the client disconnects or sends a shutdown signal, the server performs cleanup and exits. Because the protocol is stateful within a session, the server can maintain per-connection state — for example, caching expensive API responses for the duration of a session.
+The **server lifecycle** follows a predictable pattern: the server starts and binds to a transport (stdio for local servers, Streamable HTTP for remote servers), waits for a client to connect, completes the `initialize` handshake to negotiate protocol versions and capabilities, then enters its main loop responding to requests. When the client disconnects or sends a shutdown signal, the server performs cleanup and exits. Because the protocol is stateful within a session, the server can maintain per-connection state — for example, caching expensive API responses for the duration of a session.
 
 ## How it works
 
@@ -36,7 +36,9 @@ Prompts are reusable interaction templates. A prompt has a name, a description, 
 
 ### Transport configuration
 
-The transport layer determines how the server communicates with clients. **stdio transport** (`StdioServerTransport`) reads from `process.stdin` and writes to `process.stdout`. It is the default for local tool servers — the host application spawns the server as a child process and communicates over the process streams. No network configuration is needed, and the server's stderr is available for logging without interfering with the protocol. **HTTP with SSE transport** (`SSEServerTransport`) accepts HTTP POST requests for client-to-server messages and streams server-to-client messages over a `/sse` Server-Sent Events endpoint. This is appropriate for shared servers that multiple clients can connect to simultaneously, or for servers that need to run as long-lived services rather than on-demand processes.
+The transport layer determines how the server communicates with clients. **stdio transport** (`StdioServerTransport`) reads from `process.stdin` and writes to `process.stdout`. It is the default for local tool servers — the host application spawns the server as a child process and communicates over the process streams. No network configuration is needed, and the server's stderr is available for logging without interfering with the protocol. **Streamable HTTP transport** (`StreamableHTTPServerTransport`) is the current standard for remote servers (introduced in the MCP spec 2025-03-26). It handles both client-to-server messages and server-to-client streaming over a single endpoint using a unified HTTP approach — replacing the previous HTTP+SSE transport which is now deprecated. Streamable HTTP is more compatible with HTTP proxies, load balancers, and corporate firewalls, and avoids the security pitfalls of long-lived SSE connections.
+
+> **Deprecation note:** The `SSEServerTransport` (HTTP+SSE, from spec version 2024-11-05) is **deprecated** as of the March 2025 MCP specification update. New servers should use `StreamableHTTPServerTransport`. Existing SSE servers may continue operating during the transition period, but major platforms (Atlassian, Keboola, Cloudflare) have published end-of-life dates in mid-2026.
 
 ```mermaid
 flowchart TB
@@ -76,7 +78,7 @@ flowchart TB
 | Wrapping a file system, database, or internal data source for AI context | Best fit — resources and tools map naturally | Custom RAG pipeline if semantic retrieval is the primary need |
 | Providing domain-specific prompt templates to AI users | Prompts capability is purpose-built | System prompt injection if templates are simple and static |
 | Building tooling for a single, internal AI application with one provider | MCP adds useful structure but may be overkill | In-process tool functions are simpler |
-| Exposing tools that require real-time streaming results | Supported via SSE transport | WebSockets or custom streaming if protocol overhead matters |
+| Exposing tools that require real-time streaming results | Supported via Streamable HTTP transport | WebSockets or custom streaming if protocol overhead matters |
 | Tools that need to maintain per-user long-lived state across sessions | Requires careful server design — sessions are 1:1 | Stateful backend service with a thin MCP wrapper |
 
 ## Code examples
@@ -254,41 +256,42 @@ main().catch((err) => {
 });
 ```
 
-### HTTP/SSE transport (for shared remote servers)
+### Streamable HTTP transport (standard remote transport)
+
+The Streamable HTTP transport is the current standard for remote MCP servers. It exposes a single HTTP endpoint that handles both request/response and server-initiated streaming.
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
 
 const app = express();
+app.use(express.json());
+
 const server = new McpServer({ name: "remote-server", version: "1.0.0" });
 
 // Register your tools, resources, and prompts here (same API as stdio)
 // server.tool(...), server.resource(...), server.prompt(...)
 
-// SSE endpoint: clients connect here to receive server-to-client messages
-app.get("/sse", async (req, res) => {
-  const transport = new SSEServerTransport("/messages", res);
+// Single endpoint handles all MCP communication (requests + streaming)
+app.all("/mcp", async (req, res) => {
+  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   await server.connect(transport);
-});
-
-// POST endpoint: clients send messages here
-app.post("/messages", express.json(), async (req, res) => {
-  // The SSEServerTransport handles routing from the active session
-  res.status(200).send("ok");
+  await transport.handleRequest(req, res, req.body);
 });
 
 app.listen(3000, () => {
-  console.log("MCP server listening on http://localhost:3000");
+  console.log("MCP server listening on http://localhost:3000/mcp");
 });
 ```
+
+> **Legacy SSE transport (deprecated):** If you need to support older clients that only implement the 2024-11-05 spec, `SSEServerTransport` from `@modelcontextprotocol/sdk/server/sse.js` can be kept alongside the Streamable HTTP endpoint during migration. New implementations should not use SSE as the primary transport.
 
 ## Practical resources
 
 - [MCP TypeScript SDK — server API reference](https://github.com/modelcontextprotocol/typescript-sdk/tree/main/src/server) — Source and inline documentation for `McpServer`, transports, and all server-side types.
 - [Official MCP server examples](https://github.com/modelcontextprotocol/servers) — Reference implementations including file system, GitHub, PostgreSQL, Slack, and more — invaluable as starting points.
-- [MCP transport documentation](https://spec.modelcontextprotocol.io/specification/architecture/) — Protocol specification section covering stdio, HTTP/SSE, and Streamable HTTP transports in depth.
+- [MCP transport documentation](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports) — Protocol specification covering stdio and Streamable HTTP transports (the current standard); includes deprecation notes for the legacy HTTP+SSE transport.
 - [Zod documentation](https://zod.dev) — The schema library used by the TypeScript SDK for input validation; understanding Zod types maps directly to tool parameter schemas.
 
 ## See also

@@ -1,21 +1,19 @@
 ---
-title: Agent prompt engineering
+title: Engenharia de prompt para agentes
 description: >-
-  Best practices for writing system prompts that produce reliable, well-scoped
-  AI agent behavior.
+  Boas práticas para escrever system prompts que produzem comportamento
+  confiável e bem delimitado em agentes de IA.
 tags:
   - intermediate
 ---
 
-# Prompt engineering para agentes
-
 ## Definição
 
-Agenten-Prompt Engineering ist die Kunst, System-Prompts und Werkzeugdefinitionen zu schreiben, die zuverlässig das gewünschte Verhalten eines KI-Agenten erzeugen. Anders als das Prompt Engineering für einen Single-Turn-Chatbot – wo es hauptsächlich um Format und Ton geht – müssen Agenten-Prompts mehrstufiges Reasoning, Werkzeugauswahl-Disziplin, Einhaltung von Einschränkungen, Fehlerwiederherstellung und Abbruchbedingungen über eine unbegrenzte Sequenz von Schritten hinweg steuern. Ein schlecht geschriebener Agenten-Prompt erzeugt Agenten, die endlos schleifen, Werkzeuge mit falschen Argumenten aufrufen, Benutzereinschränkungen ignorieren oder Ergebnisse konfabulieren, wenn Werkzeuge fehlschlagen.
+A engenharia de prompt para agentes é a arte de escrever system prompts e definições de ferramentas que produzem de forma confiável o comportamento desejado de um agente de IA. Ao contrário da engenharia de prompt para um chatbot de turno único — onde você se preocupa principalmente com formato e tom — os prompts de agentes devem governar raciocínio de múltiplos passos, disciplina na seleção de ferramentas, adesão a restrições, recuperação de erros e condições de encerramento ao longo de uma sequência ilimitada de etapas. Um prompt de agente mal escrito produz agentes que entram em loop infinito, chamam ferramentas com argumentos errados, ignoram restrições do usuário ou inventam resultados quando as ferramentas falham.
 
-Der System-Prompt ist die Verfassung des Agenten. Er definiert, was der Agent ist, was er tun kann, was er niemals tun darf, wie er denken sollte und wie seine Ausgabe aussehen soll. Da LLMs sehr empfindlich auf Formulierung, Struktur und Reihenfolge reagieren, können kleine Änderungen am System-Prompt große Verhaltenseffekte haben. Agenten-Prompt Engineering ist daher eine iterative, empirische Disziplin: Sie schreiben einen Prompt, evaluieren ihn gegen einen Aufgabendatensatz, identifizieren Fehlermodi und verfeinern. Tools wie LangSmith und DeepEval (siehe [Evaluation](/docs/agents/evaluation)) machen diese Feedback-Schleife schneller.
+O system prompt é a constituição do agente. Ele define o que o agente é, o que pode fazer, o que nunca deve fazer, como deve raciocinar e como deve ser sua saída. Como os LLMs são altamente sensíveis à formulação, estrutura e ordenação, pequenas mudanças no system prompt podem ter grandes efeitos comportamentais. A engenharia de prompt para agentes é, portanto, uma disciplina iterativa e empírica: você escreve um prompt, avalia em relação a um conjunto de dados de tarefas, identifica modos de falha e refina. Ferramentas como LangSmith e DeepEval (veja [avaliação](/docs/agents/evaluation)) tornam esse ciclo de feedback mais rápido.
 
-Gute Agenten-Prompts sind modular und explizit. Sie trennen Rollendefinition, Fähigkeitsdeklaration, Einschränkungsspezifikation, Ausgabeformat-Regeln und Few-Shot-Beispiele in klar abgegrenzte Abschnitte. Diese Struktur erleichtert die Pflege, Prüfung und Erweiterung von Prompts, wenn sich die Fähigkeiten des Agenten weiterentwickeln. Sie hilft dem LLM auch, den richtigen „Modus" für jeden Abschnitt zu aktivieren, anstatt Belange zu vermischen.
+Bons prompts de agentes são modulares e explícitos. Eles separam definição de papel, declaração de capacidades, especificação de restrições, regras de formato de saída e exemplos few-shot em seções claramente delimitadas. Essa estrutura torna os prompts mais fáceis de manter, auditar e estender à medida que as capacidades do agente evoluem. Ela também ajuda o LLM a ativar o "modo" certo para cada seção em vez de misturar preocupações.
 
 ## Como funciona
 
@@ -31,55 +29,55 @@ flowchart LR
   Examples -->|shapes| Behavior
 ```
 
-### Rollendefinition
+### Definição de papel
 
-Die Rollendefinition teilt dem Agenten mit, wer er ist, was sein primärer Zweck ist und welche Persona er annehmen soll. Eine gute Rollendefinition ist spezifisch: „Sie sind ein Senior Software Engineer, spezialisiert auf Python und PostgreSQL, der Entwicklern bei der Behebung von Produktionsproblemen hilft" ist nützlicher als „Sie sind ein hilfreicher Assistent." Spezifität aktiviert relevantes Wissen und setzt einen angemessenen Antworton. Die Rolle sollte auch das Verhältnis des Agenten zum Benutzer (Kollege, Assistent, Experte) festlegen, was beeinflusst, wie der Agent mit Unsicherheit und Meinungsverschiedenheiten umgeht. Halten Sie die Rollendefinition prägnant (3-5 Sätze) und platzieren Sie sie an erster Stelle im System-Prompt, damit sie alle nachfolgenden Anweisungen rahmt.
+A definição de papel informa ao agente quem ele é, qual é seu propósito principal e qual persona adotar. Uma boa definição de papel é específica: "Você é um engenheiro de software sênior especializado em Python e PostgreSQL, ajudando desenvolvedores a depurar problemas de produção" é mais útil do que "Você é um assistente prestativo." A especificidade ativa conhecimento relevante e define o tom de resposta apropriado. O papel também deve estabelecer a relação do agente com o usuário (par, assistente, especialista), o que influencia como o agente lida com incerteza e discordância. Mantenha a definição de papel concisa (3-5 frases) e coloque-a primeiro no system prompt para que enquadre todas as instruções subsequentes.
 
-### Werkzeugbeschreibungen und Werkzeugauswahl
+### Descrições de ferramentas e seleção de ferramentas
 
-Jedes Werkzeug, auf das der Agent Zugang hat, muss präzise beschrieben werden. Werkzeugname, Beschreibung, Parameternamen, Parametertypen und Rückgabeformat sollten alle angegeben werden. Mehrdeutige Werkzeugbeschreibungen sind eine der häufigsten Ursachen für falsche Werkzeugauswahl und fehlerhafte Argumente. Fügen Sie hinzu: was das Werkzeug tut, wann es verwendet werden soll (und kritisch, wann nicht), welche Eingaben es erwartet und welches Ausgabeformat zu erwarten ist. Für Werkzeuge mit ähnlichen Zwecken fügen Sie explizite Disambiguierung hinzu: „Verwenden Sie `search_web` für aktuelle Ereignisse und Nachrichten; verwenden Sie `search_documents` für Abfragen der internen Firmenwissensdatenbank." Few-Shot-Beispiele korrekter Werkzeugaufrufungen (innerhalb des System-Prompts oder als Konversationsverlauf) reduzieren Fehler bei der Werkzeugauswahl erheblich.
+Cada ferramenta que o agente tem acesso deve ser descrita com precisão. O nome da ferramenta, descrição, nomes de parâmetros, tipos de parâmetros e formato de retorno devem ser todos especificados. Descrições de ferramentas ambíguas são uma das causas mais comuns de seleção incorreta de ferramentas e argumentos malformados. Inclua: o que a ferramenta faz, quando usá-la (e criticamente, quando não usá-la), quais entradas ela espera e qual formato de saída esperar. Para ferramentas com propósitos similares, adicione desambiguação explícita: "Use `search_web` para eventos atuais e notícias; use `search_documents` para consultas à base de conhecimento interno da empresa." Exemplos few-shot de invocações corretas de ferramentas (dentro do system prompt ou como histórico de conversa) reduzem significativamente erros de seleção de ferramentas.
 
-### Chain-of-Thought für Agenten
+### Chain-of-thought para agentes
 
-Chain-of-Thought (CoT)-Prompting bittet den Agenten, explizit zu denken, bevor er handelt. Bei Agenten bedeutet dies, darüber nachzudenken: Was fragt der Benutzer, welche Informationen habe ich, welche Informationen brauche ich, welches Werkzeug sollte ich als nächstes aufrufen, und wie erwarte ich, dass das Ergebnis aussieht. Den Agenten anzuweisen, vor dem Handeln zu denken („Bevor Sie ein Werkzeug aufrufen, skizzieren Sie kurz Ihren Plan"), verbessert die Genauigkeit bei komplexen mehrstufigen Aufgaben und macht Traces interpretierbarer. Einige Frameworks (ReAct, siehe [ReAct](/docs/reasoning-patterns/react)) formalisieren dies als Gedanke/Aktion/Beobachtungs-Zyklen. Seien Sie explizit im Prompt, ob das Reasoning in der Ausgabe oder nur im Entwurfsblock sein soll.
+O prompting com cadeia de pensamento (CoT) pede ao agente que raciocine explicitamente antes de agir. Para agentes, isso significa pensar em: o que o usuário está pedindo, que informações eu tenho, que informações eu preciso, qual ferramenta devo chamar a seguir e como espero que o resultado seja. Instruir o agente a raciocinar antes de agir ("Antes de chamar qualquer ferramenta, descreva brevemente seu plano") melhora a precisão em tarefas complexas de múltiplos passos e torna as trilhas mais interpretáveis. Alguns frameworks (ReAct, veja [ReAct](/docs/reasoning-patterns/react)) formalizam isso como ciclos de Pensamento / Ação / Observação. Seja explícito no prompt sobre se o raciocínio deve estar na saída ou apenas no rascunho.
 
-### Einschränkungen und Guardrails in Prompts
+### Restrições e salvaguardas nos prompts
 
-Einschränkungen definieren, was der Agent nicht tun darf. Sie sollten möglichst positiv formuliert werden („immer um Bestätigung bitten, bevor Daten gelöscht werden") anstatt nur negativ („niemals Daten löschen ohne Nachfragen"). Fügen Sie hinzu: Bereichseinschränkungen (nur Fragen zu X beantworten), Ausgabeeinschränkungen (immer auf Englisch antworten, immer gültiges JSON verwenden), Verhaltenseinschränkungen (niemals URLs oder Dateipfade erfinden) und Sicherheitseinschränkungen (niemals schädliche Inhalte generieren). Guardrails in Prompts sind eine erste Verteidigungslinie, kein Ersatz für technische Kontrollen (siehe [Sicherheit](/docs/agents/security)); sie sind am wirksamsten, wenn sie das genaue erwartete Verhalten in Grenzfällen spezifizieren.
+As restrições definem o que o agente não deve fazer. Elas devem ser declaradas positivamente onde possível ("sempre peça confirmação antes de excluir dados") em vez de apenas negativamente ("nunca exclua dados sem perguntar"). Inclua: restrições de escopo (só responda perguntas sobre X), restrições de saída (sempre responda em português, sempre use JSON válido), restrições de comportamento (nunca invente URLs ou caminhos de arquivos) e restrições de segurança (nunca gere conteúdo prejudicial). As salvaguardas nos prompts são uma primeira linha de defesa, não um substituto para controles técnicos (veja [segurança](/docs/agents/security)); elas são mais eficazes quando especificam o comportamento exato esperado em casos limítrofes.
 
-### Ausgabeformat-Spezifikation
+### Especificação do formato de saída
 
-Agenten, die strukturierte Ausgaben erzeugen (JSON, Markdown, Funktionsaufrufe), benötigen explizite Format-Anweisungen. Geben Sie das genaue Schema, Feldnamen, Typen und erforderliche vs. optionale Felder an. Fügen Sie ein gültiges Beispiel in den Prompt ein. Für Werkzeugaufruf-Agenten klären Sie, wann eine Endantwort zurückgegeben werden soll versus weiterhin Werkzeuge aufgerufen werden sollen, und wie die Abbruchbedingung aussieht. Wenn der Agent mit nachgelagerten Systemen interagiert, ist das Ausgabeformat ein Vertrag; Mehrdeutigkeit hier überträgt sich in fehlerhafte Integrationen.
+Agentes que produzem saída estruturada (JSON, markdown, chamadas de funções) precisam de instruções explícitas de formato. Especifique o esquema exato, nomes de campos, tipos e campos obrigatórios versus opcionais. Inclua um exemplo válido no prompt. Para agentes que chamam ferramentas, esclareça quando retornar uma resposta final versus continuar a chamar ferramentas, e como é a condição de encerramento. Se o agente interage com sistemas downstream, o formato de saída é um contrato; a ambiguidade aqui se propaga em integrações quebradas.
 
 ## Quando usar / Quando NÃO usar
 
-| Usar quando | Evitar quando |
+| Use quando | Evite quando |
 |---|---|
-| Agent mehrere Werkzeuge aufruft und die Werkzeugauswahl inkonsistent ist | Den System-Prompt als einmalige Einrichtung behandeln, die nie überarbeitet wird |
-| Agent schleift oder bricht vorzeitig ab ohne die Aufgabe zu erfüllen | Einen riesigen Fließtext-Prompt ohne Struktur oder Abschnitte schreiben |
-| Agent ignoriert Benutzereinschränkungen oder verletzt Sicherheitsrichtlinien | Sich ausschließlich auf die Standardvorgaben des Modells verlassen ohne Rollen- oder Einschränkungsspezifikation |
-| Neues LLM eingebunden wird und Verhalten vom vorherigen Modell übertragen werden soll | Neue Anweisungen ad hoc hinzufügen ohne Regression-Evaluation |
-| Mehrstufiger Workflow mit deterministischen Ausgabeformat-Anforderungen gebaut wird | Erwarten, dass der Prompt allein Sicherheitsbedrohungen bewältigt (technische Kontrollen verwenden) |
+| O agente está chamando múltiplas ferramentas e a seleção de ferramentas é inconsistente | Tratar o system prompt como uma configuração única a nunca ser revisada |
+| O agente entra em loop ou termina prematuramente sem completar a tarefa | Escrever um prompt enorme e sem estrutura ou seções |
+| O agente ignora restrições do usuário ou viola políticas de segurança | Depender apenas dos padrões do modelo sem nenhuma especificação de papel ou restrição |
+| Integrando um novo LLM e precisando transferir comportamento do modelo anterior | Adicionar novas instruções de forma ad-hoc sem avaliar regressões |
+| Construindo um fluxo de trabalho de múltiplos passos com requisitos de formato de saída determinístico | Esperar que o prompt sozinho lide com ameaças de segurança (use também controles técnicos) |
 
 ## Comparações
 
-| Prompt-Element | Zweck | Häufige Fehler |
+| Elemento do prompt | Propósito | Erros comuns |
 |---|---|---|
-| Rollendefinition | Setzt Persona, Expertise und Ton | Zu vage („hilfreicher Assistent") oder zu lang; Platzierung nach anderen Abschnitten |
-| Werkzeugbeschreibungen | Leitet korrekte Werkzeugauswahl und Argumentbildung | Fehlende Wann/Wann-nicht-Anleitung; keine Beispielaufrufungen |
-| Einschränkungen | Erzwingt Bereich, Sicherheit und Formatgrenzen | Nur negative Einschränkungen („niemals X tun") ohne Angabe der korrekten Alternative |
-| Chain-of-Thought-Anweisung | Verbessert Reasoning-Genauigkeit bei komplexen Aufgaben | Reasoning in den Werkzeugaufruf-Output mischen, wenn es im Entwurfsblock bleiben soll |
-| Few-Shot-Beispiele | Demonstriert erwartetes Verhalten für Werkzeug-Nutzung und Ausgabeformat | Beispiele, die zu einfach sind, um echte Randfälle darzustellen |
+| Definição de papel | Define persona, expertise e tom | Muito vago ("assistente prestativo") ou muito longo; colocado após outras seções |
+| Descrições de ferramentas | Orienta seleção correta de ferramentas e formação de argumentos | Falta orientação de quando/quando-não-usar; sem exemplos de invocação |
+| Restrições | Impõe limites de escopo, segurança e formato | Apenas restrições negativas ("nunca faça X") sem especificar a alternativa correta |
+| Instrução de cadeia de pensamento | Melhora a precisão do raciocínio em tarefas complexas | Misturar o raciocínio na saída da chamada de ferramenta quando deveria ficar no rascunho |
+| Exemplos few-shot | Demonstra comportamento esperado para uso de ferramentas e formato de saída | Exemplos muito simples para representar casos extremos reais |
 
-## Vantagens e desvantagens
+## Prós e contras
 
-| Vantagens | Desvantagens |
+| Prós | Contras |
 |---|---|
-| Sofortige Wirkung: kein Fine-Tuning oder Retraining erforderlich | Prompt-Empfindlichkeit bedeutet kleine Formulierungsänderungen können Verhalten brechen |
-| Modulare Struktur macht Pflege und Prüfung unkompliziert | Lange Prompts verbrauchen Token bei jedem Aufruf und erhöhen die Kosten |
-| Few-Shot-Beispiele reduzieren Fehler bei der Werkzeugauswahl erheblich | Anweisungen können konfliktieren; LLMs priorisieren möglicherweise spätere Anweisungen |
-| Einschränkungen bieten eine erste Verteidigungslinie gegen Missbrauch | Prompts sind für das Modell sichtbar, aber nicht kryptografisch geschützt |
-| Chain-of-Thought verbessert Genauigkeit und Trace-Interpretierbarkeit | Übermäßige Verhaltensangabe kann den Agenten bei Randfällen brüchig machen |
+| Efeito imediato: sem necessidade de fine-tuning ou retreinamento | A sensibilidade ao prompt significa que pequenas mudanças de formulação podem quebrar o comportamento |
+| Estrutura modular facilita manutenção e auditoria | Prompts longos consomem tokens em cada chamada, aumentando o custo |
+| Exemplos few-shot reduzem significativamente erros de seleção de ferramentas | Instruções podem conflitar; LLMs podem priorizar instruções posteriores |
+| Restrições fornecem uma primeira linha de defesa contra uso indevido | Prompts são visíveis para o modelo mas não protegidos criptograficamente |
+| Cadeia de pensamento melhora precisão e interpretabilidade das trilhas | Especificar excessivamente o comportamento pode tornar o agente frágil em casos extremos |
 
 ## Exemplos de código
 
@@ -314,14 +312,21 @@ if __name__ == "__main__":
 
 ## Recursos práticos
 
-- [Anthropic - Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Anthropics offizielle Anleitungen zu System-Prompt-Struktur, Rollendefinition und Chain-of-Thought für Claude-Modelle.
-- [Anthropic - Tool use documentation](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Vollständige Referenz für das Schreiben von Werkzeugdefinitionen, den Umgang mit Werkzeugaufrufen und das Strukturieren von Werkzeug-Nutzungs-Gesprächen mit Claude.
-- [OpenAI - Prompt engineering guide](https://platform.openai.com/docs/guides/prompt-engineering) — Grundlegende Techniken für strukturiertes Prompting, einschließlich Few-Shot-Beispiele, explizite Format-Anweisungen und Einschränkungsspezifikation.
-- [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629) — Originales Paper, das das Gedanke/Aktion/Beobachtungs-Prompting-Muster beschreibt, das den meisten Agenten-Frameworks zugrunde liegt.
+- [Anthropic - Visão geral de engenharia de prompt](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Orientação oficial da Anthropic sobre estrutura de system prompt, definição de papel e cadeia de pensamento para modelos Claude.
+- [Anthropic - Documentação de uso de ferramentas](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Referência completa para escrever definições de ferramentas, lidar com chamadas de ferramentas e estruturar conversas de uso de ferramentas com Claude.
+- [OpenAI - Guia de engenharia de prompt](https://platform.openai.com/docs/guides/prompt-engineering) — Técnicas fundamentais para prompting estruturado, incluindo exemplos few-shot, instruções explícitas de formato e especificação de restrições.
+- [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629) — Artigo original descrevendo o padrão de prompting Pensamento/Ação/Observação fundamental para a maioria dos frameworks de agentes.
+
+## Fontes
+
+- [ReAct: Synergizing Reasoning and Acting in Language Models (Yao et al., 2022)](https://arxiv.org/abs/2210.03629) — Estabelece o padrão de prompting pensamento–ação–observação usado em system prompts de agentes.
+- [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models (Wei et al., 2022)](https://arxiv.org/abs/2201.11903) — Trabalho fundamental sobre raciocínio passo a passo em prompts de agentes.
+- [Anthropic Prompt Engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Guia oficial para estrutura de system prompt, definição de papel e prompting de uso de ferramentas para Claude.
+- [Prompt Engineering Guide (DAIR.AI)](https://www.promptingguide.ai/) — Referência da comunidade para técnicas em modelos e frameworks de agentes.
 
 ## Veja também
 
-- [Agents](/docs/agents)
-- [Prompt engineering](/docs/prompt-engineering)
-- [Agent tools and actions](/docs/agents/tools-actions)
-- [Anthropic tool use](/docs/agents/anthropic-tool-use)
+- [Agentes](/docs/agents)
+- [Engenharia de prompt](/docs/prompt-engineering)
+- [Ferramentas e ações de agentes](/docs/agents/tools-actions)
+- [Anthropic Tool Use](/docs/agents/anthropic-tool-use)

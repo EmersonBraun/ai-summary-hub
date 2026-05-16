@@ -135,6 +135,33 @@
   opacity: 0.9;
 }
 
+.ash-banner {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 120% at 85% 15%, rgba(66, 133, 244, 0.22), transparent 60%),
+    linear-gradient(160deg, #0e1118 0%, #161b26 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f5f7fa;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.ash-banner:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--ash-accent) 45%, transparent);
+  box-shadow: 0 22px 50px -24px color-mix(in srgb, var(--ash-accent-2) 70%, transparent);
+}
+.ash-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(109, 92, 255, 0.18);
+  color: #a99bff;
+}
+
 .ash-cta-panel {
   position: relative;
   overflow: hidden;

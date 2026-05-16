@@ -1,23 +1,21 @@
 ---
-title: Multi-agent systems
-description: Multiple agents collaborating or competing.
+title: Sistemas multi-agentes
+description: Múltiplos agentes colaborando ou competindo.
 tags:
   - intermediate
 ---
 
-# Sistemas multi-agente
-
 ## Definição
 
-Multi-Agenten-Systeme (MAS) umfassen mehrere KI-Agenten, die interagieren, um Aufgaben zu lösen: Zusammenarbeit (Arbeit aufteilen, Zustand teilen), Debatte (argumentieren und Antworten verfeinern) oder spezialisierte Rollen (Planer, Ausführer, Kritiker). Anstatt eines einzigen monolithischen Agenten, der alles versucht zu tun, weist MAS verschiedenen Agenten unterschiedliche Verantwortlichkeiten zu und kombiniert deren Ausgaben.
+Sistemas multi-agentes (MAS) envolvem múltiplos agentes de IA que interagem para resolver tarefas: colaboração (dividir trabalho, compartilhar estado), debate (argumentar e refinar respostas) ou papéis especializados (planejador, executor, crítico). Em vez de um único agente monolítico tentando fazer tudo, o MAS atribui responsabilidades distintas a diferentes agentes e compõe suas saídas.
 
-Sie erweitern einzelne [Agenten](/docs/agents), wenn ein Modell oder eine Schleife nicht ausreicht: zum Beispiel ein Agent für [RAG](/docs/rag)-Abruf, ein anderer für die Generierung und ein weiterer für Kritik und Faktenprüfung. Jeder Agent kann ein anderes Modell, einen anderen Satz von Werkzeugen und einen anderen System-Prompt verwenden, der auf seine Rolle zugeschnitten ist. Diese Modularität macht einzelne Agenten einfacher, zuverlässiger und einfacher auszutauschen oder zu upgraden.
+Eles estendem [agentes](/docs/agents) individuais quando um modelo ou um ciclo é insuficiente: por exemplo, um agente para recuperação via [RAG](/docs/rag), outro para geração e outro para crítica e verificação de fatos. Cada agente pode usar um modelo diferente, um conjunto diferente de ferramentas e um system prompt diferente ajustado para seu papel. Essa modularidade torna os agentes individuais mais simples, mais confiáveis e mais fáceis de substituir ou atualizar.
 
-[Subagenten](/docs/subagents) sind eine hierarchische Form, bei der ein Root-Agent an Kinder delegiert; Multi-Agenten-Systeme können auch flach (Peer-to-Peer) oder mesh-strukturiert sein, wobei Agenten ohne einen zentralen Orchestrator miteinander kommunizieren. Die richtige Topologie – hierarchisch, flach oder hybrid – hängt davon ab, ob der Workflow eine natürliche Zerlegung in unabhängige oder sequentiell abhängige Teilaufgaben aufweist.
+[Subagentes](/docs/subagents) são uma forma hierárquica onde um agente raiz delega para filhos; sistemas multi-agentes também podem ser planos (ponto a ponto) ou em malha, onde os agentes se comunicam entre si sem um orquestrador central. A topologia correta — hierárquica, plana ou híbrida — depende de se o fluxo de trabalho tem uma decomposição natural em subtarefas independentes ou sequencialmente dependentes.
 
 ## Como funciona
 
-### Orchestrierte (hierarchische) Topologie
+### Topologia orquestrada (hierárquica)
 
 ```mermaid
 flowchart LR
@@ -32,7 +30,7 @@ flowchart LR
   Orch -->|final answer| User
 ```
 
-### Debatte / Überprüfungs-Topologie
+### Topologia de debate / revisão
 
 ```mermaid
 flowchart LR
@@ -44,36 +42,36 @@ flowchart LR
   Judge -->|final answer| Output[Output]
 ```
 
-Der **Benutzer** sendet eine Aufgabe an einen **Orchestrator** (der ein LLM oder ein fester Workflow sein kann). Der Orchestrator weist Arbeit an **Agent 1**, **Agent 2** usw. zu, jeweils mit seiner eigenen Rolle, Werkzeugen und optional Modell. Agenten können einen gemeinsamen Zustand teilen, Nachrichten übergeben oder sequentiell oder parallel aufgerufen werden. Ihre Ausgaben werden **aggregiert** (kombiniert, gewählt oder zusammengefasst) und zurückgegeben. MAS sind nützlich, wenn Sie **Modularität**, **Spezialisierung**, **Wiederverwendbarkeit** und **strukturierten Kontrollfluss** über komplexe mehrstufige Aufgaben hinweg möchten.
+O **usuário** envia uma tarefa a um **orquestrador** (que pode ser um LLM ou um fluxo de trabalho fixo). O orquestrador atribui trabalho ao **Agente 1**, **Agente 2**, etc., cada um com seu próprio papel, ferramentas e, opcionalmente, modelo. Os agentes podem compartilhar um estado comum, trocar mensagens ou ser invocados em sequência ou em paralelo. Suas saídas são **agregadas** (combinadas, votadas ou resumidas) e retornadas. MAS são úteis quando você quer **modularidade**, **especialização**, **reutilização** e **controle de fluxo estruturado** em tarefas complexas de múltiplos passos.
 
 ## Quando usar / Quando NÃO usar
 
-| Cenário | Usar MAS | Não usar MAS |
+| Cenário | Use MAS | Não use MAS |
 |---|---|---|
-| Aufgabe zerlegt sich sauber in unterschiedliche Rollen | Ja — Planer + Ausführer + Kritiker ist eine natürliche Aufteilung | Nein — wenn die Aufgabe einrollig ist, reicht ein Agent |
-| Hohe Konfidenz durch Debatte/Überprüfung benötigt | Ja — Debatte-Muster filtert Fehler durch Uneinigkeit | Nein — Single-Agent ist für gut verstandene Domänen ausreichend |
-| Verschiedene Teilaufgaben brauchen verschiedene Werkzeuge/Modelle | Ja — jeder Agent verwendet nur, was er braucht | Nein — ein Agent mit allen Werkzeugen ist einfacher, wenn Rollen stark überlappen |
-| Schnelles Prototyping oder einfache Pipelines | Nein — MAS-Overhead fügt Komplexität hinzu | Ja — mit einem einzelnen Agenten beginnen und bei Bedarf Komplexität hinzufügen |
-| Starke Echtzeit-Latenzanforderungen | Nein — parallele Agenten fügen Koordinations-Overhead hinzu | Ja — Single-Agent ist schneller für knappe Latenzbudgets |
+| A tarefa se decompõe claramente em papéis distintos | Sim — planejador + executor + crítico é uma divisão natural | Não — se a tarefa é de papel único, um agente é suficiente |
+| Alta confiança necessária via debate/revisão | Sim — o padrão de debate filtra erros por meio de discordância | Não — agente único é adequado para domínios bem compreendidos |
+| Subtarefas diferentes precisam de ferramentas/modelos diferentes | Sim — cada agente usa apenas o que precisa | Não — um agente com todas as ferramentas é mais simples se os papéis se sobrepõem muito |
+| Prototipagem rápida ou pipelines simples | Não — a sobrecarga do MAS adiciona complexidade | Sim — comece com um único agente e adicione complexidade conforme necessário |
+| Requisitos fortes de latência em tempo real | Não — agentes em paralelo adicionam sobrecarga de coordenação | Sim — agente único é mais rápido para orçamentos de latência apertados |
 
 ## Comparações
 
-| Muster | Struktur | Kommunikation | Autonomie | Melhor para |
+| Padrão | Estrutura | Comunicação | Autonomia | Melhor para |
 |---|---|---|---|---|
-| Single-Agent | Monolithisch | Keine | Hoch pro Agent | Einfache oder moderate Aufgaben |
-| Hierarchisches MAS | Baum (Root → Kinder) | Root delegiert | Mittel pro Agent | Strukturierte Workflows |
-| Flaches / Peer-to-Peer MAS | Mesh oder Ring | Direkte Nachrichtenübermittlung | Hoch | Kollaboratives Reasoning |
-| Debatte / Überprüfung | Parallel + Zusammenführen | Kritikunterbasiert | Mittel | Hochvertrauens-Generierung |
-| Subagent (strikte Hierarchie) | Baum (Root besitzt Ziel) | Kontrollierte Delegation | Niedrig pro Subagent | Komplexe, langfristige Aufgaben |
+| Agente único | Monolítico | Nenhuma | Alta por agente | Tarefas simples ou moderadas |
+| MAS hierárquico | Árvore (raiz → filhos) | Raiz delega | Média por agente | Fluxos de trabalho estruturados |
+| MAS plano / ponto a ponto | Malha ou anel | Mensagens diretas | Alta | Raciocínio colaborativo |
+| Debate / revisão | Paralelo + mesclagem | Baseado em crítica | Média | Geração de alta confiança |
+| Subagente (hierarquia estrita) | Árvore (raiz é dona do objetivo) | Delegação controlada | Baixa por subagente | Tarefas complexas de longo horizonte |
 
-## Vantagens e desvantagens
+## Prós e contras
 
-| Vantagens | Desvantagens |
+| Prós | Contras |
 |---|---|
-| Modular — jeder Agent hat eine klare, testbare Verantwortung | Koordinations-Overhead (Latenz, Token, Zustandssynchronisation) |
-| Spezialisierte Agenten übertreffen Generalisten in ihrer Rolle | Schwieriger zu debuggen als ein Single-Agent-Trace |
-| Wiederverwendbar — gleicher Agent in verschiedenen Workflows | Design des Kommunikationsprotokolls ist nicht trivial |
-| Debatte-Muster können die Genauigkeit erheblich verbessern | Risiko von kaskadierenden Fehlern über Agenten hinweg |
+| Modular — cada agente tem uma responsabilidade clara e testável | Sobrecarga de coordenação (latência, tokens, sincronização de estado) |
+| Agentes especializados superam agentes generalistas em seu papel | Mais difícil de depurar do que uma trilha de agente único |
+| Reutilizável — mesmo agente em diferentes fluxos de trabalho | O design do protocolo de comunicação é não trivial |
+| Padrões de debate podem melhorar significativamente a precisão | Risco de erros em cascata entre agentes |
 
 ## Exemplos de código
 
@@ -121,14 +119,21 @@ print("\nCritique:\n", critique)
 
 ## Recursos práticos
 
-- [From Prototypes to Agents with ADK – Google Codelabs](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — ADK unterstützt die Komposition mehrerer Agenten zu einem Multi-Agenten-System
-- [LangChain – Multi-agent orchestration](https://python.langchain.com/docs/concepts/multi_agent/) — Multi-Agenten-Muster einschließlich Supervisor- und Schwarm-Topologien
-- [Microsoft AutoGen](https://microsoft.github.io/autogen/) — Framework zum Aufbau von Multi-Agenten-Konversationssystemen
-- [AgentsKit](https://emersonbraun.github.io/agentskit/) — Produktionsreifes Framework zum Aufbau von KI-Agenten mit Speicher, Werkzeugen und Multi-Agent-Orchestrierung
+- [From Prototypes to Agents with ADK – Google Codelabs](https://codelabs.developers.google.com/your-first-agent-with-adk#0) — ADK suporta a composição de múltiplos agentes em um sistema multi-agente
+- [LangChain – Multi-agent orchestration](https://python.langchain.com/docs/concepts/multi_agent/) — Padrões multi-agentes incluindo topologias de supervisor e enxame
+- [Microsoft AutoGen](https://microsoft.github.io/autogen/) — Framework para construir sistemas multi-agentes conversacionais
+- [AgentsKit](https://emersonbraun.github.io/agentskit/) — Framework pronto para produção para construir agentes de IA com memória, ferramentas e orquestração multi-agente
+
+## Fontes
+
+- [AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation (Wu et al., 2023)](https://arxiv.org/abs/2308.08155) — Artigo fundamental sobre sistemas multi-agentes orientados à conversa.
+- [Communicative Agents for Software Development (Qian et al., 2023)](https://arxiv.org/abs/2307.07924) — Colaboração multi-agente para tarefas complexas de engenharia de software.
+- [MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework (Hong et al., 2023)](https://arxiv.org/abs/2308.00352) — Framework multi-agente estruturado com atribuição de papéis e procedimentos operacionais padronizados.
+- [Camel: Communicative Agents for "Mind" Exploration of Large Scale Language Model Society (Li et al., 2023)](https://arxiv.org/abs/2303.17760) — Framework de role-playing para cooperação autônoma entre agentes.
 
 ## Veja também
 
-- [Agents](/docs/agents)
-- [Subagents](/docs/subagents)
-- [Autonomous agents](/docs/autonomous-agents)
+- [Agentes](/docs/agents)
+- [Subagentes](/docs/subagents)
+- [Agentes autônomos](/docs/autonomous-agents)
 - [ReAct](/docs/reasoning-patterns/react)

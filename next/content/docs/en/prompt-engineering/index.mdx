@@ -39,6 +39,18 @@ Configuration parameters (temperature, Top-K, Top-P, max tokens) operate at the 
 
 Advanced prompt engineering adds a reliability layer on top of basic prompting. This includes running multiple prompts in parallel (ensembling), having the model critique its own output (self-evaluation), and applying debiasing strategies to reduce systematic errors. These methods trade compute cost for output quality and are especially important in high-stakes applications.
 
+## When to use / When NOT to use
+
+| Scenario | Apply prompt engineering | Skip / use alternatives |
+|---|---|---|
+| Improving output quality without retraining | Yes — prompt engineering is the fastest lever | No — if the problem is a capability gap the model cannot bridge at all |
+| Steering model persona, tone, or format | Yes — system prompts and role instructions are highly effective | No — if downstream parsing requires strict schemas, use [structured outputs](/docs/prompt-engineering/structured-outputs) with JSON mode |
+| Multi-step reasoning tasks (math, logic, code planning) | Yes — add chain-of-thought or step-back prompting | No — for simple single-step responses, adding reasoning steps increases cost without benefit |
+| Reducing hallucinations on knowledge-heavy queries | Yes — combine with [RAG](/docs/rag) to ground responses in retrieved facts | No — prompt engineering alone cannot add new knowledge the model was not trained on |
+| High-volume, latency-critical inference | Partial — keep prompts concise; avoid few-shot examples when zero-shot suffices | Yes — long prompts and multi-call techniques (self-consistency, ensembling) add cost and latency |
+| Safety and compliance guardrails | Partial — system prompts can constrain behavior | No — for hard safety requirements, add programmatic guardrails; models can be jailbroken |
+| Domain-specific accuracy at scale | Partial — few-shot prompting helps | Yes — consider [fine-tuning](/docs/llms/fine-tuning) when prompt engineering hits a quality ceiling |
+
 ## Practical resources
 
 - [OpenAI — Prompt engineering guide](https://platform.openai.com/docs/guides/prompt-engineering) — Comprehensive guide covering best practices and strategies

@@ -78,6 +78,45 @@ const WHY = {
   ],
 } as const;
 
+const PROJECTS = {
+  en: {
+    heading: 'Open-source projects',
+    subtitle: 'Tools from the same author — free and open source.',
+    cards: [
+      {
+        name: 'AgentsKit',
+        href: 'https://www.agentskit.io/',
+        desc: 'The most complete library for building AI agents. Production-ready framework with memory, tools, multi-agent orchestration, and more.',
+        cta: 'Visit documentation →',
+      },
+      {
+        name: 'Skills',
+        href: 'https://github.com/EmersonBraun/skills',
+        desc: 'A curated repository of reusable AI skills for Claude Code and other AI coding assistants. Boost your dev workflow instantly.',
+        cta: 'View on GitHub →',
+      },
+    ],
+  },
+  'pt-BR': {
+    heading: 'Projetos open source',
+    subtitle: 'Ferramentas do mesmo autor — gratuitas e open source.',
+    cards: [
+      {
+        name: 'AgentsKit',
+        href: 'https://www.agentskit.io/',
+        desc: 'A biblioteca mais completa para construir agentes de IA. Framework pronto para produção com memória, ferramentas, orquestração multi-agente e mais.',
+        cta: 'Ver documentação →',
+      },
+      {
+        name: 'Skills',
+        href: 'https://github.com/EmersonBraun/skills',
+        desc: 'Um repositório curado de skills de IA reutilizáveis para Claude Code e outros assistentes de código. Acelere seu fluxo de dev na hora.',
+        cta: 'Ver no GitHub →',
+      },
+    ],
+  },
+} as const;
+
 export default async function HomePage(props: { params: Promise<Params> }) {
   const { lang } = await props.params;
   const copy = HOME_COPY[lang];
@@ -219,6 +258,37 @@ export default async function HomePage(props: { params: Promise<Params> }) {
                   {w.d}
                 </p>
               </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Open-source projects */}
+        <section className="border-t border-fd-border py-24">
+          <div className="mb-10 text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              {PROJECTS[lang].heading}
+            </h2>
+            <p className="mt-3 text-fd-muted-foreground">{PROJECTS[lang].subtitle}</p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2">
+            {PROJECTS[lang].cards.map((p) => (
+              <a
+                key={p.name}
+                href={p.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ash-banner group flex flex-col rounded-2xl p-8"
+              >
+                <span className="ash-badge w-fit">Open Source</span>
+                <h3 className="mt-5 text-2xl font-bold">{p.name}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-white/70">{p.desc}</p>
+                <span
+                  className="mt-6 text-sm font-semibold transition group-hover:translate-x-1"
+                  style={{ color: 'var(--ash-accent)' }}
+                >
+                  {p.cta}
+                </span>
+              </a>
             ))}
           </div>
         </section>

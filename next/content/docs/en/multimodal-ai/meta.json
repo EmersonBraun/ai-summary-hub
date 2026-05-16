@@ -1,5 +1,7 @@
 {
   "pages": [
-    "index"
+    "index",
+    "vision-language-models",
+    "document-ai"
   ]
 }

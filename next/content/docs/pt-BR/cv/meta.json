@@ -1,5 +1,8 @@
 {
   "pages": [
-    "index"
+    "index",
+    "vision-transformers",
+    "object-detection",
+    "segmentation"
   ]
 }

@@ -11,9 +11,17 @@ tags:
 
 **Anthropic** is an AI safety company and model provider founded in 2021 by former OpenAI researchers. Its core thesis is that building capable AI models and solving the alignment problem are inseparable goals — the company pursues cutting-edge capability alongside safety research such as Constitutional AI, interpretability, and mechanistic understanding of model internals. The commercial product of that research is the **Claude** family of models, available through the Anthropic API and enterprise products.
 
-The Claude model lineup follows a three-tier naming convention reflecting capability and cost trade-offs: **Opus** (highest quality, complex reasoning), **Sonnet** (balanced quality and speed), and **Haiku** (fastest and most cost-efficient). As of 2025 the current generation is **Claude 3.7 Sonnet** — the flagship model with extended thinking capabilities — along with **Claude 3 Opus**, **Claude 3.5 Sonnet**, and **Claude 3.5 Haiku**. All Claude 3+ models support vision input (images), and the entire family is designed around a 200K-token context window that can handle books, large codebases, and long conversation histories without truncation.
+The Claude model lineup as of May 2026 follows a three-tier naming convention reflecting capability and cost trade-offs: **Opus** (highest quality, complex reasoning), **Sonnet** (balanced quality and speed), and **Haiku** (fastest and most cost-efficient).
 
-From a platform perspective, Anthropic's API centers on the **Messages API** — a clean, purpose-built interface for multi-turn conversations. The platform includes tool use (Anthropic's term for function calling), extended thinking (visible chain-of-thought reasoning), prompt caching (reduces cost and latency for large repeated contexts), and batch processing. The Python SDK (`anthropic`) and TypeScript SDK are the primary client libraries. Claude models are also available through Amazon Bedrock, Google Cloud Vertex AI, and enterprise contracts with data residency options.
+| Model | API Model ID | Context | Max Output | Input ($/1M) | Output ($/1M) |
+|-------|-------------|---------|------------|--------------|---------------|
+| Claude Opus 4.7 | `claude-opus-4-7` | 1M tokens | 128K tokens | $5.00 | $25.00 |
+| Claude Sonnet 4.6 | `claude-sonnet-4-6` | 1M tokens | 64K tokens | $3.00 | $15.00 |
+| Claude Haiku 4.5 | `claude-haiku-4-5` | 200K tokens | 64K tokens | $1.00 | $5.00 |
+
+> All Claude 3.x series models (Opus, Sonnet, Haiku) are fully superseded and should not be referenced as current. `claude-sonnet-4-20250514` and `claude-opus-4-20250514` retire **2026-06-15**.
+
+From a platform perspective, Anthropic's API centers on the **Messages API** — a clean, purpose-built interface for multi-turn conversations. The platform includes tool use (Anthropic's term for function calling), extended thinking / adaptive thinking, prompt caching (reduces cost and latency for large repeated contexts), and batch processing. The Python SDK (`anthropic`) and TypeScript SDK are the primary client libraries. Claude models are also available through Amazon Bedrock, Google Cloud Vertex AI, and enterprise contracts with data residency options.
 
 ## How it works
 
@@ -25,9 +33,9 @@ The Messages API (`POST /v1/messages`) is Anthropic's primary interface. Unlike 
 flowchart LR
   Client[Client app] -->|POST /v1/messages| API[Anthropic API]
   API -->|system + messages| Selector{Model\nselector}
-  Selector -->|complex reasoning| Opus[Claude 3 Opus]
-  Selector -->|balanced| Sonnet[Claude 3.7 Sonnet]
-  Selector -->|fast / cheap| Haiku[Claude 3.5 Haiku]
+  Selector -->|complex reasoning| Opus[Claude Opus 4.7]
+  Selector -->|balanced| Sonnet[Claude Sonnet 4.6]
+  Selector -->|fast / cheap| Haiku[Claude Haiku 4.5]
   Opus -->|content blocks| Resp[Message response]
   Sonnet --> Resp
   Haiku --> Resp
@@ -49,21 +57,23 @@ flowchart LR
   Claude -->|final text response| UserMsg
 ```
 
-### Extended thinking
+### Extended thinking and adaptive thinking
 
-Extended thinking is a mode available on Claude 3.7 Sonnet that allows the model to reason at length before producing its final answer. When you set `thinking: {type: "enabled", budget_tokens: N}`, the model emits `thinking` content blocks containing its internal scratchpad — similar to chain-of-thought but native and structured. Extended thinking significantly improves performance on math competitions, complex code, multi-step reasoning, and tasks requiring careful step-by-step analysis. The thinking tokens count toward the token budget but are visible in the response, giving you transparency into how the model arrived at its answer.
+**Extended thinking** (Sonnet 4.6, Haiku 4.5) allows the model to reason at length before producing its final answer. When you set `thinking: {type: "enabled", budget_tokens: N}`, the model emits `thinking` content blocks containing its internal scratchpad — similar to chain-of-thought but native and structured.
+
+**Adaptive thinking** (Opus 4.7, Opus 4.6, Sonnet 4.6) automatically scales reasoning depth to task complexity. Both modes significantly improve performance on math competitions, complex code, multi-step reasoning, and tasks requiring careful step-by-step analysis. The thinking tokens count toward the token budget but are visible in the response, giving you transparency into how the model arrived at its answer.
 
 ### Prompt caching
 
-Prompt caching dramatically reduces cost and latency for workloads that repeatedly use large system prompts or document contexts. You mark prefix sections of your request with `cache_control: {type: "ephemeral"}`. On the first call, Anthropic caches the prompt prefix on their infrastructure; subsequent calls that match the prefix are served from cache at 90% lower input token cost and significantly reduced time-to-first-token. This is especially valuable for RAG pipelines (large context passed with every query), agent loops (large system prompts repeated every turn), and batch document processing.
+Prompt caching dramatically reduces cost and latency for workloads that repeatedly use large system prompts or document contexts. You mark prefix sections of your request with `cache_control: {type: "ephemeral"}`. Cache writes for a 5-minute TTL cost 1.25x base; cache writes for a 1-hour TTL cost 2x base; cache reads cost 0.1x base (90% discount). This is especially valuable for RAG pipelines (large context passed with every query), agent loops (large system prompts repeated every turn), and batch document processing.
 
-### Long context (200K tokens)
+### Long context (1M tokens)
 
-All Claude 3 and later models support a 200K-token context window — equivalent to roughly 150,000 words or ~500 pages of text. Long context enables entire codebases, legal documents, research papers, or full conversation histories to be processed in a single call without chunking. Anthropic's research on long-context performance ("needle in a haystack" evaluations) shows Claude maintains strong recall accuracy across the full 200K range, making it reliable for document Q&A, contract analysis, and code review over large repositories. This is one of Anthropic's clearest differentiators relative to GPT-4o's 128K window.
+Claude Opus 4.7 and Sonnet 4.6 support a 1M-token context window, and Haiku 4.5 supports 200K tokens. Long context enables entire codebases, legal documents, research papers, or full conversation histories to be processed in a single call without chunking. The **Batch API** provides a 50% discount on both input and output tokens for async workloads. An `output-300k-2026-03-24` beta header extends maximum output to 300K tokens.
 
 ```mermaid
 flowchart LR
-  LargeDoc[Large document\nor codebase] -->|tokenize| Tokens[Up to 200K tokens]
+  LargeDoc[Large document\nor codebase] -->|tokenize| Tokens[Up to 1M tokens]
   Tokens -->|single API call| Claude[Claude model]
   SystemPrompt[System prompt] -->|cached prefix| Cache[(Prompt cache)]
   Cache -->|cache hit: 90% cheaper| Claude
@@ -74,25 +84,25 @@ flowchart LR
 
 | Use Anthropic when | Avoid or consider alternatives when |
 |--------------------|--------------------------------------|
-| You need a 200K context window to process long documents, codebases, or extended conversations without chunking | Your workload requires image generation, audio transcription, or text-to-speech — Claude is text/vision only; OpenAI covers audio |
+| You need a 1M context window to process long documents, codebases, or extended conversations without chunking | Your workload requires image generation, audio transcription, or text-to-speech — Claude is text/vision only; OpenAI covers audio |
 | Safety constraints and predictable refusal behavior are critical (compliance, healthcare, finance) | You need open-weights models for self-hosting, fine-tuning, or data residency — Anthropic offers no open-weights option |
-| You want extended thinking for deep reasoning tasks (math, complex code, multi-step analysis) | Your primary use case is high-volume embedding generation — Anthropic does not offer an embeddings API |
-| Prompt caching will meaningfully reduce cost (large repeated contexts, agent system prompts) | You rely heavily on OpenAI-specific tooling (Assistants API, DALL-E, Whisper) that has no Anthropic equivalent |
-| You are building tool use or computer use workflows and want a model well-calibrated for structured outputs | You need the absolute lowest cost-per-token at scale — Claude Haiku competes on price but GPT-4o-mini and open models are cheaper |
+| You want extended or adaptive thinking for deep reasoning tasks (math, complex code, multi-step analysis) | Your primary use case is high-volume embedding generation — Anthropic does not offer an embeddings API |
+| Prompt caching will meaningfully reduce cost (large repeated contexts, agent system prompts) | You rely heavily on OpenAI-specific tooling (DALL-E, Whisper) that has no Anthropic equivalent |
+| You are building tool use or computer use workflows and want a model well-calibrated for structured outputs | You need the absolute lowest cost-per-token at scale — Claude Haiku competes on price but open models can be cheaper |
 
 ## Comparisons
 
 | Criteria | Anthropic | OpenAI | Google Gemini |
 |----------|-----------|--------|---------------|
-| Flagship model | Claude 3.7 Sonnet | GPT-4o | Gemini 2.5 Pro |
-| Context window | 200K (all Claude 3+) | 128K (GPT-4o) | Up to 1M (Gemini 1.5 Pro) |
-| Reasoning / thinking | Extended thinking (native CoT) | o1, o3 series | Gemini 2.5 Pro thinking |
+| Flagship model | Claude Opus 4.7 | GPT-5.5 | Gemini 2.5 Pro |
+| Context window | 1M (Opus 4.7, Sonnet 4.6); 200K (Haiku 4.5) | 1,050K (GPT-5.5 / GPT-5.4) | 1M (Gemini 2.5 Pro) |
+| Reasoning / thinking | Adaptive thinking (Opus 4.7); Extended thinking (Sonnet 4.6, Haiku 4.5) | Reasoning modes: none → xhigh | Gemini 2.5 Pro thinking |
 | Multimodal input | Text, image | Text, image, audio, video | Text, image, audio, video |
-| Audio / speech | No | Yes (Whisper, TTS) | Yes (Gemini) |
-| Image generation | No | Yes (DALL-E 3) | Yes (Imagen) |
+| Audio / speech | No | Yes (GPT Realtime 2) | Yes (Gemini) |
+| Image generation | No | Yes (GPT Image 2) | Yes (Imagen 4) |
 | Embeddings API | No | Yes | Yes |
 | Open-weights | No | No | Gemma (partial) |
-| Prompt caching | Yes (native, 90% discount) | Context caching (limited) | Yes (Gemini) |
+| Prompt caching | Yes (native, 90% read discount) | Context caching (limited) | Yes (Gemini) |
 | Tool use / function calling | Mature, computer use support | Mature, widely adopted | Mature |
 | Safety philosophy | Constitutional AI, refusal-tuned | Moderation API, usage policy | Responsible AI guidelines |
 | Data residency options | Enterprise contract | Enterprise contract | Google Cloud regions |
@@ -101,11 +111,11 @@ flowchart LR
 
 | Pros | Cons |
 |------|------|
-| 200K context window across all models — best-in-class for long documents | No audio, speech, or image generation APIs |
-| Extended thinking gives transparent chain-of-thought for hard reasoning tasks | No embeddings API — you need a second provider for RAG |
+| Up to 1M context window — best-in-class for long documents | No audio, speech, or image generation APIs |
+| Adaptive and extended thinking give transparent chain-of-thought for hard reasoning tasks | No embeddings API — you need a second provider for RAG |
 | Prompt caching significantly reduces cost for repeated large contexts | Closed model with no open-weights option |
 | Safety-first design with careful refusal calibration and Constitutional AI | Smaller ecosystem than OpenAI — fewer third-party tutorials and integrations |
-| Computer use (beta) enables agentic control of desktop GUIs | Pricing can be higher than GPT-4o-mini or open-weights alternatives for simple tasks |
+| Computer use (beta) enables agentic control of desktop GUIs | Pricing can be higher than open-weights alternatives for simple tasks |
 
 ## Code examples
 
@@ -118,7 +128,7 @@ client = anthropic.Anthropic(api_key="sk-ant-...")  # or set ANTHROPIC_API_KEY e
 
 # Basic message
 message = client.messages.create(
-    model="claude-3-7-sonnet-20250219",
+    model="claude-sonnet-4-6",
     max_tokens=1024,
     system="You are a concise technical assistant. Answer in plain English.",
     messages=[
@@ -134,7 +144,7 @@ messages = [
     {"role": "user", "content": "How much does it save?"},
 ]
 response = client.messages.create(
-    model="claude-3-5-haiku-20241022",
+    model="claude-haiku-4-5",
     max_tokens=512,
     messages=messages,
 )
@@ -169,7 +179,7 @@ messages = [{"role": "user", "content": "How do I enable prompt caching?"}]
 
 # First call — Claude may request a tool
 response = client.messages.create(
-    model="claude-3-7-sonnet-20250219",
+    model="claude-sonnet-4-6",
     max_tokens=1024,
     tools=tools,
     messages=messages,
@@ -194,7 +204,7 @@ if response.stop_reason == "tool_use":
 
     # Final call with tool result
     final = client.messages.create(
-        model="claude-3-7-sonnet-20250219",
+        model="claude-sonnet-4-6",
         max_tokens=1024,
         tools=tools,
         messages=messages,
@@ -210,7 +220,7 @@ import anthropic
 client = anthropic.Anthropic()
 
 response = client.messages.create(
-    model="claude-3-7-sonnet-20250219",
+    model="claude-sonnet-4-6",
     max_tokens=16000,
     thinking={
         "type": "enabled",
@@ -246,7 +256,7 @@ client = anthropic.Anthropic()
 large_document = open("contract.txt").read()  # e.g., 50K tokens
 
 response = client.messages.create(
-    model="claude-3-5-sonnet-20241022",
+    model="claude-sonnet-4-6",
     max_tokens=1024,
     system=[
         {
@@ -263,7 +273,7 @@ response = client.messages.create(
 )
 
 print(response.content[0].text)
-# usage.cache_creation_input_tokens — tokens cached this call (full price)
+# usage.cache_creation_input_tokens — tokens cached this call (full price × 1.25)
 # usage.cache_read_input_tokens — tokens served from cache (10% price)
 print(response.usage)
 ```
@@ -271,16 +281,17 @@ print(response.usage)
 ## Practical resources
 
 - [Anthropic API reference](https://docs.anthropic.com/en/api/getting-started) — Complete endpoint documentation with request/response schemas and parameter reference
+- [Claude models overview](https://platform.claude.com/docs/en/docs/about-claude/models) — Current model IDs, context windows, capability comparison, and deprecation schedule
+- [Claude pricing](https://platform.claude.com/docs/en/docs/about-claude/pricing) — Per-token pricing, prompt caching rates, batch discount, and fast mode pricing
 - [Anthropic prompt engineering guide](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Official best practices for system prompts, chain-of-thought, and task-specific techniques
 - [Anthropic Cookbook](https://github.com/anthropics/anthropic-cookbook) — Runnable notebooks covering tool use, RAG, multimodal, prompt caching, and agents
-- [Claude model overview](https://docs.anthropic.com/en/docs/about-claude/models) — Current model IDs, context windows, capability comparison, and deprecation schedule
 - [Anthropic Python SDK on GitHub](https://github.com/anthropics/anthropic-sdk-python) — Source, changelog, type stubs, and migration guides
 
 ## See also
 
 - [Model providers](/docs/model-providers) — Overview and comparison of all providers including a 7-provider comparison table
 - [Case study: Claude](/docs/case-studies/claude) — For a deeper look at model architecture and training methodology, see the Claude case study
-- [OpenAI](/docs/model-providers/openai) — GPT-4o, o-series reasoning, function calling, DALL-E, Whisper
+- [OpenAI](/docs/model-providers/openai) — GPT-5.x models, function calling, image and video generation
 - [Prompt engineering](/docs/prompt-engineering) — Techniques applicable to all Claude models
 - [Tools](/docs/tools/claude-code) — Claude Code, Anthropic's AI coding agent built on the Claude API
 - [Agents](/docs/agents) — Building agentic workflows with Claude tool use

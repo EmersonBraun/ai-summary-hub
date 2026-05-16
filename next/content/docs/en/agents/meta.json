@@ -10,6 +10,7 @@
     "tools-actions",
     "frameworks-overview",
     "agent-runtimes",
+    "a2a-protocol",
     "crewai",
     "autogen",
     "langgraph",

@@ -61,13 +61,14 @@ The decision tree depends on your constraints. Start with your requirements — 
 
 | Criteria | OpenAI | Anthropic | Google Gemini | Meta Llama | Mistral | Cohere | DeepSeek |
 |----------|--------|-----------|---------------|------------|---------|--------|----------|
-| Model access | API only | API only | API + Vertex AI | Open weights | Open + API | API only | Open + API |
-| Top model tier | GPT-4o, o3 | Claude Opus/Sonnet | Gemini Ultra/Pro | Llama 3.1 405B | Mistral Large | Command R+ | DeepSeek-V3 |
-| Context window | 128K | 200K | 1M+ | 128K | 128K | 128K | 128K |
-| Multimodal | Vision, audio, image gen | Vision | Vision, audio, video | Vision (3.2) | Vision | Text-focused | Text-focused |
-| Specialty | General-purpose, ecosystem | Safety, long context | Multimodal, search grounding | Open-weights, customization | Efficiency, multilingual | Embeddings, RAG, reranking | Reasoning, cost efficiency |
-| Fine-tuning | API fine-tuning | Not available | Vertex AI tuning | Full weight access | API fine-tuning | Not available | Full weight access |
-| Pricing model | Per token | Per token | Per token + free tier | Free (self-host) or third-party | Per token + free models | Per token | Per token (very low cost) |
+| Model access | API only | API only | API + Vertex AI | Open weights + Llama API | Open + API | API only | Open + API |
+| Flagship tier | GPT-5.5 (`gpt-5.5`) | Claude Opus 4.7 (`claude-opus-4-7`) | Gemini 2.5 Pro (`gemini-2.5-pro`) | Llama 4 Maverick (17B active / 400B) | Mistral Large 3 (`mistral-large-2512`, 41B active / 675B) | Command A (`command-a-03-2025`, 111B) | DeepSeek V4 Pro (`deepseek-v4-pro`) |
+| Context window | 1,050K (GPT-5.5 / GPT-5.4) | 1M (Opus 4.7, Sonnet 4.6); 200K (Haiku 4.5) | 1M (Gemini 2.5 Pro / Flash) | 10M (Scout), 1M (Maverick) | 256K (Mistral Large 3) | 256K (Command A) | 1M (V4 Flash / Pro) |
+| Flagship input pricing | $5.00/1M (GPT-5.5) | $5.00/1M (Opus 4.7) | $1.25–$2.50/1M (Gemini 2.5 Pro) | Free (self-host) | $0.50/1M (Mistral Large 3) | Not published (enterprise) | $0.435/1M cache-miss (V4 Pro) |
+| Multimodal | Text, image, audio, video | Text, image | Text, image, audio, video | Text + images (up to 5) | Text + image (Large 3) | Text + image (Command A Vision) | Text only |
+| Specialty | Broadest ecosystem, agent tooling | Safety, long context, thinking | Multimodal, Google Search grounding | Open-weights, customization, huge context | Efficiency, EU sovereignty, multilingual | Embeddings, reranking, enterprise RAG | Reasoning, very low cost |
+| Fine-tuning | API fine-tuning | Not available | Vertex AI tuning | Full weight access | Open-weights LoRA/QLoRA; API fine-tuning beta | Not available | Full weight access |
+| Pricing model | Per token | Per token | Per token + free tier | Free (self-host) or third-party API | Per token + free open-weights | Per token (enterprise) | Per token (very low cost) |
 
 ## Code examples
 
@@ -79,7 +80,7 @@ from openai import OpenAI
 
 openai_client = OpenAI()
 openai_response = openai_client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-5.4",
     messages=[{"role": "user", "content": "Explain RAG in one sentence."}],
 )
 print("OpenAI:", openai_response.choices[0].message.content)
@@ -91,7 +92,7 @@ import anthropic
 
 anthropic_client = anthropic.Anthropic()
 anthropic_response = anthropic_client.messages.create(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-4-6",
     max_tokens=256,
     messages=[{"role": "user", "content": "Explain RAG in one sentence."}],
 )
@@ -102,7 +103,7 @@ print("Anthropic:", anthropic_response.content[0].text)
 # Google Gemini
 import google.generativeai as genai
 
-model = genai.GenerativeModel("gemini-1.5-pro")
+model = genai.GenerativeModel("gemini-2.5-flash")
 gemini_response = model.generate_content("Explain RAG in one sentence.")
 print("Gemini:", gemini_response.text)
 ```
@@ -114,9 +115,9 @@ from litellm import completion
 
 # Same interface, different providers
 providers = {
-    "OpenAI": "gpt-4o",
-    "Anthropic": "claude-sonnet-4-20250514",
-    "Gemini": "gemini/gemini-1.5-pro",
+    "OpenAI": "gpt-5.4",
+    "Anthropic": "claude-sonnet-4-6",
+    "Gemini": "gemini/gemini-2.5-flash",
 }
 
 for name, model in providers.items():
