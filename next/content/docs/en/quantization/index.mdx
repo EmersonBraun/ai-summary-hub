@@ -19,17 +19,17 @@ Quantization exists on a spectrum of approaches: **post-training quantization (P
 
 ```mermaid
 flowchart LR
-  FP32["FP32 / BF16 weights"] -->|"run calibration data"| Calibrate["Collect activation stats\n(min, max, percentiles)"]
+  FP32["FP32 / BF16 weights"] -->|"run calibration data"| Calibrate["Collect activation stats<br/>(min, max, percentiles)"]
   Calibrate -->|"compute"| Scale["Scale + zero-point per layer"]
   Scale -->|"map weights"| INT8["INT8 / INT4 weights"]
-  INT8 -->|"deploy"| Runtime["Inference runtime\n(GPU tensor cores / NPU)"]
+  INT8 -->|"deploy"| Runtime["Inference runtime<br/>(GPU tensor cores / NPU)"]
 ```
 
 ### Quantization-aware training (QAT)
 
 ```mermaid
 flowchart LR
-  Model["FP32 model"] -->|"insert"| FakeQuant["Fake quantization nodes\n(simulate rounding in forward pass)"]
+  Model["FP32 model"] -->|"insert"| FakeQuant["Fake quantization nodes<br/>(simulate rounding in forward pass)"]
   FakeQuant -->|"fine-tune with data"| Adapted["Weights adapted to quantization"]
   Adapted -->|"strip fake quant"| INT8Model["INT8 model"]
   INT8Model -->|"deploy"| Runtime["Inference runtime"]

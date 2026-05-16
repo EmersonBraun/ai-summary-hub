@@ -32,7 +32,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  Event["IDE event\n(save / commit / test)"] -->|"triggers"| Hook["Agent hook"]
+  Event["IDE event<br/>(save / commit / test)"] -->|"triggers"| Hook["Agent hook"]
   Hook -->|"reads context"| Repo["Repo + steering files"]
   Hook -->|"runs task"| Agent["Agent"]
   Agent -->|"updates"| Outputs["Docs / tests / lint fixes"]

@@ -22,14 +22,14 @@ O custo é determinado por quatro fatores: o número de **tokens de entrada** en
 
 ```mermaid
 flowchart LR
-  Request[Consulta recebida] --> Cache\{Cache semântico\nacerto?\}
-  Cache -->|Sim| Return[Retornar resposta em cache\n100% de economia]
-  Cache -->|Não| Router[Roteador de modelos\nclassificador de complexidade]
-  Router -->|simples| Cheap[Modelo pequeno\nex.: Haiku / GPT-4o-mini]
-  Router -->|complexo| Premium[Modelo premium\nex.: Opus / GPT-4o]
-  Cheap --> PromptCache\{Prefixo do prompt\nem cache?\}
+  Request[Consulta recebida] --> Cache\{Cache semântico<br/>acerto?\}
+  Cache -->|Sim| Return[Retornar resposta em cache<br/>100% de economia]
+  Cache -->|Não| Router[Roteador de modelos<br/>classificador de complexidade]
+  Router -->|simples| Cheap[Modelo pequeno<br/>ex.: Haiku / GPT-4o-mini]
+  Router -->|complexo| Premium[Modelo premium<br/>ex.: Opus / GPT-4o]
+  Cheap --> PromptCache\{Prefixo do prompt<br/>em cache?\}
   Premium --> PromptCache
-  PromptCache -->|Sim| Discount[Desconto de 90% no custo de entrada\nAnthropic / 50% OpenAI]
+  PromptCache -->|Sim| Discount[Desconto de 90% no custo de entrada<br/>Anthropic / 50% OpenAI]
   PromptCache -->|Não| Full[Inferência com preço integral]
   Discount --> Store[Armazenar no cache semântico]
   Full --> Store

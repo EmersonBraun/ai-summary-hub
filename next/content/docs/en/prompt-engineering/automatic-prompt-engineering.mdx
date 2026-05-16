@@ -21,14 +21,14 @@ APE is distinct from soft prompt tuning (which optimizes continuous token embedd
 
 ```mermaid
 flowchart TD
-    Demos["Demonstration examples\n(input → output pairs)"] -->|"describe task"| MetaLLM["Meta-LLM\n(instruction proposer)"]
-    MetaLLM -->|"generate N candidate instructions"| Pool["Candidate instruction pool\n[instr_1, instr_2, ..., instr_N]"]
-    Pool -->|"each instruction tested"| Eval["Evaluation on\nheld-out benchmark"]
-    Eval -->|"score each candidate"| Scores["Scored instructions\n[(instr_1, 0.72), (instr_2, 0.85), ...]"]
+    Demos["Demonstration examples<br/>(input → output pairs)"] -->|"describe task"| MetaLLM["Meta-LLM<br/>(instruction proposer)"]
+    MetaLLM -->|"generate N candidate instructions"| Pool["Candidate instruction pool<br/>[instr_1, instr_2, ..., instr_N]"]
+    Pool -->|"each instruction tested"| Eval["Evaluation on<br/>held-out benchmark"]
+    Eval -->|"score each candidate"| Scores["Scored instructions<br/>[(instr_1, 0.72), (instr_2, 0.85), ...]"]
     Scores -->|"select top-K"| Select["Top-K instructions"]
-    Select -->|"resample variants"| Refine["Iterative refinement\n(paraphrase / edit)"]
+    Select -->|"resample variants"| Refine["Iterative refinement<br/>(paraphrase / edit)"]
     Refine -->|"new candidates"| Eval
-    Scores -->|"best instruction"| Output["Optimal instruction\n→ deployed prompt"]
+    Scores -->|"best instruction"| Output["Optimal instruction<br/>→ deployed prompt"]
 ```
 
 ### Candidate generation

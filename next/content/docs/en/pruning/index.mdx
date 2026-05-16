@@ -19,7 +19,7 @@ Pruning is most effective when combined with other [model compression](/docs/mod
 
 ```mermaid
 flowchart LR
-  Trained["Fully trained model"] -->|"measure importance"| Score["Importance scoring\n(magnitude / gradient / L1)"]
+  Trained["Fully trained model"] -->|"measure importance"| Score["Importance scoring<br/>(magnitude / gradient / L1)"]
   Score -->|"rank parameters"| Rank["Rank weights or channels"]
   Rank -->|"remove bottom N%"| Prune["Prune (zero out or remove)"]
   Prune -->|"recover accuracy"| FineTune["Fine-tune on training data"]
@@ -32,8 +32,8 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  Model["Weight matrix W\n(dense, all connections)"] -->|"unstructured: zero individual weights"| Sparse["Sparse W\n(same shape, many zeros)"]
-  Model -->|"structured: remove channel / head"| Dense["Smaller dense W\n(fewer rows or columns)"]
+  Model["Weight matrix W<br/>(dense, all connections)"] -->|"unstructured: zero individual weights"| Sparse["Sparse W<br/>(same shape, many zeros)"]
+  Model -->|"structured: remove channel / head"| Dense["Smaller dense W<br/>(fewer rows or columns)"]
   Sparse -->|"requires sparse kernels"| SpeedupSparse["Memory savings, limited speedup"]
   Dense -->|"standard matmul"| SpeedupDense["Real wall-clock speedup"]
 ```

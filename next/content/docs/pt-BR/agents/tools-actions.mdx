@@ -35,10 +35,10 @@ APIs modernas de LLM suportam chamadas paralelas de ferramentas: o modelo pode s
 
 ```mermaid
 flowchart LR
-  User[User Message] -->|"message + tool schemas"| Agent[Agent / LLM\nReasoning]
-  Agent -->|"selects tool"| ToolSelection[Tool Selection\nFunction Call Object]
-  ToolSelection -->|"dispatch"| ToolExec[Tool Execution\nPython Function]
-  ToolExec -->|"calls"| External[External Service\nAPI / DB / Web]
+  User[User Message] -->|"message + tool schemas"| Agent[Agent / LLM<br/>Reasoning]
+  Agent -->|"selects tool"| ToolSelection[Tool Selection<br/>Function Call Object]
+  ToolSelection -->|"dispatch"| ToolExec[Tool Execution<br/>Python Function]
+  ToolExec -->|"calls"| External[External Service<br/>API / DB / Web]
   External -->|"raw result"| ToolExec
   ToolExec -->|"formatted result"| Agent
   Agent -->|"continue reasoning or answer"| Agent

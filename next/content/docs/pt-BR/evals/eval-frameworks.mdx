@@ -17,7 +17,7 @@ A escolha do framework correto depende do que está sendo avaliado: um template 
 
 ```mermaid
 flowchart LR
-  TestCases[Casos de teste\nprompts + saídas esperadas] --> Framework[Framework de eval]
+  TestCases[Casos de teste<br/>prompts + saídas esperadas] --> Framework[Framework de eval]
   Framework -->|executa inferência| App[Aplicação LLM]
   App -->|saídas| Scorer[Pontuadores de métricas]
   Scorer -->|baseado em regras| Rules[Exact match / regex / JSON schema]

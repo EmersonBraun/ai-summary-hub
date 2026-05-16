@@ -52,26 +52,26 @@ Uma das vantagens mais atraentes dos modelos de pesos abertos é o acesso comple
 
 ```mermaid
 flowchart TD
-    Source["Meta model weights\n(Hugging Face Hub / llama.com)"] -->|"download weights"| Local
+    Source["Meta model weights<br/>(Hugging Face Hub / llama.com)"] -->|"download weights"| Local
 
     subgraph Local["Local / Self-hosted inference"]
         direction LR
-        TF["Hugging Face Transformers\n(GPU server)"]
-        LCPP["llama.cpp\n(Scout: single H100 INT4)"]
-        vLLM["vLLM\n(production serving, OpenAI-compatible API)"]
+        TF["Hugging Face Transformers<br/>(GPU server)"]
+        LCPP["llama.cpp<br/>(Scout: single H100 INT4)"]
+        vLLM["vLLM<br/>(production serving, OpenAI-compatible API)"]
     end
 
-    Source -->|"weights available for fine-tuning"| FT["Fine-tuning\n(LoRA / QLoRA / SFT)"]
+    Source -->|"weights available for fine-tuning"| FT["Fine-tuning<br/>(LoRA / QLoRA / SFT)"]
     FT -->|"merged or adapter weights"| Local
 
     Source -->|"hosted by provider"| Providers
 
     subgraph Providers["Third-party API providers"]
         direction LR
-        Together["Together AI\n(Llama 4, competitive pricing)"]
-        Groq["Groq\n(LPU hardware, ultra-low latency)"]
-        Fireworks["Fireworks AI\n(serverless, fine-tuned models)"]
-        LlamaAPI["Llama API\n(first-party, llama.com)"]
+        Together["Together AI<br/>(Llama 4, competitive pricing)"]
+        Groq["Groq<br/>(LPU hardware, ultra-low latency)"]
+        Fireworks["Fireworks AI<br/>(serverless, fine-tuned models)"]
+        LlamaAPI["Llama API<br/>(first-party, llama.com)"]
     end
 
     Local -->|"inference request"| App["Your Application"]

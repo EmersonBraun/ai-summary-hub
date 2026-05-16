@@ -60,21 +60,21 @@ No Vertex AI, o Gemini é acessado por meio do SDK Python `vertexai` (`aiplatfor
 
 ```mermaid
 flowchart LR
-    Dev[Developer / Application] -->|"API key or service account"| GLAPI["Generative Language API\ngenerativelanguage.googleapis.com"]
+    Dev[Developer / Application] -->|"API key or service account"| GLAPI["Generative Language API<br/>generativelanguage.googleapis.com"]
 
-    GLAPI -->|"stable / GA"| Flash[Gemini 2.5 Flash\nlow-latency / high-throughput]
-    GLAPI -->|"stable / GA"| Pro[Gemini 2.5 Pro\nbalanced / production]
-    GLAPI -->|"preview"| Pro31[Gemini 3.1 Pro Preview\nnext-gen]
+    GLAPI -->|"stable / GA"| Flash[Gemini 2.5 Flash<br/>low-latency / high-throughput]
+    GLAPI -->|"stable / GA"| Pro[Gemini 2.5 Pro<br/>balanced / production]
+    GLAPI -->|"preview"| Pro31[Gemini 3.1 Pro Preview<br/>next-gen]
 
-    Dev -->|"upload assets"| FileAPI[File API\nvideo & audio URIs]
+    Dev -->|"upload assets"| FileAPI[File API<br/>video & audio URIs]
     FileAPI -->|"file URI in request"| GLAPI
 
-    GLAPI -->|"search retrieval tool"| GSearch[Google Search\nreal-time grounding]
+    GLAPI -->|"search retrieval tool"| GSearch[Google Search<br/>real-time grounding]
     GSearch -->|"grounded results"| GLAPI
 
-    AIStudio[Google AI Studio\nprototyping] -->|"generates"| GLAPI
-    VertexAI[Vertex AI\nenterprise production] -->|"managed endpoint"| GLAPI
-    VertexAI -->|"fine-tuning pipeline"| FT[Fine-tuned model\ndeployed on Vertex]
+    AIStudio[Google AI Studio<br/>prototyping] -->|"generates"| GLAPI
+    VertexAI[Vertex AI<br/>enterprise production] -->|"managed endpoint"| GLAPI
+    VertexAI -->|"fine-tuning pipeline"| FT[Fine-tuned model<br/>deployed on Vertex]
 ```
 
 ## Quando usar / Quando NÃO usar

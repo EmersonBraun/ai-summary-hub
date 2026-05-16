@@ -23,7 +23,7 @@ The practical choice:
 
 ```mermaid
 flowchart LR
-  PydanticModel[Pydantic model\ndefinition] -->|patch| InstructorClient[Instructor-patched client]
+  PydanticModel[Pydantic model<br/>definition] -->|patch| InstructorClient[Instructor-patched client]
   UserPrompt[User prompt] --> InstructorClient
   InstructorClient -->|tool call or JSON prompt| LLMProvider[LLM provider API]
   LLMProvider -->|raw JSON string| InstructorClient

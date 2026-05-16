@@ -19,15 +19,15 @@ A diferença essencial em relação à execução de ML em VMs bare-metal é que
 
 ```mermaid
 flowchart TB
-  Developer["Data Scientist\n(writes Dockerfile + YAML)"] -->|"docker build + push"| Registry["Container Registry\n(ECR / GCR / GHCR)"]
+  Developer["Data Scientist<br/>(writes Dockerfile + YAML)"] -->|"docker build + push"| Registry["Container Registry<br/>(ECR / GCR / GHCR)"]
   Registry -->|"image pull"| K8s["Kubernetes Cluster"]
-  K8s -->|"schedule on GPU node"| TrainJob["Training Job\n(K8s Job)"]
-  K8s -->|"scale replicas"| ServingDeploy["Serving Deployment\n(K8s Deployment + HPA)"]
+  K8s -->|"schedule on GPU node"| TrainJob["Training Job<br/>(K8s Job)"]
+  K8s -->|"scale replicas"| ServingDeploy["Serving Deployment<br/>(K8s Deployment + HPA)"]
   ServingDeploy -->|"expose externally"| Ingress["Ingress / LoadBalancer"]
   Ingress -->|"traffic"| Client["Client"]
-  TrainJob -->|"write artifacts"| PVC["Persistent Volume\nor Object Storage"]
+  TrainJob -->|"write artifacts"| PVC["Persistent Volume<br/>or Object Storage"]
   PVC -->|"model load"| ServingDeploy
-  K8s -->|"GPU request"| GPUNode["GPU Node Pool\n(nvidia.com/gpu resource)"]
+  K8s -->|"GPU request"| GPUNode["GPU Node Pool<br/>(nvidia.com/gpu resource)"]
 ```
 
 ### Containerização de modelos de ML

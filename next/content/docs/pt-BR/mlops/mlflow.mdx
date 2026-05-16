@@ -36,8 +36,8 @@ O registro armazena versões de modelos com nome e estados de transição. Siste
 ```mermaid
 flowchart LR
   Code[Training code] -->|"mlflow.start_run()"| Run[Active run]
-  Run -->|"log_params / log_metrics"| Backend[(Backend store\nSQLite / Postgres)]
-  Run -->|"log_artifact / log_model"| ArtStore[(Artifact store\nS3 / GCS / local)]
+  Run -->|"log_params / log_metrics"| Backend[(Backend store<br/>SQLite / Postgres)]
+  Run -->|"log_artifact / log_model"| ArtStore[(Artifact store<br/>S3 / GCS / local)]
   Backend -->|"query"| UI[MLflow UI]
   ArtStore -->|"retrieve"| UI
   UI -->|"register_model"| Registry[Model Registry]

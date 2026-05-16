@@ -22,7 +22,7 @@ Três padrões dominantes emergiram:
 
 ```mermaid
 flowchart LR
-  Prompt[Prompt de avaliação\nrubric + saída candidata] --> Judge[LLM juiz]
+  Prompt[Prompt de avaliação<br/>rubric + saída candidata] --> Judge[LLM juiz]
   Judge -->|raciocínio chain-of-thought| CoT[Rastro de raciocínio]
   CoT -->|pontuação numérica ou veredito| Score[Pontuação / ranking]
   Score --> Aggregator[Agregador de pontuações]

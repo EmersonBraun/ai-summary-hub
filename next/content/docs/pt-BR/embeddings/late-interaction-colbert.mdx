@@ -20,13 +20,13 @@ Em 2025, o **Jina ColBERT v2** estendeu a interação tardia para 89 idiomas com
 
 ```mermaid
 flowchart LR
-  Query[Consulta do usuário\n"melhores hotéis perto do\nrio E cobertura"] --> QEnc[Encoder de consulta\nBERT ajustado fino]
-  QEnc -->|Matriz Q\n32 × 128| MaxSim
+  Query[Consulta do usuário<br/>"melhores hotéis perto do<br/>rio E cobertura"] --> QEnc[Encoder de consulta<br/>BERT ajustado fino]
+  QEnc -->|Matriz Q<br/>32 × 128| MaxSim
 
-  Doc[Documento\n512 tokens] --> DEnc[Encoder de documento\npesos BERT compartilhados]
-  DEnc -->|Matriz D\n512 × 128| MaxSim
+  Doc[Documento<br/>512 tokens] --> DEnc[Encoder de documento<br/>pesos BERT compartilhados]
+  DEnc -->|Matriz D<br/>512 × 128| MaxSim
 
-  MaxSim[Operador MaxSim\npara cada q_i: máx sobre d_j sim q_i·d_j\nsomar todas as pontuações q] --> Score[Pontuação de relevância]
+  MaxSim[Operador MaxSim<br/>para cada q_i: máx sobre d_j sim q_i·d_j<br/>somar todas as pontuações q] --> Score[Pontuação de relevância]
   Score --> Rank[Resultados classificados]
 ```
 

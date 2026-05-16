@@ -18,8 +18,8 @@ Modelos como GPT-4 (OpenAI), Claude (Anthropic), Gemini (Google) e Llama (Meta) 
 ```mermaid
 flowchart LR
   Prompt["Prompt do usuário"] -->|"tokenizar"| Tokens["Sequência de tokens"]
-  Tokens -->|"embeddings + posição"| Layers["N camadas Transformer\n(atenção + FFN)"]
-  Layers -->|"logits"| Sampling["Amostragem\n(temperatura, top-p, top-k)"]
+  Tokens -->|"embeddings + posição"| Layers["N camadas Transformer<br/>(atenção + FFN)"]
+  Layers -->|"logits"| Sampling["Amostragem<br/>(temperatura, top-p, top-k)"]
   Sampling -->|"próximo token"| Tokens
   Sampling -->|"token EOS"| Response["Resposta completa"]
 ```

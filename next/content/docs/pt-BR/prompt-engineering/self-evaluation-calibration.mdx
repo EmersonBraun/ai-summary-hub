@@ -19,7 +19,7 @@ A autoavaliação assume várias formas. A **autocrítica** pede ao modelo para 
 flowchart TD
   Q[Input query] --> GEN[Generate initial response]
   GEN --> SELF[Self-evaluate: critique + confidence]
-  SELF --> CONF{Confidence\nhigh?}
+  SELF --> CONF{Confidence<br/>high?}
   CONF -->|yes| OUT[Return response]
   CONF -->|no| REFINE[Refine based on critique]
   REFINE --> SELF

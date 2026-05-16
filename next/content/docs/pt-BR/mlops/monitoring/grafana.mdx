@@ -40,12 +40,12 @@ O Grafana suporta provisionamento declarativo de fontes de dados, dashboards e r
 
 ```mermaid
 flowchart LR
-  PrometheusDS[Prometheus\ndata source] -->|"PromQL query"| GrafanaQuery[Grafana query engine]
-  SQLDB[SQL / InfluxDB\ndata source] -->|"SQL / Flux query"| GrafanaQuery
-  GrafanaQuery -->|"normalized data frames"| Panels[Dashboard panels\ntime series, gauges, tables]
-  Panels -->|"rendered in browser"| Users[Data scientists /\nML engineers]
+  PrometheusDS[Prometheus<br/>data source] -->|"PromQL query"| GrafanaQuery[Grafana query engine]
+  SQLDB[SQL / InfluxDB<br/>data source] -->|"SQL / Flux query"| GrafanaQuery
+  GrafanaQuery -->|"normalized data frames"| Panels[Dashboard panels<br/>time series, gauges, tables]
+  Panels -->|"rendered in browser"| Users[Data scientists /<br/>ML engineers]
   GrafanaQuery -->|"evaluate alert rule"| AlertEngine[Grafana alert engine]
-  AlertEngine -->|"route notification"| ContactPoints[Slack / PagerDuty /\nemail]
+  AlertEngine -->|"route notification"| ContactPoints[Slack / PagerDuty /<br/>email]
 ```
 
 ## Quando usar / Quando NÃO usar

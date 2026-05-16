@@ -24,9 +24,9 @@ Principais componentes abordados nesta seção:
 ```mermaid
 flowchart LR
   Mic[Microfone / áudio telefônico] -->|WebRTC / SIP| VAD[VAD — segmentação de fala]
-  VAD -->|segmentos de fala| STT[Modelo ASR\nex.: Deepgram Nova-3]
-  STT -->|transcrição| LLM[LLM\nex.: GPT-4o / Claude]
-  LLM -->|resposta em texto| TTS[Modelo TTS\nex.: ElevenLabs / Deepgram Aura]
+  VAD -->|segmentos de fala| STT[Modelo ASR<br/>ex.: Deepgram Nova-3]
+  STT -->|transcrição| LLM[LLM<br/>ex.: GPT-4o / Claude]
+  LLM -->|resposta em texto| TTS[Modelo TTS<br/>ex.: ElevenLabs / Deepgram Aura]
   TTS -->|stream de áudio| Speaker[Alto-falante / telefonia]
 ```
 

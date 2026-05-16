@@ -29,12 +29,12 @@ Um **consumidor** lê registros de uma ou mais partições. Os consumidores se o
 
 ```mermaid
 flowchart LR
-  Producer["Producer\n(App / IoT / DB CDC)"] -- "publish events" --> Topic["Kafka Topic\n(partitioned, replicated)"]
-  Topic -- "consume raw events" --> StreamProcessor["Stream Processor\n(Spark / Flink / Kafka Streams)"]
-  StreamProcessor -- "write features" --> FeatureStore["Online Feature Store\n(Feast / Redis)"]
-  FeatureStore -- "low-latency read" --> ModelServer["Model Server\n(REST / gRPC)"]
+  Producer["Producer<br/>(App / IoT / DB CDC)"] -- "publish events" --> Topic["Kafka Topic<br/>(partitioned, replicated)"]
+  Topic -- "consume raw events" --> StreamProcessor["Stream Processor<br/>(Spark / Flink / Kafka Streams)"]
+  StreamProcessor -- "write features" --> FeatureStore["Online Feature Store<br/>(Feast / Redis)"]
+  FeatureStore -- "low-latency read" --> ModelServer["Model Server<br/>(REST / gRPC)"]
   ModelServer -- "publish predictions" --> PredictionTopic["Prediction Topic"]
-  PredictionTopic -- "consume" --> Consumer["Consumer\n(Monitoring / Downstream app)"]
+  PredictionTopic -- "consume" --> Consumer["Consumer<br/>(Monitoring / Downstream app)"]
 ```
 
 ## Quando usar / Quando NÃO usar

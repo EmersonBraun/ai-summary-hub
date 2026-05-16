@@ -19,15 +19,15 @@ KubeFlow's strength is that it runs on any Kubernetes cluster — on-premises, G
 
 ```mermaid
 flowchart TB
-  Developer["Data Scientist\n(Jupyter / SDK)"] -->|"define pipeline"| KFP["KubeFlow Pipelines\n(KFP)"]
-  KFP -->|"schedules pods"| K8s["Kubernetes\n(control plane)"]
-  K8s -->|"run training job"| TrainPod["Training Pod\n(GPU node pool)"]
-  TrainPod -->|"log metrics"| Katib["Katib\n(hyperparameter tuning)"]
+  Developer["Data Scientist<br/>(Jupyter / SDK)"] -->|"define pipeline"| KFP["KubeFlow Pipelines<br/>(KFP)"]
+  KFP -->|"schedules pods"| K8s["Kubernetes<br/>(control plane)"]
+  K8s -->|"run training job"| TrainPod["Training Pod<br/>(GPU node pool)"]
+  TrainPod -->|"log metrics"| Katib["Katib<br/>(hyperparameter tuning)"]
   Katib -->|"suggest next trial"| TrainPod
-  TrainPod -->|"push artifact"| Storage["Model Store\n(S3 / GCS / MinIO)"]
-  Storage -->|"register model"| KFServe["KServe\n(model serving)"]
+  TrainPod -->|"push artifact"| Storage["Model Store<br/>(S3 / GCS / MinIO)"]
+  Storage -->|"register model"| KFServe["KServe<br/>(model serving)"]
   KFServe -->|"expose endpoint"| Client["Prediction Clients"]
-  KFP -->|"emit events"| Dashboard["KubeFlow Dashboard\n(UI + RBAC)"]
+  KFP -->|"emit events"| Dashboard["KubeFlow Dashboard<br/>(UI + RBAC)"]
 ```
 
 ### KubeFlow Pipelines (KFP)

@@ -27,10 +27,10 @@ Esta seção aborda:
 
 ```mermaid
 flowchart LR
-  Seeds[Tarefas / prompts semente\npoucos exemplos reais] --> Generator[Modelo gerador\nGPT-4o / Claude / Llama]
-  Generator -->|pares sintéticos brutos| Filter[Filtro de qualidade\njuiz LLM + dedup]
+  Seeds[Tarefas / prompts semente<br/>poucos exemplos reais] --> Generator[Modelo gerador<br/>GPT-4o / Claude / Llama]
+  Generator -->|pares sintéticos brutos| Filter[Filtro de qualidade<br/>juiz LLM + dedup]
   Filter -->|conjunto de dados limpo| Train[Ajustar fino do modelo estudante]
-  Train -->|saídas do estudante| Verify[Opcional: verificação\nexecução de código, checagem de fatos]
+  Train -->|saídas do estudante| Verify[Opcional: verificação<br/>execução de código, checagem de fatos]
   Verify -->|aprovado| Dataset[Conjunto de treinamento final]
   Verify -->|reprovado| Reject[Descartar]
 ```

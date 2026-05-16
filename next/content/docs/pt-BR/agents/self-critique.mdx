@@ -35,12 +35,12 @@ O Reflexion (Shinn et al., 2023) aplica reflexão no nível do episódio em vez 
 
 ```mermaid
 flowchart TD
-  Task[Input Task] -->|"initial prompt"| Generate[Generate\nInitial Output]
-  Generate -->|"draft output"| Evaluate[Evaluate\nCritic LLM]
-  Evaluate -->|"score + critique"| Decision{Score >=\nthreshold?}
+  Task[Input Task] -->|"initial prompt"| Generate[Generate<br/>Initial Output]
+  Generate -->|"draft output"| Evaluate[Evaluate<br/>Critic LLM]
+  Evaluate -->|"score + critique"| Decision{Score >=<br/>threshold?}
   Decision -->|"yes — accept"| Accept[Final Output]
-  Decision -->|"no — refine"| Critique[Critique\nStructured Feedback]
-  Critique -->|"feedback + draft"| Refine[Refine\nRevision LLM]
+  Decision -->|"no — refine"| Critique[Critique<br/>Structured Feedback]
+  Critique -->|"feedback + draft"| Refine[Refine<br/>Revision LLM]
   Refine -->|"revised output"| Evaluate
   Refine -->|"max iterations reached"| Accept
 ```

@@ -25,10 +25,10 @@ Esta seção aborda:
 
 ```mermaid
 flowchart LR
-  UserInput[Entrada do usuário] --> InputGuard[Guardrail de entrada\ndetectar injeção / varredura PII / portão de tópico]
+  UserInput[Entrada do usuário] --> InputGuard[Guardrail de entrada<br/>detectar injeção / varredura PII / portão de tópico]
   InputGuard -->|seguro| LLM[LLM]
   InputGuard -->|bloqueado| Reject[Resposta de rejeição]
-  LLM --> OutputGuard[Guardrail de saída\ntoxicidade / PII / alucinação / política]
+  LLM --> OutputGuard[Guardrail de saída<br/>toxicidade / PII / alucinação / política]
   OutputGuard -->|seguro| Response[Resposta ao usuário]
   OutputGuard -->|bloqueado| Fallback[Resposta de fallback / redigida]
 ```

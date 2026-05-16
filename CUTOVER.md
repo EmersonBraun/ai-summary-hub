@@ -80,7 +80,7 @@ function) before cutover.
    `.github/workflows/redirect-pages.yml`. GitHub Pages serves `404.html`
    for unknown deep links, so *every* old URL
    (`emersonbraun.github.io/ai-summary-hub/...`) bounces to the matching
-   path on `https://aisummaryhub.dev`, dropping unsupported locales
+   path on `https://ai-hub.emersonbraun.dev`, dropping unsupported locales
    (es/fr/de/zh-Hans → EN) and keeping `pt-BR`. To activate: repo Settings
    → Pages → Source = GitHub Actions, then run the workflow once.
 4. Update any external backlinks pointing at the old GH Pages URL

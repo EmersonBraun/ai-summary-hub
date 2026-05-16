@@ -36,9 +36,9 @@ Como o `CLAUDE.md` é injetado em cada requisição, instruções desatualizadas
 
 ```mermaid
 flowchart LR
-  Global["~/.claude/CLAUDE.md\n(global)"] -->|loaded first| Merge[Merged system prompt]
-  Root["project-root/CLAUDE.md\n(project)"] -->|overrides global| Merge
-  Sub["src/feature/CLAUDE.md\n(subdirectory, optional)"] -->|narrowest scope| Merge
+  Global["~/.claude/CLAUDE.md<br/>(global)"] -->|loaded first| Merge[Merged system prompt]
+  Root["project-root/CLAUDE.md<br/>(project)"] -->|overrides global| Merge
+  Sub["src/feature/CLAUDE.md<br/>(subdirectory, optional)"] -->|narrowest scope| Merge
   Merge -->|injected into| Session[Claude Code session]
   Session -->|persistent for entire session| LLM[Claude model]
 ```

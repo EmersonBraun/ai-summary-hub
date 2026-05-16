@@ -20,13 +20,13 @@ In 2025, **Jina ColBERT v2** extended late interaction to 89 languages with MRL 
 
 ```mermaid
 flowchart LR
-  Query[User query\n"best hotels near\n river AND rooftop"] --> QEnc[Query encoder\nfine-tuned BERT]
-  QEnc -->|Q matrix\n32 × 128| MaxSim
+  Query[User query<br/>"best hotels near<br/> river AND rooftop"] --> QEnc[Query encoder<br/>fine-tuned BERT]
+  QEnc -->|Q matrix<br/>32 × 128| MaxSim
 
-  Doc[Document\n512 tokens] --> DEnc[Document encoder\nshared BERT weights]
-  DEnc -->|D matrix\n512 × 128| MaxSim
+  Doc[Document<br/>512 tokens] --> DEnc[Document encoder<br/>shared BERT weights]
+  DEnc -->|D matrix<br/>512 × 128| MaxSim
 
-  MaxSim[MaxSim operator\nfor each q_i: max over d_j sim q_i·d_j\nsum all q scores] --> Score[Relevance score]
+  MaxSim[MaxSim operator<br/>for each q_i: max over d_j sim q_i·d_j<br/>sum all q scores] --> Score[Relevance score]
   Score --> Rank[Ranked results]
 ```
 

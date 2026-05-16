@@ -36,12 +36,12 @@ LangGraph handles cycles natively: a node can edge back to a previous node (or i
 
 ```mermaid
 flowchart TD
-  Start([START]) -->|initializes state| CallModel[call_model node\nLLM generates response]
-  CallModel -->|reads tool_calls from state| Router{tools_router\nconditional edge}
-  Router -->|tool_calls present| ToolNode[tool_node\nexecutes tool calls]
+  Start([START]) -->|initializes state| CallModel[call_model node<br/>LLM generates response]
+  CallModel -->|reads tool_calls from state| Router{tools_router<br/>conditional edge}
+  Router -->|tool_calls present| ToolNode[tool_node<br/>executes tool calls]
   ToolNode -->|appends tool results to state| CallModel
-  Router -->|no tool_calls| End([END\nfinal answer])
-  CallModel -->|on error| ErrorHandler[error_handler node\nretry or escalate]
+  Router -->|no tool_calls| End([END<br/>final answer])
+  CallModel -->|on error| ErrorHandler[error_handler node<br/>retry or escalate]
   ErrorHandler -->|retry| CallModel
   ErrorHandler -->|max retries exceeded| End
 ```

@@ -42,7 +42,7 @@ flowchart LR
   FileRead[File contents loaded] -->|appended to history| History
   Assemble -->|sent to| Model[Claude model]
   Model -->|response + new tool calls| History
-  History -->|approaching limit| Compress[Auto-compression\nold turns summarized]
+  History -->|approaching limit| Compress[Auto-compression<br/>old turns summarized]
   Compress -->|trimmed history| Assemble
   Clear[/clear command] -->|resets| History
 ```

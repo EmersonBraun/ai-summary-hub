@@ -37,9 +37,9 @@ A resposta da API inclui um objeto `usage` que distingue entre tokens de entrada
 ```mermaid
 flowchart LR
   Req1[First API request] -->|cache_control marker| Build[Build cache entry]
-  Build -->|stores KV state| Cache[Prompt cache\n5 min TTL]
-  Req2[Second API request\nsame prefix] -->|prefix matches| Hit[Cache hit]
-  Hit -->|skip reprocessing| Fast[Fast response\n0.1x token cost]
+  Build -->|stores KV state| Cache[Prompt cache<br/>5 min TTL]
+  Req2[Second API request<br/>same prefix] -->|prefix matches| Hit[Cache hit]
+  Hit -->|skip reprocessing| Fast[Fast response<br/>0.1x token cost]
   Req3[Request after 5 min idle] -->|cache expired| Miss[Cache miss]
   Miss -->|rebuild cache| Build
 ```

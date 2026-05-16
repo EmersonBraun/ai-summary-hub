@@ -17,7 +17,7 @@ Choosing the right framework depends on what you are evaluating: a prompt templa
 
 ```mermaid
 flowchart LR
-  TestCases[Test cases\nprompts + expected outputs] --> Framework[Eval framework]
+  TestCases[Test cases<br/>prompts + expected outputs] --> Framework[Eval framework]
   Framework -->|run inference| App[LLM application]
   App -->|outputs| Scorer[Metric scorers]
   Scorer -->|rule-based| Rules[Exact match / regex / JSON schema]

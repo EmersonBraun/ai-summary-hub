@@ -39,7 +39,7 @@ flowchart LR
   Human[Human / Initiator] -->|initial message| UPA[UserProxyAgent]
   UPA -->|sends message| AA[AssistantAgent]
   AA -->|generates reply with code| UPA
-  UPA -->|executes code block| Exec[Code executor\nsubprocess / Docker]
+  UPA -->|executes code block| Exec[Code executor<br/>subprocess / Docker]
   Exec -->|stdout / stderr| UPA
   UPA -->|reports result| AA
   AA -->|revised reply or TERMINATE| UPA

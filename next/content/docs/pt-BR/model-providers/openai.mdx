@@ -30,7 +30,7 @@ GPT-5.4 e GPT-5.5 suportam cinco modos de raciocínio — `none`, `low`, `medium
 ```mermaid
 flowchart LR
   Client[Client app] -->|POST messages array| ChatAPI[/v1/chat/completions]
-  ChatAPI -->|model routing| Selector{Model\nselector}
+  ChatAPI -->|model routing| Selector{Model<br/>selector}
   Selector -->|flagship| GPT55[GPT-5.5]
   Selector -->|balanced| GPT54[GPT-5.4]
   Selector -->|cost-optimized| Mini[GPT-5.4 mini]
@@ -50,7 +50,7 @@ GPT-5.4 e GPT-5.5 também suportam ferramentas integradas: busca na web, busca e
 flowchart LR
   User[User query] --> LLM[GPT-5.4]
   LLM -->|decides to call tool| ToolCall[tool_calls JSON]
-  ToolCall -->|your code executes| ExtFn[External function\nor API]
+  ToolCall -->|your code executes| ExtFn[External function<br/>or API]
   ExtFn -->|result as tool message| LLM
   LLM -->|final answer| User
 ```

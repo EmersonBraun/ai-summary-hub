@@ -17,7 +17,7 @@ O ecossistema TensorFlow inclui: **TF Serving** para implantação de modelos em
 
 ```mermaid
 flowchart LR
-  Data["tf.data.Dataset"] -->|"lotes em pipeline"| Model["Modelo Keras\n(camadas Sequential / Functional)"]
+  Data["tf.data.Dataset"] -->|"lotes em pipeline"| Model["Modelo Keras<br/>(camadas Sequential / Functional)"]
   Model -->|"forward pass"| Loss["Função de perda"]
   Loss -->|"GradientTape / compile()"| Grads["Gradientes calculados"]
   Grads -->|"optimizer.apply()"| Weights["Pesos atualizados"]

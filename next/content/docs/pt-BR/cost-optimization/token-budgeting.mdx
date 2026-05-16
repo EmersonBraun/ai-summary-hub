@@ -18,14 +18,14 @@ Tokens de entrada incluem: o prompt de sistema, o histórico de conversa, o cont
 
 ```mermaid
 flowchart TD
-  Raw[Entradas brutas\nsistema + histórico + contexto + consulta] --> Compress[Compressão de prompt\nLLMLingua / sumarização seletiva]
-  Compress --> Trim[Cortador de contexto RAG\ntop-k chunks, limite de tokens]
-  Trim --> Prune[Podador de histórico\njanela deslizante / resumo abstrato]
-  Prune --> Budget\{Total de tokens\n≤ orçamento?\}
+  Raw[Entradas brutas<br/>sistema + histórico + contexto + consulta] --> Compress[Compressão de prompt<br/>LLMLingua / sumarização seletiva]
+  Compress --> Trim[Cortador de contexto RAG<br/>top-k chunks, limite de tokens]
+  Trim --> Prune[Podador de histórico<br/>janela deslizante / resumo abstrato]
+  Prune --> Budget\{Total de tokens<br/>≤ orçamento?\}
   Budget -->|Sim| LLM[Enviar ao LLM]
   Budget -->|Não| Drop[Descartar chunks de menor pontuação]
   Drop --> LLM
-  LLM --> MaxTok[max_tokens / sequência de parada\nrestrição de saída]
+  LLM --> MaxTok[max_tokens / sequência de parada<br/>restrição de saída]
   MaxTok --> Response[Resposta limitada]
 ```
 

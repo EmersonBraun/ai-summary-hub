@@ -17,11 +17,11 @@ As CNNs dominam tarefas de [visão computacional](/docs/cv): classificação de 
 
 ```mermaid
 flowchart LR
-  Input["Imagem de entrada\n(H × W × C)"] -->|"convolução + ReLU"| Conv1["Mapas de features\nCamada Conv 1"]
+  Input["Imagem de entrada<br/>(H × W × C)"] -->|"convolução + ReLU"| Conv1["Mapas de features<br/>Camada Conv 1"]
   Conv1 -->|"max pooling"| Pool1["Features reduzidas"]
   Pool1 -->|"conv + ReLU + pool"| ConvN["Camadas Conv mais profundas"]
   ConvN -->|"aplanar"| Flat["Vetor de features"]
-  Flat -->|"camadas densas"| Output["Saída\n(classe / bbox / máscara)"]
+  Flat -->|"camadas densas"| Output["Saída<br/>(classe / bbox / máscara)"]
 ```
 
 ### Camada convolucional

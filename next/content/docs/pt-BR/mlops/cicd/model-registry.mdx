@@ -21,10 +21,10 @@ Os registros de modelos se integram tanto ao lado de treinamento (rastreadores d
 
 ```mermaid
 flowchart LR
-  Experiment["Training Run\n(MLflow / W&B)"] -->|"log + register artifact"| Registry["Model Registry\n(versioned catalog)"]
-  Registry -->|"promote to Staging"| Staging["Staging Environment\n(shadow traffic / A/B)"]
+  Experiment["Training Run<br/>(MLflow / W&B)"] -->|"log + register artifact"| Registry["Model Registry<br/>(versioned catalog)"]
+  Registry -->|"promote to Staging"| Staging["Staging Environment<br/>(shadow traffic / A/B)"]
   Staging -->|"approval / quality gate"| Production["Production Deployment"]
-  Production -->|"new version available"| Archived["Archived\n(old version)"]
+  Production -->|"new version available"| Archived["Archived<br/>(old version)"]
   CI["CI/CD Pipeline"] -->|"fetch latest Production model"| Production
   Registry -->|"webhook / event"| CI
 ```

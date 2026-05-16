@@ -20,13 +20,13 @@ Industry data from 2025–2026 consistently shows that 50–70% of enterprise LL
 
 ```mermaid
 flowchart TD
-  Query[Incoming query] --> SemCache{Semantic cache\nhit? cosine ≥ 0.92}
-  SemCache -->|Yes| CacheReturn[Return cached response\n0 tokens consumed]
-  SemCache -->|No| Classifier[Complexity classifier\nsmall model / rule-based]
-  Classifier -->|score ≤ 0.4\nsimple| Tier1[Tier 1 — small model\nHaiku / GPT-4o-mini\n~$0.15/1M tokens]
-  Classifier -->|0.4–0.75\nmedium| Tier2[Tier 2 — mid model\nSonnet / GPT-4o\n~$3/1M tokens]
-  Classifier -->|score > 0.75\ncomplex| Tier3[Tier 3 — premium\nOpus / o3\n~$15/1M tokens]
-  Tier1 --> ConfCheck{Output confidence\n≥ threshold?}
+  Query[Incoming query] --> SemCache{Semantic cache<br/>hit? cosine ≥ 0.92}
+  SemCache -->|Yes| CacheReturn[Return cached response<br/>0 tokens consumed]
+  SemCache -->|No| Classifier[Complexity classifier<br/>small model / rule-based]
+  Classifier -->|score ≤ 0.4<br/>simple| Tier1[Tier 1 — small model<br/>Haiku / GPT-4o-mini<br/>~$0.15/1M tokens]
+  Classifier -->|0.4–0.75<br/>medium| Tier2[Tier 2 — mid model<br/>Sonnet / GPT-4o<br/>~$3/1M tokens]
+  Classifier -->|score > 0.75<br/>complex| Tier3[Tier 3 — premium<br/>Opus / o3<br/>~$15/1M tokens]
+  Tier1 --> ConfCheck{Output confidence<br/>≥ threshold?}
   ConfCheck -->|No| Escalate[Escalate to Tier 2]
   ConfCheck -->|Yes| Store[Store in semantic cache]
   Tier2 --> Store

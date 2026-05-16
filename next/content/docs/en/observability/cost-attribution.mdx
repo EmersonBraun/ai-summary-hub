@@ -26,11 +26,11 @@ These attributes, combined with custom dimension tags (user ID, feature name, ex
 
 ```mermaid
 flowchart LR
-  Request[User request] -->|tagged with user_id + feature| Span[OTel span\ngen_ai.usage.input_tokens\ngen_ai.usage.output_tokens]
+  Request[User request] -->|tagged with user_id + feature| Span[OTel span<br/>gen_ai.usage.input_tokens<br/>gen_ai.usage.output_tokens]
   Span -->|export| Backend[Observability backend]
   Backend -->|token × price lookup| CostEngine[Cost calculation]
-  CostEngine --> Dashboard[Cost dashboard\nby user · team · model · feature]
-  Dashboard --> Alerts[Budget alerts\n$ / day threshold]
+  CostEngine --> Dashboard[Cost dashboard<br/>by user · team · model · feature]
+  Dashboard --> Alerts[Budget alerts<br/>$ / day threshold]
 ```
 
 At instrumentation time, custom span attributes tag each LLM call with business dimensions (`user.id`, `team.name`, `feature.name`, `experiment.id`). The observability backend multiplies token counts by the provider's per-token price table (updated periodically) to compute dollar cost. Aggregated dashboards and alerts fire when per-user or per-feature spend exceeds configured thresholds.

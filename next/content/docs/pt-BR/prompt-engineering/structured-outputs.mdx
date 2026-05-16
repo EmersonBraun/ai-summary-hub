@@ -20,9 +20,9 @@ flowchart TD
   PROMPT[Prompt with schema/format instruction] --> LLM[LLM]
   LLM --> STRATEGY{Output strategy}
   STRATEGY -->|instruction only| RAW[Raw text — parse manually]
-  STRATEGY -->|JSON mode| JRAW[Guaranteed valid JSON\n— parse with json.loads]
-  STRATEGY -->|tool/function call| SCHEMA[Schema-validated JSON\n— typed object]
-  STRATEGY -->|Instructor/Outlines| PYDANTIC[Pydantic model instance\n— fully validated]
+  STRATEGY -->|JSON mode| JRAW[Guaranteed valid JSON<br/>— parse with json.loads]
+  STRATEGY -->|tool/function call| SCHEMA[Schema-validated JSON<br/>— typed object]
+  STRATEGY -->|Instructor/Outlines| PYDANTIC[Pydantic model instance<br/>— fully validated]
   RAW --> PARSE[Parse + validate]
   JRAW --> PARSE
   SCHEMA --> PARSE

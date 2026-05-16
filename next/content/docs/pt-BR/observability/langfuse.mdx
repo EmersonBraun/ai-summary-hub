@@ -26,7 +26,7 @@ Principais capacidades:
 flowchart LR
   App[Aplicação LLM] -->|SDK ou OTLP| Langfuse[Servidor Langfuse]
   Langfuse -->|armazena| DB[(PostgreSQL + ClickHouse)]
-  DB --> UI[Dashboard web\nTraces · Prompts · Pontuações]
+  DB --> UI[Dashboard web<br/>Traces · Prompts · Pontuações]
   UI --> Annotators[Anotadores humanos]
   UI --> Evals[Jobs de eval automatizados]
   Langfuse -->|exporta| Analytics[Relatórios de custo / qualidade]

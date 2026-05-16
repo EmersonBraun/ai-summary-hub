@@ -17,7 +17,7 @@ Kiro também apresenta **hooks de agentes** — gatilhos automáticos que execut
 
 ```mermaid
 flowchart LR
-  Idea["Ideia do usuário"] -->|"colaboração em chat"| Spec["Especificações\n(requisitos + histórias + design)"]
+  Idea["Ideia do usuário"] -->|"colaboração em chat"| Spec["Especificações<br/>(requisitos + histórias + design)"]
   Spec -->|"aprovado"| Agent["Agente Kiro"]
   Agent -->|"implementa"| Code["Base de código"]
   Code -->|"evento: salvar / PR / teste"| Hooks["Hooks de agentes"]

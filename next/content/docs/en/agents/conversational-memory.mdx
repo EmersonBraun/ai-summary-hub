@@ -33,12 +33,12 @@ Entity memory extracts named entities—people, places, products, preferences—
 
 ```mermaid
 flowchart TD
-  Msg[New User Message] -->|"add to"| Buffer[Buffer Memory\nlast N turns]
-  Msg -->|"embed query"| VectorDB[(Vector Memory\nembedding store)]
+  Msg[New User Message] -->|"add to"| Buffer[Buffer Memory<br/>last N turns]
+  Msg -->|"embed query"| VectorDB[(Vector Memory<br/>embedding store)]
   VectorDB -->|"retrieve similar turns"| Merge[Context Assembly]
   Buffer -->|"recent verbatim turns"| Merge
-  Summary[Summary Memory\nrunning narrative] -->|"inject summary"| Merge
-  Entities[Entity Memory\nkey facts / profiles] -->|"relevant entities"| Merge
+  Summary[Summary Memory<br/>running narrative] -->|"inject summary"| Merge
+  Entities[Entity Memory<br/>key facts / profiles] -->|"relevant entities"| Merge
   Merge -->|"assembled context"| LLM[LLM Inference]
   LLM -->|"response"| Out[Agent Output]
   LLM -->|"trigger summarize"| Summarizer[Summarizer LLM]

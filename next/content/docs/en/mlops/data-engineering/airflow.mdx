@@ -35,12 +35,12 @@ The Airflow scheduler is a Python process that parses DAG files on a configurabl
 
 ```mermaid
 flowchart LR
-  DagFile["DAG file\n(Python)"] -- "parsed by" --> Scheduler["Scheduler"]
-  Scheduler -- "dispatches task" --> Executor["Executor\n(Celery / K8s)"]
+  DagFile["DAG file<br/>(Python)"] -- "parsed by" --> Scheduler["Scheduler"]
+  Scheduler -- "dispatches task" --> Executor["Executor<br/>(Celery / K8s)"]
   Executor -- "runs on" --> Worker["Worker / Pod"]
-  Worker -- "writes state" --> MetaDB["Metadata DB\n(PostgreSQL)"]
+  Worker -- "writes state" --> MetaDB["Metadata DB<br/>(PostgreSQL)"]
   MetaDB -- "read by" --> WebUI["Web UI"]
-  Worker -- "logs" --> LogStore["Log store\n(S3 / GCS)"]
+  Worker -- "logs" --> LogStore["Log store<br/>(S3 / GCS)"]
 ```
 
 ## When to use / When NOT to use

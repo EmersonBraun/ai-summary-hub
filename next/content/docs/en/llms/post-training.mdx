@@ -77,7 +77,7 @@ This eliminates the critic (value function) entirely — the group statistics se
 ```mermaid
 flowchart TD
   P[Prompt] --> S[Sample group of N responses]
-  S --> R[Score each with verifiable reward\ne.g. math checker / code runner]
+  S --> R[Score each with verifiable reward<br/>e.g. math checker / code runner]
   R --> A[Compute group-normalized advantages]
   A --> G[Clipped policy gradient update]
   G --> P2[Updated policy]
@@ -101,9 +101,9 @@ DAPO enables stable training at scales where GRPO diverges, and has been adopted
 
 ```mermaid
 flowchart LR
-  PT[Pretrained base model] --> SFT[SFT\nInstruction format]
-  SFT --> PREF[Preference optimization\nRLHF · DPO · ORPO]
-  PREF --> RLVR[RL with verifiable rewards\nGRPO · DAPO]
+  PT[Pretrained base model] --> SFT[SFT<br/>Instruction format]
+  SFT --> PREF[Preference optimization<br/>RLHF · DPO · ORPO]
+  PREF --> RLVR[RL with verifiable rewards<br/>GRPO · DAPO]
   RLVR --> Final[Aligned + reasoning model]
 ```
 

@@ -17,12 +17,12 @@ A ideia central: uma RNN processa uma sequência passo a passo, carregando infor
 
 ```mermaid
 flowchart LR
-  X1["x₁"] --> RNN1["Célula RNN\n(estado h₁)"]
-  X2["x₂"] --> RNN2["Célula RNN\n(estado h₂)"]
-  X3["x₃"] --> RNN3["Célula RNN\n(estado h₃)"]
+  X1["x₁"] --> RNN1["Célula RNN<br/>(estado h₁)"]
+  X2["x₂"] --> RNN2["Célula RNN<br/>(estado h₂)"]
+  X3["x₃"] --> RNN3["Célula RNN<br/>(estado h₃)"]
   RNN1 -->|"h₁"| RNN2
   RNN2 -->|"h₂"| RNN3
-  RNN3 -->|"h₃"| Output["Saída\n(previsão)"]
+  RNN3 -->|"h₃"| Output["Saída<br/>(previsão)"]
 ```
 
 ### Passo recorrente

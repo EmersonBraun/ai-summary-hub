@@ -36,11 +36,11 @@ Running `terraform init` downloads required providers and modules and initialize
 
 ```mermaid
 flowchart LR
-  HCL[HCL configuration\n.tf files] -->|"terraform init"| Init[Provider & module\ndownload]
-  Init -->|"terraform plan"| Plan[Execution plan\ndiff against state]
+  HCL[HCL configuration<br/>.tf files] -->|"terraform init"| Init[Provider & module<br/>download]
+  Init -->|"terraform plan"| Plan[Execution plan<br/>diff against state]
   Plan -->|"human review / CI approval"| Apply[terraform apply]
-  Apply -->|"API calls"| Cloud[Cloud provider APIs\nAWS / GCP / Azure]
-  Cloud -->|"resource IDs"| State[State file\nS3 / GCS backend]
+  Apply -->|"API calls"| Cloud[Cloud provider APIs<br/>AWS / GCP / Azure]
+  Cloud -->|"resource IDs"| State[State file<br/>S3 / GCS backend]
   State -->|"next plan reads state"| Plan
 ```
 

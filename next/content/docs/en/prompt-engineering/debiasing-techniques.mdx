@@ -21,16 +21,16 @@ Debiasing at the prompt level is one of several available interventions. Alterna
 
 ```mermaid
 flowchart TD
-    Input["User input\n(query / task)"] -->|"analyze for bias triggers"| BiasCheck{"Bias risk\nassessment"}
-    BiasCheck -->|"social/demographic context"| CounterFact["Counterfactual\nbalancing"]
-    BiasCheck -->|"evaluation / judging task"| PosDebias["Positional & verbosity\ndebiasing"]
-    BiasCheck -->|"opinion / advice request"| SycophDebias["Sycophancy\nmitigation"]
-    BiasCheck -->|"all tasks"| NeutralInstruct["Neutral instruction\ninjection"]
-    CounterFact -->|"multiple perspectives generated"| Aggregator["Response\naggregation"]
+    Input["User input<br/>(query / task)"] -->|"analyze for bias triggers"| BiasCheck{"Bias risk<br/>assessment"}
+    BiasCheck -->|"social/demographic context"| CounterFact["Counterfactual<br/>balancing"]
+    BiasCheck -->|"evaluation / judging task"| PosDebias["Positional & verbosity<br/>debiasing"]
+    BiasCheck -->|"opinion / advice request"| SycophDebias["Sycophancy<br/>mitigation"]
+    BiasCheck -->|"all tasks"| NeutralInstruct["Neutral instruction<br/>injection"]
+    CounterFact -->|"multiple perspectives generated"| Aggregator["Response<br/>aggregation"]
     PosDebias -->|"randomized ordering + calibration"| Aggregator
     SycophDebias -->|"steelman + evidence-first"| Aggregator
     NeutralInstruct -->|"constrained generation"| Aggregator
-    Aggregator -->|"bias-reduced output"| EvalLoop{"Bias\nevaluation"}
+    Aggregator -->|"bias-reduced output"| EvalLoop{"Bias<br/>evaluation"}
     EvalLoop -->|"passes threshold"| Output["Final response"]
     EvalLoop -->|"bias detected"| Input
 ```

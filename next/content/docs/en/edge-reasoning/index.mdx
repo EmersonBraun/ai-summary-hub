@@ -19,11 +19,11 @@ Applications range from offline-capable voice assistants and wearables to autono
 
 ```mermaid
 flowchart LR
-  Input["Sensor / user input\n(text, audio, image)"] -->|"preprocess on-device"| PreProc["Preprocessing\n(tokenize / resize)"]
-  PreProc -->|"feed"| SmallModel["Small / compressed model\n(quantized transformer / CNN)"]
+  Input["Sensor / user input<br/>(text, audio, image)"] -->|"preprocess on-device"| PreProc["Preprocessing<br/>(tokenize / resize)"]
+  PreProc -->|"feed"| SmallModel["Small / compressed model<br/>(quantized transformer / CNN)"]
   SmallModel -->|"forward pass"| Confidence["Confidence check"]
-  Confidence -->|"high confidence\n(early exit)"| Output["On-device output"]
-  Confidence -->|"low confidence\n(optional fallback)"| Cloud["Cloud model\n(when online)"]
+  Confidence -->|"high confidence<br/>(early exit)"| Output["On-device output"]
+  Confidence -->|"low confidence<br/>(optional fallback)"| Cloud["Cloud model<br/>(when online)"]
   Cloud -->|"refined answer"| Output
 ```
 
@@ -31,8 +31,8 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  Prompt["Short prompt"] -->|"draft tokens"| DraftModel["Tiny draft model\n(on-device)"]
-  DraftModel -->|"candidate tokens"| VerifyModel["Larger verify model\n(cloud or bigger on-device)"]
+  Prompt["Short prompt"] -->|"draft tokens"| DraftModel["Tiny draft model<br/>(on-device)"]
+  DraftModel -->|"candidate tokens"| VerifyModel["Larger verify model<br/>(cloud or bigger on-device)"]
   VerifyModel -->|"accept / reject"| Output["Final tokens"]
 ```
 

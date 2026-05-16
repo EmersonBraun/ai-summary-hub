@@ -22,7 +22,7 @@ Duas classes de autômatos são usadas:
 
 ```mermaid
 flowchart LR
-  Schema[JSON Schema] -->|compilar uma vez| Automaton[Autômato de gramática\nFSM ou pilha]
+  Schema[JSON Schema] -->|compilar uma vez| Automaton[Autômato de gramática<br/>FSM ou pilha]
   Prompt[Prompt + saída parcial] -->|estado atual de parse| Automaton
   Automaton -->|conjunto de próximos tokens válidos| Mask[Máscara de tokens]
   Logits[Logits brutos do LLM] -->|aplicar máscara -inf| Masked[Logits mascarados]

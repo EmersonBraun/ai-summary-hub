@@ -21,11 +21,11 @@ O **prompting contextual** injeta informações de fundo relevantes — trechos 
 
 ```mermaid
 flowchart LR
-  SYS[System prompt\n— rules, persona, format] -->|prefixes conversation| LLM
-  ROLE[Role assignment\n— expertise, style] -->|part of system| LLM
-  CTX[Injected context\n— docs, facts, history] -->|grounding| LLM
+  SYS[System prompt<br/>— rules, persona, format] -->|prefixes conversation| LLM
+  ROLE[Role assignment<br/>— expertise, style] -->|part of system| LLM
+  CTX[Injected context<br/>— docs, facts, history] -->|grounding| LLM
   USER[User message] -->|task input| LLM
-  LLM --> OUT[Response shaped by\nall three inputs]
+  LLM --> OUT[Response shaped by<br/>all three inputs]
 ```
 
 ### Prompts de sistema

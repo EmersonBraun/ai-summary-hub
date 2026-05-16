@@ -19,16 +19,16 @@ Ao contrário de injeção SQL ou buffer overflows, a injeção de prompt explor
 
 ```mermaid
 flowchart TD
-  Attacker[Atacante] -->|embute texto malicioso| Vector[Vetor de injeção\nex.: documento / entrada do usuário / resultado de ferramenta]
-  Vector --> Prompt[Prompt combinado\nsistema + recuperação + usuário]
+  Attacker[Atacante] -->|embute texto malicioso| Vector[Vetor de injeção<br/>ex.: documento / entrada do usuário / resultado de ferramenta]
+  Vector --> Prompt[Prompt combinado<br/>sistema + recuperação + usuário]
   Prompt --> LLM[LLM processa tokens]
-  LLM -->|injeção bem-sucedida| Hijack[Substituir intenção\nexfiltrar dados / contornar política]
+  LLM -->|injeção bem-sucedida| Hijack[Substituir intenção<br/>exfiltrar dados / contornar política]
   LLM -->|injeção bloqueada| Safe[Resposta normal]
 
-  Defense[Defesas] --> InputClassifier[Classificador de entrada\ndetectar padrões de injeção]
-  Defense --> Boundary[Marcadores de limite\ntags XML / delimitadores]
-  Defense --> PrivilegeCtrl[Separação de privilégios\nzona de conteúdo não confiável]
-  Defense --> ToolGuard[Lista de permissão de ferramentas\nexecução sandboxada]
+  Defense[Defesas] --> InputClassifier[Classificador de entrada<br/>detectar padrões de injeção]
+  Defense --> Boundary[Marcadores de limite<br/>tags XML / delimitadores]
+  Defense --> PrivilegeCtrl[Separação de privilégios<br/>zona de conteúdo não confiável]
+  Defense --> ToolGuard[Lista de permissão de ferramentas<br/>execução sandboxada]
 ```
 
 ## Taxonomia de ataques

@@ -15,8 +15,8 @@ tags:
 
 ```mermaid
 flowchart LR
-  Client[Browser / Phone] -->|WebRTC / SIP| Media[Media server\nLiveKit / Daily / Twilio]
-  Media -->|PCM audio| Agent[Agent process\nPython / Node]
+  Client[Browser / Phone] -->|WebRTC / SIP| Media[Media server<br/>LiveKit / Daily / Twilio]
+  Media -->|PCM audio| Agent[Agent process<br/>Python / Node]
   Agent -->|STT call| ASR[ASR API]
   Agent -->|LLM call| LLM[LLM API]
   Agent -->|TTS call| TTS[TTS API]

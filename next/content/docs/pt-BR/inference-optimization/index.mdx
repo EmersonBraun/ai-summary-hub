@@ -31,7 +31,7 @@ flowchart TD
   GPU -->|páginas KV| PagedKV[Pool de KV cache paginado]
   PagedKV -->|hit de prefixo| PrefixCache[Reutilização de prefix cache]
   PagedKV -->|novos tokens| Allocate[Alocar novos blocos]
-  GPU -->|tokens rascunho| SpecDec[Speculative decoding\nmodelo de rascunho]
+  GPU -->|tokens rascunho| SpecDec[Speculative decoding<br/>modelo de rascunho]
   SpecDec -->|verificar em paralelo| GPU
   GPU --> Output[Stream de tokens]
 ```

@@ -23,11 +23,11 @@ O cache de prompts oferece maior benefício quando o mesmo prefixo longo é reut
 
 ```mermaid
 flowchart LR
-  Request[Nova requisição\nsistema + docs + consulta do usuário] --> Split[Dividir no ponto de quebra de cache]
-  Split -->|Prefixo ≤ ponto de quebra| Check\{Acerto no\nKV-cache?\}
-  Split -->|Sufixo após ponto de quebra| Always[Sempre computado\npreço integral]
-  Check -->|Acerto| Cheap[Tokens em cache\n10% preço Anthropic\n50% preço OpenAI]
-  Check -->|Erro| Full[Preço integral\n+ taxa de escrita de cache]
+  Request[Nova requisição<br/>sistema + docs + consulta do usuário] --> Split[Dividir no ponto de quebra de cache]
+  Split -->|Prefixo ≤ ponto de quebra| Check\{Acerto no<br/>KV-cache?\}
+  Split -->|Sufixo após ponto de quebra| Always[Sempre computado<br/>preço integral]
+  Check -->|Acerto| Cheap[Tokens em cache<br/>10% preço Anthropic<br/>50% preço OpenAI]
+  Check -->|Erro| Full[Preço integral<br/>+ taxa de escrita de cache]
   Cheap --> Merge[Mesclar estados KV]
   Full --> Merge
   Always --> Merge

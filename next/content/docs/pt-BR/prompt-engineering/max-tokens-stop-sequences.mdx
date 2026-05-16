@@ -20,13 +20,13 @@ O **máximo de tokens** define um limite superior estrito sobre quantos tokens o
 ```mermaid
 flowchart TD
   START([Start generation]) --> LOOP[Generate next token]
-  LOOP --> EOS{End-of-sequence\ntoken?}
+  LOOP --> EOS{End-of-sequence<br/>token?}
   EOS -->|yes| DONE([Return output])
-  EOS -->|no| MAXT{Tokens generated\n≥ max_tokens?}
+  EOS -->|no| MAXT{Tokens generated<br/>≥ max_tokens?}
   MAXT -->|yes| DONE
-  MAXT -->|no| STOP{Output ends with\na stop sequence?}
+  MAXT -->|no| STOP{Output ends with<br/>a stop sequence?}
   STOP -->|yes| DONE
-  STOP -->|no| REP[Apply repetition\npenalty to logits]
+  STOP -->|no| REP[Apply repetition<br/>penalty to logits]
   REP --> LOOP
 ```
 

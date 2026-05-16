@@ -22,10 +22,10 @@ flowchart TD
   Task{What is your primary goal?} -->|Research and rapid iteration| PT[PyTorch]
   Task -->|Production pipelines, mobile, TPUs| TF[TensorFlow / Keras]
 
-  PT -->|Training| HF[HuggingFace Transformers\ntorchvision · torchaudio]
+  PT -->|Training| HF[HuggingFace Transformers<br/>torchvision · torchaudio]
   PT -->|Deployment| PTD[TorchScript · ONNX · PyTorch Mobile]
 
-  TF -->|Training| KR[Keras API\ntf.data · tf.distribute]
+  TF -->|Training| KR[Keras API<br/>tf.data · tf.distribute]
   TF -->|Deployment| TFD[TF Serving · TFLite · TFX · TF Hub]
 
   HF -->|Ship to production| PTD

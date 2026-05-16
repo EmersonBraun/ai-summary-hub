@@ -19,8 +19,8 @@ Speculative decoding is **lossless by design**: it never changes the output dist
 
 ```mermaid
 flowchart LR
-  Prompt[Prompt\n+ context] -->|k forward passes| Draft[Draft model\nproposes tokens t1...tk]
-  Draft -->|t1 t2 t3 t4| Target[Target model\nverifies all 4 in one pass]
+  Prompt[Prompt<br/>+ context] -->|k forward passes| Draft[Draft model<br/>proposes tokens t1...tk]
+  Draft -->|t1 t2 t3 t4| Target[Target model<br/>verifies all 4 in one pass]
   Target -->|accept t1 t2 t3| Accepted[Accept 3 tokens]
   Target -->|reject t4, resample| Resampled[Resample t4 from target]
   Accepted & Resampled --> Output[Output: 4 tokens in ~2 target passes]

@@ -35,11 +35,11 @@ In dynamic mode, a planning step runs first and outputs a graph specification (e
 
 ```mermaid
 flowchart LR
-  Start[User Goal] -->|"decompose goal"| TaskA[Task A\nResearch Topic 1]
-  Start -->|"decompose goal"| TaskB[Task B\nResearch Topic 2]
-  TaskA -->|"research result A"| TaskC[Task C\nSynthesize Results]
+  Start[User Goal] -->|"decompose goal"| TaskA[Task A<br/>Research Topic 1]
+  Start -->|"decompose goal"| TaskB[Task B<br/>Research Topic 2]
+  TaskA -->|"research result A"| TaskC[Task C<br/>Synthesize Results]
   TaskB -->|"research result B"| TaskC
-  TaskC -->|"synthesis"| TaskD[Task D\nWrite Final Report]
+  TaskC -->|"synthesis"| TaskD[Task D<br/>Write Final Report]
   TaskD -->|"report"| Output[Final Output]
 ```
 

@@ -22,7 +22,7 @@ Two classes of automata are used:
 
 ```mermaid
 flowchart LR
-  Schema[JSON Schema] -->|compile once| Automaton[Grammar automaton\nFSM or pushdown]
+  Schema[JSON Schema] -->|compile once| Automaton[Grammar automaton<br/>FSM or pushdown]
   Prompt[Prompt + partial output] -->|current parse state| Automaton
   Automaton -->|valid next token set| Mask[Token mask]
   Logits[Raw logits from LLM] -->|apply mask -inf| Masked[Masked logits]

@@ -39,13 +39,13 @@ Materialization is the process of running transformation pipelines and writing r
 
 ```mermaid
 flowchart LR
-  RawData[Raw data sources\nDB / data lake / streams] -->|"batch ETL"| OfflineStore[(Offline store\nBigQuery / S3 Parquet)]
-  RawData -->|"stream pipeline"| OnlineStore[(Online store\nRedis / DynamoDB)]
+  RawData[Raw data sources<br/>DB / data lake / streams] -->|"batch ETL"| OfflineStore[(Offline store<br/>BigQuery / S3 Parquet)]
+  RawData -->|"stream pipeline"| OnlineStore[(Online store<br/>Redis / DynamoDB)]
   OfflineStore -->|"point-in-time join"| TrainingData[Training dataset]
   TrainingData -->|"train model"| Model[ML model]
   OnlineStore -->|"low-latency lookup"| Serving[Inference serving]
   Model -->|"deploy"| Serving
-  FeatureDefs[Feature definitions\nPython / YAML] -->|"define transforms"| OfflineStore
+  FeatureDefs[Feature definitions<br/>Python / YAML] -->|"define transforms"| OfflineStore
   FeatureDefs -->|"define transforms"| OnlineStore
 ```
 

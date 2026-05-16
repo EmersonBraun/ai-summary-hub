@@ -74,14 +74,14 @@ A integração RAG da Cohere une Embed, Rerank e Command A em um pipeline unific
 
 ```mermaid
 flowchart LR
-  Q[User Query] -->|embed with\nsearch_query| E[Embed API]
+  Q[User Query] -->|embed with<br/>search_query| E[Embed API]
   E -->|query vector| VDB[(Vector Database)]
   VDB -->|top-k candidates| RR[Rerank API]
-  RR -->|ranked documents\nwith scores| CMD[Command A]
+  RR -->|ranked documents<br/>with scores| CMD[Command A]
   Q -->|original question| CMD
-  CMD -->|grounded answer\nwith citations| A[Response]
+  CMD -->|grounded answer<br/>with citations| A[Response]
 
-  DOCS[Documents] -->|embed with\nsearch_document| E2[Embed API]
+  DOCS[Documents] -->|embed with<br/>search_document| E2[Embed API]
   E2 -->|document vectors| VDB
 ```
 

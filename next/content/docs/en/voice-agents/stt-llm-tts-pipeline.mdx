@@ -18,13 +18,13 @@ The central constraint is a **300 ms budget**: at or below 300 ms total round-tr
 
 ```mermaid
 flowchart TD
-  Audio[Raw audio stream] --> VAD[Voice Activity Detection\nsilero-VAD / Deepgram streaming]
-  VAD -->|end-of-utterance signal| STT[ASR\nDeepgram Nova-3 / Whisper v3]
-  STT -->|transcript text| Prompt[Prompt construction\nsystem + history + user turn]
-  Prompt --> LLM[LLM — streaming\nGPT-4o / Claude / Gemini]
-  LLM -->|token stream| Splitter[Sentence splitter\nfirst 8-15 tokens → flush]
-  Splitter -->|sentence chunk| TTS[TTS synthesis\nElevenLabs / Deepgram Aura]
-  TTS -->|audio chunks| Playback[Audio playback\nWebRTC / PCM]
+  Audio[Raw audio stream] --> VAD[Voice Activity Detection<br/>silero-VAD / Deepgram streaming]
+  VAD -->|end-of-utterance signal| STT[ASR<br/>Deepgram Nova-3 / Whisper v3]
+  STT -->|transcript text| Prompt[Prompt construction<br/>system + history + user turn]
+  Prompt --> LLM[LLM — streaming<br/>GPT-4o / Claude / Gemini]
+  LLM -->|token stream| Splitter[Sentence splitter<br/>first 8-15 tokens → flush]
+  Splitter -->|sentence chunk| TTS[TTS synthesis<br/>ElevenLabs / Deepgram Aura]
+  TTS -->|audio chunks| Playback[Audio playback<br/>WebRTC / PCM]
 ```
 
 ### Stage 1 — Voice Activity Detection (VAD)

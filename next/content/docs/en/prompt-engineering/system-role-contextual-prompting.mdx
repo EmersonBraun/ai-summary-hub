@@ -20,10 +20,10 @@ A **system prompt** (also called a system message) is a special input slot in mo
 
 ```mermaid
 flowchart TD
-    System["System message\n(role + instructions + constraints)"] -->|"prepended to context"| Context
-    Context["Contextual information\n(documents, history, data)"] -->|"injected before user turn"| UserMsg
-    UserMsg["User message\n(query / task)"] -->|"full prompt assembled"| LLM["LLM"]
-    LLM -->|"constrained by system message"| Response["Assistant response\n(persona-consistent, grounded)"]
+    System["System message<br/>(role + instructions + constraints)"] -->|"prepended to context"| Context
+    Context["Contextual information<br/>(documents, history, data)"] -->|"injected before user turn"| UserMsg
+    UserMsg["User message<br/>(query / task)"] -->|"full prompt assembled"| LLM["LLM"]
+    LLM -->|"constrained by system message"| Response["Assistant response<br/>(persona-consistent, grounded)"]
     Response -->|"conversation continues"| UserMsg
 ```
 

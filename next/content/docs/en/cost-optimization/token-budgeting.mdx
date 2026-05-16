@@ -17,14 +17,14 @@ Input tokens comprise: the system prompt, conversation history, retrieved RAG co
 
 ```mermaid
 flowchart TD
-  Raw[Raw inputs\nsystem + history + context + query] --> Compress[Prompt compression\nLLMLingua / selective summarisation]
-  Compress --> Trim[RAG context trimmer\ntop-k chunks, token cap]
-  Trim --> Prune[History pruner\nsliding window / abstractive summary]
-  Prune --> Budget{Total tokens\n≤ budget?}
+  Raw[Raw inputs<br/>system + history + context + query] --> Compress[Prompt compression<br/>LLMLingua / selective summarisation]
+  Compress --> Trim[RAG context trimmer<br/>top-k chunks, token cap]
+  Trim --> Prune[History pruner<br/>sliding window / abstractive summary]
+  Prune --> Budget{Total tokens<br/>≤ budget?}
   Budget -->|Yes| LLM[Send to LLM]
   Budget -->|No| Drop[Drop lowest-score chunks]
   Drop --> LLM
-  LLM --> MaxTok[max_tokens / stop sequence\noutput constraint]
+  LLM --> MaxTok[max_tokens / stop sequence<br/>output constraint]
   MaxTok --> Response[Bounded response]
 ```
 

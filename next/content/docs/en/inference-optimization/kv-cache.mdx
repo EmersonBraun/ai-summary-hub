@@ -20,8 +20,8 @@ The trade-off is memory: the KV cache grows linearly with context length, batch 
 
 ```mermaid
 flowchart LR
-  Prefill[Prefill phase\ncompute K,V for all prompt tokens\nstore in KV cache] --> Decode
-  Decode[Decode phase\ncompute K,V for new token only\nlook up all prior K,V from cache] -->|next token| Decode
+  Prefill[Prefill phase<br/>compute K,V for all prompt tokens<br/>store in KV cache] --> Decode
+  Decode[Decode phase<br/>compute K,V for new token only<br/>look up all prior K,V from cache] -->|next token| Decode
   Decode -->|sequence complete| Evict[Evict blocks from pool]
 ```
 

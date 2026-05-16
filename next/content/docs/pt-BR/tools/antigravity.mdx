@@ -15,8 +15,8 @@ O editor foi desenvolvido para baixar a fricção entre ideia e código funciona
 
 ```mermaid
 flowchart LR
-  User["Intenção do usuário\n(prompt de linguagem natural)"] -->|"submeter"| Planner["Planejador de agente"]
-  Planner -->|"decompor em etapas"| Tools["Ferramentas: leitura/escrita\nde arquivo, terminal, busca"]
+  User["Intenção do usuário<br/>(prompt de linguagem natural)"] -->|"submeter"| Planner["Planejador de agente"]
+  Planner -->|"decompor em etapas"| Tools["Ferramentas: leitura/escrita<br/>de arquivo, terminal, busca"]
   Tools -->|"resultados"| Verifier["Verificador"]
   Verifier -->|"objetivo atingido?"| Done["Saída / diff"]
   Verifier -->|"não"| Planner

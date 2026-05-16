@@ -31,10 +31,10 @@ Data quality checks should be embedded at every stage of the pipeline, not bolte
 
 ```mermaid
 flowchart LR
-  Sources["Sources\n(DB / API / Events)"] -- "raw records" --> Ingest["Ingest\n(Extract & Load)"]
-  Ingest -- "raw data" --> Transform["Transform\n(Clean / Validate / Feature eng.)"]
-  Transform -- "validated features" --> Store["Store\n(Warehouse / Feature store)"]
-  Store -- "query / serve" --> Serve["Serve\n(Training / Inference)"]
+  Sources["Sources<br/>(DB / API / Events)"] -- "raw records" --> Ingest["Ingest<br/>(Extract & Load)"]
+  Ingest -- "raw data" --> Transform["Transform<br/>(Clean / Validate / Feature eng.)"]
+  Transform -- "validated features" --> Store["Store<br/>(Warehouse / Feature store)"]
+  Store -- "query / serve" --> Serve["Serve<br/>(Training / Inference)"]
 ```
 
 ## When to use / When NOT to use

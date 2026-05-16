@@ -32,7 +32,7 @@ The Messages API (`POST /v1/messages`) is Anthropic's primary interface. Unlike 
 ```mermaid
 flowchart LR
   Client[Client app] -->|POST /v1/messages| API[Anthropic API]
-  API -->|system + messages| Selector{Model\nselector}
+  API -->|system + messages| Selector{Model<br/>selector}
   Selector -->|complex reasoning| Opus[Claude Opus 4.7]
   Selector -->|balanced| Sonnet[Claude Sonnet 4.6]
   Selector -->|fast / cheap| Haiku[Claude Haiku 4.5]
@@ -40,7 +40,7 @@ flowchart LR
   Sonnet --> Resp
   Haiku --> Resp
   Resp --> Client
-  Resp -.->|token usage,\nbilling| Platform[Anthropic platform]
+  Resp -.->|token usage,<br/>billing| Platform[Anthropic platform]
 ```
 
 ### Tool use
@@ -50,8 +50,8 @@ Tool use lets Claude call external functions by emitting structured `tool_use` c
 ```mermaid
 flowchart LR
   UserMsg[User message] --> Claude[Claude model]
-  Claude -->|emits tool_use block| ToolReq[Tool request\nname + input JSON]
-  ToolReq -->|your code invokes| ExtSystem[External system\nor function]
+  Claude -->|emits tool_use block| ToolReq[Tool request<br/>name + input JSON]
+  ToolReq -->|your code invokes| ExtSystem[External system<br/>or function]
   ExtSystem -->|result| ToolResult[tool_result message]
   ToolResult --> Claude
   Claude -->|final text response| UserMsg
@@ -73,7 +73,7 @@ Claude Opus 4.7 and Sonnet 4.6 support a 1M-token context window, and Haiku 4.5 
 
 ```mermaid
 flowchart LR
-  LargeDoc[Large document\nor codebase] -->|tokenize| Tokens[Up to 1M tokens]
+  LargeDoc[Large document<br/>or codebase] -->|tokenize| Tokens[Up to 1M tokens]
   Tokens -->|single API call| Claude[Claude model]
   SystemPrompt[System prompt] -->|cached prefix| Cache[(Prompt cache)]
   Cache -->|cache hit: 90% cheaper| Claude

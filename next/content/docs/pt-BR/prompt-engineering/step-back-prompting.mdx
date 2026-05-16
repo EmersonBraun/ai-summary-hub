@@ -17,10 +17,10 @@ Por exemplo, em vez de perguntar diretamente "Qual é a temperatura do corpo em 
 
 ```mermaid
 flowchart LR
-  Q[Specific question] --> ABSTRACT[Step-back: ask for\nhigh-level concept/principle]
-  ABSTRACT --> CONCEPT[LLM generates\nabstract context]
+  Q[Specific question] --> ABSTRACT[Step-back: ask for<br/>high-level concept/principle]
+  ABSTRACT --> CONCEPT[LLM generates<br/>abstract context]
   Q --> REASON
-  CONCEPT --> REASON[LLM reasons with\noriginal Q + abstract context]
+  CONCEPT --> REASON[LLM reasons with<br/>original Q + abstract context]
   REASON --> ANS[Final answer]
 ```
 
