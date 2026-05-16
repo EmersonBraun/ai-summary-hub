@@ -11,13 +11,26 @@ export function Mermaid({ chart }: { chart: string }) {
     void (async () => {
       const { default: mermaid } = await import('mermaid');
       if (cancelled) return;
-      mermaid.initialize({ startOnLoad: false, securityLevel: 'strict' });
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: 'strict',
+        // htmlLabels emits <br> inside foreignObject — invalid XML that breaks
+        // DOMParser(image/svg+xml). Force SVG <text> labels instead.
+        htmlLabels: false,
+        flowchart: { htmlLabels: false },
+      });
       try {
         const { svg } = await mermaid.render(`m-${id}`, chart);
         if (cancelled || !ref.current) return;
         const parser = new DOMParser();
-        const doc = parser.parseFromString(svg, 'image/svg+xml');
-        const node = doc.documentElement;
+        let doc = parser.parseFromString(svg, 'image/svg+xml');
+        // If strict XML parsing failed (e.g. a stray <br>), re-parse as HTML
+        // and lift the <svg> out — never inject the XML-error document.
+        if (doc.querySelector('parsererror')) {
+          doc = parser.parseFromString(svg, 'text/html');
+        }
+        const node = doc.querySelector('svg');
+        if (cancelled || !ref.current || !node) return;
         ref.current.replaceChildren(node);
       } catch (err) {
         if (cancelled || !ref.current) return;
