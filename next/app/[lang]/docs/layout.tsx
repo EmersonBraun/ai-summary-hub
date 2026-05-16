@@ -15,9 +15,11 @@ export default async function Layout({
   const { lang } = await params;
   const locale: Locale = lang === 'pt-BR' ? 'pt-BR' : 'en';
   return (
-    <DocsLayout tree={source.getPageTree(lang)} {...baseOptions}>
-      {children}
+    <div className="flex min-h-dvh flex-col">
+      <DocsLayout tree={source.getPageTree(lang)} {...baseOptions}>
+        {children}
+      </DocsLayout>
       <Footer lang={locale} />
-    </DocsLayout>
+    </div>
   );
 }

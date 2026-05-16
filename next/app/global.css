@@ -3,3 +3,144 @@
 @import 'fumadocs-ui/css/preset.css';
 
 @source '../node_modules/fumadocs-ui/dist/**/*.js';
+
+/* --- Footer placement fix ---
+   Fumadocs DocsLayout/HomeLayout force their root container to min-h-100dvh,
+   which left the externally-rendered <footer> floating with dead space on
+   short pages. We drop that forced height so the flex-col wrapper in the
+   layouts can let `mt-auto` pin the footer to the viewport bottom. */
+#nd-docs-layout,
+#nd-home-layout {
+  min-height: 0 !important;
+}
+
+/* --- Fancy landing (agentskit.io-inspired) --- */
+:root {
+  --ash-accent: #00e0c6;
+  --ash-accent-2: #6d5cff;
+  --ash-ink: #0a0c10;
+  --ash-ink-2: #11141b;
+}
+
+.ash-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(60% 70% at 50% -10%, rgba(109, 92, 255, 0.28), transparent 70%),
+    radial-gradient(45% 60% at 85% 20%, rgba(0, 224, 198, 0.18), transparent 70%),
+    linear-gradient(180deg, var(--ash-ink) 0%, var(--ash-ink-2) 100%);
+  color: #f5f7fa;
+}
+
+.ash-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(80% 60% at 50% 0%, #000 40%, transparent 100%);
+}
+
+.ash-gradient-text {
+  background: linear-gradient(110deg, #fff 30%, var(--ash-accent) 75%, var(--ash-accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ash-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 224, 198, 0.35);
+  background: rgba(0, 224, 198, 0.08);
+  color: var(--ash-accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ash-eyebrow::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--ash-accent);
+  box-shadow: 0 0 10px 1px var(--ash-accent);
+}
+
+.ash-btn-primary {
+  background: linear-gradient(110deg, var(--ash-accent) 0%, var(--ash-accent-2) 100%);
+  color: #04121a;
+  font-weight: 700;
+  box-shadow: 0 8px 30px -8px rgba(0, 224, 198, 0.6);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.ash-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px -8px rgba(0, 224, 198, 0.7);
+}
+
+.ash-btn-ghost {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f5f7fa;
+  font-weight: 600;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+.ash-btn-ghost:hover {
+  border-color: rgba(0, 224, 198, 0.5);
+  background: rgba(0, 224, 198, 0.08);
+}
+
+.ash-term {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+  background: rgba(8, 10, 14, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+}
+
+.ash-card {
+  position: relative;
+  border: 1px solid var(--fd-border);
+  background: var(--fd-card);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.ash-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--ash-accent) 55%, transparent);
+  box-shadow: 0 18px 40px -20px color-mix(in srgb, var(--ash-accent) 60%, transparent);
+}
+.ash-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(130deg, var(--ash-accent), var(--ash-accent-2));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.ash-card:hover::after {
+  opacity: 0.9;
+}
+
+.ash-cta-panel {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(70% 120% at 50% 0%, rgba(109, 92, 255, 0.25), transparent 70%),
+    linear-gradient(180deg, var(--ash-ink-2) 0%, var(--ash-ink) 100%);
+  color: #f5f7fa;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}

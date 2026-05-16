@@ -31,7 +31,7 @@ export function Footer({ lang }: { lang: Locale }) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-24 border-t border-fd-border bg-fd-card">
+    <footer className="mt-auto border-t border-fd-border bg-fd-card">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-12 md:flex-row md:justify-between">
         <div>
           <div className="text-lg font-semibold">{SITE.name}</div>

@@ -5,6 +5,7 @@
     "max-tokens-stop-sequences",
     "structured-outputs",
     "system-role-contextual-prompting",
+    "prompt-formats",
     "self-consistency",
     "step-back-prompting",
     "automatic-prompt-engineering",

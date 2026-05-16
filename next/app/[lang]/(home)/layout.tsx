@@ -14,9 +14,11 @@ export default async function Layout({
   const { lang } = await params;
   const locale: Locale = lang === 'pt-BR' ? 'pt-BR' : 'en';
   return (
-    <HomeLayout {...baseOptions}>
-      {children}
+    <div className="flex min-h-dvh flex-col">
+      <HomeLayout {...baseOptions} className="flex-1">
+        {children}
+      </HomeLayout>
       <Footer lang={locale} />
-    </HomeLayout>
+    </div>
   );
 }

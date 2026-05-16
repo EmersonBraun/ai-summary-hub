@@ -9,6 +9,7 @@
     "self-critique",
     "tools-actions",
     "frameworks-overview",
+    "agent-runtimes",
     "crewai",
     "autogen",
     "langgraph",
@@ -18,5 +19,5 @@
     "security",
     "prompt-engineering"
   ],
-  "title": "Memory"
+  "title": "Agentes de IA"
 }
