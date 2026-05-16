@@ -16,6 +16,10 @@ const config: Config = {
   url: 'https://emersonbraun.github.io',
   baseUrl: '/ai-summary-hub/',
 
+  // Legacy app kept for reference; deployed Docusaurus only redirects to the
+  // new Fumadocs app. See src/clientModules/redirectToApp.js + redirect/.
+  clientModules: ['./src/clientModules/redirectToApp.js'],
+
   organizationName: 'EmersonBraun',
   projectName: 'ai-summary-hub',
 
