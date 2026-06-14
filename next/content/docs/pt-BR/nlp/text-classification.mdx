@@ -22,7 +22,7 @@ flowchart LR
   Text[Texto de entrada] -->|tokenizar| Enc[Encoder Transformer]
   Enc -->|CLS pooling| Pool[Embedding agrupado]
   Pool -->|camada linear| Logits[Logits de classe]
-  Logits -->|softmax / sigmoid| Pred[Rótulo\(s\) previsto\(s\)]
+  Logits -->|softmax / sigmoid| Pred["Rótulo(s) previsto(s)"]
 ```
 
 1. **Tokenizar** — o texto é dividido em tokens de subpalavras (BPE, WordPiece) e mapeado para embeddings com codificações posicionais.

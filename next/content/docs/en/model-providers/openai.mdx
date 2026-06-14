@@ -29,7 +29,7 @@ GPT-5.4 and GPT-5.5 support five reasoning modes — `none`, `low`, `medium`, `h
 
 ```mermaid
 flowchart LR
-  Client[Client app] -->|POST messages array| ChatAPI[/v1/chat/completions]
+  Client[Client app] -->|POST messages array| ChatAPI["/v1/chat/completions"]
   ChatAPI -->|model routing| Selector{Model<br/>selector}
   Selector -->|flagship| GPT55[GPT-5.5]
   Selector -->|balanced| GPT54[GPT-5.4]

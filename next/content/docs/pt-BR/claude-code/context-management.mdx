@@ -44,7 +44,7 @@ flowchart LR
   Model -->|response + new tool calls| History
   History -->|approaching limit| Compress[Auto-compression<br/>old turns summarized]
   Compress -->|trimmed history| Assemble
-  Clear[/clear command] -->|resets| History
+  Clear["/clear command"] -->|resets| History
 ```
 
 ## Quando usar / Quando NÃO usar
