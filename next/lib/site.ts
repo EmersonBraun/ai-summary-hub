@@ -69,7 +69,7 @@ export const FEATURED_CATEGORIES: Array<{
 
 export const HOME_COPY = {
   en: {
-    eyebrow: 'Open knowledge wiki',
+    eyebrow: 'The learn layer of the AgentsKit ecosystem',
     cta_primary: 'Explore docs',
     cta_secondary: 'View on GitHub',
     stats: [
@@ -84,7 +84,7 @@ export const HOME_COPY = {
     final_cta_subtitle: 'No paywalls, no fluff — just concise, cited summaries.',
   },
   'pt-BR': {
-    eyebrow: 'Wiki aberta de conhecimento',
+    eyebrow: 'A camada de aprendizado do ecossistema AgentsKit',
     cta_primary: 'Explorar docs',
     cta_secondary: 'Ver no GitHub',
     stats: [

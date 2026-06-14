@@ -1,8 +1,9 @@
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import type { ReactNode } from 'react';
-import { baseOptions } from '@/lib/layout.shared';
+import { getBaseOptions } from '@/lib/layout.shared';
 import { source } from '@/lib/source';
 import { Footer } from '@/components/footer';
+import { FunnelBanner } from '@/components/funnel-banner';
 import type { Locale } from '@/lib/site';
 
 export default async function Layout({
@@ -14,11 +15,13 @@ export default async function Layout({
 }) {
   const { lang } = await params;
   const locale: Locale = lang === 'pt-BR' ? 'pt-BR' : 'en';
+  const baseOptions = await getBaseOptions(locale);
   return (
     <div className="flex min-h-dvh flex-col">
       <DocsLayout tree={source.getPageTree(lang)} {...baseOptions}>
         {children}
       </DocsLayout>
+      <FunnelBanner lang={locale} />
       <Footer lang={locale} />
     </div>
   );
