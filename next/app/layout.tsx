@@ -1,9 +1,11 @@
 import './global.css';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import Script from 'next/script';
+import { Suspense } from 'react';
 import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { SITE } from '@/lib/site';
+import { PostHogProvider } from '@/components/posthog-provider';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -57,7 +59,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <RootProvider
           theme={{ defaultTheme: 'dark', enableSystem: false }}
         >
-          {children}
+          {/* Suspense required because PostHogProvider uses useSearchParams */}
+          <Suspense>
+            <PostHogProvider>{children}</PostHogProvider>
+          </Suspense>
         </RootProvider>
         <script suppressHydrationWarning>{LANG_PATCH}</script>
         <Script

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { SITE } from '@/lib/site';
 import type { Locale } from '@/lib/site';
+import { ECOSYSTEM_LINKS } from '@/lib/ecosystem';
 
 const ICON = 20;
 
@@ -48,10 +49,6 @@ const SOCIAL = [
   { label: 'GitHub', href: SITE.github },
 ] as const;
 
-const OSS = [
-  { label: 'AgentsKit', href: 'https://www.agentskit.io/' },
-  { label: 'Skills', href: 'https://github.com/EmersonBraun/skills' },
-] as const;
 
 const COPY = {
   en: {
@@ -60,8 +57,7 @@ const COPY = {
     docs: 'Docs',
     rss: 'RSS feed',
     connect: 'Connect',
-    oss: 'Open Source',
-    ossDesc: { AgentsKit: 'AI agent framework', Skills: 'Reusable AI skills' },
+    oss: 'Ecosystem',
   },
   'pt-BR': {
     builtBy: 'Feito por',
@@ -69,8 +65,7 @@ const COPY = {
     docs: 'Docs',
     rss: 'Feed RSS',
     connect: 'Conectar',
-    oss: 'Open Source',
-    ossDesc: { AgentsKit: 'Framework de agentes de IA', Skills: 'Skills de IA reutilizáveis' },
+    oss: 'Ecossistema',
   },
 } as const;
 
@@ -106,7 +101,7 @@ export function Footer({ lang }: { lang: Locale }) {
         <div>
           <div className="text-sm font-semibold">{copy.oss}</div>
           <ul className="mt-4 space-y-2 text-sm">
-            {OSS.map((o) => (
+            {ECOSYSTEM_LINKS[lang].items.map((o) => (
               <li key={o.label}>
                 <a
                   href={o.href}
@@ -115,9 +110,7 @@ export function Footer({ lang }: { lang: Locale }) {
                   className="text-fd-muted-foreground hover:text-fd-primary"
                 >
                   <span className="font-medium text-fd-foreground">{o.label}</span>
-                  <span className="block text-xs text-fd-muted-foreground">
-                    {copy.ossDesc[o.label as 'AgentsKit' | 'Skills']}
-                  </span>
+                  <span className="block text-xs text-fd-muted-foreground">{o.sub}</span>
                 </a>
               </li>
             ))}

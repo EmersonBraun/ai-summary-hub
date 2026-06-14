@@ -14,12 +14,24 @@
   min-height: 0 !important;
 }
 
-/* --- Fancy landing (agentskit.io-inspired) --- */
+/* --- Ecosystem palette (AgentsKit / emersonbraun.dev) ---
+   Violet is the shared ecosystem brand color; teal is a secondary accent
+   reserved for micro-details (terminal prompt, gradient tails). Keeping the
+   primary in lockstep with AgentsKit is what makes the three sites read as
+   one family. fd-primary is pinned to the same violet so docs UI (links,
+   cards, focus rings) match the landing. */
 :root {
-  --ash-accent: #00e0c6;
-  --ash-accent-2: #6d5cff;
+  --ash-accent: #6d5cff;
+  --ash-accent-2: #00e0c6;
   --ash-ink: #0a0c10;
   --ash-ink-2: #11141b;
+  --color-fd-primary: #5b4bff;
+  --color-fd-ring: #5b4bff;
+}
+
+.dark {
+  --color-fd-primary: #8b7dff;
+  --color-fd-ring: #8b7dff;
 }
 
 .ash-hero {

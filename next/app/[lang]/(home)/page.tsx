@@ -78,40 +78,56 @@ const WHY = {
   ],
 } as const;
 
+const UTM = 'utm_source=aisummaryhub&utm_medium=home&utm_campaign=ecosystem';
+
 const PROJECTS = {
   en: {
-    heading: 'Open-source projects',
-    subtitle: 'Tools from the same author — free and open source.',
+    heading: 'Part of the AgentsKit ecosystem',
+    subtitle: 'Learn the concepts here, then take them to production.',
+    steps: [
+      { k: 'Learn', d: 'Concepts, cited — right here', here: true },
+      { k: 'Build', d: 'Agents in JavaScript with AgentsKit', here: false },
+      { k: 'Ship', d: 'Orchestrate in production with AKOS', here: false },
+    ],
     cards: [
       {
         name: 'AgentsKit',
-        href: 'https://www.agentskit.io/',
-        desc: 'The most complete library for building AI agents. Production-ready framework with memory, tools, multi-agent orchestration, and more.',
-        cta: 'Visit documentation →',
+        badge: 'Build',
+        href: `https://www.agentskit.io?${UTM}`,
+        desc: 'Ship AI agents in JavaScript without gluing 8 libraries together. Chat UI, runtime, tools, memory, RAG, and guardrails in one ecosystem.',
+        cta: 'Start building →',
       },
       {
-        name: 'Skills',
-        href: 'https://github.com/EmersonBraun/skills',
-        desc: 'A curated repository of reusable AI skills for Claude Code and other AI coding assistants. Boost your dev workflow instantly.',
-        cta: 'View on GitHub →',
+        name: 'AKOS',
+        badge: 'Ship',
+        href: `https://akos.agentskit.io?${UTM}`,
+        desc: 'The AgentsKit control plane — orchestration, governance, and observability for running agents in production at scale.',
+        cta: 'Explore AKOS →',
       },
     ],
   },
   'pt-BR': {
-    heading: 'Projetos open source',
-    subtitle: 'Ferramentas do mesmo autor — gratuitas e open source.',
+    heading: 'Parte do ecossistema AgentsKit',
+    subtitle: 'Aprenda os conceitos aqui e leve-os para produção.',
+    steps: [
+      { k: 'Aprenda', d: 'Conceitos, com fontes — aqui', here: true },
+      { k: 'Construa', d: 'Agentes em JavaScript com AgentsKit', here: false },
+      { k: 'Suba', d: 'Orquestre em produção com AKOS', here: false },
+    ],
     cards: [
       {
         name: 'AgentsKit',
-        href: 'https://www.agentskit.io/',
-        desc: 'A biblioteca mais completa para construir agentes de IA. Framework pronto para produção com memória, ferramentas, orquestração multi-agente e mais.',
-        cta: 'Ver documentação →',
+        badge: 'Construa',
+        href: `https://www.agentskit.io?${UTM}`,
+        desc: 'Construa agentes de IA em JavaScript sem colar 8 bibliotecas. Chat UI, runtime, ferramentas, memória, RAG e guardrails em um só ecossistema.',
+        cta: 'Começar a construir →',
       },
       {
-        name: 'Skills',
-        href: 'https://github.com/EmersonBraun/skills',
-        desc: 'Um repositório curado de skills de IA reutilizáveis para Claude Code e outros assistentes de código. Acelere seu fluxo de dev na hora.',
-        cta: 'Ver no GitHub →',
+        name: 'AKOS',
+        badge: 'Suba',
+        href: `https://akos.agentskit.io?${UTM}`,
+        desc: 'O control plane do AgentsKit — orquestração, governança e observabilidade para rodar agentes em produção e em escala.',
+        cta: 'Explorar AKOS →',
       },
     ],
   },
@@ -173,7 +189,7 @@ export default async function HomePage(props: { params: Promise<Params> }) {
                 <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
               </div>
               <code className="block text-white/80">
-                <span style={{ color: 'var(--ash-accent)' }}>$</span> curl
+                <span style={{ color: 'var(--ash-accent-2)' }}>$</span> curl
                 aisummaryhub.dev/docs/agents/index.mdx
                 <br />
                 <span className="text-white/40">
@@ -270,6 +286,40 @@ export default async function HomePage(props: { params: Promise<Params> }) {
             </h2>
             <p className="mt-3 text-fd-muted-foreground">{PROJECTS[lang].subtitle}</p>
           </div>
+
+          {/* Learn → Build → Ship — the ecosystem funnel, "you are here" on Learn */}
+          <ol className="mx-auto mb-10 flex max-w-3xl flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+            {PROJECTS[lang].steps.map((step, i) => (
+              <li key={step.k} className="flex flex-1 items-center gap-3">
+                <div
+                  className={`flex-1 rounded-xl border p-4 ${
+                    step.here
+                      ? 'border-fd-primary bg-fd-primary/5'
+                      : 'border-fd-border bg-fd-card'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs text-fd-primary">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span className="text-sm font-semibold">{step.k}</span>
+                    {step.here && (
+                      <span className="ml-auto rounded-full bg-fd-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-fd-primary-foreground">
+                        {lang === 'en' ? 'You are here' : 'Você está aqui'}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1.5 text-xs text-fd-muted-foreground">{step.d}</p>
+                </div>
+                {i < PROJECTS[lang].steps.length - 1 && (
+                  <span className="hidden text-fd-muted-foreground sm:inline" aria-hidden>
+                    →
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+
           <div className="grid gap-5 md:grid-cols-2">
             {PROJECTS[lang].cards.map((p) => (
               <a
@@ -279,7 +329,7 @@ export default async function HomePage(props: { params: Promise<Params> }) {
                 rel="noopener noreferrer"
                 className="ash-banner group flex flex-col rounded-2xl p-8"
               >
-                <span className="ash-badge w-fit">Open Source</span>
+                <span className="ash-badge w-fit">{p.badge}</span>
                 <h3 className="mt-5 text-2xl font-bold">{p.name}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-white/70">{p.desc}</p>
                 <span
