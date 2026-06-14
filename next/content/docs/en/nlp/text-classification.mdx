@@ -22,7 +22,7 @@ flowchart LR
   Text[Input text] -->|tokenize| Enc[Transformer encoder]
   Enc -->|CLS pooling| Pool[Pooled embedding]
   Pool -->|linear layer| Logits[Class logits]
-  Logits -->|softmax / sigmoid| Pred[Predicted label\(s\)]
+  Logits -->|softmax / sigmoid| Pred["Predicted label(s)"]
 ```
 
 1. **Tokenize** — text is split into subword tokens (BPE, WordPiece) and mapped to embeddings with positional encodings.
