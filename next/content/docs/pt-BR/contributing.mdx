@@ -66,29 +66,19 @@ Cada documento deve incluir este bloco de frontmatter:
 ---
 title: "Título completo do artigo"
 description: "Descrição de uma linha para SEO e busca"
-keywords: [keyword1, keyword2, keyword3]
 tags: [intermediate]  # exatamente um de: beginner, intermediate, advanced
-authors: [NomeUsuarioGitHub]  # nome(s) de usuário do GitHub do(s) autor(es)
 ---
 ```
 
-**Campos obrigatórios:**
+**Campos:**
 
-| Campo | Descrição |
-|-------|-----------|
-| `title` | Título completo do artigo |
-| `description` | Descrição de uma linha (usada para SEO e busca) |
-| `keywords` | Array de palavras-chave relevantes |
-| `tags` | Array contendo **exatamente uma** tag de nível: `beginner`, `intermediate` ou `advanced` |
-| `authors` | Array de nomes de usuário do GitHub que escreveram o artigo |
+| Campo | Obrigatório | Descrição |
+|-------|-------------|-----------|
+| `title` | sim | Título completo do artigo — também usado como rótulo da barra lateral e como o `<h1>` da página |
+| `description` | sim | Descrição de uma linha (usada para SEO, cards sociais e busca) |
+| `tags` | sim | Array contendo **exatamente uma** tag de nível: `beginner`, `intermediate` ou `advanced` |
 
-**Campos opcionais:**
-
-| Campo | Descrição | Quando usar |
-|-------|-----------|-------------|
-| `sidebar_label` | Rótulo curto para a barra lateral | Apenas quando o título excede ~30 caracteres |
-
-**Nota:** `last_updated` é gerenciado automaticamente pelo Docusaurus via histórico do git. Não o adicione manualmente.
+Não adicione um título `# H1` no corpo — o fumadocs renderiza o `title` como o cabeçalho da página automaticamente. Comece o corpo direto com `## Definição`.
 
 ### Exemplo completo de modelo
 
@@ -96,12 +86,8 @@ authors: [NomeUsuarioGitHub]  # nome(s) de usuário do GitHub do(s) autor(es)
 ---
 title: "Tópico Exemplo"
 description: "Uma breve descrição do tópico."
-keywords: [topico, exemplo, ia]
 tags: [intermediate]
-authors: [SeuNomeUsuarioGitHub]
 ---
-
-# Tópico Exemplo
 
 ## Definição
 
@@ -172,54 +158,61 @@ Explicação com diagrama:
 
 ## Adicionando novos tópicos
 
-1. Crie um novo arquivo em `docs/` na categoria correta (p. ex. `docs/tools/minha-ferramenta.md`).
-2. Use o modelo acima e garanta um ID de documento único (baseado no caminho).
+O conteúdo fica em `content/docs/<lang>/`, e o roteamento é baseado no caminho: o
+arquivo `content/docs/en/tools/minha-ferramenta.mdx` é servido em `/docs/tools/minha-ferramenta`.
+
+1. Crie um novo arquivo `.mdx` na categoria correta, p. ex. `content/docs/en/tools/minha-ferramenta.mdx`.
+2. Use o modelo acima (comece o corpo em `## Definição` — sem `# H1`).
 3. Inclua **todas as seções obrigatórias** e seções opcionais relevantes.
-4. Adicione o documento a `sidebars.ts` na categoria correta.
-5. Se seu artigo inclui uma **Comparação** com outro artigo, atualize esse artigo com uma comparação recíproca.
-6. Abra um PR com uma breve descrição.
+4. Adicione o slug do arquivo ao array `pages` do `meta.json` da categoria — isso controla a ordem da barra lateral.
+5. **Categoria nova?** Crie a pasta com um `meta.json` (`title` + `pages`, com `index` primeiro) e uma página `index.mdx` de entrada.
+6. Se seu artigo inclui uma **Comparação** com outro artigo, atualize esse artigo com uma comparação recíproca.
+7. Abra um PR com uma breve descrição.
+
+Um `meta.json` se parece com:
+
+```json
+{
+  "title": "Tools",
+  "pages": ["index", "minha-ferramenta", "outra-ferramenta"]
+}
+```
 
 ## Melhorando exemplos
 
 - Prefira código executável; adicione comentários se dependências ou configuração não forem óbvias.
-- Use linguagens suportadas pelo Prism (Python, JavaScript, TypeScript, bash, yaml, docker).
+- Use blocos de código cercados com a tag de linguagem — o destaque é feito pelo [Shiki](https://shiki.style/) (Python, JavaScript, TypeScript, bash, yaml, json, docker e mais).
 - Vincule à documentação oficial ou repositórios onde relevante.
 
 ## Diagramas (Mermaid)
 
-Os diagramas nos docs são escritos em [Mermaid](https://mermaid.js.org/intro/getting-started.html) e renderizados pelo site via Docusaurus. Diretrizes:
+Os diagramas são escritos em [Mermaid](https://mermaid.js.org/intro/getting-started.html) em um bloco cercado ` ```mermaid ` e renderizados no cliente pelo site. Diretrizes:
 
 - Use sintaxe Mermaid.js válida — teste no [Mermaid Live Editor](https://mermaid.live/) antes de enviar.
+- **Coloque entre aspas qualquer rótulo de nó que contenha `/`, `(`, `)` ou `:`** — p. ex. escreva `Api["/v1/chat"]`, não `Api[/v1/chat]`. Caracteres especiais sem aspas são interpretados como sintaxe de forma e quebram a renderização.
+- Para quebras de linha dentro de um rótulo, use `<br/>`, não `\n`.
 - **Rotule as arestas** para descrever relacionamentos (não apenas caixas conectadas por setas).
 - Use subgrafos para agrupar componentes relacionados quando os diagramas tiverem 5+ nós.
 - Prefira `flowchart LR` ou `flowchart TD` para arquitetura; `sequenceDiagram` para interações.
 
 ## Traduções
 
-O site é localizado para **espanhol (es), português (pt-BR), alemão (de), francês (fr) e chinês simplificado (zh-Hans)**. O conteúdo padrão está em inglês.
+O conteúdo está disponível em **inglês (en)** e **português (pt-BR)**. O inglês é a fonte da verdade.
 
-Novos artigos são produzidos **apenas em inglês**. As traduções são tratadas em uma fase separada.
+Cada idioma é uma árvore paralela em `content/docs/<lang>/` — não há camada separada de JSON de tradução. Para traduzir uma página:
 
-**Onde ficam os arquivos de tradução:**
+- Espelhe a mesma estrutura de pastas e nome de arquivo entre os idiomas, p. ex.
+  `content/docs/en/agents/index.mdx` ↔ `content/docs/pt-BR/agents/index.mdx`.
+- Traduza o `title` e a `description` do frontmatter e o corpo. Mantenha `tags` idêntico.
+- Cada pasta de idioma tem seu próprio `meta.json`: traduza o `title`, mas mantenha os slugs de `pages` idênticos entre idiomas (slugs são agnósticos de idioma).
+- Mantenha os links internos como `/docs/...` (sem prefixo de locale) — o locale é inferido a partir da pasta.
 
-- **Rótulos de barra lateral e documento:** `i18n/<locale>/docusaurus-plugin-content-docs/current.json` (rótulos de categoria de barra lateral). Os títulos dos documentos vêm do frontmatter de cada documento traduzido em `i18n/<locale>/docusaurus-plugin-content-docs/current/`.
-- **Barra de navegação:** `i18n/<locale>/docusaurus-theme-classic/navbar.json`
-- **Rodapé:** `i18n/<locale>/docusaurus-theme-classic/footer.json`
-- **UI do tema e páginas personalizadas (home, all-topics):** `i18n/<locale>/code.json`
-- **Conteúdo do documento:** Espelhe a árvore `docs/` sob `i18n/<locale>/docusaurus-plugin-content-docs/current/` e traduza cada `.md` (frontmatter `title`, `description` e corpo). Mantenha links internos como `/docs/...` para que funcionem com o prefixo de locale.
-
-**Adicionando uma nova localidade:** Adicione a localidade a `i18n.locales` em `docusaurus.config.ts`, depois execute `npm run write-translations` (opcionalmente com `--locale <locale>`) para gerar a estrutura JSON. Preencha as traduções para barra de navegação, rodapé, `code.json`, barra lateral e conteúdo do documento.
-
-**Quando executar `write-translations`:** Execute `npm run write-translations` ao adicionar novos itens de barra lateral, strings de tema ou chaves de páginas personalizadas para que novas chaves apareçam nos arquivos JSON de cada locale para os tradutores.
+**Adicionando um novo locale:** adicione-o a `languages` em `lib/i18n.ts`, crie a árvore `content/docs/<lang>/` e traduza a copy de UI em `lib/site.ts` (`HOME_COPY`, `FEATURED_CATEGORIES`) além dos componentes de footer e nav do ecossistema.
 
 ## Estilo de código e commits
 
-- Siga a formatação existente (p. ex. 2 espaços, nova linha no final).
-- Use mensagens de commit claras (p. ex. "Add doc: X", "Fix link in Y").
-
-## Versionamento
-
-Quando a base de conteúdo estiver estável, os mantenedores podem executar `npm run docusaurus docs:version 1.0.0` para criar snapshots versionados. O seletor de versão aparecerá na barra de navegação. Veja [Versionamento do Docusaurus](https://docusaurus.io/docs/versioning) para detalhes.
+- Siga a formatação existente (2 espaços, nova linha ao final).
+- Use [Conventional Commits](https://www.conventionalcommits.org/) — p. ex. `docs(agents): add planner-executor`, `fix(mermaid): quote node label`.
 
 ---
 

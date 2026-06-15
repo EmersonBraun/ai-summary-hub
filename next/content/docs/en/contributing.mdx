@@ -66,29 +66,19 @@ Every doc must include this frontmatter block:
 ---
 title: "Full article title"
 description: "One-line description for SEO and search"
-keywords: [keyword1, keyword2, keyword3]
 tags: [intermediate]  # exactly one of: beginner, intermediate, advanced
-authors: [GitHubUsername]  # GitHub username(s) of author(s)
 ---
 ```
 
-**Required fields:**
+**Fields:**
 
-| Field | Description |
-|-------|-------------|
-| `title` | Full article title |
-| `description` | One-line description (used for SEO and search) |
-| `keywords` | Array of relevant keywords |
-| `tags` | Array containing **exactly one** level tag: `beginner`, `intermediate`, or `advanced` |
-| `authors` | Array of GitHub usernames who wrote the article |
+| Field | Required | Description |
+|-------|----------|-------------|
+| `title` | yes | Full article title — also used as the sidebar label and the page `<h1>` |
+| `description` | yes | One-line description (used for SEO, social cards, and search) |
+| `tags` | yes | Array containing **exactly one** level tag: `beginner`, `intermediate`, or `advanced` |
 
-**Optional fields:**
-
-| Field | Description | When to use |
-|-------|-------------|-------------|
-| `sidebar_label` | Short label for the sidebar | Only when the title exceeds ~30 characters |
-
-**Note:** `last_updated` is handled automatically by Docusaurus via git history. Do not add it manually.
+Do not add an `# H1` heading in the body — fumadocs renders the `title` as the page heading automatically. Start the body directly with `## Definition`.
 
 ### Complete template example
 
@@ -96,12 +86,8 @@ authors: [GitHubUsername]  # GitHub username(s) of author(s)
 ---
 title: "Example Topic"
 description: "A brief description of the topic."
-keywords: [topic, example, ai]
 tags: [intermediate]
-authors: [YourGitHubUsername]
 ---
-
-# Example Topic
 
 ## Definition
 
@@ -172,54 +158,61 @@ Explanation with diagram:
 
 ## Adding new topics
 
-1. Create a new file under `docs/` in the right category (e.g. `docs/tools/my-tool.md`).
-2. Use the template above and ensure a unique doc ID (path-based).
+Content lives under `content/docs/<lang>/`, and routing is path-based: the file
+`content/docs/en/tools/my-tool.mdx` is served at `/docs/tools/my-tool`.
+
+1. Create a new `.mdx` file in the right category, e.g. `content/docs/en/tools/my-tool.mdx`.
+2. Use the template above (start the body at `## Definition` — no `# H1`).
 3. Include **all mandatory sections** and relevant optional sections.
-4. Add the doc to `sidebars.ts` in the right category.
-5. If your article includes a **Comparison** to another article, update that article with a reciprocal comparison.
-6. Open a PR with a short description.
+4. Add the file's slug to the category's `meta.json` `pages` array — this controls sidebar order.
+5. **New category?** Create the folder with a `meta.json` (`title` + `pages`, with `index` first) and an `index.mdx` landing page.
+6. If your article includes a **Comparison** to another article, update that article with a reciprocal comparison.
+7. Open a PR with a short description.
+
+A `meta.json` looks like:
+
+```json
+{
+  "title": "Tools",
+  "pages": ["index", "my-tool", "another-tool"]
+}
+```
 
 ## Improving examples
 
 - Prefer runnable code; add comments if dependencies or setup are non-obvious.
-- Use Prism-supported languages (Python, JavaScript, TypeScript, bash, yaml, docker).
+- Use fenced code blocks with a language tag — highlighting is handled by [Shiki](https://shiki.style/) (Python, JavaScript, TypeScript, bash, yaml, json, docker, and more).
 - Link to official docs or repos where relevant.
 
 ## Diagrams (Mermaid)
 
-Diagrams in the docs are written in [Mermaid](https://mermaid.js.org/intro/getting-started.html) and rendered by the site via Docusaurus. Guidelines:
+Diagrams are written in [Mermaid](https://mermaid.js.org/intro/getting-started.html) in a ` ```mermaid ` fenced block and rendered client-side by the site. Guidelines:
 
 - Use valid Mermaid.js syntax — test in the [Mermaid Live Editor](https://mermaid.live/) before submitting.
+- **Quote any node label that contains `/`, `(`, `)`, or `:`** — e.g. write `Api["/v1/chat"]`, not `Api[/v1/chat]`. Unquoted special characters are parsed as shape syntax and break the render.
+- For line breaks inside a label use `<br/>`, not `\n`.
 - **Label edges** to describe relationships (not just boxes connected by arrows).
 - Use subgraphs to group related components when diagrams have 5+ nodes.
 - Prefer `flowchart LR` or `flowchart TD` for architecture; `sequenceDiagram` for interactions.
 
 ## Translations
 
-The site is localized for **Spanish (es), Portuguese (pt-BR), German (de), French (fr), and Simplified Chinese (zh-Hans)**. Default content is in English.
+Content is available in **English (en)** and **Portuguese (pt-BR)**. English is the source of truth.
 
-New articles are produced in **English only**. Translations are handled in a separate phase.
+Each language is a parallel tree under `content/docs/<lang>/` — there is no separate translation-JSON layer. To translate a page:
 
-**Where translation files live:**
+- Mirror the same folder structure and file name across languages, e.g.
+  `content/docs/en/agents/index.mdx` ↔ `content/docs/pt-BR/agents/index.mdx`.
+- Translate the frontmatter `title` and `description` and the body. Keep `tags` identical.
+- Each language folder has its own `meta.json`: translate its `title`, but keep the `pages` slugs identical across languages (slugs are language-agnostic).
+- Keep internal links as `/docs/...` (no locale prefix) — the locale is inferred from the folder.
 
-- **Sidebar and doc labels:** `i18n/<locale>/docusaurus-plugin-content-docs/current.json` (sidebar category labels). Doc titles come from each translated doc's front matter in `i18n/<locale>/docusaurus-plugin-content-docs/current/`.
-- **Navbar:** `i18n/<locale>/docusaurus-theme-classic/navbar.json`
-- **Footer:** `i18n/<locale>/docusaurus-theme-classic/footer.json`
-- **Theme UI and custom pages (home, all-topics):** `i18n/<locale>/code.json`
-- **Doc content:** Mirror the `docs/` tree under `i18n/<locale>/docusaurus-plugin-content-docs/current/` and translate each `.md` (front matter `title`, `description`, and body). Keep internal links as `/docs/...` so they work with the locale prefix.
-
-**Adding a new locale:** Add the locale to `i18n.locales` in `docusaurus.config.ts`, then run `npm run write-translations` (optionally with `--locale <locale>`) to generate the JSON structure. Fill in translations for navbar, footer, `code.json`, sidebar, and doc content.
-
-**When to run `write-translations`:** Run `npm run write-translations` when you add new sidebar items, theme strings, or custom page keys so that new keys appear in each locale's JSON files for translators.
+**Adding a new locale:** add it to `languages` in `lib/i18n.ts`, create the `content/docs/<lang>/` tree, and translate the UI copy in `lib/site.ts` (`HOME_COPY`, `FEATURED_CATEGORIES`) plus the footer and ecosystem nav components.
 
 ## Code style and commits
 
-- Follow existing formatting (e.g. 2 spaces, trailing newline).
-- Use clear commit messages (e.g. "Add doc: X", "Fix link in Y").
-
-## Versioning
-
-When the content baseline is stable, maintainers may run `npm run docusaurus docs:version 1.0.0` to create versioned snapshots. The version selector will appear in the navbar. See [Docusaurus versioning](https://docusaurus.io/docs/versioning) for details.
+- Follow existing formatting (2 spaces, trailing newline).
+- Use [Conventional Commits](https://www.conventionalcommits.org/) — e.g. `docs(agents): add planner-executor`, `fix(mermaid): quote node label`.
 
 ---
 
