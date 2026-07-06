@@ -42,10 +42,10 @@
     "eslint": "^10.6.0",
     "glob": "^13.0.6",
     "gray-matter": "^4.0.3",
-    "markdownlint-cli2": "^0.22.1",
-    "tsx": "^4.22.4",
+    "markdownlint-cli2": "^0.23.0",
+    "tsx": "^4.23.0",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.62.0"
+    "typescript-eslint": "^8.62.1"
   },
   "browserslist": {
     "production": [
