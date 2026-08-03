@@ -38,7 +38,7 @@
     "@docusaurus/module-type-aliases": "3.10.2",
     "@docusaurus/tsconfig": "3.10.2",
     "@docusaurus/types": "3.10.2",
-    "@types/react": "^19.2.17",
+    "@types/react": "^19.2.18",
     "eslint": "^10.8.0",
     "glob": "^13.0.6",
     "gray-matter": "^4.0.3",
