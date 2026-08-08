@@ -14,7 +14,7 @@
     "fumadocs-mdx": "latest",
     "fumadocs-ui": "latest",
     "mermaid": "^11.16.1",
-    "next": "^16.2.11",
+    "next": "^16.3.0",
     "posthog-js": "^1.245.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -26,7 +26,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "postcss": "^8.5.18",
+    "postcss": "^8.5.23",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.6.0"
   }
