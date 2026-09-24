@@ -14,7 +14,7 @@
     "fumadocs-mdx": "latest",
     "fumadocs-ui": "latest",
     "mermaid": "^11.16.1",
-    "next": "^16.2.11",
+    "next": "^16.3.4",
     "posthog-js": "^1.245.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
