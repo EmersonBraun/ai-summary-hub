@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Cloudflare Workers deployment via OpenNext (@opennextjs/cloudflare).
+  // Build + deploy: npm cf:deploy. Vercel keeps using `next build` unchanged.
+  "name": "ai-summary-hub",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-30",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": { "enabled": true },
+  // Guard against runaway invocations (Workers Paid; default would be 30 s).
+  "limits": { "cpu_ms": 5000 }
+}

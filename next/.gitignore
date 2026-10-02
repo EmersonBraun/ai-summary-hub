@@ -5,3 +5,8 @@ out
 .env*.local
 next-env.d.ts
 *.tsbuildinfo
+
+# Cloudflare (OpenNext / wrangler)
+.open-next/
+.wrangler/
+.dev.vars
