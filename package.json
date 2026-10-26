@@ -39,13 +39,13 @@
     "@docusaurus/tsconfig": "3.10.2",
     "@docusaurus/types": "3.10.2",
     "@types/react": "^19.3.0",
-    "eslint": "^10.12.0",
+    "eslint": "^10.13.0",
     "glob": "^13.0.6",
     "gray-matter": "^4.0.3",
-    "markdownlint-cli2": "^0.23.3",
+    "markdownlint-cli2": "^0.24.0",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.71.2"
+    "typescript-eslint": "^8.72.0"
   },
   "browserslist": {
     "production": [
